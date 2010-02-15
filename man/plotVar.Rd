@@ -7,6 +7,7 @@
 \alias{plotVar.plsda}
 \alias{plotVar.splsda}
 \alias{plotVar.pca}
+\alias{plotVar.spca}
 
 \title{Plot of Variables}
 
@@ -32,7 +33,10 @@ This function provides variables representation for (regularized) CCA, (sparse) 
         X.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
 
 \method{plotVar}{pca}(object, comp = 1:2, rad.in = 0.5, 
-        var.label = FALSE, \ldots)	
+        var.label = FALSE, \ldots)
+
+\method{plotVar}{spca}(object, comp = 1:2, rad.in = 0.5, 
+        var.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)	
 }
 
 \arguments{

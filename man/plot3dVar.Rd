@@ -7,6 +7,7 @@
 \alias{plot3dVar.plsda}
 \alias{plot3dVar.splsda}
 \alias{plot3dVar.pca}
+\alias{plot3dVar.spca}
 
 \title{Plot of Variables in three dimensions}
 
@@ -46,10 +47,19 @@ This function provides variables representation in three dimensions for
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)	 
 		  
-\method{plot3dVar}{pca}(object, comp = 1:3, var.label = FALSE,
+\method{plot3dVar}{pca}(object, comp = 1:3, rad.in = 1, 
+	  var.label = FALSE,
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
+
+\method{plot3dVar}{spca}(object, comp = 1:3, rad.in = 1, 
+          var.label = FALSE, 
+          pch = NULL, cex = NULL, col = NULL, font = NULL, 
+          axes.box = "all", label.axes.box = "both",		
+          xlab = NULL, ylab = NULL, zlab = NULL, \ldots)	 
+		  
+
 }
 
 \arguments{

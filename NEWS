@@ -1,3 +1,14 @@
+Changes in 2.9-4
+================
+
+New features:
+-------------
+- PCA has been modified to run either SVD (no missing values) or NIPALS (missing values)
+
+- print.pca has been added to display the results of PCA
+
+- pcatune has been added to guide the choice of the number of principal components
+
 
 Changes in 2.9-1
 ================

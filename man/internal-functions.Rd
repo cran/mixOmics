@@ -3,8 +3,9 @@
 \alias{bin.color}
 \alias{loo}
 \alias{Mfold}
+\alias{pcasvd}
 
-\title{Regularized CCA Internal Functions}
+\title{Internal Functions in mixOmics}
 
 \description{
 Internal functions not to be used by the user.

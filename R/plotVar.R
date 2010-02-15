@@ -565,13 +565,13 @@ function(object,
     #------------------------#
         keep.X = apply(abs(object$loadings$X), 1, sum) > 0
 
-        if (object$mode == "canonical") {
+##        if (object$mode == "canonical") {
+##            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
+##                     use = "pairwise")
+##        }else{
             cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
                      use = "pairwise")
-        }else{
-            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
-                     use = "pairwise")
-        }
+##        }
 
     p = ncol(object$X)
 
@@ -903,6 +903,163 @@ function(object,
     par(def.par)  
 }
 
+
+# -------------------------------- sPCA ----------------------------------------
+plotVar.spca <- 
+function(object, 
+         comp = 1:2, 
+         rad.in = 0.5, 
+         var.label = FALSE, 
+         pch = NULL, 
+         cex = NULL, 
+         col = NULL, 
+         font = NULL,
+	 ...) 
+{
+
+    # validation des arguments #
+    #--------------------------#
+    if (length(comp) != 2)
+        stop("'comp' must be a numeric vector of length 2.")
+
+    if (!is.numeric(comp) || any(comp < 1))
+        stop("invalid vector for 'comp'.")
+		
+    if (any(comp > object$ncomp)) 
+        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+
+    comp1 = round(comp[1])
+    comp2 = round(comp[2])
+
+
+    # calcul des coordonnées #
+    #------------------------#
+        keep.X = apply(abs(object$rotation), 1, sum) > 0
+
+
+            cord.X = cor(object$X[, keep.X], object$x[, c(comp1, comp2)], 
+                     use = "pairwise")
+
+    p = ncol(object$X)
+
+    # le plot des variables #
+    #-----------------------#
+    if (length(var.label) > 1 & length(var.label) != p)
+        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
+
+    if (is.null(pch)) {
+        pch = list(rep(16, p))
+
+    }
+    else {
+        if (is.list(pch)) {
+            if (length(pch[[1]]) != p) 
+                stop("'pch' must be a vector of length 1 or a vector of length ", p)
+        }
+
+        else { 
+            if (length(pch) == 2) { 
+                pch = list(rep(pch[1], p))
+
+            }
+            else {
+                stop("'pch' must be a vector of length 1 or a vector of length ", p)
+
+            }
+        }
+    }
+
+
+    if (is.null(cex)) {
+        cex = list(rep(1, p))
+    }
+    else {
+        if (is.list(cex)) {
+            if (length(cex[[1]]) != p) 
+                stop("'cex' must be a vector of length 1 or a vector of length ", p)
+        }
+        else { 
+            if (length(cex) == 1) { 
+                cex = list(rep(cex[1], p))
+
+                }
+            else {
+                    stop("'cex' must be a vector of length 1 or a vector of length ", p)
+
+            }
+        }
+    }
+
+    if (is.null(col)) {
+        col = list(rep("red", p))
+    }
+    else {
+        if (is.list(col)) {
+            if (length(col[[1]]) != p) 
+                stop("'col' must be a vector of length 1 or a vector of length ", p)
+        }
+
+        else { 
+            if (length(col) == 1) { 
+                col = list(rep(col[1], p))
+            }
+            else {
+                stop("'col' must be a vector of length 1 or a vector of length ", p)
+            }
+        }
+    }
+
+    if (is.null(font)) {
+        font = list(rep(2, p))
+    }
+    else {
+        if (is.list(font)) {
+            if (length(font[[1]]) != p) 
+                stop("'font' must be a vector of length 1 or a vector of length ", p)
+        }
+        else { 
+            if (length(font) == 1) { 
+                font = list(rep(font[1], p))
+            }
+            else {
+                stop("'font' must be a vector of length 1 or a vector of length ", p)
+            }
+        }
+    }
+
+        pch[[1]] = pch[[1]][keep.X]
+        col[[1]] = col[[1]][keep.X]
+        cex[[1]] = cex[[1]][keep.X]
+        font[[1]] = font[[1]][keep.X]
+
+    def.par = par(no.readonly = TRUE)
+
+    if (isTRUE(var.label)) var.label = object$names$X
+
+    if (length(var.label) == p) var.label = var.label[keep.X]
+
+    par(pty = "s")
+    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
+         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
+
+    if (length(var.label) > 1) {
+        text(cord.X[, 1], cord.X[, 2], var.label, col = col[[1]], 
+             font = font[[1]], cex = cex[[1]])
+    }
+    else {
+        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
+               cex = cex[[1]], col = col[[1]])
+    }
+
+    abline(v = 0, h = 0)
+    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
+    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
+          rad.in * sin(seq(0, 2 * pi, l = 100)))
+  
+    par(def.par)  
+}
+
+
 # ------------------------------ PCA object ------------------------------------
 plotVar.pca <-
 function(object, 
@@ -915,17 +1072,24 @@ function(object,
     # validation des arguments #
     #--------------------------#
     if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 3.")
+        stop("'comp' must be a numeric vector of length 2.")
 
     if (!is.numeric(comp) || any(comp < 1))
         stop("invalid vector for 'comp'.")
 
-    p = ncol(object$rotation)
+#    p = ncol(object$rotation)
 	q = nrow(object$rotation)
 	
-    if (any(comp > p)) 
-        stop("the elements of 'comp' must be smaller or equal than ", p, ".")
-    comp = round(comp)
+    if (any(comp > object$ncomp)) 
+        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+
+    comp1 = round(comp[1])
+    comp2 = round(comp[2])
+
+
+#    if (any(comp > p)) 
+#        stop("the elements of 'comp' must be smaller or equal than ", p, ".")
+#    comp = round(comp)
 	
     if (is.logical(var.label)) {
         if (isTRUE(var.label)) var.label = rownames(object$rotation)
@@ -938,7 +1102,9 @@ function(object,
 	
     # calcul des coordonnées #
     #------------------------#
-    cord.X = object$rotation[, comp] 
+##    cord.X = object$x[, comp] 
+      cord.X = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
+
 
     # le plot des variables #
     #-----------------------#
@@ -962,3 +1128,6 @@ function(object,
   
     par(def.par)  
 }
+
+
+

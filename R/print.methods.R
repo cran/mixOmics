@@ -3,6 +3,9 @@
 # Ignacio González, Genopole Toulouse Midi-Pyrenees, France
 # Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+# Leigh Coonan, Student, University of Queensland, Australia
+# Fangzhou Yao, Student, University of Queensland, Australia
+
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -228,3 +231,60 @@ function(x, ...)
 
     }  #end rcc
 }
+
+
+# ------------------------ print for pca --------------------------------
+print.pca <- function(x, ...) {
+    
+ 
+    per.var = as.vector(x$sdev/sum(x$sdev))
+    cum.var=as.vector(cumsum(per.var))
+    x$sdev=as.vector(x$sdev)
+    names(x$sdev) = paste("PC", 1:length(x$sdev), sep = "")
+    names(per.var) = paste("PC", 1:length(per.var), sep = "")
+    names(cum.var) = paste("PC", 1:length(cum.var), sep = "")
+    
+
+    cat("Eigenvalues for the first ", x$ncomp, "principal components:", "\n")
+    print(x$sdev[1:x$ncomp])
+    cat("\n")
+    
+    
+    if(!x$NA.X) {
+        cat("Proportion of explained variance for the first ", x$ncomp, "principal components:", "\n")
+        print(per.var[1:x$ncomp])
+        cat("\n")
+
+        cat("Cumulative proportion explained variance for the first ", x$ncomp, "principal components:", "\n")
+        print(cum.var[1:x$ncomp])
+        cat("\n")
+
+        cat(" Other available components: \n", "-------------------- \n")
+        cat(" loading vectors: see object$rotation \n")
+    }
+}
+
+# ------------------------ print for spca -------------------------
+print.spca <-
+function(x, ...) 
+{
+
+#    mode = paste("'", x$mode, "'", sep = "")
+	
+    cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
+	
+    cat(" sparse pCA with", x$ncomp, "principal components. \n")
+    cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
+
+    cat(" Selection of", x$keepX, "variables on each of the principal components on the X data set. \n")
+
+    cat(" Available components: \n", 
+        "-------------------- \n")
+	
+    cat(" loading vectors: see object$rotation \n")
+    cat(" principal components: see object$x \n")
+    cat(" cumulative explained variance: see object$varX \n")
+    cat(" variable names: see object$names \n")
+
+}
+

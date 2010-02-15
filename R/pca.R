@@ -3,6 +3,8 @@
 # Ignacio González, Genopole Toulouse Midi-Pyrenees, France
 # Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+# Leigh Coonan, Student, University of Quuensland, Australia
+# Fangzhou Yao, Student, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -20,66 +22,101 @@
 
 
 pca <-
-function(x, 
-         ncomp = NULL,
-         retx = TRUE, 
+function(X, 
+         ncomp = 3,
+#         retx = TRUE, 
          center = TRUE, 
          scale. = FALSE, 
          comp.tol = NULL,
          max.iter = 500, 
          tol = 1e-09) 
 {
-    x = as.matrix(x)
-	
-    x.names = dimnames(x)[[2]]
-    if (is.null(x.names)) x.names = paste("X", 1:ncol(x), sep = "")
 
-    ind.names = dimnames(x)[[1]]
-    if (is.null(ind.names)) ind.names = 1:nrow(x)
+    retx  =TRUE  # to return pc's
+    X = as.matrix(X)
 	
-    x = scale(x, center = center, scale = scale.)
-    cen = attr(x, "scaled:center")
-    sc = attr(x, "scaled:scale")
+    X.names = dimnames(X)[[2]]
+    if (is.null(X.names)) X.names = paste("X", 1:ncol(X), sep = "")
+
+    ind.names = dimnames(X)[[1]]
+    if (is.null(ind.names)) ind.names = 1:nrow(X)
+	
+    X = scale(X, center = center, scale = scale.)
+    cen = attr(X, "scaled:center")
+    sc = attr(X, "scaled:scale")
     if (any(sc == 0)) 
         stop("cannot rescale a constant/zero column to unit variance.")
 
+## added warning
+    if (ncomp > min(ncol(X),nrow(X))) {
+        stop("Use smaller 'ncomp'")
+    }
+
+    is.na.X = is.na(X)
+    na.X = FALSE
+    if (any(is.na.X)) na.X = TRUE
+    NA.X = any(is.na.X)       
+
     if (is.null(ncomp)) {
-        comp = 1
-        rank.old = 0
-        repeat {
-            s = nipals(x, ncomp = comp, reconst = TRUE, max.iter = max.iter, tol = tol)
-            rank = sum(s$eig > (s$eig[1L] * .Machine$double.eps))
+        ncomp = min(nrow(X),ncol(X))
+    }
+# REMOVED 16-2-11 the estimation of the rank (too long or crashes when p >> n)
+#        comp = 1
+#        rank.old = 0
+#        repeat {
+#            s = nipals(x, ncomp = comp, reconst = TRUE, max.iter = max.iter, tol = tol)
+#            rank = sum(s$eig > (s$eig[1L] * .Machine$double.eps))
+#
+#            if ((rank - rank.old) == 0) break
+#            comp = comp + 1
+#
+#            if (comp > (ncol(x) - 1)) break	
+#            rank.old = rank			
+#        }
+#		ncomp = comp
+#    }
+ 
 
-            if ((rank - rank.old) == 0) break
-            comp = comp + 1
-
-            if (comp > (ncol(x) - 1)) break	
-            rank.old = rank			
-        }
-		ncomp = comp
-    }
-    else {
-        s = nipals(x, ncomp = ncomp, reconst = retx, max.iter = max.iter, tol = tol)
-    }
-	
-    s$eig = s$eig/sqrt(max(1, nrow(x) - 1))
-    if (!is.null(comp.tol)) {
-        rank = sum(s$eig > (s$eig[1L] * comp.tol))
-        if (rank < ncol(x)) {
-            s$p = s$p[, 1L:rank, drop = FALSE]
-            s$eig = s$eig[1L:rank]
-        }
-    }
-	
-    dimnames(s$p) = list(x.names, paste("PC", 1:ncol(s$p), sep = ""))
-    r = list(ncomp = ncomp, sdev = s$eig, rotation = s$p, center = if (is.null(cen)) FALSE else cen, 
+# If there are missing values use NIPALS agorithm
+    if(na.X){
+        result = nipals(X, ncomp = ncomp, reconst = retx, max.iter = max.iter, tol = tol)
+        result$eig = (result$eig/sqrt(max(1, nrow(X) - 1)))^2
+        result$rotation = result$p
+ 
+  
+    dimnames(result$rotation) = list(X.names, paste("PC", 1:ncol(result$rotation), sep = ""))
+    dimnames(result$p) = list(X.names, paste("PC", 1:ncol(result$p), sep = ""))
+    r = list(X = X, ncomp = ncomp, NA.X = NA.X, sdev = result$eig, rotation = result$rotation, center = if (is.null(cen)) FALSE else cen, 
              scale = if (is.null(sc)) FALSE else sc)
-			 
+
     if (retx) {
-        r$x = s$rec %*% s$p
-        dimnames(r$x) = list(ind.names, paste("X", 1:ncol(s$p), sep = ""))
+        r$x = result$rec %*% result$p
+        dimnames(r$x) = list(ind.names, paste("X", 1:ncol(result$p), sep = ""))
     }
-	
+
+
+    }
+# If data is complete use PCASVD, singular value decomposition
+    if(!na.X){
+        result = pcasvd(X, ncomp=ncomp, center=center, scale.=scale.)
+        result$eig = (result$sdev^2)
+
+# REMOVED 16-2-11 rank estimation (too long or crashes when p>>n)
+#    if (!is.null(comp.tol)) {
+#        rank = sum(s$eig > (s$eig[1L] * comp.tol))
+#        if (rank < ncol(x)) {
+#            s$p = s$p[, 1L:rank, drop = FALSE]
+#            s$eig = s$eig[1L:rank]
+
+    dimnames(result$rotation) = list(X.names, paste("PC", 1:ncol(result$rotation), sep = ""))
+    r = list(X = X, ncomp = ncomp, NA.X = NA.X, sdev = (result$eig), rotation = (result$rotation), center = if (is.null(cen)) FALSE else cen, 
+             scale = if (is.null(sc)) FALSE else sc)
+    if (retx){
+        r$x = X %*% result$rotation
+        dimnames(r$x) = list(ind.names, paste("X", 1:ncol(result$rotation), sep = ""))
+    }
+    }
+
     class(r) = c("pca", "prcomp")
     return(invisible(r))
 }

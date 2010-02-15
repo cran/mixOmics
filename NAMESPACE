@@ -12,6 +12,8 @@ Mfold,
 network,
 nipals, 
 pca,
+pcatune,
+pcasvd,
 plot3dIndiv, 
 plot3dVar,
 plotIndiv, 
@@ -23,6 +25,7 @@ scatterutil.base,
 scatterutil.eti, 
 scatterutil.grid, 
 s.match,
+spca,
 spls,
 splsda,
 unmap, 
@@ -38,6 +41,7 @@ S3method(image, estim.regul)
 
 S3method(plot, rcc)
 S3method(plot, valid)
+S3method(plot, pca)
 
 S3method(plotIndiv, pls)
 S3method(plotIndiv, spls)
@@ -52,6 +56,7 @@ S3method(plotVar, plsda)
 S3method(plotVar, splsda)
 S3method(plotVar, rcc)
 S3method(plotVar, pca)
+S3method(plotVar, spca)
 
 S3method(predict, pls)
 S3method(predict, spls)
@@ -68,6 +73,8 @@ S3method(print, plsda)
 S3method(print, splsda)
 S3method(print, rcc)
 S3method(print, summary)
+S3method(print, pca)
+S3method(print, spca)
 
 S3method(plot3dIndiv, pls)
 S3method(plot3dIndiv, spls)
@@ -82,6 +89,7 @@ S3method(plot3dVar, rcc)
 S3method(plot3dVar, pca)
 S3method(plot3dVar, plsda)
 S3method(plot3dVar, splsda)
+S3method(plot3dVar, spca)
 
 
 S3method(network, default)

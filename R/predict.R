@@ -254,7 +254,13 @@ function(object, newdata, method = c("max.dist", "class.dist", "centroids.dist",
     rownames(Y.hat) = rownames(newdata)
     colnames(Y.hat) = colnames(Y)
     colnames(G) = paste("dim", c(1:ncomp), sep = " ")
-    colnames(cl) = paste(rep("comp", ncomp), 1:ncomp, sep = " ")
+    # KA: added a !is.null(dim(cl) for loocv
+    if(!is.null(dim(cl))) {
+	colnames(cl) = paste(rep("comp", ncomp), 1:ncomp, sep = " ")
+	}
+	else {
+		names(cl) = paste(rep("comp", ncomp), 1:ncomp, sep = " ")
+	}
      
     return(invisible(list(predict = Y.hat, variates = t.pred, B.hat = B.hat, 
 		                  centroids = G, method = method, class = cl)))
