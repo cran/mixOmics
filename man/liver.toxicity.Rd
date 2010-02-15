@@ -1,0 +1,58 @@
+\name{liver.toxicity}
+\encoding{latin1}
+\alias{liver.toxicity}
+
+\docType{data}
+
+\title{Liver Toxicity Data}
+
+\description{
+This data set contains the expression measure of 3116 
+genes and 10 clinical measurements for 64 subjects (rats) that were 
+exposed to non-toxic, moderately toxic or severely toxic doses of acetaminophen
+in a controlled experiment.
+}
+
+\usage{data(liver.toxicity)}
+
+\format{
+A list containing the following components:
+  \describe{
+    \item{\code{gene}}{data frame with 64 rows and 3116 columns. 
+		The expression measure of 3116 genes for the 64 subjects (rats).}
+    \item{\code{clinic}}{data frame with 64 rows and 10 columns, 
+		containing 10 clinical variables for the same 64 subjects.}
+	\item{\code{treatment}}{data frame with 64 rows and 4 columns, 
+		containing information on the treatment of the 64 subjects, 
+		such as doses of acetaminophen and times of necropsies.}
+  }
+}
+
+\details{
+The data come from a liver toxicity study (Heinloth et al., 2004) in which
+4 male rats of the inbred strain Fisher 344 were exposed to non-toxic (50 or
+150 mg/kg), moderately toxic (1500 mg/kg) or severely toxic (2000 mg/kg)
+doses of acetaminophen (paracetamol) in a controlled experiment. Necropsies
+were performed at 6, 18, 24 and 48 hours after exposure and the mRNA
+from the liver was extracted. Ten clinical chemistry measurements of variables
+containing markers for liver injury are available for each subject and the
+serum enzymes levels are measured numerically. The data were further normalized 
+and pre-processed by Bushel \emph{et al}. (2007).
+}
+
+\references{
+Heinloth, A., Irwin, R., Boorman, G., Nettesheim, P., Fannin, R., Sieber,
+S., Snell, M., Tucker, C., Li, L., Travlos, G., et al. (2004). Gene Expression Profiling 
+of Rat Livers Reveals Indicators of Potential Adverse Effects.
+\emph{Toxicological Sciences} \bold{80}(1), 193-202.
+
+Bushel, P., Wolfinger, R. D. and Gibson, G. (2007). Simultaneous clustering of gene 
+expression data with clinical chemistry and pathological evaluations reveals 
+phenotypic prototypes. \emph{BMC Systems Biology} \bold{1}, Number 15.
+
+Lê Cao, K.-A., Rossouw, D., Robert-Granié, C. and Besse, P. (2008). A sparse PLS for variable 
+selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular 
+Biology} \bold{7}, article 35.
+}
+
+\keyword{datasets}

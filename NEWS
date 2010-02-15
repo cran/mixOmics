@@ -1,0 +1,22 @@
+Changes in 2.6-0
+================
+
+New features:
+-------------
+- former R package integrOmics has been renamed mixOmics
+
+- in functions plotIndiv(), plotVar(), cim(), network() the arguments 'dim1', 'dim2', 'ncomp' were replaced by 'comp', a vector of length 2 (by default 'comp = 1:2')
+
+- network() has a new argument 'alpha'
+
+User-visible changes:
+---------------------
+
+
+Bug fixes:
+----------
+
+
+Internal changes:
+-----------------
+
