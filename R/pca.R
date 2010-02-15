@@ -21,34 +21,65 @@
 
 pca <-
 function(x, 
-         ncomp = ncol(x),
+         ncomp = NULL,
          retx = TRUE, 
          center = TRUE, 
          scale. = FALSE, 
-         tol = NULL) 
+         comp.tol = NULL,
+         max.iter = 500, 
+         tol = 1e-09) 
 {
     x = as.matrix(x)
+	
+    x.names = dimnames(x)[[2]]
+    if (is.null(x.names)) x.names = paste("X", 1:ncol(x), sep = "")
+
+    ind.names = dimnames(x)[[1]]
+    if (is.null(ind.names)) ind.names = 1:nrow(x)
+	
     x = scale(x, center = center, scale = scale.)
     cen = attr(x, "scaled:center")
     sc = attr(x, "scaled:scale")
     if (any(sc == 0)) 
         stop("cannot rescale a constant/zero column to unit variance.")
 
-    s = nipals(x, ncomp = ncomp, reconst = TRUE, max.iter = 500, tol = 1e-09)
+    if (is.null(ncomp)) {
+        comp = 1
+        rank.old = 0
+        repeat {
+            s = nipals(x, ncomp = comp, reconst = TRUE, max.iter = max.iter, tol = tol)
+            rank = sum(s$eig > (s$eig[1L] * .Machine$double.eps))
+
+            if ((rank - rank.old) == 0) break
+            comp = comp + 1
+
+            if (comp > (ncol(x) - 1)) break	
+            rank.old = rank			
+        }
+		ncomp = comp
+    }
+    else {
+        s = nipals(x, ncomp = ncomp, reconst = retx, max.iter = max.iter, tol = tol)
+    }
+	
     s$eig = s$eig/sqrt(max(1, nrow(x) - 1))
-    if (!is.null(tol)) {
-        rank = sum(s$eig > (s$eig[1L] * tol))
+    if (!is.null(comp.tol)) {
+        rank = sum(s$eig > (s$eig[1L] * comp.tol))
         if (rank < ncol(x)) {
             s$p = s$p[, 1L:rank, drop = FALSE]
             s$eig = s$eig[1L:rank]
         }
     }
 	
-    dimnames(s$p) = list(colnames(x), paste("PC", seq_len(ncol(s$p)), sep = ""))
-    r = list(sdev = s$eig, rotation = s$p, center = if (is.null(cen)) FALSE else cen, 
+    dimnames(s$p) = list(x.names, paste("PC", 1:ncol(s$p), sep = ""))
+    r = list(ncomp = ncomp, sdev = s$eig, rotation = s$p, center = if (is.null(cen)) FALSE else cen, 
              scale = if (is.null(sc)) FALSE else sc)
-    if (retx) 
+			 
+    if (retx) {
         r$x = s$rec %*% s$p
+        dimnames(r$x) = list(ind.names, paste("X", 1:ncol(s$p), sep = ""))
+    }
+	
     class(r) = c("pca", "prcomp")
-    r
+    return(invisible(r))
 }

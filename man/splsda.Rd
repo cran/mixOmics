@@ -9,34 +9,36 @@ embeds variable selection for this purpose.
 }
 
 \usage{
-splsda(X, Y, ncomp = 2, keepX = c(rep(ncol(X), ncomp)), max.iter = 500, scaleY =TRUE, mode = 'regression', tol = 1e-06)
+splsda(X, Y, ncomp = 2, keepX = c(rep(ncol(X), ncomp)), max.iter = 500, 
+       mode = 'regression', tol = 1e-06, ...)
 }	
 
 \arguments{
   \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
-  \item{Y}{a factor or or a class vector for the discrete outcome.}
+  \item{Y}{a factor or a class vector for the discrete outcome.}
   \item{ncomp}{the number of components to include in the model (see Details).}
   \item{keepX}{numeric vector of length \code{ncomp}, the number of variables
     to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
   \item{max.iter}{integer, the maximum number of iterations.}   
-  \item{scaleY}{logical, indicates if Y should be scaled or not.}
   \item{mode}{indicates the mode of analysis.
   It can be either 'regression', 'classic' or 'invariant'}
   \item{tol}{a positive real, the tolerance used in the iterative algorithm.} 
+  \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 
 \details{
-\code{splsda} function fit sPLS models with \eqn{1, \ldots ,}\code{ncomp} components
-to the indicator matrix \code{Y}. If a factor is supplied, the appropriate indicator 
+\code{splsda} function fit sPLS models with \eqn{1,...,}\code{ncomp} components
+to the factor or class vector \code{Y}. The appropriate indicator 
 matrix is created.
 }
 
 \value{
-\code{splsda} returns an object of class \code{"spls"}, a list 
+\code{splsda} returns an object of class \code{"splsda"}, a list 
 that contains the following components:
 
   \item{X}{the centered and standardized original predictor matrix.}
-  \item{Y}{the indicator matrix.}
+  \item{Y}{the centered and standardized indicator response vector or matrix.}
+  \item{ind.mat}{the indicator matrix.}
   \item{ncomp}{the number of components included in the model.}
   \item{keepX}{number of X variables kept in the model on each component.}
   \item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
@@ -44,6 +46,7 @@ that contains the following components:
   \item{loadings}{list containing the estimated loadings for the \code{X} and 
 	\code{Y} variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
+  \item{nzv}{list containing the zero- or near-zero predictors information.}
 }
 
 \references{
@@ -83,7 +86,7 @@ In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N
 # First example
 data(breast.tumors)
 X <- breast.tumors$gene.exp
-Y <- as.factor(breast.tumors$sample$treatment)
+Y <- breast.tumors$sample$treatment
 
 res <- splsda(X, Y, ncomp = 2, keepX = c(25, 25))
 palette(c("red", "blue"))
@@ -96,11 +99,10 @@ palette("default")
 
 # Second example
 data(liver.toxicity)
-X = as.matrix(liver.toxicity$gene)
-Y = as.factor(liver.toxicity$treatment[,4])
-ncomp = 2
-keepX = 20
-splsda.liver = splsda(X, Y, ncomp = ncomp, keepX = c(rep(keepX, ncomp)),  mode = 'regression')
+X <- as.matrix(liver.toxicity$gene)
+Y <- liver.toxicity$treatment[, 4]
+
+splsda.liver = splsda(X, Y, ncomp = 2, keepX = c(20, 20))
 col = as.numeric(Y)
 plotIndiv(splsda.liver, col = col)
 }

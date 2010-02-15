@@ -51,7 +51,7 @@ function(X,
     if (is.null(X.names)) X.names = paste("X", 1:p, sep = "")
      
     Y.names = dimnames(Y)[[2]]
-    if (is.null(X.names)) Y.names = paste("Y", 1:q, sep = "")
+    if (is.null(Y.names)) Y.names = paste("Y", 1:q, sep = "")
     ind.names = dimnames(X)[[1]]
      
     if (is.null(ind.names)) ind.names = dimnames(Y)[[1]]

@@ -26,33 +26,37 @@ function(X,
          ncomp = 2, 
 		 keepX = c(rep(ncol(X), ncomp)),
          max.iter = 500,
-         scaleY = TRUE,
          mode = "regression",		 
-         tol = 1e-06)
+         tol = 1e-06,
+         ...)
 {
-	#-- validation des arguments --#
+    #-- validation des arguments --#
     if (length(dim(X)) != 2 || !is.numeric(X)) 
         stop("'X' must be a numeric matrix.")
-     
-    n = nrow(X)
      
     if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0)
         stop("invalid number of variates, 'ncomp'.")
 		
-	# / Testing input Y
-	if(is.null(dim(Y))){			
-			if(is.factor(Y)){
-				Yprim = unmap(as.numeric(Y))					
-				}else {stop(" Y should be a factor, please use 'as.factor(Y)' ")						
-			}
-	}	
-	# \ Testing input Y
+    # / Testing the input Y
+    if (is.null(dim(Y))) {
+        Y = as.factor(Y)	
+        ind.mat = unmap(as.numeric(Y))					
+    }
+    else {
+        stop("'Y' should be a factor or a class vector.")						
+    }		
+    # \ Testing input Y
+	
+    n = nrow(X)
+     
+    if ((n != nrow(ind.mat))) 
+        stop("unequal number of rows in 'X' and 'Y'.")
 
-	result = spls(X, Yprim, ncomp = ncomp, mode = "regression", keepX = keepX, max.iter = max.iter, 
-                 tol = tol, scaleY = scaleY)
+    result = spls(X, ind.mat, ncomp = ncomp, mode = mode, keepX = keepX, 
+                  max.iter = max.iter, tol = tol, ...)
 
-	result$Yprim = Yprim
-	result$names$Y = levels(Y)
+    result$ind.mat = ind.mat
+    result$names$Y = levels(Y)
     class(result) = "splsda"
     return(invisible(result))	
 }

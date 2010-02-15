@@ -12,7 +12,7 @@ in a one-step strategy.
 \usage{
 spls(X, Y, ncomp = 2, mode = c("regression", "canonical"),
      max.iter = 500, tol = 1e-06, keepX = c(rep(ncol(X), ncomp)), 
-     keepY = c(rep(ncol(Y), ncomp)), scaleY = TRUE)
+     keepY = c(rep(ncol(Y), ncomp)), ...)
 }	
 
 \arguments{
@@ -29,7 +29,7 @@ spls(X, Y, ncomp = 2, mode = c("regression", "canonical"),
     to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
   \item{keepY}{numeric vector of length \code{ncomp}, the number of variables
     to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
-  \item{scaleY}{should the Y data be scaled ?}
+  \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 
 \details{
@@ -62,6 +62,7 @@ that contains the following components:
   \item{loadings}{list containing the estimated loadings for the \code{X} and 
 	\code{Y} variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
+  \item{nzv}{list containing the zero- or near-zero predictors information.}
 }
 
 \references{

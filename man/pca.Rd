@@ -10,15 +10,18 @@ by using the nipals algorithm.
 }
 
 \usage{
-pca(x, ncomp = ncol(x), retx = TRUE, 
-    center = TRUE, scale. = FALSE, tol = NULL)
+pca(x, ncomp = NULL, retx = TRUE, 
+    center = TRUE, scale. = FALSE, 
+    comp.tol = NULL, max.iter = 500, 
+    tol = 1e-09)
 }
 
 \arguments{
   \item{x}{a numeric matrix (or data frame) which provides the 
     data for the principal components analysis. It can contain missing values.}
   \item{ncomp}{integer, the number of components to keep to perform the 
-	reconstitution of the data using the nipals algorithm. If missing \code{ncomp=ncol(X)}.}	
+	reconstitution of the data using the nipals algorithm. If \code{NULL}, 
+    a criterion of stop is given.}	
   \item{retx}{a logical value indicating whether the rotated variables should be returned.} 
   \item{center}{a logical value indicating whether the variables should be shifted to be zero centered. 
     Alternately, a vector of length equal the number of columns of \code{x} can be supplied. 
@@ -27,7 +30,9 @@ pca(x, ncomp = ncol(x), retx = TRUE,
     unit variance before the analysis takes place. The default is FALSE for consistency with \code{prcomp} 
     function, but in general scaling is advisable. Alternatively, a vector of length equal the number of 
     columns of \code{x} can be supplied. The value is passed to \code{\link{scale}}.} 
-  \item{tol}{a value indicating the magnitude below which components should be omitted.} 
+  \item{comp.tol}{a value indicating the magnitude below which components should be omitted.} 
+  \item{max.iter}{integer, the maximum number of iterations in the nipals algorithm.}
+  \item{tol}{a positive real, the tolerance used in the nipals algorithm.}
 }
 
 \details{
@@ -35,11 +40,11 @@ The calculation is done by a singular value decomposition of the (centered and p
 by using the nipals algorithm. Unlike \code{\link{princomp}}, the print method for these objects prints the 
 results in a nice format and the \code{plot} method produces a scree plot.
 
-Note that \code{scale = TRUE} cannot be used if there are zero or constant (for \code{center = TRUE}) variables. 
+Note that \code{scale. = TRUE} cannot be used if there are zero or constant (for \code{center = TRUE}) variables. 
  
-Components are omitted if their standard deviations are less than or equal to \code{tol} times 
+Components are omitted if their standard deviations are less than or equal to \code{comp.tol} times 
 the standard deviation of the first component. With the default null setting, no components are omitted. 
-Other settings for tol could be \code{tol = 0} or \code{tol = sqrt(.Machine$double.eps)}, 
+Other settings for \code{comp.tol} could be \code{comp.tol = 0} or \code{comp.tol = sqrt(.Machine$double.eps)}, 
 which would omit essentially constant components.
 }    
 

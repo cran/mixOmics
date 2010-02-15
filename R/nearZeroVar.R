@@ -2,11 +2,8 @@
 # Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
 # Ignacio González, Genopole Toulouse Midi-Pyrenees, France
 # Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
-# Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
-# Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
+# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #
-# This function was borrowed from the mclust package
-#  
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -22,15 +19,27 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-map <-
-function (Y, ...) 
+nearZeroVar <- 
+function (x, freqCut = 95/5, uniqueCut = 10) 
 {
-    nrowY <- nrow(Y)
-    cl <- numeric(nrowY)
-    I <- 1:nrowY
-    J <- 1:ncol(Y)
-    for (i in I) {
-        cl[i] <- (J[Y[i, ] == max(Y[i, ])])[1]
-    }
-    cl
+    if (is.vector(x)) 
+        x = matrix(x, ncol = 1)
+    freqRatio = apply(x, 2, function(data) {
+        t = table(data[!is.na(data)])
+        if (length(t) <= 1) {
+            return(0)
+        }
+        w = which.max(t)
+        return(max(t, na.rm = TRUE)/max(t[-w], na.rm = TRUE))
+    })
+    lunique = apply(x, 2, function(data) length(unique(data[!is.na(data)])))
+    percentUnique = 100 * lunique/apply(x, 2, length)
+    zeroVar = (lunique == 1) | apply(x, 2, function(data) all(is.na(data)))
+	
+    out = list()
+	out$Position = which((freqRatio > freqCut & percentUnique <= uniqueCut) | zeroVar)
+	names(out$Position) = NULL
+    out$Metrics = data.frame(freqRatio = freqRatio, percentUnique = percentUnique)
+    out$Metrics = out$Metrics[out$Position, ]
+    out
 }

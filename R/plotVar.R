@@ -19,22 +19,21 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#----------------------------------------------#
-#-- Includes plotVar for PLS, sPLS and rCC --#
-#----------------------------------------------#
+#------------------------------------------------------------------#
+#-- Includes plotVar for PLS, sPLS, PLS-DA, SPLS-DA, rCC and PCA --#
+#------------------------------------------------------------------#
 
 plotVar <-
 function(object, ...) UseMethod("plotVar")
 
 
-#--------------------- PLS, plsda (sPLS, sPLSDA below)---------------------#
-plotVar.pls <-  plotVar.plsda <-
+#--------------------- PLS, (plsada, sPLS, sPLSDA below)---------------------#
+plotVar.pls <-  
 function(object, 
          comp = 1:2, 
          rad.in = 0.5, 
          X.label = FALSE, 
          Y.label = FALSE, 
-         keep.var = FALSE, 
          pch = NULL, 
          cex = NULL, 
          col = NULL, 
@@ -58,33 +57,14 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-    if (isTRUE(keep.var)) {
-        keep.X = apply(abs(object$loadings$X), 1, sum) > 0
-        keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
-
-        if (object$mode == "canonical") {
-            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
-                     use = "pairwise")
-            cord.Y = cor(object$Y[, keep.Y], object$variates$Y[, c(comp1, comp2)], 
-                     use = "pairwise")
-        }
-        else {
-            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
-                     use = "pairwise")
-            cord.Y = cor(object$Y[, keep.Y], object$variates$X[, c(comp1, comp2)], 
-                     use = "pairwise")
-        }
-    }
-    else {
-        if (object$mode == "canonical") {
-            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-            cord.Y = cor(object$Y, object$variates$Y[, c(comp1, comp2)], use = "pairwise")
-        }
-        else {
-            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-            cord.Y = cor(object$Y, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-        }
-    }
+      if (object$mode == "canonical") {
+          cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+          cord.Y = cor(object$Y, object$variates$Y[, c(comp1, comp2)], use = "pairwise")
+      }
+      else {
+          cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+          cord.Y = cor(object$Y, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+      }
 
     p = ncol(object$X)
     q = ncol(object$Y)
@@ -177,26 +157,11 @@ function(object,
         }
     }
 
-    if (isTRUE(keep.var)) {
-        pch[[1]] = pch[[1]][keep.X]
-        pch[[2]] = pch[[2]][keep.Y]
-        col[[1]] = col[[1]][keep.X]
-        col[[2]] = col[[2]][keep.Y]
-        cex[[1]] = cex[[1]][keep.X]
-        cex[[2]] = cex[[2]][keep.Y]
-        font[[1]] = font[[1]][keep.X]
-        font[[2]] = font[[2]][keep.Y]
-    }
 
     def.par = par(no.readonly = TRUE)
 
     if (isTRUE(X.label)) X.label = object$names$X
     if (isTRUE(Y.label)) Y.label = object$names$Y
-
-    if (isTRUE(keep.var)) {
-        if (length(X.label) == p) X.label = X.label[keep.X]
-        if (length(Y.label) == q) Y.label = Y.label[keep.Y]
-    }
 
     par(pty = "s")
     plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
@@ -228,15 +193,12 @@ function(object,
     par(def.par)  
 }
 
-
-#--------------------- sPLS, sPLSDA ---------------------#
-plotVar.spls <- plotVar.splsda <-
+# ----------------------plsda ---------------------------#
+plotVar.plsda <-  
 function(object, 
          comp = 1:2, 
          rad.in = 0.5, 
          X.label = FALSE, 
-         Y.label = FALSE, 
-         keep.var = TRUE, 
          pch = NULL, 
          cex = NULL, 
          col = NULL, 
@@ -260,7 +222,162 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-    if (isTRUE(keep.var)) {
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+        }
+
+    p = ncol(object$X)
+
+    # le plot des variables #
+    #-----------------------#
+    if (length(X.label) > 1 & length(X.label) != p)
+        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
+
+    if (is.null(pch)) {
+        pch = list(rep(16, p))
+
+    }
+    else {
+        if (is.list(pch)) {
+            if (length(pch[[1]]) != p) 
+                stop("'pch'  must be a vector of length 1 or a vector of length ", p)
+
+        }
+        else { 
+            if (length(pch) == 1) { 
+                pch = list(rep(pch[1], p))
+            }
+
+            else {
+                stop("'pch'  must be a vector of length 1 or a vector of length ", p)
+
+            }
+        }
+    }
+
+    if (is.null(cex)) {
+        cex = list(rep(1, p))
+
+    }
+    else {
+        if (is.list(cex)) {
+            if (length(cex[[1]]) != p) 
+                stop("'cex'  must be a vector of length 1 or a vector of length ", p)
+
+        }
+        else { 
+            if (length(cex) == 1) { 
+                cex = list(rep(cex[1], p))
+
+                }
+            else {
+                    stop("'cex'  must be a vector of length 1 or a vector of length ", p)
+
+            }
+        }
+    }
+
+    if (is.null(col)) {
+        col = list(rep("red", p))
+
+    }
+    else {
+        if (is.list(col)) {
+            if (length(col[[1]]) != p) 
+                stop("'col' must be a vector of length 1 or a vector of length ", p)
+        }
+        else { 
+            if (length(col) == 1) { 
+                col = list(rep(col[1], p))
+
+            }
+            else {
+                stop("'col' must be a vector of length 1 or a vector of length ", p)
+            }
+        }
+    }
+
+    if (is.null(font)) {
+        font = list(rep(2, p))
+
+    }
+    else {
+        if (is.list(font)) {
+            if (length(font[[1]]) != p) 
+                stop("'font' must be a vector of length 1 or a vector of length ", p)
+
+        }
+        else { 
+            if (length(font) == 2) { 
+                font = list(rep(font[1], p), rep(font[2], q))
+
+            }
+            else {
+                stop("'font'  must be a vector of length 1 or a vector of length ", p)
+
+            }
+        }
+    }
+
+    def.par = par(no.readonly = TRUE)
+
+    if (isTRUE(X.label)) X.label = object$names$X
+
+    par(pty = "s")
+    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
+         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
+
+    if (length(X.label) > 1) {
+        text(cord.X[, 1], cord.X[, 2], X.label, col = col[[1]], 
+             font = font[[1]], cex = cex[[1]])
+    }
+    else {
+        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
+               cex = cex[[1]], col = col[[1]])
+    }
+
+    abline(v = 0, h = 0)
+    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
+    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
+          rad.in * sin(seq(0, 2 * pi, l = 100)))
+  
+    par(def.par)  
+}
+
+
+#--------------------- sPLS ---------------------#
+plotVar.spls <- 
+function(object, 
+         comp = 1:2, 
+         rad.in = 0.5, 
+         X.label = FALSE, 
+         Y.label = FALSE, 
+         pch = NULL, 
+         cex = NULL, 
+         col = NULL, 
+         font = NULL,
+	 ...) 
+{
+
+    # validation des arguments #
+    #--------------------------#
+    if (length(comp) != 2)
+        stop("'comp' must be a numeric vector of length 2.")
+
+    if (!is.numeric(comp) || any(comp < 1))
+        stop("invalid vector for 'comp'.")
+		
+    if (any(comp > object$ncomp)) 
+        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+
+    comp1 = round(comp[1])
+    comp2 = round(comp[2])
+
+    # calcul des coordonnées #
+    #------------------------#
         keep.X = apply(abs(object$loadings$X), 1, sum) > 0
         keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
 
@@ -276,17 +393,6 @@ function(object,
             cord.Y = cor(object$Y[, keep.Y], object$variates$X[, c(comp1, comp2)], 
                      use = "pairwise")
         }
-    }
-    else {
-        if (object$mode == "canonical") {
-            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-            cord.Y = cor(object$Y, object$variates$Y[, c(comp1, comp2)], use = "pairwise")
-        }
-        else {
-            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-            cord.Y = cor(object$Y, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-        }
-    }
 
     p = ncol(object$X)
     q = ncol(object$Y)
@@ -379,26 +485,22 @@ function(object,
         }
     }
 
-    if (isTRUE(keep.var)) {
-        pch[[1]] = pch[[1]][keep.X]
-        pch[[2]] = pch[[2]][keep.Y]
-        col[[1]] = col[[1]][keep.X]
-        col[[2]] = col[[2]][keep.Y]
-        cex[[1]] = cex[[1]][keep.X]
-        cex[[2]] = cex[[2]][keep.Y]
-        font[[1]] = font[[1]][keep.X]
-        font[[2]] = font[[2]][keep.Y]
-    }
+      pch[[1]] = pch[[1]][keep.X]
+      pch[[2]] = pch[[2]][keep.Y]
+      col[[1]] = col[[1]][keep.X]
+      col[[2]] = col[[2]][keep.Y]
+      cex[[1]] = cex[[1]][keep.X]
+      cex[[2]] = cex[[2]][keep.Y]
+      font[[1]] = font[[1]][keep.X]
+      font[[2]] = font[[2]][keep.Y]
 
     def.par = par(no.readonly = TRUE)
 
     if (isTRUE(X.label)) X.label = object$names$X
     if (isTRUE(Y.label)) Y.label = object$names$Y
 
-    if (isTRUE(keep.var)) {
-        if (length(X.label) == p) X.label = X.label[keep.X]
-        if (length(Y.label) == q) Y.label = Y.label[keep.Y]
-    }
+      if (length(X.label) == p) X.label = X.label[keep.X]
+      if (length(Y.label) == q) Y.label = Y.label[keep.Y]
 
     par(pty = "s")
     plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
@@ -431,6 +533,166 @@ function(object,
 }
 
 	
+
+# ---------------------- sPLSDA -------------------------#
+plotVar.splsda <- 
+function(object, 
+         comp = 1:2, 
+         rad.in = 0.5, 
+         X.label = FALSE, 
+         pch = NULL, 
+         cex = NULL, 
+         col = NULL, 
+         font = NULL,
+	 ...) 
+{
+
+    # validation des arguments #
+    #--------------------------#
+    if (length(comp) != 2)
+        stop("'comp' must be a numeric vector of length 2.")
+
+    if (!is.numeric(comp) || any(comp < 1))
+        stop("invalid vector for 'comp'.")
+		
+    if (any(comp > object$ncomp)) 
+        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+
+    comp1 = round(comp[1])
+    comp2 = round(comp[2])
+
+    # calcul des coordonnées #
+    #------------------------#
+        keep.X = apply(abs(object$loadings$X), 1, sum) > 0
+
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
+                     use = "pairwise")
+        }else{
+            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
+                     use = "pairwise")
+        }
+
+    p = ncol(object$X)
+
+    # le plot des variables #
+    #-----------------------#
+    if (length(X.label) > 1 & length(X.label) != p)
+        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
+
+    if (is.null(pch)) {
+        pch = list(rep(16, p))
+
+    }
+    else {
+        if (is.list(pch)) {
+            if (length(pch[[1]]) != p) 
+                stop("'pch' must be a vector of length 1 or a vector of length ", p)
+        }
+
+        else { 
+            if (length(pch) == 2) { 
+                pch = list(rep(pch[1], p))
+
+            }
+            else {
+                stop("'pch' must be a vector of length 1 or a vector of length ", p)
+
+            }
+        }
+    }
+
+
+    if (is.null(cex)) {
+        cex = list(rep(1, p))
+    }
+    else {
+        if (is.list(cex)) {
+            if (length(cex[[1]]) != p) 
+                stop("'cex' must be a vector of length 1 or a vector of length ", p)
+        }
+        else { 
+            if (length(cex) == 1) { 
+                cex = list(rep(cex[1], p))
+
+                }
+            else {
+                    stop("'cex' must be a vector of length 1 or a vector of length ", p)
+
+            }
+        }
+    }
+
+    if (is.null(col)) {
+        col = list(rep("red", p))
+    }
+    else {
+        if (is.list(col)) {
+            if (length(col[[1]]) != p) 
+                stop("'col' must be a vector of length 1 or a vector of length ", p)
+        }
+
+        else { 
+            if (length(col) == 1) { 
+                col = list(rep(col[1], p))
+            }
+            else {
+                stop("'col' must be a vector of length 1 or a vector of length ", p)
+            }
+        }
+    }
+
+    if (is.null(font)) {
+        font = list(rep(2, p))
+    }
+    else {
+        if (is.list(font)) {
+            if (length(font[[1]]) != p) 
+                stop("'font' must be a vector of length 1 or a vector of length ", p)
+        }
+        else { 
+            if (length(font) == 1) { 
+                font = list(rep(font[1], p))
+            }
+            else {
+                stop("'font' must be a vector of length 1 or a vector of length ", p)
+            }
+        }
+    }
+
+        pch[[1]] = pch[[1]][keep.X]
+        col[[1]] = col[[1]][keep.X]
+        cex[[1]] = cex[[1]][keep.X]
+        font[[1]] = font[[1]][keep.X]
+
+    def.par = par(no.readonly = TRUE)
+
+    if (isTRUE(X.label)) X.label = object$names$X
+
+    if (length(X.label) == p) X.label = X.label[keep.X]
+
+    par(pty = "s")
+    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
+         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
+
+    if (length(X.label) > 1) {
+        text(cord.X[, 1], cord.X[, 2], X.label, col = col[[1]], 
+             font = font[[1]], cex = cex[[1]])
+    }
+    else {
+        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
+               cex = cex[[1]], col = col[[1]])
+    }
+
+    abline(v = 0, h = 0)
+    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
+    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
+          rad.in * sin(seq(0, 2 * pi, l = 100)))
+  
+    par(def.par)  
+}
+
+
 
 #-------------------------- rCC -------------------------#
 plotVar.rcc <-
@@ -638,5 +900,65 @@ function(object,
     lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
           rad.in * sin(seq(0, 2 * pi, l = 100)))
   
-par(def.par)  
+    par(def.par)  
+}
+
+# ------------------------------ PCA object ------------------------------------
+plotVar.pca <-
+function(object, 
+         comp = 1:2,
+         rad.in = 0.5, 		 
+         var.label = FALSE,		 
+         ...) 
+{
+
+    # validation des arguments #
+    #--------------------------#
+    if (length(comp) != 2)
+        stop("'comp' must be a numeric vector of length 3.")
+
+    if (!is.numeric(comp) || any(comp < 1))
+        stop("invalid vector for 'comp'.")
+
+    p = ncol(object$rotation)
+	q = nrow(object$rotation)
+	
+    if (any(comp > p)) 
+        stop("the elements of 'comp' must be smaller or equal than ", p, ".")
+    comp = round(comp)
+	
+    if (is.logical(var.label)) {
+        if (isTRUE(var.label)) var.label = rownames(object$rotation)
+    }
+	
+	if (length(var.label) > 1) {
+        if (length(var.label) != q)
+            stop("'var.label' must be a character vector of length ", q, " or a boolean atomic vector.")
+    }
+	
+    # calcul des coordonnées #
+    #------------------------#
+    cord.X = object$rotation[, comp] 
+
+    # le plot des variables #
+    #-----------------------#
+    def.par = par(no.readonly = TRUE)
+	
+    par(pty = "s")
+    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
+         xlab = paste("Comp ", comp[1]), ylab = paste("Comp ", comp[2]))
+
+    if (length(var.label) > 1) {
+        text(cord.X[, 1], cord.X[, 2], var.label, ...)
+    }
+    else {
+        points(cord.X[, 1], cord.X[, 2], ...)
+    }
+
+    abline(v = 0, h = 0, lty = 2)
+    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
+    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
+          rad.in * sin(seq(0, 2 * pi, l = 100)))
+  
+    par(def.par)  
 }

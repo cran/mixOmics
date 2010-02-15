@@ -50,6 +50,15 @@ function(object,
     if (any(comp > object$ncomp)) 
         stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
 
+    if (is.logical(ind.names)) {
+        if (isTRUE(ind.names)) ind.names = object$names$indiv
+    }
+	
+	if (length(ind.names) > 1) {
+        if (length(ind.names) != nrow(object$X))
+            stop("'ind.names' must be a character vector of length ", nrow(object$X), " or a boolean atomic vector.")
+    }
+
     # l'espace de représentation #
     #----------------------------#
     rep.space = match.arg(rep.space, c("XY-variate", "X-variate", "Y-variate"))
@@ -85,11 +94,9 @@ function(object,
 	
     if ((length(cex) != length(pchlevels)) & (length(cex) > 1) & !isTRUE(ind.names)) 
         stop("'cex' must be a numeric vector of length equal than number of 'pch' levels.")
-    else 
-        cex = rep(cex, length(pchlevels))
+    else cex = rep(cex, length(pchlevels))
 	
 	opw = open3d(windowRect = c(500, 30, 1100, 630))
-	
     par3d(userMatrix = rotationMatrix(pi/80, 1, -1/(100*pi), 0))
 	
     if (length(ind.names) > 1) {
@@ -97,8 +104,7 @@ function(object,
                color = col, font = font, cex = cex)
     }
     else {
-        if (ind.names) {
-            ind.names = object$names$indiv
+        if (isTRUE(ind.names)) {
             text3d(x, y, z, text = ind.names,
                color = col, font = font, cex = cex[1])    
         }
@@ -175,9 +181,17 @@ function (object,
     if (!is.numeric(comp) || any(comp < 1))
         stop("invalid vector for 'comp'.")
 
-    dim = min(ncol(object$X), ncol(object$Y))
-    if (any(comp > dim)) 
-        stop("the elements of 'comp' must be smaller or equal than ", dim, ".")
+    if (any(comp > object$ncomp)) 
+        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+
+    if (is.logical(ind.names)) {
+        if (isTRUE(ind.names)) ind.names = object$names$indiv
+    }
+	
+	if (length(ind.names) > 1) {
+        if (length(ind.names) != nrow(object$X))
+            stop("'ind.names' must be a character vector of length ", nrow(object$X), " or a boolean atomic vector.")
+    }		
 
     # l'espace de représentation #
     #----------------------------#
@@ -214,11 +228,9 @@ function (object,
 	
     if ((length(cex) != length(pchlevels)) & (length(cex) > 1) & !isTRUE(ind.names)) 
         stop("'cex' must be a numeric vector of length equal than number of 'pch' levels.")
-    else 
-        cex = rep(cex, length(pchlevels))
+    else cex = rep(cex, length(pchlevels))
 	
-	opw = open3d(windowRect = c(500, 30, 1100, 630))
-	
+	opw = open3d(windowRect = c(500, 30, 1100, 630))	
 	par3d(userMatrix = rotationMatrix(pi/80, 1, -1/(100*pi), 0))
 	
     if (length(ind.names) > 1) {
@@ -226,8 +238,7 @@ function (object,
                color = col, font = font, cex = cex)
     }
     else {
-        if (ind.names) {
-            ind.names = object$names$indiv
+        if (isTRUE(ind.names)) {
             text3d(x, y, z, text = ind.names,
                color = col, font = font, cex = cex[1])    
         }
@@ -303,9 +314,17 @@ function (object,
     if (!is.numeric(comp) || any(comp < 1))
         stop("invalid vector for 'comp'.")
 
-    dim = ncol(object$x)
-    if (any(comp > dim)) 
-        stop("the elements of 'comp' must be smaller or equal than ", dim, ".")
+    if (any(comp > object$ncomp)) 
+        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+		
+    if (is.logical(ind.names)) {
+        if (isTRUE(ind.names)) ind.names = rownames(object$x)
+    }
+	
+	if (length(ind.names) > 1) {
+        if (length(ind.names) != nrow(object$x))
+            stop("'ind.names' must be a character vector of length ", nrow(object$x), " or a boolean atomic vector.")
+    }
 
     # l'espace de représentation #
     #----------------------------#
@@ -326,11 +345,9 @@ function (object,
 	
     if ((length(cex) != length(pchlevels)) & (length(cex) > 1) & !isTRUE(ind.names)) 
         stop("'cex' must be a numeric vector of length equal than number of 'pch' levels.")
-    else 
-        cex = rep(cex, length(pchlevels))
+    else cex = rep(cex, length(pchlevels))
 	
 	opw = open3d(windowRect = c(500, 30, 1100, 630))
-	
 	par3d(userMatrix = rotationMatrix(pi/80, 1, -1/(100*pi), 0))
 	
     if (length(ind.names) > 1) {
@@ -338,12 +355,12 @@ function (object,
                color = col, font = font, cex = cex)
     }
     else {
-        if (ind.names) {
-            ind.names = object$names$indiv
+        if (isTRUE(ind.names)) {
             text3d(x, y, z, text = ind.names,
                color = col, font = font, cex = cex[1])    
         }
         else {
+            cex = 20 * cex
             k = 0
             for (level in pchlevels) {
 			    id = (pch == level)

@@ -12,7 +12,7 @@
 
 \description{
 This function provides variables representation in three dimensions for 
-(regularized) CCA and (sparse) PLS regression.
+(regularized) CCA, (sparse) PLS regression and PCA.
 }
 
 \usage{
@@ -23,30 +23,30 @@ This function provides variables representation in three dimensions for
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
 
 \method{plot3dVar}{pls}(object, comp = 1:3, rad.in = 1, 
-          keep.var = FALSE, X.label = FALSE, Y.label = FALSE,
+          X.label = FALSE, Y.label = FALSE,
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
 
 \method{plot3dVar}{spls}(object, comp = 1:3, rad.in = 1, 
-          keep.var = TRUE, X.label = FALSE, Y.label = FALSE,
+          X.label = FALSE, Y.label = FALSE,
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
 
 \method{plot3dVar}{plsda}(object, comp = 1:3, rad.in = 1, 
-          keep.var = FALSE, X.label = FALSE, Y.label = FALSE,
+          X.label = FALSE, 
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
 
 \method{plot3dVar}{splsda}(object, comp = 1:3, rad.in = 1, 
-          keep.var = TRUE, X.label = FALSE, Y.label = FALSE,
+          X.label = FALSE, 
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)	 
 		  
-\method{plot3dVar}{pca}(object, comp = 1:3, X.label = FALSE,
+\method{plot3dVar}{pca}(object, comp = 1:3, var.label = FALSE,
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
@@ -59,16 +59,14 @@ This function provides variables representation in three dimensions for
   \item{rad.in}{numeric between 0 and 1, the radius of the small sphere. Defaults to \code{1}.}
   \item{cutoff}{numeric between 0 and 1. Variables with correlations below this cutoff 
     in absolute value are not plotted (see Details).}
-  \item{X.label, Y.label}{either a character vector of names for the \eqn{X}- and  
-    \eqn{Y}-variables or \code{FALSE} for no names. If \code{TRUE}, the columns names 
+  \item{X.label, Y.label, var.label}{either a character vector of names for the variables 
+    or \code{FALSE} for no names. If \code{TRUE}, the columns names 
 	of the matrice are used as labels.}	
   \item{col}{character or integer vector of colors for plotted character and items. 
 	See Details.}
   \item{pch}{character indicating the type of item to plot, possibly vector (see Details).}
   \item{cex}{numeric character (or item) expansion (see Details).}
   \item{font}{numeric font to be used. See \code{\link[rgl]{text3d}} for details.}
-  \item{keep.var}{boolean. If \code{TRUE} only the variables with loadings not zero are plotted
-    (as selected by \code{spls} or \code{splsda}). Defaults to \code{FALSE} for the pls functions and \code{TRUE} for spls functions.}
   \item{axes.box}{character string or vector specifying the axes box type. Should be a subset 
     of \code{c("axes", "box", "bbox", "all")}.}
   \item{label.axes.box}{character string indicating whether to label the axes and/or boxes.
@@ -85,6 +83,12 @@ For the objects of class \code{rcc}, \code{pls} and \code{spls} a sphere of radi
 centred in the origin is displayed. If \code{cutoff} is not \code{NULL} 
 the \code{rad.in} is ignored and the radius of the sphere is equal to \code{cutoff}.
 
+
+For \code{plsda} and \code{splsda} objects, only the X variables are represented.
+
+For \code{spls} and \code{splsda} objects, only the X and Y variables selected on dimensions \code{comp} are represented.
+
+
 The arguments \code{cex}, \code{pch} and \code{font} are vectors of
 length two for the objects of class \code{rcc}, \code{pls} and \code{spls}. 
 The firts and second component value determines the graphical attribute for 
@@ -100,7 +104,12 @@ vector determine the color for the \eqn{X}- and \eqn{Y}-variables respectively.
 Otherwise, multiple colors can be specified so that each item (variable)
 can be given its own color. In this case, the first component of the list 
 correspond to the \eqn{X}-color attribut and the second component correspond to 
-the \eqn{Y}-color attribut.  
+the \eqn{Y}-color attribute.  
+
+The pointing device of your graphics user-interface can also be used to set the viewpoint interactively. With the pointing device the buttons are by default set as follows:
+- left adjust viewpoint position
+- middle adjust field of view angle
+- right or wheel adjust zoom factor 
 }
 
 \author{Ignacio González.}

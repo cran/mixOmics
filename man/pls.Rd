@@ -11,7 +11,7 @@
 \usage{
 pls(X, Y, ncomp = 2, 
     mode = c("regression", "canonical", "invariant", "classic"), 
-    max.iter = 500, tol = 1e-06, scaleY = TRUE)
+    max.iter = 500, tol = 1e-06, ...)
 }	
 
 \arguments{
@@ -24,7 +24,7 @@ pls(X, Y, ncomp = 2,
 	See Details.}
   \item{max.iter}{integer, the maximum number of iterations.}
   \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
-  \item{scaleY}{should the Y data be scaled ?}
+  \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 
 \details{
@@ -55,6 +55,7 @@ that contains the following components:
   \item{variates}{list containing the \code{X} and \code{Y} variates.}
   \item{loadings}{list containing the estimated loadings for the variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
+  \item{nzv}{list containing the zero- or near-zero predictors information.}
 }
 
 \references{

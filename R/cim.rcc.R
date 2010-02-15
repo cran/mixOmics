@@ -29,20 +29,20 @@ function(object,
 
     p = ncol(object$X)
     q = ncol(object$Y)
-    dim = object$ncomp	
+    ncomp = object$ncomp	
 	
     if (length(comp) == 1) {
-	    if (is.null(comp) || !is.numeric(comp) || comp <= 0 || comp > dim)
+	    if (is.null(comp) || !is.numeric(comp) || comp <= 0 || comp > ncomp)
             stop("invalid value for 'comp'.")
     }
 	
     if (length(comp) > 1) {
-        if(length(comp) > dim) 
-            stop("the length of 'comp' must be smaller or equal than ", dim, ".")
+        if(length(comp) > ncomp) 
+            stop("the length of 'comp' must be smaller or equal than ", ncomp, ".")
         if (!is.numeric(comp) || any(comp < 1))
             stop("invalid vector for 'comp'.")
-        if (any(comp > dim)) 
-            stop("the elements of 'comp' must be smaller or equal than ", dim, ".")
+        if (any(comp > ncomp)) 
+            stop("the elements of 'comp' must be smaller or equal than ", ncomp, ".")
     }
 	
     if (length(X.names) != p & !is.null(X.names))

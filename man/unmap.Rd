@@ -5,10 +5,11 @@
   Converts a class vector to an indicator matrix
 }
 \description{
-  Converts a class vector into a matrix of indicator variables, borrowed from the mclust package, used as internal function.
+  Converts a class vector into a matrix of indicator variables, borrowed from the 
+\pkg{mclust} package, used as internal function.
 }
 \usage{
-  unmap(classification, groups=NULL, noise=NULL, \dots)
+  unmap(classification, groups = NULL, noise = NULL, \dots)
 }
 \arguments{
   \item{classification}{

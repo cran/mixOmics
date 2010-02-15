@@ -1,9 +1,9 @@
 Package: mixOmics
 Type: Package
 Title: Integrate Omics data project
-Version: 2.8-1
+Version: 2.9-1
 Date: 2010-02-15
-Depends: igraph, rgl
+Depends: igraph, rgl, lattice
 Author: Sebastien Dejean, Ignacio Gonzalez, Kim-Anh Le Cao and Pierre
         Monget
 Maintainer: Kim-Anh Le Cao <k.lecao@uq.edu.au>
@@ -22,7 +22,5 @@ Description: The package supplies two efficients methodologies:
         are provided to help interpreting the results.
 License: GPL (>= 2)
 Repository: CRAN
-Date/Publication: 2010-08-12 04:59:29
-Repository/R-Forge/Project: mixomics
-Repository/R-Forge/Revision: 22
-Packaged: 2010-08-10 20:58:45 UTC; rforge
+Date/Publication: 2010-11-08 07:32:15
+Packaged: 2010-11-07 22:37:22 UTC; klecao

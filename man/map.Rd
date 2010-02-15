@@ -6,10 +6,11 @@
 }
 \description{
   Converts a matrix in which each row sums to \emph{1} 
-  into the nearest matrix of \emph{(0,1)} indicator variables. Borrowed from the mclust package, used as internal function.
+  into the nearest matrix of \emph{(0,1)} indicator variables. Borrowed from the 
+\pkg{mclust} package, used as internal function.
 }
 \usage{
-map(Y,\dots)
+map(Y, \dots)
 }
 \arguments{
   \item{Y}{

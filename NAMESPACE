@@ -37,13 +37,14 @@ S3method(cim, spls)
 S3method(image, estim.regul)
 
 S3method(plot, rcc)
+S3method(plot, valid)
 
 S3method(plotIndiv, pls)
 S3method(plotIndiv, spls)
 S3method(plotIndiv, plsda)
 S3method(plotIndiv, splsda)
-
 S3method(plotIndiv, rcc)
+S3method(plotIndiv, pca)
 
 S3method(plotVar, pls)
 S3method(plotVar, spls)

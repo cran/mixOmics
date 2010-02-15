@@ -15,15 +15,19 @@ represent "high-dimensional" data sets.
 \usage{
 \method{cim}{default}(mat, breaks, col = jet.colors, 
     distfun = dist, hclustfun = hclust,
-    labRow = NULL, labCol = NULL, symkey = TRUE, zoom = FALSE, 
-    main = NULL, xlab = NULL, ylab = NULL, keysize = 1, 
+    dendrogram = c("both", "row", "column", "none"),
+    labRow = NULL, labCol = NULL,
+    ColSideColors = NULL, RowSideColors = NULL,		 
+    symkey = TRUE, keysize = 1, zoom = FALSE, 
+    main = NULL, xlab = NULL, ylab = NULL, 
     cexRow = min(1, 0.2 + 1/log10(nr)), 
     cexCol = min(1, 0.2 + 1/log10(nc)), 
     margins = c(5, 5), lhei = NULL, lwid = NULL, \ldots)
 			
 \method{cim}{rcc}(object, comp = 1, X.names = NULL, Y.names = NULL, \ldots)
 
-\method{cim}{spls}(object, comp = 1, X.names = NULL, Y.names = NULL, keep.var = TRUE, \ldots)
+\method{cim}{spls}(object, comp = 1, X.names = NULL, Y.names = NULL, 
+    keep.var = TRUE, \ldots)
 }
 
 \arguments{
@@ -37,27 +41,33 @@ represent "high-dimensional" data sets.
     (as selected by \code{spls}). Defaults to \code{TRUE}.}	
   \item{distfun}{function used to compute the distance (dissimilarity) between both rows and columns. 
     Defaults to \code{\link[stats]{dist}}.} 
-  \item{hclustfun}{function used to compute the hierarchical clustering for both rows and columns. 
-    Defaults to \code{\link[stats]{hclust}}. Should take as argument a result of \code{distfun} and return 
-    an object to which \code{as.dendrogram} can be applied.}
   \item{breaks}{(optional) either a numeric vector indicating the splitting points for 
     binning \code{mat} into colors, or a integer number of break points to be used, in 
 	which case the break points will be spaced equally between \code{min(mat)} 
-	and \code{max(mat)}.}
+	and \code{max(mat)}.}	
   \item{col}{a character string specifying the colors function to use: 
     \code{\link{terrain.colors}}, \code{\link{topo.colors}}, 
 	\code{\link{rainbow}} or similar functions. Defaults to \code{\link{jet.colors}}.}
+  \item{hclustfun}{function used to compute the hierarchical clustering for both rows and columns. 
+    Defaults to \code{\link[stats]{hclust}}. Should take as argument a result of \code{distfun} and return 
+    an object to which \code{as.dendrogram} can be applied.}
+  \item{dendrogram}{character string indicating whether to draw \code{'none'}, \code{'row'}, 
+    \code{'column'} or \code{'both'} dendrograms. Defaults to \code{'both'}.}	
   \item{labRow}{character vectors with row labels to use. 
 	Defaults to \code{rownames(mat)}.}
   \item{labCol}{character vectors with column labels to use. 
 	Defaults to \code{colnames(mat)}.}	
+  \item{ColSideColors}{(optional) character vector of length \code{ncol(mat)} containing 
+    the color names for a horizontal side bar that may be used to annotate the columns of \code{mat}.}
+  \item{RowSideColors}{(optional) character vector of length \code{nrow(mat)} containing the color 
+    names for a vertical side bar that may be used to annotate the rows of \code{mat}.}
   \item{symkey}{boolean indicating whether the color key should be made symmetric about 0. 
 	Defaults to \code{TRUE}.}
+  \item{keysize}{positive numeric value indicating the size of the color key.}	
   \item{zoom}{logical. Whether to use zoom for interactively zooming-out. See Details.}
   \item{main, xlab, ylab}{main, \eqn{x}- and \eqn{y}-axis titles; defaults to none.}
   \item{cexRow, cexCol}{positive numbers, used as \code{cex.axis} in for the row or column 
 	axis labeling. The defaults currently only use number of rows or columns, respectively.}
-  \item{keysize}{numeric value indicating the size of the color key.}
   \item{margins}{numeric vector of length two containing the margins (see \code{\link{par}(mar)}) 
 	for column and row names respectively.}
   \item{lhei, lwid}{arguments passed to \code{layout} to divide the device up into two 
@@ -119,7 +129,7 @@ and Paull, K. D. (1997). An information-intensive approach to the molecular
 pharmacology of cancer. \emph{Science} \bold{275}, 343-349.
 }
 
-\author{Sébastien Déjean and Ignacio González.}
+\author{Ignacio González.}
 
 \seealso{\code{\link{image}}, \code{\link{heatmap}}, \code{\link{hclust}}, \code{\link{plotVar}}, 
 \code{\link{plot3dVar}}, \code{\link{network}}.}
@@ -130,9 +140,10 @@ data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
 
-cim(cor(X, Y))
+cim(cor(X, Y), dendrogram = "none")
 
 ## CIM representation for objects of class 'rcc'
+\dontrun{
 nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 dends <- cim(nutri.res, comp = 1:3, xlab = "genes", 
@@ -141,6 +152,7 @@ dends <- cim(nutri.res, comp = 1:3, xlab = "genes",
 op <- par(mar = c(5, 4, 4, 4), cex = 0.8)			 
 plot(dends$ddr, axes = FALSE, horiz = TRUE)
 par(op)
+}
 
 ## interactive 'zoom' 
 \dontrun{
@@ -149,6 +161,7 @@ cim(nutri.res, comp = 1:3, zoom = TRUE)
 }
 
 ## CIM representation for objects of class 'spls'
+\dontrun{
 data(liver.toxicity)
 X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
@@ -157,6 +170,7 @@ toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50),
                       keepY = c(10, 10, 10))
 
 cim(toxicity.spls, comp = 1:3)
+}
 }
 
 \keyword{multivariate}

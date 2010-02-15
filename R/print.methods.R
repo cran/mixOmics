@@ -26,7 +26,7 @@ function(x, ...)
 
     mode = paste("'", x$mode, "'", sep = "")
 	
-    cat("\nCall:\n", deparse(x$call), "\n\n")
+    cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
 	
     cat(" PLS with a", mode, "mode with", x$ncomp, "PLS components. \n")
     cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
@@ -49,11 +49,11 @@ function(x, ...)
 
     mode = paste("'", x$mode, "'", sep = "")
 	
-    cat("\nCall:\n", deparse(x$call), "\n\n")
+    cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
 	
-    cat(" PLS-da  (regression mode) with", x$ncomp, "PLS components. \n")
+    cat(" PLS-da (regression mode) with", x$ncomp, "PLS components. \n")
     cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
-    cat(" You entered data Y with ", ncol(x$Yprim) , "classes \n\n")
+    cat(" You entered data Y with", ncol(x$ind.mat) , "classes \n\n")
 
     cat(" No variable selection \n\n")
 	
@@ -75,7 +75,7 @@ function(x, ...)
     keepX = paste("[", x$keepX, "]", sep = "")
     keepY = paste("[", x$keepY, "]", sep = "")
 	
-	cat("\nCall:\n", deparse(x$call), "\n\n")
+	cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
 	
     cat(" sPLS with a", mode, "mode with", x$ncomp, "sPLS components. \n")
     cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
@@ -102,11 +102,11 @@ function(x, ...)
     keepX = paste("[", x$keepX, "]", sep = "")
     keepY = paste("[", x$keepY, "]", sep = "")
 	
-	cat("\nCall:\n", deparse(x$call), "\n\n")
+	cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
 	
     cat(" sPLS with a regression mode with", x$ncomp, "sPLS components. \n")
     cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
-    cat(" You entered data Y with ", ncol(x$Yprim) , "classes \n\n")
+    cat(" You entered data Y with", ncol(x$ind.mat) , "classes \n\n")
 	
     cat(" Selection of", keepX, "variables on each of the sPLS components on the X data set. \n")
     cat(" No Y variables can be selection. \n\n")
@@ -125,7 +125,7 @@ print.rcc <-
 function(x, ...)
 {
 
-    cat("\nCall:\n", deparse(x$call), "\n\n")
+    cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
 
     cat(" rCCA with", x$ncomp, "components and regularization parameters", x$lambda[1], "and", x$lambda[2], "for the X and Y data. \n")
     cat(" You entered data X of dimensions :", nrow(x$X), ncol(x$X), "\n")

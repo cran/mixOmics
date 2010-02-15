@@ -12,7 +12,7 @@
 
 \description{
 This function provides scatter plots of individuals (experimental units)
-in three dimensions for (r)CCA and (s)PLS regression.
+in three dimensions for (r)CCA, (s)PLS regression and PCA.
 }
 
 \usage{
@@ -53,7 +53,8 @@ in three dimensions for (r)CCA and (s)PLS regression.
 }
 
 \arguments{
-  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"spls"} or \code{"pca"}.}
+  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"}, 
+    \code{"spls"}, \code{"plsda"} or \code{"pca"}.}
   \item{comp}{an integer vector of length 3, the components that will be used on the \eqn{x}-axis,  
 	the \eqn{y}-axis and \eqn{z}-axis respectively to project the individuals.}
   \item{ind.names}{either a character vector of names for the individuals to be plotted, 
@@ -86,6 +87,11 @@ In the last case, multiple arguments values can be specified so that each item (
 can be given its own graphic attributes. Default values exist for this arguments. 
 Supported types for \code{pch} are: \code{"s"} for spheres, \code{"t"} for tetrahedrons, \code{"c"} for cubes, 
 \code{"o"} for octahedrons, \code{"i"} for icosahedrons and \code{"d"} dodecahedrons. Partial matching is used.    
+
+The pointing device of your graphics user-interface can also be used to set the viewpoint interactively. With the pointing device the buttons are by default set as follows:
+- left adjust viewpoint position
+- middle adjust field of view angle
+- right or wheel adjust zoom factor 
 }
 
 \author{Ignacio González}

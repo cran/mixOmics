@@ -94,7 +94,7 @@ function(object, newdata, ...)
 
 # -------------------------- for plsda and splsda ---------------------------------------
 predict.plsda <- predict.splsda <-
-function(object, newdata, method = c("class.dist", "centroids.dist", "Sr.dist", "max.dist"), ...)  
+function(object, newdata, method = c("max.dist", "class.dist", "centroids.dist", "mahalanobis.dist"), ...)  
 {
 	#-- validation des arguments --#
     if (missing(newdata))
@@ -102,10 +102,11 @@ function(object, newdata, method = c("class.dist", "centroids.dist", "Sr.dist", 
      
     X = object$X
     Y = object$Y 
-	Yprim = object$Yprim   
+	Yprim = object$ind.mat   
 	q = ncol(Yprim)          
     p = ncol(X)
     mode = object$mode
+	method = match.arg(method)
 	
     if (length(dim(newdata)) == 2) {
         if (ncol(newdata) != p)
@@ -157,7 +158,6 @@ function(object, newdata, method = c("class.dist", "centroids.dist", "Sr.dist", 
 	
 	G = matrix(0, nrow = q, ncol = ncomp)
 	obsLevels = c(1:q)   
-##	cl = list()
 	cl = matrix(nrow = nrow(newdata), ncol = ncomp)
 	
 	for (i in 1:q) {
@@ -221,9 +221,9 @@ function(object, newdata, method = c("class.dist", "centroids.dist", "Sr.dist", 
 		}
 	}	
 
-	# ----    Sr distance -----------------
+	# ----    mahalanobis distance -----------------
 	
-	if (method == "Sr.dist") {
+	if (method == "mahalanobis.dist") {
 	
 		Sr.fun = function(x, G, Yprim, h) {
 			q = nrow(G)
@@ -254,11 +254,8 @@ function(object, newdata, method = c("class.dist", "centroids.dist", "Sr.dist", 
     rownames(Y.hat) = rownames(newdata)
     colnames(Y.hat) = colnames(Y)
     colnames(G) = paste("dim", c(1:ncomp), sep = " ")
-    colnames(cl) = paste("dim", c(1:ncomp), sep = " ")
+    colnames(cl) = paste(rep("comp", ncomp), 1:ncomp, sep = " ")
      
     return(invisible(list(predict = Y.hat, variates = t.pred, B.hat = B.hat, 
 		                  centroids = G, method = method, class = cl)))
 }
-
-
-

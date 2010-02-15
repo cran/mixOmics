@@ -6,11 +6,12 @@
 \alias{plotVar.spls}
 \alias{plotVar.plsda}
 \alias{plotVar.splsda}
+\alias{plotVar.pca}
 
 \title{Plot of Variables}
 
 \description{
-This function provides variables representation for (regularized) CCA and (sparse) PLS regression.
+This function provides variables representation for (regularized) CCA, (sparse) PLS regression and PCA.
 }
 
 \usage{
@@ -19,31 +20,31 @@ This function provides variables representation for (regularized) CCA and (spars
         pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
 
 \method{plotVar}{pls}(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, Y.label = FALSE, keep.var = FALSE, 
-        pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
+        X.label = FALSE, Y.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
 
 \method{plotVar}{plsda}(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, Y.label = FALSE, keep.var = FALSE, 
-        pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)		
+        X.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)		
 
 \method{plotVar}{spls}(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, Y.label = FALSE, keep.var = TRUE, 
-        pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)	 
+        X.label = FALSE, Y.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)	 
 
 \method{plotVar}{splsda}(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, Y.label = FALSE, keep.var = TRUE, 
-        pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)	 
+        X.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
+
+\method{plotVar}{pca}(object, comp = 1:2, rad.in = 0.5, 
+        var.label = FALSE, \ldots)	
 }
 
 \arguments{
-  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"} or \code{"spls"}.}
+  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"}, 
+    \code{"spls"}, \code{"plsda"} or \code{"pca"}.}
   \item{comp}{integer vector of length two. The components that will be used on the horizontal 
 	and the vertical axis respectively to project the variables.}
   \item{rad.in}{numeric between 0 and 1, the radius of the inner circle. Defaults to \code{0.5}.}
   \item{cutoff}{numeric between 0 and 1. Variables with correlations below this cutoff 
     in absolute value are not plotted (see Details).}
-  \item{X.label, Y.label}{either a character vector of names for the \eqn{X}- and  
-    \eqn{Y}-variables or \code{FALSE} for no names. If \code{TRUE}, the columns names 
+  \item{X.label, Y.label, var.label}{either a character vector of names for the variables 
+    or \code{FALSE} for no names. If \code{TRUE}, the columns names 
 	of the matrice are used as labels.}	
   \item{col}{character or integer vector of colors for plotted character and symbols. 
 	See Details.}
@@ -51,8 +52,6 @@ This function provides variables representation for (regularized) CCA and (spars
 	or integers. See \code{\link{points}} for all alternatives.}
   \item{cex}{numeric vector of character expansion sizes for the plotted character and symbols.}
   \item{font}{numeric vector of font to be used. See \code{\link{par}} for details.}
-  \item{keep.var}{boolean. If \code{TRUE} only the variables with loadings not zero are plotted
-    (as selected by \code{spls} or \code{splsda}). Defaults to \code{FALSE} for the pls functions and \code{TRUE} for spls functions.}
   \item{\ldots}{not used currently.}
 }
 
@@ -65,6 +64,11 @@ components correspond to the equiangular vector between \eqn{X}- and \eqn{Y}-var
 For (sparse) PLS regression mode the components correspond to the \eqn{X}-variates. If mode is
 canonical, the components for \eqn{X} and \eqn{Y} variables correspond to
 the \eqn{X}- and \eqn{Y}-variates respectively. 
+
+For \code{plsda} and \code{splsda} objects, only the X variables are represented.
+
+For \code{spls} and \code{splsda} objects, only the X and Y variables selected on dimensions \code{comp} are represented.
+
 
 The arguments \code{col}, \code{pch}, \code{cex} and \code{font} can be either vectors of
 length two or a list with two vector components of length \eqn{p} and \eqn{q} respectively, 

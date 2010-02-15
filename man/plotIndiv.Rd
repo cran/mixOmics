@@ -6,12 +6,13 @@
 \alias{plotIndiv.spls}
 \alias{plotIndiv.plsda}
 \alias{plotIndiv.splsda}
+\alias{plotIndiv.pca}
 
 \title{Plot of Individuals (Experimental Units)}
 
 \description{
 This function provides scatter plots for individuals (experimental units)
-representation in (r)CCA and (s)PLS regression.
+representation in (r)CCA, (s)PLS regression and PCA.
 }
 
 \usage{
@@ -28,11 +29,15 @@ representation in (r)CCA and (s)PLS regression.
 \method{plotIndiv}{spls}(object, comp = 1:2, ind.names = TRUE,
           rep.space = "X-variate",
           x.label = NULL, y.label = NULL,  
-          col = "black", cex = 1, pch = 1, \ldots)		  
+          col = "black", cex = 1, pch = 1, \ldots)
+
+\method{plotIndiv}{pca}(object, comp = 1:2, ind.names = TRUE,
+          x.label = NULL, y.label = NULL, \ldots)		  
 }
 
 \arguments{
-  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"} or \code{"spls"}.}
+  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"}, 
+    \code{"spls"}, \code{"plsda"} or \code{"pca"}.}
   \item{comp}{integer vector of length two. The components that will be used on the horizontal 
 	and the vertical axis respectively to project the individuals.}
   \item{ind.names}{either a character vector of names for the individuals to be plotted, 

@@ -1,8 +1,9 @@
 # Copyright (C) 2009 
-# SÃ©bastien DÃ©jean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio GonzÃ¡lez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh LÃª Cao, French National Institute for Agricultural Research and 
-# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
+# Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,20 +23,24 @@
 cim <-
 function(...) UseMethod("cim")
 
+
 cim.default <-
 function(mat, 
          breaks, 
          col = jet.colors, 
          distfun = dist, 
          hclustfun = hclust,
+		 dendrogram = c("both", "row", "column", "none"),
          labRow = NULL, 
-         labCol = NULL, 
+         labCol = NULL,
+         ColSideColors = NULL,
+         RowSideColors = NULL,		 
          symkey = TRUE, 
+         keysize = 1,
          zoom = FALSE, 
          main = NULL, 
          xlab = NULL, 
-         ylab = NULL, 
-         keysize = 1, 
+         ylab = NULL,  
          cexRow = min(1, 0.2 + 1/log10(nr)), 
          cexCol = min(1, 0.2 + 1/log10(nc)), 
          margins = c(5, 5), 
@@ -78,28 +83,34 @@ function(mat,
 
     if (!is.numeric(margins) || length(margins) != 2) 
         stop("'margins' must be a numeric vector of length 2.")
-
-    Rowv = rowMeans(mat)
-    hcr = hclustfun(distfun(mat))
-    ddr = as.dendrogram(hcr)
-    ddr = reorder(ddr, Rowv)
-    rowInd = order.dendrogram(ddr)
-        
-    Colv = colMeans(mat)
-    hcc = hclustfun(distfun(t(mat)))
-    ddc = as.dendrogram(hcc)
-    ddc = reorder(ddc, Colv)
-    colInd = order.dendrogram(ddc)
-        
-    mat = mat[rowInd, colInd]
-
+		
+	dendrogram = match.arg(dendrogram)
+	
     if (is.null(labRow)) 
         labRow = if (is.null(rownames(mat))) (1:nr)[rowInd] else rownames(mat)
-    else labRow = labRow[rowInd]
 
     if (is.null(labCol)) 
-        labCol = if (is.null(colnames(mat))) (1:nc)[colInd] else colnames(mat)
-    else labCol = labCol[colInd]
+        labCol = if (is.null(colnames(mat))) (1:nc)[colInd] else colnames(mat) 
+
+	if (any(dendrogram == "both") || any(dendrogram == "row")) { 
+        Rowv = rowMeans(mat)
+        hcr = hclustfun(distfun(mat))
+        ddr = as.dendrogram(hcr)
+        ddr = reorder(ddr, Rowv)
+        rowInd = order.dendrogram(ddr)
+        mat = mat[rowInd, ]
+        labRow = labRow[rowInd]
+    }    
+     
+	if (any(dendrogram == "both") || any(dendrogram == "column")) {
+        Colv = colMeans(mat)
+        hcc = hclustfun(distfun(t(mat)))
+        ddc = as.dendrogram(hcc)
+        ddc = reorder(ddc, Colv)
+        colInd = order.dendrogram(ddc)
+        mat = mat[, colInd]
+        labCol = labCol[colInd]
+    }
 	
     rownames(mat) = labRow
     colnames(mat) = labCol
@@ -127,19 +138,49 @@ function(mat,
     mat[mat > max.breaks] = max.breaks
     mat = t(mat)
 
+    lmat = matrix(c(1, 2, 3, 4), 2, 2, byrow = TRUE)
+	csc = rsc = FALSE
+	
+    if (!missing(ColSideColors) || !is.null(ColSideColors)) {
+        if (!is.character(ColSideColors) || length(ColSideColors) != nc) 
+            stop("'ColSideColors' must be a colors character vector of length ncol(mat)")
+        lmat = rbind(lmat[1, ], c(NA, 3), lmat[2, ] + 1)
+        if (missing(lhei) || is.null(lhei)) 
+            lhei = c(keysize, 0.15, 4)
+        if (length(lhei) != nrow(lmat)) 
+            stop("lhei must have length = ", nrow(lmat))
+        csc = TRUE
+        if (any(dendrogram == "both") || any(dendrogram == "column"))
+            ColSideColors = ColSideColors[colInd]
+    }
+     
+    if (!missing(RowSideColors) || !is.null(RowSideColors)) {
+        if (!is.character(RowSideColors) || length(RowSideColors) != nr) 
+            stop("'RowSideColors' must be a colors character vector of length nrow(mat)")
+        lmat = cbind(lmat[, 1], c(rep(NA, nrow(lmat) - 1), nrow(lmat) + 2), lmat[, 2] + 
+               c(rep(0, nrow(lmat) - 1), 1))
+        if (missing(lwid) || is.null(lwid)) 
+            lwid = c(keysize, 0.15, 4)
+        if (length(lwid) != ncol(lmat)) 
+            stop("lwid must have length = ", ncol(lmat))
+        rsc = TRUE
+        if (any(dendrogram == "both") || any(dendrogram == "row")) 
+            RowSideColors = RowSideColors[rowInd]
+    }
+
+    lmat[is.na(lmat)] = 0
+
     if (missing(lhei) || is.null(lhei)) 
         lhei = c(keysize, 4)
 
     if (missing(lwid) || is.null(lwid)) 
         lwid = c(keysize, 4)
- 
-    lmat = matrix(c(1, 2, 3, 4), 2, 2, byrow = TRUE)
 
     if (length(lhei) != nrow(lmat)) 
-        stop("'lhei' must have length = 2.")
+        stop("'lhei' must have length = ", nrow(lmat))
 
     if (length(lwid) != ncol(lmat)) 
-        stop("'lwid' must have length = 2.")
+        stop("'lwid' must have length = ", ncol(lmat))
 
     if (isTRUE(zoom)) {
         getOption("device")("xpos" = 65)
@@ -150,7 +191,7 @@ function(mat,
     layout(lmat, widths = lwid, heights = lhei, respect = FALSE)
 
     #-- layout 1 --#
-    par(mar = c(5, 4, 2, 1), cex = 0.75)
+    par(mar = c(5, 2, 2, 1), cex = 0.75)
 
     z = seq(0, 1, length = length(col))
     z = matrix(z, ncol = 1)
@@ -162,19 +203,41 @@ function(mat,
     xv = (as.numeric(lv) - min.mat) / (max.mat - min.mat)
     axis(1, at = xv, labels = round(lv, 2))
     title("Color key", font.main = 1)
-
+	
     #-- layout 2 --#   
     par(mar = c(0, 0, if (!is.null(main)) 5 else 0, margins[2]))
-    plot(ddc, axes = FALSE, xaxs = "i", leaflab = "none")
+    if (any(dendrogram == "both") || any(dendrogram == "column")) {
+        plot(ddc, axes = FALSE, xaxs = "i", leaflab = "none")
+    }
+    else {
+        plot(0, 0, axes = FALSE, type = "n", xlab = "", ylab = "")	
+    }
 
     if (!is.null(main)) 
         title(main, cex.main = 1.5 * op[["cex.main"]])
 
     #-- layout 3 --#
-    par(mar = c(margins[1], 0, 0, 0))
-    plot(ddr, horiz = TRUE, axes = FALSE, yaxs = "i", leaflab = "none")
-
+    if (isTRUE(csc)) {
+        par(mar = c(0.5, 0, 0, margins[2]))
+        image(cbind(1:nc), col = ColSideColors, axes = FALSE)	
+    }
+	
     #-- layout 4 --#
+    par(mar = c(margins[1], 0, 0, 0))
+    if (any(dendrogram == "both") || any(dendrogram == "row")) {
+        plot(ddr, horiz = TRUE, axes = FALSE, yaxs = "i", leaflab = "none")    
+    }
+    else {
+        plot(0, 0, axes = FALSE, type = "n", xlab = "", ylab = "")	
+    }
+
+    #-- layout 5 --#
+    if (isTRUE(rsc)) {
+        par(mar = c(margins[1], 0, 0, 0.5))
+        image(rbind(1:nr), col = RowSideColors, axes = FALSE)	
+    }
+	
+    #-- layout 6 --#
     par(mar = c(margins[1], 0, 0, margins[2]))
     image(1:nc, 1:nr, mat, xlim = 0.5 + c(0, nc), ylim = 0.5 + 
         c(0, nr), axes = FALSE, xlab = "", ylab = "", col = col, 
@@ -264,6 +327,9 @@ function(mat,
                 cexCol = min(1, 0.2 + 1/log10(nc.zoom))
 
                 lmat = matrix(c(1, 0, 0, 2), 2, 2, byrow = TRUE)
+                if (isTRUE(csc)) lmat = matrix(c(1, 0, 0, 2, 0, 3), 3, 2, byrow = TRUE)
+                if (isTRUE(rsc)) lmat = matrix(c(1, 0, 0, 0, 2, 3), 2, 3, byrow = TRUE)
+                if (isTRUE(csc) && isTRUE(rsc)) lmat = matrix(c(1, 0, 0, 0, 0, 2, 0, 3, 4), 3, 3, byrow = TRUE)
                 layout(lmat, widths = lwid, heights = lhei, respect = FALSE)
 
                 # layout 1
@@ -278,6 +344,18 @@ function(mat,
                 title("Color key", font.main = 1)
 
                 # layout 2
+                if (isTRUE(csc)) {
+                    par(mar = c(0.5, 0, 0, margins[2] + 1))
+                    image(cbind(1:nr.zoom), col = ColSideColors[xleft:xright], axes = FALSE)	
+                }
+				
+                # layout 3
+                if (isTRUE(rsc)) {
+                    par(mar = c(margins[1] + 1, 0, 0, 0.5))
+                    image(rbind(1:nc.zoom), col = RowSideColors[ybottom:ytop], axes = FALSE)	
+                }
+				
+                # layout 4
                 par(mar = c(margins[1] + 1, 0, 0, margins[2] + 1))
                 image(1:nr.zoom, 1:nc.zoom, mat.zoom, col = col, 
                 breaks = breaks, axes = FALSE, xlab = "", ylab = "")
@@ -300,6 +378,17 @@ function(mat,
     }
 
     par(op)
-    invisible(list(rowInd = rowInd, colInd = colInd, ddc = ddc, ddr = ddr,
-              labCol = labCol, labRow = labRow))
+    res = list(labCol = labCol, labRow = labRow)
+	
+    if (any(dendrogram == "both") || any(dendrogram == "row")) {
+        res$rowInd = rowInd
+        res$ddr = ddr		
+    }
+	
+    if (any(dendrogram == "both") || any(dendrogram == "column")) {
+        res$colInd = colInd
+        res$ddc = ddc
+    }
+	
+    return(invisible(res))
 }
