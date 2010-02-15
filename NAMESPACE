@@ -51,6 +51,7 @@ S3method(plotVar, spls)
 S3method(plotVar, plsda)
 S3method(plotVar, splsda)
 S3method(plotVar, rcc)
+S3method(plotVar, pca)
 
 S3method(predict, pls)
 S3method(predict, spls)

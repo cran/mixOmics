@@ -1,7 +1,7 @@
 Package: mixOmics
 Type: Package
 Title: Integrate Omics data project
-Version: 2.9-1
+Version: 2.9-2
 Date: 2010-02-15
 Depends: igraph, rgl, lattice
 Author: Sebastien Dejean, Ignacio Gonzalez, Kim-Anh Le Cao and Pierre
@@ -22,5 +22,5 @@ Description: The package supplies two efficients methodologies:
         are provided to help interpreting the results.
 License: GPL (>= 2)
 Repository: CRAN
-Date/Publication: 2010-11-08 07:32:15
-Packaged: 2010-11-07 22:37:22 UTC; klecao
+Date/Publication: 2011-01-27 10:34:22
+Packaged: 2011-01-27 05:35:18 UTC; klecao

@@ -23,13 +23,8 @@ method = c("max.dist", "class.dist", "centroids.dist", "mahalanobis.dist")
 
 - Functions pls, plsda, spls and splsda were modified to identify zero- or near-zero variance predictors.
 
-<<<<<<< .mine
--Functions plotVar.plsda, plotVar.splsda, plot3dVar.plsda, plot3dVar.splsda were modified to represent only the X variables
-
-=======
 - Functions plotVar.plsda, plotVar.splsda, plot3dVar.plsda, plot3dVar.splsda were modified to represent only the X variables
 
->>>>>>> .r49
 - New function: 'nearZeroVar' for identification of zero- or near-zero variance predictors 
 
 Changes in 2.8-1
