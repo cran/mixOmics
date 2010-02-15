@@ -28,7 +28,7 @@ function(object, ...) UseMethod("plotIndiv")
 
 
 #--------------------- PLS and sPLS ---------------------#
-plotIndiv.pls <- plotIndiv.spls <- 
+plotIndiv.pls <- plotIndiv.spls <- plotIndiv.plsda <- plotIndiv.splsda <- 
 function(object, 
          comp = 1:2, 
          ind.names = TRUE,

@@ -1,3 +1,19 @@
+Changes in 2.8-1
+================
+
+New features:
+-------------
+- new arguments ("axis.labelX", "axis.labelY") in the function imgCor, to indicate if the labels of axis have to be shown or not
+
+- new classes splsda and plsda for predict, print, plotIndiv, plot3dIndiv, plotVar, plot3dVar
+
+- several prediction functions are avaiable to predict the classes of test data with plsda and splsda see predit (argument 'method' ("class.dist", "centroids.dist", "Sr.dist", "max.dist"))
+
+- new functions map & unmap borrowed from the mclust package
+
+
+Bug fixes:
+----------
 
 
 Changes in 2.7-1

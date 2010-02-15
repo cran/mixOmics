@@ -7,6 +7,7 @@ imgCor,
 jet.colors,
 loo,
 mat.rank, 
+map,
 Mfold,
 network,
 nipals, 
@@ -23,7 +24,8 @@ scatterutil.eti,
 scatterutil.grid, 
 s.match,
 spls,
-splsda, 
+splsda,
+unmap, 
 vip, 
 valid)
 
@@ -38,14 +40,21 @@ S3method(plot, rcc)
 
 S3method(plotIndiv, pls)
 S3method(plotIndiv, spls)
+S3method(plotIndiv, plsda)
+S3method(plotIndiv, splsda)
+
 S3method(plotIndiv, rcc)
 
 S3method(plotVar, pls)
 S3method(plotVar, spls)
+S3method(plotVar, plsda)
+S3method(plotVar, splsda)
 S3method(plotVar, rcc)
 
 S3method(predict, pls)
 S3method(predict, spls)
+S3method(predict, plsda)
+S3method(predict, splsda)
 
 S3method(summary, pls)
 S3method(summary, spls)
@@ -53,11 +62,15 @@ S3method(summary, rcc)
 
 S3method(print, pls)
 S3method(print, spls)
+S3method(print, plsda)
+S3method(print, splsda)
 S3method(print, rcc)
 S3method(print, summary)
 
 S3method(plot3dIndiv, pls)
 S3method(plot3dIndiv, spls)
+S3method(plot3dIndiv, plsda)
+S3method(plot3dIndiv, splsda)
 S3method(plot3dIndiv, rcc)
 S3method(plot3dIndiv, pca)
 
@@ -65,6 +78,9 @@ S3method(plot3dVar, pls)
 S3method(plot3dVar, spls)
 S3method(plot3dVar, rcc)
 S3method(plot3dVar, pca)
+S3method(plot3dVar, plsda)
+S3method(plot3dVar, splsda)
+
 
 S3method(network, default)
 S3method(network, rcc)

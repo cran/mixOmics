@@ -4,6 +4,8 @@
 \alias{plot3dVar.rcc}
 \alias{plot3dVar.pls}
 \alias{plot3dVar.spls}
+\alias{plot3dVar.plsda}
+\alias{plot3dVar.splsda}
 \alias{plot3dVar.pca}
 
 \title{Plot of Variables in three dimensions}
@@ -14,20 +16,32 @@ This function provides variables representation in three dimensions for
 }
 
 \usage{
-\method{plot3dVar}{rcc}(object, comp = 1:3, rad.in = 0.5, 
+\method{plot3dVar}{rcc}(object, comp = 1:3, rad.in = 1, 
           cutoff = NULL, X.label = FALSE, Y.label = FALSE, 
           pch = NULL, cex = NULL, col = NULL, font = NULL,
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
 
-\method{plot3dVar}{pls}(object, comp = 1:3, rad.in = 0.5, 
+\method{plot3dVar}{pls}(object, comp = 1:3, rad.in = 1, 
           keep.var = FALSE, X.label = FALSE, Y.label = FALSE,
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
 
-\method{plot3dVar}{spls}(object, comp = 1:3, rad.in = 0.5, 
+\method{plot3dVar}{spls}(object, comp = 1:3, rad.in = 1, 
+          keep.var = TRUE, X.label = FALSE, Y.label = FALSE,
+          pch = NULL, cex = NULL, col = NULL, font = NULL, 
+          axes.box = "all", label.axes.box = "both",		
+          xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
+
+\method{plot3dVar}{plsda}(object, comp = 1:3, rad.in = 1, 
           keep.var = FALSE, X.label = FALSE, Y.label = FALSE,
+          pch = NULL, cex = NULL, col = NULL, font = NULL, 
+          axes.box = "all", label.axes.box = "both",		
+          xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
+
+\method{plot3dVar}{splsda}(object, comp = 1:3, rad.in = 1, 
+          keep.var = TRUE, X.label = FALSE, Y.label = FALSE,
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)	 
@@ -42,7 +56,7 @@ This function provides variables representation in three dimensions for
   \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"spls"} or \code{"pca"}.}
   \item{comp}{an integer vector of length 3, the components that will be used on the \eqn{x}-axis,  
 	the \eqn{y}-axis and \eqn{z}-axis respectively to project the variables.}
-  \item{rad.in}{numeric between 0 and 1, the radius of the small sphere. Defaults to \code{0.5}.}
+  \item{rad.in}{numeric between 0 and 1, the radius of the small sphere. Defaults to \code{1}.}
   \item{cutoff}{numeric between 0 and 1. Variables with correlations below this cutoff 
     in absolute value are not plotted (see Details).}
   \item{X.label, Y.label}{either a character vector of names for the \eqn{X}- and  
@@ -54,7 +68,7 @@ This function provides variables representation in three dimensions for
   \item{cex}{numeric character (or item) expansion (see Details).}
   \item{font}{numeric font to be used. See \code{\link[rgl]{text3d}} for details.}
   \item{keep.var}{boolean. If \code{TRUE} only the variables with loadings not zero are plotted
-    (as selected by \code{spls}). Defaults to \code{FALSE}.}
+    (as selected by \code{spls} or \code{splsda}). Defaults to \code{FALSE} for the pls functions and \code{TRUE} for spls functions.}
   \item{axes.box}{character string or vector specifying the axes box type. Should be a subset 
     of \code{c("axes", "box", "bbox", "all")}.}
   \item{label.axes.box}{character string indicating whether to label the axes and/or boxes.
@@ -133,6 +147,18 @@ data(multidrug)
 pca.res <- pca(multidrug$ABC.trans, ncomp = 4, scale = TRUE)
 
 plot3dVar(pca.res)
+
+## variable representation for objects of class 'splsda'
+data(liver.toxicity)
+X = as.matrix(liver.toxicity$gene)
+Y = as.factor(liver.toxicity$treatment[,4])
+
+keepX = 20
+ncomp = 3
+
+splsda.liver = splsda(X, Y, ncomp = ncomp, keepX = c(rep(keepX, ncomp)), mode = 'regression')
+plot3dVar(splsda.liver, X.label = FALSE, Y.label = TRUE, keep.var = TRUE)
+
 }
 }
 

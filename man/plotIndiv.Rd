@@ -4,7 +4,8 @@
 \alias{plotIndiv.rcc}
 \alias{plotIndiv.pls}
 \alias{plotIndiv.spls}
-
+\alias{plotIndiv.plsda}
+\alias{plotIndiv.splsda}
 
 \title{Plot of Individuals (Experimental Units)}
 

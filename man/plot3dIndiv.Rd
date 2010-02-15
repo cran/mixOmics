@@ -4,6 +4,8 @@
 \alias{plot3dIndiv.rcc}
 \alias{plot3dIndiv.pls}
 \alias{plot3dIndiv.spls}
+\alias{plot3dIndiv.plsda}
+\alias{plot3dIndiv.splsda}
 \alias{plot3dIndiv.pca}
 
 \title{Plot of Individuals (Experimental Units) in three dimensions}
@@ -21,6 +23,18 @@ in three dimensions for (r)CCA and (s)PLS regression.
             axes.box = "box", \ldots)
 	  
 \method{plot3dIndiv}{pls}(object, comp = 1:3, ind.names = FALSE,
+            rep.space = "X-variate",
+            xlab = NULL, ylab = NULL, zlab = NULL,
+            col = "blue", cex = 1, pch = "s", font = 1,
+            axes.box = "box", \ldots)
+
+\method{plot3dIndiv}{splsda}(object, comp = 1:3, ind.names = FALSE,
+            rep.space = "X-variate",
+            xlab = NULL, ylab = NULL, zlab = NULL,
+            col = "blue", cex = 1, pch = "s", font = 1,
+            axes.box = "box", \ldots)
+
+\method{plot3dIndiv}{plsda}(object, comp = 1:3, ind.names = FALSE,
             rep.space = "X-variate",
             xlab = NULL, ylab = NULL, zlab = NULL,
             col = "blue", cex = 1, pch = "s", font = 1,

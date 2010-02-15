@@ -1,9 +1,8 @@
-\name{rcc-internal}
+\name{internal-functions}
 \encoding{latin1}
+\alias{bin.color}
 \alias{loo}
 \alias{Mfold}
-\alias{bin.color}
-
 
 \title{Regularized CCA Internal Functions}
 

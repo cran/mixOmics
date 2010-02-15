@@ -9,20 +9,20 @@ embeds variable selection for this purpose.
 }
 
 \usage{
-splsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06, 
-       keepX = c(rep(ncol(X), ncomp)))
+splsda(X, Y, ncomp = 2, keepX = c(rep(ncol(X), ncomp)), max.iter = 500, scaleY =TRUE, mode = 'regression', tol = 1e-06)
 }	
 
 \arguments{
   \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
-  \item{Y}{a factor or indicator matrix for the discrete outcome. If a matrix, the 
-	entries must be either 0 (not in class) or 1 (in class) for each sample (rows must sum to one).}
-  \item{ncomp}{the number of components to include in the model (see Details). 
-    Default is set to from one to the rank of \code{X}.}
-  \item{max.iter}{integer, the maximum number of iterations.}
-  \item{tol}{a positive real, the tolerance used in the iterative algorithm.}
+  \item{Y}{a factor or or a class vector for the discrete outcome.}
+  \item{ncomp}{the number of components to include in the model (see Details).}
   \item{keepX}{numeric vector of length \code{ncomp}, the number of variables
     to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
+  \item{max.iter}{integer, the maximum number of iterations.}   
+  \item{scaleY}{logical, indicates if Y should be scaled or not.}
+  \item{mode}{indicates the mode of analysis.
+  It can be either 'regression', 'classic' or 'invariant'}
+  \item{tol}{a positive real, the tolerance used in the iterative algorithm.} 
 }
 
 \details{
@@ -72,7 +72,7 @@ Wold H. (1966). Estimation of principal components and related models by iterati
 In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
 }
 
-\author{Ignacio González and Kim-Anh Lê Cao.}
+\author{Ignacio González, Kim-Anh Lê Cao and Pierre Monget.}
 
 \seealso{\code{\link{spls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
@@ -80,6 +80,7 @@ In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N
 \code{\link{cim}}, \code{\link{network}}.}
 
 \examples{
+# First example
 data(breast.tumors)
 X <- breast.tumors$gene.exp
 Y <- as.factor(breast.tumors$sample$treatment)
@@ -91,6 +92,17 @@ legend(-0.35, -0.19, c("After", "Before"), pch = c(16, 16),
        col = c("red", "blue"), cex = 1, pt.cex = c(1.2, 1.2), 
        title = "Treatment")
 palette("default")
+
+
+# Second example
+data(liver.toxicity)
+X = as.matrix(liver.toxicity$gene)
+Y = as.factor(liver.toxicity$treatment[,4])
+ncomp = 2
+keepX = 20
+splsda.liver = splsda(X, Y, ncomp = ncomp, keepX = c(rep(keepX, ncomp)),  mode = 'regression')
+col = as.numeric(Y)
+plotIndiv(splsda.liver, col = col)
 }
 
 \keyword{regression}

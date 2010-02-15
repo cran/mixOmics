@@ -9,15 +9,17 @@ to classify samples.
 }
 
 \usage{
-plsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06)
+plsda(X, Y, ncomp = 2, max.iter = 500, scaleY = TRUE, mode = "regression", tol = 1e-06)
 }	
 
 \arguments{
   \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
-  \item{Y}{a factor or indicator matrix for the discrete outcome. If a matrix, the 
-	entries must be either 0 (not in class) or 1 (in class) for each sample (rows must sum to one).}
+  \item{Y}{a factor or a class vector for the discrete outcome.}
   \item{ncomp}{the number of components to include in the model. Default to 2.}
-  \item{max.iter}{integer, the maximum number of iterations.}
+  \item{max.iter}{integer, the maximum number of iterations.}  
+  \item{scaleY}{logical, indicates if Y should be scaled or not.}
+  \item{mode}{indicates the mode of analysis.
+  It can be either 'regression', 'classic' or 'invariant'}
   \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
 }
 
@@ -52,13 +54,14 @@ least squares using microarray gene expression data. \emph{Bioinformatics}
 Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.
 }
 
-\author{Ignacio González and Kim-Anh Lê Cao.}
+\author{Ignacio González, Kim-Anh Lê Cao and Pierre Monget.}
 
 \seealso{\code{\link{splsda}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}.}
 
 \examples{
+# First example
 data(breast.tumors)
 X <- breast.tumors$gene.exp
 Y <- as.factor(breast.tumors$sample$treatment)
@@ -70,6 +73,14 @@ legend(18, -9, c("After", "Before"), pch = c(16, 16),
        col = c("red", "blue"), cex = 1, pt.cex = c(1.2, 1.2), 
        title = "Treatment")
 palette("default")
+
+# Second example
+data(liver.toxicity)
+X = as.matrix(liver.toxicity$gene)
+Y = as.factor(liver.toxicity$treatment[,4])
+plsda.liver = plsda(X, Y, ncomp = 2,  mode = 'regression')
+col = as.numeric(Y)
+plotIndiv(plsda.liver, col = col)
 }
 
 \keyword{regression}

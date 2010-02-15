@@ -5,6 +5,8 @@
 # Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
 # Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
 #
+# This function was borrowed from the mclust package
+#  
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -20,41 +22,15 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-plsda <-
-function(X, 
-         Y, 
-         ncomp = 2, 
-         max.iter = 500,
-         scaleY = TRUE,
-         mode = "regression",		 
-         tol = 1e-06)
+map <-
+function (Y, ...) 
 {
-	
-	#-- validation des arguments --#
-    if (length(dim(X)) != 2 || !is.numeric(X)) 
-        stop("'X' must be a numeric matrix.")
-     
-    n = nrow(X)
-     
-    if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0)
-        stop("invalid number of variates, 'ncomp'.")
-		
-	# / Testing the input Y
-	
-	if(is.null(dim(Y))){			
-			if(is.factor(Y)){
-				Yprim = unmap(as.numeric(Y))					
-				}else {stop(" Y should be a factor, please use 'as.factor(Y)' ")						
-			}
-	}		
-	# \ Testing input Y
-
-	result = pls(X, Yprim, ncomp = ncomp, mode = "regression", max.iter = max.iter, 
-                 tol = tol, scaleY = scaleY)
-
-	result$Yprim = Yprim
-	result$names$Y = levels(Y)
-    class(result) = "plsda"
-    return(invisible(result))	
+    nrowY <- nrow(Y)
+    cl <- numeric(nrowY)
+    I <- 1:nrowY
+    J <- 1:ncol(Y)
+    for (i in I) {
+        cl[i] <- (J[Y[i, ] == max(Y[i, ])])[1]
+    }
+    cl
 }
-

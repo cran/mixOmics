@@ -42,6 +42,29 @@ function(x, ...)
     cat(" variable names: see object$names \n")
 }
 
+#------------------ print method for plsda ------------------#
+print.plsda <-
+function(x, ...) 
+{
+
+    mode = paste("'", x$mode, "'", sep = "")
+	
+    cat("\nCall:\n", deparse(x$call), "\n\n")
+	
+    cat(" PLS-da  (regression mode) with", x$ncomp, "PLS components. \n")
+    cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
+    cat(" You entered data Y with ", ncol(x$Yprim) , "classes \n\n")
+
+    cat(" No variable selection \n\n")
+	
+    cat(" Available components: \n", 
+        "-------------------- \n")
+	
+    cat(" loading vectors: see object$loadings \n")
+    cat(" variates: see object$variates \n")
+    cat(" variable names: see object$names \n")
+}
+
 
 #----------------- print method for spls ------------------#
 print.spls <-
@@ -65,6 +88,33 @@ function(x, ...)
         "-------------------- \n")
 	
 	cat(" loading vectors: see object$loadings \n")
+    cat(" variates: see object$variates \n")
+    cat(" variable names: see object$names \n")
+}
+
+
+#----------------- print method for splsda ------------------#
+print.splsda <-
+function(x, ...)
+{
+
+    mode = paste("'", x$mode, "'", sep = "")
+    keepX = paste("[", x$keepX, "]", sep = "")
+    keepY = paste("[", x$keepY, "]", sep = "")
+	
+	cat("\nCall:\n", deparse(x$call), "\n\n")
+	
+    cat(" sPLS with a regression mode with", x$ncomp, "sPLS components. \n")
+    cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
+    cat(" You entered data Y with ", ncol(x$Yprim) , "classes \n\n")
+	
+    cat(" Selection of", keepX, "variables on each of the sPLS components on the X data set. \n")
+    cat(" No Y variables can be selection. \n\n")
+
+    cat(" Available components: \n", 
+        "-------------------- \n")
+	
+    cat(" loading vectors: see object$loadings \n")
     cat(" variates: see object$variates \n")
     cat(" variable names: see object$names \n")
 }

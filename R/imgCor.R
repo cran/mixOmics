@@ -2,7 +2,8 @@
 # Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
 # Ignacio González, Genopole Toulouse Midi-Pyrenees, France
 # Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
-# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+# Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
+# Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,6 +23,8 @@
 imgCor <-
 function(X, 
          Y, 
+	 axis.labelX = TRUE,
+	 axis.labelY = TRUE,
          type = c("combine", "separate"), 
          col = jet.colors(64)) 
 {
@@ -29,7 +32,11 @@ function(X,
     #-- validation des arguments --#
     if (length(dim(X)) != 2 || length(dim(Y)) != 2) 
         stop("'X' and/or 'Y' must be a numeric matrix.")
-     
+    
+	labCol = names(Y) 
+	labRow = names(X)
+	InvlabCol = names(X)
+	InvlabRow = names(Y)
     X = as.matrix(X)
     Y = as.matrix(Y)
      
@@ -39,6 +46,11 @@ function(X,
     type = match.arg(type)
     p = ncol(X)
     q = ncol(Y)
+	nc = ncol(X)
+	nr = ncol(Y)
+	invnc = ncol(Y)
+	invnr = ncol(X)
+	
      
     matcor = cor(cbind(X, Y), use = "pairwise")
     breaks = seq(-1, 1, length = length(col) + 1)
@@ -80,7 +92,7 @@ function(X,
         Ycor = cor(Y, use = "pairwise")
         XYcor = cor(X, Y, use = "pairwise")
         layout(matrix(c(1, 2, 3, 3, 4, 4), ncol = 2, nrow = 3, 
-             byrow = TRUE), widths = 1, heights = c(0.8, 1, 0.35))
+             byrow = TRUE), widths = 1, heights = c(0.6, 1, 0.35))
          
         #-- layout 1 --#
         par(pty = "s", mar = c(2, 2, 2, 1))
@@ -89,37 +101,51 @@ function(X,
             breaks = breaks)
         box()
          
-        #-- layout 2 --#
+        #-- layout 2 --#		
         image(1:q, 1:q, t(Ycor[q:1, ]), zlim = c(-1, 1), col = col,
         main = "Y correlation", axes = FALSE, xlab = "", ylab = "",
         breaks = breaks)
         box()
          
-        #-- layout 3 --#
+        #-- layout 3 --#		
         if (p > q) {
             XYcor = t(XYcor)
             p = ncol(Ycor)
-            q = ncol(Xcor)
+            q = ncol(Xcor)	
+			labCol = InvlabCol 
+			labRow = InvlabRow 		
+			nc = invnc
+			nr = invnr
         }
 
-        par(pty = "m", mai = c(0.25, 0.5, 0.3, 0.4)) 
+        par(pty = "m", mai = c(0.25, 0.5, 0.3, 1.0)) 
         image(1:q, 1:p, t(XYcor), zlim = c(-1, 1), col = col, 
-            main = "Cross-correlation", axes = FALSE, xlab = "", ylab = "",
-            breaks = breaks)
-        box()
+           main = "Cross-correlation", axes = FALSE, xlab = "", ylab = "",
+           breaks = breaks)			
+		box()
+		
+		if (axis.labelY == "TRUE") {
+			axis(4, 1:nc, labels = labRow, las = 2, line = -0.5, tick = 0, 
+			cex.axis = 1)			
+        }
+		
+		if (axis.labelX == "TRUE") {
+		axis(1, 1:nr, labels = labCol, las = 3, line = -0.5, tick = 0, 
+        cex.axis = 1)
+        }
          
-        #-- layout 4 --#
-        par(mai = c(0.6, 1.2, 0.1, 1))  
+        #-- layout 4 --#		
+        par(mai = c(0.5, 0.6, 0.6, 1.0))  
         z = seq(-1, 1, length = length(col))
         breaks = seq(-1, 1, length = length(col) + 1)
          
         image(z = matrix(z, ncol = 1), col = col, breaks = breaks, 
-            xaxt = "n", yaxt = "n")
+           xaxt = "n", yaxt = "n")
         box()
          
         par(usr = c(-1, 1, -1, 1))
         axis(1, at = c(-1, -0.5, 0, 0.5, 1))
-        mtext(side = 1, "Value", line = 2.5, cex = 0.8)
+        mtext(side = 1, "Value", line = 2.5, cex = 0.8)	
     }
-    par(def.par)
+    par(def.par)	
 }
