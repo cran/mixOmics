@@ -1,5 +1,6 @@
 \name{network}
 \encoding{latin1}
+\alias{network.default}
 \alias{network.rcc}
 \alias{network.spls}
 \alias{network}
@@ -12,25 +13,21 @@ and (sparse) PLS regression.
 }
 
 \usage{
-\method{network}{rcc}(object, comp = 1, threshold = 0.5, 
-        X.names = NULL, Y.names = NULL, 
-        color.node = c("white", "white"), 
-        shape.node = c("circle", "rectangle"), 
-        color.edge = c("red", "blue"), 
-        lty.edge = c("solid", "solid"), lwd.edge = c(1, 1), 
-        show.edge.labels = FALSE, interactive = FALSE, alpha = 1, ...)	
+\method{network}{default}(mat, threshold = 0.5, X.names = NULL, Y.names = NULL,
+   color.node = c("white", "white"), shape.node = c("circle", "rectangle"), 
+   color.edge = c("blue", "red"), lty.edge = c("solid", "solid"), 
+   lwd.edge = c(1, 1), show.edge.labels = FALSE, show.color.key = TRUE, 
+   symkey = TRUE, keysize = 1, breaks, interactive = FALSE, alpha = 1, \ldots)
 
-\method{network}{spls}(object, comp = 1, threshold = 0.5, 
-        X.names = NULL, Y.names = NULL, keep.var = TRUE, 
-        color.node = c("white", "white"),
-        shape.node = c("circle", "rectangle"), 
-        color.edge = c("red", "blue"),
-        lty.edge = c("solid", "solid"), lwd.edge = c(1, 1), 
-        show.edge.labels = FALSE, interactive = FALSE, alpha = 1, ...)		
+\method{network}{rcc}(object, comp = 1, X.names = NULL, Y.names = NULL, \ldots)
+
+\method{network}{spls}(object, comp = 1, X.names = NULL, Y.names = NULL, 
+        keep.var = TRUE, \ldots)		
 }
 
 \arguments{
-  \item{object}{object returned by \code{rcc}.}
+  \item{mat}{numeric matrix of values to be represented.}
+  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"} or \code{"spls"}.}
   \item{comp}{atomic or vector of positive integers. The components to adequately account 
     for the data association. Defaults to \code{comp = 1}.}
   \item{threshold}{numeric value between \code{0} and \code{1}. The tuning 
@@ -43,16 +40,25 @@ and (sparse) PLS regression.
     \eqn{Y}	nodes (see Details).}
   \item{shape.node}{character vector of length two, the shape of the \eqn{X} and  
     \eqn{Y} nodes (see Details).}
-  \item{color.edge}{vector of length two. The colors of the edges (see Details).}
+  \item{color.edge}{vector of colors or character string specifying the colors function to using
+     to color the edges (see Details).}
   \item{lty.edge}{character vector of length two, the line type for the edges (see Details).}
   \item{lwd.edge}{vector of length two, the line width of the edges (see Details).}
   \item{show.edge.labels}{logical. If \code{TRUE}, plot association values as edge 
 	labels (defaults to \code{FALSE}).}
+  \item{show.color.key}{boolean. If \code{TRUE} a color key should be plotted.}
+  \item{symkey}{boolean indicating whether the color key should be made symmetric about 0. 
+	Defaults to \code{TRUE}.}
+  \item{keysize}{numeric value indicating the size of the color key.}
+  \item{breaks}{(optional) either a numeric vector indicating the splitting points for 
+    binning \code{mat} into colors, or a integer number of break points to be used, in 
+	which case the break points will be spaced equally between \code{min(mat)} 
+	and \code{max(mat)}.}
   \item{interactive}{logical. If \code{TRUE}, a scrollbar is created to change the
     threshold value interactively (defaults to \code{FALSE}). See Details.}
   \item{alpha}{numeric value. Tuning parameter to enhance the differences between edges corresponding to
     low and high correlations. Defaults to \code{alpha = 1}.}	
-  \item{...}{not used currently.}
+  \item{\ldots}{arguments passed to \code{network.default}.}
 }
 
 \details{
@@ -65,12 +71,14 @@ In \code{rcc}, to identify \eqn{X}-\eqn{Y} pairs showing relevant associations, 
 similarity measure between \eqn{X} and \eqn{Y} variables in a pair-wise manner: the 
 scalar product value between every pairs of vectors in dimension \code{length(comp)} representing 
 the variables \eqn{X} and \eqn{Y} on the axis defined by \eqn{Z_i} with \eqn{i} in \code{comp}, 
-where \eqn{Z_i} is the bisector vector between the \eqn{i}-th \eqn{X} and \eqn{Y} canonical variate. 
+where \eqn{Z_i} is the equiangular vector between the \eqn{i}-th \eqn{X} and \eqn{Y} canonical variate. 
 
-In \code{spls}, the similarity measure between \eqn{X} and \eqn{Y} variables is given
-by the scalar product value between every pairs of vectors in dimension \code{length(comp)} representing 
-the variables \eqn{X} and \eqn{Y} on the axis defined by \eqn{U_i} with \eqn{i} in \code{comp}, where 
-\eqn{U_i} is the \eqn{i}-th \eqn{X} variate.
+In \code{spls}, if \code{object$mode} is \code{regression}, the similarity measure between \eqn{X} and 
+\eqn{Y} variables is given by the scalar product value between every pairs of vectors in dimension 
+\code{length(comp)} representing the variables \eqn{X} and \eqn{Y} on the axis defined by \eqn{U_i} with 
+\eqn{i} in \code{comp}, where \eqn{U_i} is the \eqn{i}-th \eqn{X} variate. If \code{object$mode} is 
+\code{canonical} then \eqn{X} and \eqn{Y} are represented on the axis defined by \eqn{U_i} and \eqn{V_i} 
+respectively.
 
 Variable pairs with a high similarity measure (in absolute value) are considered as relevant. 
 By changing the threshold, one can tune the relevance of the associations to include or 
@@ -85,17 +93,15 @@ associated to the display network.
 The interactive process is terminated by clicking the second button and selecting `Stop' 
 from the menu, or from the `Stop' menu on the graphics window. 
 
-The \code{color.node} and \code{color.edge} are vectors of length two, 
+The \code{color.node} is a vector of length two, 
 of any of the three kind of \code{R} colors, i.e., either a color name 
 (an element of \code{colors()}), a hexadecimal string of the form \code{"#rrggbb"}, 
-or an integer \code{i} meaning \code{palette()[i]}. 
-
-\code{color.node[1]} and 
+or an integer \code{i} meaning \code{palette()[i]}. \code{color.node[1]} and 
 \code{color.node[2]} give the color for filled nodes of the \eqn{X}- and \eqn{Y}-variables
 respectively. Defaults to \code{c("white", "white")}.
  
-\code{color.edge[1]} and \code{color.egde[2]} give the color to 
-edges with positive and negative weight respectively. Defaults to \code{c("red", "blue")}.
+\code{color.edge} give the color to edges with colors corresponding to the values in 
+\code{mat}. Defaults to \code{c("blue", "red")} for low and high weight respectively.
 
 \code{shape.node[1]} and \code{shape.node[2]} provide the shape of the nodes associate
 to \eqn{X}- and \eqn{Y}-variables respectively. Current acceptable values are 
@@ -143,7 +149,7 @@ require(igraph)
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
-nutri.res <- rcc(X, Y, lambda1 = 0.064, lambda2 = 0.008)
+nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 \dontrun{   # may not work on the Linux version, use Windows instead
 network(nutri.res, comp = 1:3, threshold = 0.6)
@@ -151,14 +157,14 @@ network(nutri.res, comp = 1:3, threshold = 0.6)
 
 ## Changing the attributes of the network
 \dontrun{
-network(nutri.res, comp = 1:3, threshold = 0.6,
-        color.node = c("mistyrose", "lightcyan"),
+network(nutri.res, comp = 1:3, threshold = 0.45,
+        color.node = c("mistyrose", "lightcyan"),,
         shape.node = c("circle", "rectangle"), 
-        color.edge = c("red", "blue"),
-        lty.edge = c("dashed", "solid"), 
-        lwd.edge = c(2, 2), 
-        show.edge.labels = TRUE)
+        color.edge = jet.colors(8),
+        lty.edge = c("solid", "solid"), lwd.edge = c(2, 2), 
+        show.edge.labels = FALSE)
 }
+
 ## interactive 'threshold' 
 \dontrun{
 network(nutri.res, comp = 1:3, threshold = 0.55, interactive = TRUE)

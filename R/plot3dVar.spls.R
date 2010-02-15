@@ -19,13 +19,23 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
 plot3dVar.pls <- plot3dVar.spls <- 
-function(object, comp = 1:3, rad.in = 0.5, keep.var = FALSE, 
-        X.label = FALSE, Y.label = FALSE,
-        pch = NULL, cex = NULL, col = NULL, font = NULL, 
-        axes.box = "all", label.axes.box = "both",		
-        xlab = NULL, ylab = NULL, zlab = NULL, ...)
+function(object, 
+         comp = 1:3, 
+         rad.in = 0.5, 
+         keep.var = FALSE, 
+         X.label = FALSE, 
+         Y.label = FALSE,
+         pch = NULL, 
+         cex = NULL, 
+         col = NULL, 
+         font = NULL, 
+         axes.box = "all", 
+         label.axes.box = "both",		
+         xlab = NULL, 
+         ylab = NULL, 
+         zlab = NULL, 
+         ...)
 {
 
     # validation des arguments #
@@ -43,15 +53,32 @@ function(object, comp = 1:3, rad.in = 0.5, keep.var = FALSE,
 
     # calcul des coordonnées #
     #------------------------#
-    if (keep.var) {
+    if (isTRUE(keep.var)) {
         keep.X = apply(abs(object$loadings$X), 1, sum) > 0
         keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
-        cord.X = cor(object$X[, keep.X], object$variates$X[, comp], use = "pairwise")
-        cord.Y = cor(object$Y[, keep.Y], object$variates$X[, comp], use = "pairwise")
+
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
+                     use = "pairwise")
+            cord.Y = cor(object$Y[, keep.Y], object$variates$Y[, comp], 
+                     use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
+                     use = "pairwise")
+            cord.Y = cor(object$Y[, keep.Y], object$variates$X[, comp], 
+                     use = "pairwise")
+        }
     }
     else {
-        cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
-        cord.Y = cor(object$Y, object$variates$X[, comp], use = "pairwise")
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
+            cord.Y = cor(object$Y, object$variates$Y[, comp], use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
+            cord.Y = cor(object$Y, object$variates$X[, comp], use = "pairwise")
+        }
     }
 
     p = ncol(object$X)
@@ -121,8 +148,7 @@ function(object, comp = 1:3, rad.in = 0.5, keep.var = FALSE,
     # le plot 3d #
     #------------#
     opw = open3d(windowRect = c(500, 30, 1100, 630))
-    
-#    par3d(userMatrix = rotationMatrix(-pi/4, -1, 4, 1.25/pi))
+     
 	par3d(userMatrix = rotationMatrix(pi/80, 1, -1/(100*pi), 0))
 	
     if (any(axes.box == "axes") || any(axes.box == "all"))

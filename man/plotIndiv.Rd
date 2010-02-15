@@ -15,17 +15,17 @@ representation in (r)CCA and (s)PLS regression.
 
 \usage{
 \method{plotIndiv}{rcc}(object, comp = 1:2, ind.names = TRUE,
-          rep.space = c("X-variate", "Y-variate", "XY-variate"),
+          rep.space = "XY-variate",
           x.label = NULL, y.label = NULL,
           col = "black", cex = 1, pch = 1, \ldots)
 	  
 \method{plotIndiv}{pls}(object, comp = 1:2, ind.names = TRUE,
-          rep.space = c("X-variate", "Y-variate", "XY-variate"),
+          rep.space = "X-variate",
           x.label = NULL, y.label = NULL,  
           col = "black", cex = 1, pch = 1, \ldots)	
 
 \method{plotIndiv}{spls}(object, comp = 1:2, ind.names = TRUE,
-          rep.space = c("X-variate", "Y-variate", "XY-variate"),
+          rep.space = "X-variate",
           x.label = NULL, y.label = NULL,  
           col = "black", cex = 1, pch = 1, \ldots)		  
 }
@@ -39,7 +39,8 @@ representation in (r)CCA and (s)PLS regression.
 	data matrix is used as names (see Details).}
   \item{rep.space}{character string, (partially) matching one of \code{"X-variate"}, 
     \code{"Y-variate"} or \code{"XY-variate"}, determining the subspace to project the 
-	  individuals. Defaults to \code{"X-variate"}.}
+	  individuals. Defaults to \code{"XY-variate"} and \code{"X-variate"} for (r)CCA and (s)PLS 
+      respectivvely.}
   \item{x.label, y.label}{\eqn{x}- and \eqn{y}-axis titles.}
   \item{col}{character (or symbol) color to be used, possibly vector.}
   \item{cex}{numeric character (or symbol) expansion, possibly vector.}
@@ -51,10 +52,7 @@ representation in (r)CCA and (s)PLS regression.
 
 \details{
 \code{plotIndiv} method makes scatter plot for individuals representation  
-depending on the variate components selected and the subspace of projection. 
-Each point corresponds to an individual.
-If \code{rep.space="XY-variate"}, component \code{comp[1]} and \code{comp[2]} correspond to 
-\eqn{X}- and \eqn{Y}-variates respectively.
+depending on the subspace of projection. Each point corresponds to an individual.
 
 If \code{ind.names=TRUE} and row names is \code{NULL}, then \code{ind.names=1:n}, where
 \code{n} is the number of individuals. 
@@ -75,13 +73,13 @@ can be given its own graphic attributes (see \code{\link{par}}). Default values 
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
-nutri.res <- rcc(X, Y, lambda1 = 0.064, lambda2 = 0.008)
+nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 plotIndiv(nutri.res) #(default) 
 
 col <- rep(c("blue", "red"), c(20, 20))
 plotIndiv(nutri.res, ind.names = nutrimouse$diet, col = col)
-legend(-2.45, -1.21, c("WT", "PPAR"), pch = c(16, 16), 
+legend(-2.2, -1.1, c("WT", "PPAR"), pch = c(16, 16), 
        col = c("blue", "red"), text.col = c("blue", "red"),
        cex = 1, pt.cex = c(1.2, 1.2))
 

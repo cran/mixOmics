@@ -19,20 +19,26 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
 cim.spls <-
-function(object, comp = 1, X.names = NULL, Y.names = NULL, keep.var = TRUE, ...) 
+function(object, 
+         comp = 1, 
+         X.names = NULL, 
+         Y.names = NULL, 
+         keep.var = TRUE, 
+         ...) 
 {
 
+    # validation des arguments #
+	#--------------------------#
     dim = object$ncomp	
-	
+    	
     if (length(comp) == 1) {
 	    if (is.null(comp) || !is.numeric(comp) || comp <= 0)
             stop("invalid value for 'comp'.")
         if (comp > dim) 
             stop("'comp' must be smaller or equal than ", dim, ".")
     }
-	
+    	
     if (length(comp) > 1) {
         if(length(comp) > dim) 
             stop("the length of 'comp' must be smaller or equal than ", dim, ".")
@@ -41,7 +47,7 @@ function(object, comp = 1, X.names = NULL, Y.names = NULL, keep.var = TRUE, ...)
         if (any(comp > dim)) 
             stop("the elements of 'comp' must be smaller or equal than ", dim, ".")
     }
-	
+    	
     p = ncol(object$X)
     q = ncol(object$Y)
 		
@@ -52,34 +58,51 @@ function(object, comp = 1, X.names = NULL, Y.names = NULL, keep.var = TRUE, ...)
         stop("'Y.names' must be a character vector of length ", q, ".")
 		
     comp = round(comp)
-
-    if (keep.var) {
+     
+    # Calcul de la matrice des associations entre les variables X et Y #
+    #------------------------------------------------------------------#
+    if (isTRUE(keep.var)) {
         keep.X = apply(abs(object$loadings$X), 1, sum) > 0
         keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
-        cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
+
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
                      use = "pairwise")
-        cord.Y = cor(object$Y[, keep.Y], object$variates$X[, comp], 
-                     use = "pairwise")					 
+            cord.Y = cor(object$Y[, keep.Y], object$variates$Y[, comp], 
+                     use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
+                     use = "pairwise")
+            cord.Y = cor(object$Y[, keep.Y], object$variates$X[, comp], 
+                     use = "pairwise")
+        }		
 		
-		if (is.null(X.names)) X.names = object$names$X[keep.X]
+        if (is.null(X.names)) X.names = object$names$X[keep.X]
 	    if (is.null(Y.names)) Y.names = object$names$Y[keep.Y]
     }
     else {
-        cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
-        cord.Y = cor(object$Y, object$variates$X[, comp], use = "pairwise")
-		
-		if (is.null(X.names)) X.names = object$names$X
-	    if (is.null(Y.names)) Y.names = object$names$Y
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
+            cord.Y = cor(object$Y, object$variates$Y[, comp], use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
+            cord.Y = cor(object$Y, object$variates$X[, comp], use = "pairwise")
+        }
+     		
+        if (is.null(X.names)) X.names = object$names$X
+        if (is.null(Y.names)) Y.names = object$names$Y
     }
-	
-	simMat = cord.X %*% t(cord.Y)
-	if (ncol(simMat) < nrow(simMat)) {
+     	
+    simMat = cord.X %*% t(cord.Y)
+    if (ncol(simMat) < nrow(simMat)) {
         simMat = t(simMat)
         aux.names = X.names
-		X.names = Y.names
-		Y.names = aux.names
+        X.names = Y.names
+        Y.names = aux.names
     }  
-	
+     	
     result = cim(simMat, labRow = X.names, labCol = Y.names, ...)
     return(invisible(result))
 }

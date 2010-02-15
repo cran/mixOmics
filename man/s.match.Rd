@@ -50,8 +50,8 @@ s.match(df1xy, df2xy, xax = 1, yax = 2, pch = 20, cpoint = 1,
 
 \details{
 Graphical of the samples (individuals) is displayed in a superimposed manner where each sample will be 
-indicated using an arrow. The start of the arrow indicates the location of the sample in $X$ in one plot, 
-and the tip the location of the sample in $Y$ in the other plot. Short arrows indicate if both data sets 
+indicated using an arrow. The start of the arrow indicates the location of the sample in \eqn{X} in one plot, 
+and the tip the location of the sample in \eqn{Y} in the other plot. Short arrows indicate if both data sets 
 strongly agree and long arrows a disagreement between the two data sets.
 }
 

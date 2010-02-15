@@ -19,21 +19,33 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
-
 cim <-
 function(...) UseMethod("cim")
 
 cim.default <-
-function(mat, breaks, col = jet.colors, 
-        distfun = dist, hclustfun = hclust,
-        labRow = NULL, labCol = NULL, symkey = TRUE, zoom = FALSE, 
-        main = NULL, xlab = NULL, ylab = NULL, keysize = 1, 
-        cexRow = min(1, 0.2 + 1/log10(nr)), 
-        cexCol = min(1, 0.2 + 1/log10(nc)), 
-        margins = c(5, 5), lhei = NULL, lwid = NULL, ...) 
+function(mat, 
+         breaks, 
+         col = jet.colors, 
+         distfun = dist, 
+         hclustfun = hclust,
+         labRow = NULL, 
+         labCol = NULL, 
+         symkey = TRUE, 
+         zoom = FALSE, 
+         main = NULL, 
+         xlab = NULL, 
+         ylab = NULL, 
+         keysize = 1, 
+         cexRow = min(1, 0.2 + 1/log10(nr)), 
+         cexCol = min(1, 0.2 + 1/log10(nc)), 
+         margins = c(5, 5), 
+         lhei = NULL, 
+         lwid = NULL,
+         ...) 
 {
 
+    # validation des arguments #
+	#--------------------------#
     if (length(dim(mat)) != 2) 
         stop("'mat' must be a numeric matrix.")
 
@@ -44,6 +56,16 @@ function(mat, breaks, col = jet.colors,
 
     nr = nrow(mat)
     nc = ncol(mat)
+	
+    if (!is.null(labRow)) {
+        if (length(labRow) != nr)
+            stop("the length of 'labRow' must be equal to nrow(mat) = ", nr, ".")
+    }
+
+    if (!is.null(labCol)) {
+        if (length(labCol) != nc)
+            stop("the length of 'labCol' must be equal to ncol(mat) = ", nc, ".")
+    }	
 
     if (isTRUE(symkey)) {
         max.mat = max(abs(mat))
@@ -72,14 +94,15 @@ function(mat, breaks, col = jet.colors,
     mat = mat[rowInd, colInd]
 
     if (is.null(labRow)) 
-        labRow = if (is.null(rownames(mat))) (1:nr)[rowInd]
-                 else rownames(mat)
+        labRow = if (is.null(rownames(mat))) (1:nr)[rowInd] else rownames(mat)
     else labRow = labRow[rowInd]
 
     if (is.null(labCol)) 
-        labCol = if (is.null(colnames(mat))) (1:nc)[colInd]
-                 else colnames(mat)
+        labCol = if (is.null(colnames(mat))) (1:nc)[colInd] else colnames(mat)
     else labCol = labCol[colInd]
+	
+    rownames(mat) = labRow
+    colnames(mat) = labCol
 
     if (missing(breaks) || is.null(breaks)) {
         if (class(col) == "function") breaks = 33
@@ -126,30 +149,32 @@ function(mat, breaks, col = jet.colors,
     on.exit(par(op))
     layout(lmat, widths = lwid, heights = lhei, respect = FALSE)
 
-#-- layout 1 --#
+    #-- layout 1 --#
     par(mar = c(5, 4, 2, 1), cex = 0.75)
-    z = seq(min.mat, max.mat, length = length(col))
-z = matrix(z, ncol = 1)
-    image(z, col = col, breaks = breaks, xaxt = "n", yaxt = "n")
-box()
+
+    z = seq(0, 1, length = length(col))
+    z = matrix(z, ncol = 1)
+    image(z, col = col, xaxt = "n", yaxt = "n")
+    box()
     par(usr = c(0, 1, 0, 1))
-    lv = pretty(breaks)
+    lv = c(min.breaks, (3*min.breaks + max.breaks)/4, (min.breaks + max.breaks)/2,
+           (3*max.breaks + min.breaks)/4, max.breaks)
     xv = (as.numeric(lv) - min.mat) / (max.mat - min.mat)
-    axis(1, at = xv, labels = lv)
+    axis(1, at = xv, labels = round(lv, 2))
     title("Color key", font.main = 1)
 
-#-- layout 2 --#   
+    #-- layout 2 --#   
     par(mar = c(0, 0, if (!is.null(main)) 5 else 0, margins[2]))
-plot(ddc, axes = FALSE, xaxs = "i", leaflab = "none")
+    plot(ddc, axes = FALSE, xaxs = "i", leaflab = "none")
 
     if (!is.null(main)) 
         title(main, cex.main = 1.5 * op[["cex.main"]])
 
-#-- layout 3 --#
+    #-- layout 3 --#
     par(mar = c(margins[1], 0, 0, 0))
     plot(ddr, horiz = TRUE, axes = FALSE, yaxs = "i", leaflab = "none")
 
-#-- layout 4 --#
+    #-- layout 4 --#
     par(mar = c(margins[1], 0, 0, margins[2]))
     image(1:nc, 1:nr, mat, xlim = 0.5 + c(0, nc), ylim = 0.5 + 
         c(0, nr), axes = FALSE, xlab = "", ylab = "", col = col, 
@@ -242,11 +267,14 @@ plot(ddc, axes = FALSE, xaxs = "i", leaflab = "none")
                 layout(lmat, widths = lwid, heights = lhei, respect = FALSE)
 
                 # layout 1
-                par(mar = c(5, 4, 2, 1), cex = 0.75)
-                image(z, col = col, breaks = breaks, xaxt = "n", yaxt = "n")
+                par(mar = c(5, 4, 2, 1), cex = 0.75)				
+                image(z, col = col, xaxt = "n", yaxt = "n")
                 box()
                 par(usr = c(0, 1, 0, 1))
-                axis(1, at = xv, labels = lv)
+                lv = c(min.breaks, (3*min.breaks + max.breaks)/4, (min.breaks + max.breaks)/2,
+                      (3*max.breaks + min.breaks)/4, max.breaks)
+                xv = (as.numeric(lv) - min.mat) / (max.mat - min.mat)
+                axis(1, at = xv, labels = round(lv, 2))
                 title("Color key", font.main = 1)
 
                 # layout 2
@@ -275,4 +303,3 @@ plot(ddc, axes = FALSE, xaxs = "i", leaflab = "none")
     invisible(list(rowInd = rowInd, colInd = colInd, ddc = ddc, ddr = ddr,
               labCol = labCol, labRow = labRow))
 }
-

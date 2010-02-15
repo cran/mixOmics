@@ -26,12 +26,10 @@ spls(X, Y, ncomp = 2, mode = c("regression", "canonical"),
   \item{max.iter}{integer, the maximum number of iterations.}
   \item{tol}{a positive real, the tolerance used in the iterative algorithm.}
   \item{keepX}{numeric vector of length \code{ncomp}, the number of variables
-   to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
+    to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
   \item{keepY}{numeric vector of length \code{ncomp}, the number of variables
-   to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
-  \item{scaleY}{should the Y data be scaled ? In the case of a 'discriminant' version of the sPLS
-where the Y is a vector of discrete type, it can be set to \code{FALSE}.}
-  \item{...}{not used currently.}
+    to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
+  \item{scaleY}{should the Y data be scaled ?}
 }
 
 \details{
@@ -41,11 +39,12 @@ can contain missing values.
 
 The type of algorithm to use is specified with the \code{mode} argument. Two sPLS 
 algorithms are available: sPLS regression \code{("regression")} and sPLS canonical analysis 
-\code{("canonical")} (see References).
+\code{("canonical")} (see References). 
 
-The number of components to fit is specified with the argument \code{ncomp}. 
-It this is not supplied, the rank of \code{X} is used. The rank is compute by
-using the \code{\link{mat.rank}} function. 
+The estimation of the missing values can be performed 
+by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
+values are handled by casewise deletion in the \code{spls} function without having to 
+delete the rows with missing data.
 }
 
 \value{
@@ -84,8 +83,10 @@ In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N
 
 \author{Sébastien Déjean, Ignacio González and Kim-Anh Lê Cao.}
 
-\seealso{\code{\link{pls}}, \code{\link{summary}}, \code{\link{mat.rank}}, 
-\code{\link{plotIndiv}}, \code{\link{plotVar}}.}
+\seealso{\code{\link{pls}}, \code{\link{summary}}, 
+\code{\link{plotIndiv}}, \code{\link{plotVar}}, 
+\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
+\code{\link{cim}}, \code{\link{network}}.}
 
 \examples{
 data(liver.toxicity)

@@ -14,15 +14,15 @@ This function provides variables representation for (regularized) CCA and (spars
 \usage{
 \method{plotVar}{rcc}(object, comp = 1:2, rad.in = 0.5, cutoff = NULL,
         X.label = FALSE, Y.label = FALSE,
-        pch = NULL, cex = NULL, col = NULL, font = NULL, ...)
+        pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
 
 \method{plotVar}{pls}(object, comp = 1:2, rad.in = 0.5, 
         X.label = FALSE, Y.label = FALSE, keep.var = FALSE, 
-        pch = NULL, cex = NULL, col = NULL, font = NULL, ...)	
+        pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)	
 
 \method{plotVar}{spls}(object, comp = 1:2, rad.in = 0.5, 
         X.label = FALSE, Y.label = FALSE, keep.var = FALSE, 
-        pch = NULL, cex = NULL, col = NULL, font = NULL, ...)	 
+        pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)	 
 }
 
 \arguments{
@@ -43,16 +43,18 @@ This function provides variables representation for (regularized) CCA and (spars
   \item{font}{numeric vector of font to be used. See \code{\link{par}} for details.}
   \item{keep.var}{boolean. If \code{TRUE} only the variables with loadings not zero are plotted
     (as selected by \code{spls}). Defaults to \code{FALSE}.}
-  \item{...}{not used currently.}
+  \item{\ldots}{not used currently.}
 }
 
 \details{
 \code{plotVar} produce a "correlation circle", i.e. the correlations 
 between each variable and the selected components are plotted as scatter plot,
 with concentric circles of radius one et radius given by \code{rad.in}. Each point 
-corresponds to a variable. For (sparse) PLS regression the components correspond to
-the \eqn{X}-variates components and for (regularized) CCA the components correspond 
-to the bisector vector components between \eqn{X}- and \eqn{Y}-variates. 
+corresponds to a variable. For (regularized) CCA the 
+components correspond to the equiangular vector between \eqn{X}- and \eqn{Y}-variates. 
+For (sparse) PLS regression mode the components correspond to the \eqn{X}-variates. If mode is
+canonical, the components for \eqn{X} and \eqn{Y} variables correspond to
+the \eqn{X}- and \eqn{Y}-variates respectively. 
 
 The arguments \code{col}, \code{pch}, \code{cex} and \code{font} can be either vectors of
 length two or a list with two vector components of length \eqn{p} and \eqn{q} respectively, 
@@ -74,7 +76,7 @@ the \eqn{Y} attributs. Default values exist for this arguments.
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
-nutri.res <- rcc(X, Y, lambda1 = 0.064, lambda2 = 0.008)
+nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 plotVar(nutri.res) #(default)
 

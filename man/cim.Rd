@@ -19,16 +19,16 @@ represent "high-dimensional" data sets.
     main = NULL, xlab = NULL, ylab = NULL, keysize = 1, 
     cexRow = min(1, 0.2 + 1/log10(nr)), 
     cexCol = min(1, 0.2 + 1/log10(nc)), 
-    margins = c(5, 5), lhei = NULL, lwid = NULL, ...)
+    margins = c(5, 5), lhei = NULL, lwid = NULL, \ldots)
 			
-\method{cim}{rcc}(object, comp = 1, X.names = NULL, Y.names = NULL, ...)
+\method{cim}{rcc}(object, comp = 1, X.names = NULL, Y.names = NULL, \ldots)
 
-\method{cim}{spls}(object, comp = 1, X.names = NULL, Y.names = NULL, keep.var = TRUE, ...)
+\method{cim}{spls}(object, comp = 1, X.names = NULL, Y.names = NULL, keep.var = TRUE, \ldots)
 }
 
 \arguments{
   \item{mat}{numeric matrix of values to be plotted.}
-  \item{object}{object returned by \code{rcc}.}
+  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"} or \code{"spls"}.}
   \item{comp}{atomic or vector of positive integers. The components to adequately account 
     for the data association. Defaults to \code{comp = 1}.}
   \item{X.names, Y.names}{character vector containing the names of \eqn{X}- and  
@@ -71,17 +71,19 @@ real-valued matrix (basically \code{\link{image}(t(mat))}) with a dendrogram add
 left side and to the top. The rows and columns are reordered according to some hierarchical
 clustering method to identify interesting patterns. By default the used clustering method for
 rows and columns is the \emph{complete linkage} method and the used distance measure is the distance
-\emph{euclidean}. 
+\emph{euclidean}.  
  
-In \code{cim.rcc} method, the matrix \code{mat} is created where element \eqn{(i,j)} is the
+In \code{rcc} method, the matrix \code{mat} is created where element \eqn{(j,k)} is the
 scalar product value between every pairs of vectors in dimension \code{length(comp)} representing 
-the variables \eqn{X_i} and \eqn{Y_j} on the axis defined by \eqn{Z_i} with \eqn{i} in \code{comp}, 
-where \eqn{Z_i} is the bisector vector between the \eqn{i}-th \eqn{X} and \eqn{Y} canonical variate. 
+the variables \eqn{X_j} and \eqn{Y_k} on the axis defined by \eqn{Z_i} with \eqn{i} in \code{comp}, 
+where \eqn{Z_i} is the equiangular vector between the \eqn{i}-th \eqn{X} and \eqn{Y} canonical variate. 
 
-In \code{spls}, the element \eqn{(i,j)} of the similarity matrix \code{mat} is given 
-by the scalar product value between every pairs of vectors in dimension \code{length(comp)} representing 
-the variables \eqn{X_i} and \eqn{Y_j} on the axis defined by \eqn{U_i} with \eqn{i} in \code{comp}, where 
-\eqn{U_i} is the \eqn{i}-th \eqn{X} variate.
+In \code{spls}, if \code{object$mode} is \code{regression}, the element \eqn{(j,k)} of the similarity matrix 
+\code{mat} is given by the scalar product value between every pairs of vectors in dimension \code{length(comp)} 
+representing the variables \eqn{X_j} and \eqn{Y_k} on the axis defined by \eqn{U_i} with \eqn{i} in \code{comp}, 
+where \eqn{U_i} is the \eqn{i}-th \eqn{X} variate. If \code{object$mode} is 
+\code{canonical} then \eqn{X_j} and \eqn{Y_k} are represented on the axis defined by \eqn{U_i} and \eqn{V_i} 
+respectively.
 
 For visualization of "high-dimensional" data sets, a nice zooming tool was created. 
 \code{zoom=TRUE} open a new device, one for CIM, one for zoom-out region and
@@ -131,7 +133,7 @@ Y <- nutrimouse$gene
 cim(cor(X, Y))
 
 ## CIM representation for objects of class 'rcc'
-nutri.res <- rcc(X, Y, lambda1 = 0.064, lambda2 = 0.008)
+nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 dends <- cim(nutri.res, comp = 1:3, xlab = "genes", 
              ylab = "lipids", margins = c(5, 6))

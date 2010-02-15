@@ -19,19 +19,26 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#----------------------------------------------#
+#-- Includes plotIndiv for PLS, sPLS and rCC --#
+#----------------------------------------------#
 
-
-## includes plotIndiv for PLS, sPLS and rCC
-
-`plotIndiv` <-
+plotIndiv <-
 function(object, ...) UseMethod("plotIndiv")
 
-# --------------------------------- PLS/sPLS ---------------------------
-`plotIndiv.pls` <- `plotIndiv.spls` <- 
-function(object, comp = 1:2, ind.names = TRUE,
-    rep.space = c("X-variate", "Y-variate", "XY-variate"),
-    x.label = NULL, y.label = NULL,  
-    col = "black", cex = 1, pch = 1, ...) 
+
+#--------------------- PLS and sPLS ---------------------#
+plotIndiv.pls <- plotIndiv.spls <- 
+function(object, 
+         comp = 1:2, 
+         ind.names = TRUE,
+         rep.space = "X-variate",
+         x.label = NULL, 
+         y.label = NULL,  
+         col = "black", 
+         cex = 1, 
+         pch = 1, 
+         ...) 
 {
 
     # validation des arguments #
@@ -47,7 +54,7 @@ function(object, comp = 1:2, ind.names = TRUE,
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
-    rep.space = match.arg(rep.space)
+    rep.space = match.arg(rep.space, c("XY-variate", "X-variate", "Y-variate"))
 
     # l'espace de représentation #
     #----------------------------#
@@ -66,8 +73,8 @@ function(object, comp = 1:2, ind.names = TRUE,
     }
 	
     if (rep.space == "XY-variate"){
-        x = object$variates$X[, comp1]
-        y = object$variates$Y[, comp2]
+        x = (object$variates$X[, comp1] + object$variates$Y[, comp1]) / 2
+        y = (object$variates$X[, comp2] + object$variates$Y[, comp2]) / 2
         if (is.null(x.label)) x.label = paste("X-variate", comp1)
         if (is.null(y.label)) y.label = paste("Y-variate", comp2)
     }
@@ -95,12 +102,18 @@ function(object, comp = 1:2, ind.names = TRUE,
 }
 
 
-# ------------------- rCC -------------------------
-`plotIndiv.rcc` <-
-function (object, comp = 1:2, ind.names = TRUE,
-    rep.space = c("X-variate", "Y-variate", "XY-variate"),
-    x.label = NULL, y.label = NULL,
-    col = "black", cex = 1, pch = 1, ...) 
+#-------------------------- rCC -------------------------#
+plotIndiv.rcc <-
+function (object, 
+          comp = 1:2, 
+          ind.names = TRUE,
+          rep.space = "XY-variate",
+          x.label = NULL, 
+          y.label = NULL,
+          col = "black", 
+          cex = 1, 
+          pch = 1, 
+          ...) 
 {
 
     # validation des arguments #
@@ -117,7 +130,7 @@ function (object, comp = 1:2, ind.names = TRUE,
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
-    rep.space = match.arg(rep.space)
+    rep.space = match.arg(rep.space, c("XY-variate", "X-variate", "Y-variate"))
 
     # l'espace de représentation #
     #----------------------------#
@@ -131,9 +144,9 @@ function (object, comp = 1:2, ind.names = TRUE,
         y = object$variates$Y[, comp2]
     }
 
-    if (rep.space == "XY-variate") {
-        x = object$variates$X[, comp1]
-        y = object$variates$Y[, comp2]
+    if (rep.space == "XY-variate"){
+        x = (object$variates$X[, comp1] + object$variates$Y[, comp1]) / 2
+        y = (object$variates$X[, comp2] + object$variates$Y[, comp2]) / 2
     }
 
     if (is.null(x.label)) x.label = paste("Dimension ", comp1)

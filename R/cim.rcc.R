@@ -19,15 +19,17 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
-
 cim.rcc <-
-function(object, comp = 1, X.names = NULL, Y.names = NULL, ...) 
+function(object, 
+         comp = 1, 
+         X.names = NULL, 
+         Y.names = NULL, 
+         ...) 
 {
 
     p = ncol(object$X)
-	q = ncol(object$Y)
-    dim = min(p, q)	
+    q = ncol(object$Y)
+    dim = object$ncomp	
 	
     if (length(comp) == 1) {
 	    if (is.null(comp) || !is.numeric(comp) || comp <= 0 || comp > dim)
@@ -59,11 +61,11 @@ function(object, comp = 1, X.names = NULL, Y.names = NULL, ...)
     cord.Y = cor(object$Y, bisect, use = "pairwise")
     simMat = as.matrix(cord.X %*% t(cord.Y))
 
-	if (ncol(simMat) < nrow(simMat)) {
+    if (ncol(simMat) < nrow(simMat)) {
         simMat = t(simMat)
         aux.names = X.names
-		X.names = Y.names
-		Y.names = aux.names
+        X.names = Y.names
+        Y.names = aux.names
     }  
 	
     result = cim(simMat, labRow = X.names, labCol = Y.names, ...)

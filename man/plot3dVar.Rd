@@ -4,6 +4,7 @@
 \alias{plot3dVar.rcc}
 \alias{plot3dVar.pls}
 \alias{plot3dVar.spls}
+\alias{plot3dVar.pca}
 
 \title{Plot of Variables in three dimensions}
 
@@ -30,10 +31,15 @@ This function provides variables representation in three dimensions for
           pch = NULL, cex = NULL, col = NULL, font = NULL, 
           axes.box = "all", label.axes.box = "both",		
           xlab = NULL, ylab = NULL, zlab = NULL, \ldots)	 
+		  
+\method{plot3dVar}{pca}(object, comp = 1:3, X.label = FALSE,
+          pch = NULL, cex = NULL, col = NULL, font = NULL, 
+          axes.box = "all", label.axes.box = "both",		
+          xlab = NULL, ylab = NULL, zlab = NULL, \ldots)
 }
 
 \arguments{
-  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"} or \code{"spls"}.}
+  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"spls"} or \code{"pca"}.}
   \item{comp}{an integer vector of length 3, the components that will be used on the \eqn{x}-axis,  
 	the \eqn{y}-axis and \eqn{z}-axis respectively to project the variables.}
   \item{rad.in}{numeric between 0 and 1, the radius of the small sphere. Defaults to \code{0.5}.}
@@ -59,18 +65,18 @@ This function provides variables representation in three dimensions for
 
 \details{
 \code{plot3dVar} gives an extension of the "correlation circle" to three dimensions, i.e. the correlations 
-between each variable and the selected components are plotted as scatter plot in three dimensions,
-with a sphere of radius given by \code{rad.in} centred in the origin. If \code{cutoff} is not \code{NULL} 
-the \code{rad.in} is ignored and the radius of the sphere is equal to \code{cutoff}. For (sparse) PLS 
-regression the components correspond to
-the \eqn{X}-variates components and for (regularized) CCA the components correspond 
-to the bisector vector components between \eqn{X}- and \eqn{Y}-variates. 
+between each variable and the selected components are plotted as scatter plot in three dimensions.
+
+For the objects of class \code{rcc}, \code{pls} and \code{spls} a sphere of radius given by \code{rad.in} 
+centred in the origin is displayed. If \code{cutoff} is not \code{NULL} 
+the \code{rad.in} is ignored and the radius of the sphere is equal to \code{cutoff}.
 
 The arguments \code{cex}, \code{pch} and \code{font} are vectors of
-length two. The firts and second component value determines the graphical attribute for 
+length two for the objects of class \code{rcc}, \code{pls} and \code{spls}. 
+The firts and second component value determines the graphical attribute for 
 \eqn{X}- and \eqn{Y}-variables respectively. Default values exist for this arguments.
 Supported types for \code{pch} are: \code{"s"} for spheres, \code{"t"} for tetrahedrons, \code{"c"} for cubes, 
-\code{"o"} for octahedrons, \code{"i"} for icosahedrons and \code{"d"} dodecahedrons. Partial matching is used. 
+\code{"o"} for octahedrons, \code{"i"} for icosahedrons and \code{"d"} dodecahedrons. 
 
 The argument \code{col} can be either a vector of
 length two or a list with two vector components of length \eqn{p} and \eqn{q} respectively, 
@@ -97,7 +103,7 @@ require(rgl)
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
-nutri.res <- rcc(X, Y, 0.064, 0.008)
+nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 # default
 plot3dVar(nutri.res)
@@ -121,6 +127,12 @@ toxicity.spls.2 <- spls(X, Y, ncomp = 3, keepX = c(10, 10, 10),
 plot3dVar(toxicity.spls.2, rad.in = 0.5, keep.var = TRUE, 
     Y.label = TRUE, main = "Variables 3D representation", 
     label.axes.box = "axes")
+	
+## 3D variable representation for objects of class 'pca'	   
+data(multidrug)
+pca.res <- pca(multidrug$ABC.trans, ncomp = 4, scale = TRUE)
+
+plot3dVar(pca.res)
 }
 }
 

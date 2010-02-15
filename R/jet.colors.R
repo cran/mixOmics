@@ -19,8 +19,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
-`jet.colors` <-
+jet.colors <-
 function (n) 
 {
 	ramp = colorRamp(c("#00008F", "#00009F", "#0000AF", "#0000BF", "#0000CF", 

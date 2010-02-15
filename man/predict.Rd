@@ -2,6 +2,8 @@
 \encoding{latin1}
 \alias{predict.pls}
 \alias{predict.spls}
+\alias{predict.splsda}
+\alias{predict.plsda}
 
 \title{Predict Method for PLS Regression and Sparse PLS}
 
@@ -11,16 +13,16 @@ variates are predicted using a fitted model and a new matrix of observations.
 }
 
 \usage{
-\method{predict}{pls}(object, newdata, ...)
+\method{predict}{pls}(object, newdata, \ldots)
 
-\method{predict}{spls}(object, newdata, ...)
+\method{predict}{spls}(object, newdata, \ldots)
 }
 
 \arguments{
   \item{object}{object of class inheriting from \code{"pls"} or \code{"spls"}.}
   \item{newdata}{data matrix in which to look for for explanatory variables 
     to be used for prediction.}
-  \item{...}{not used currently.}
+  \item{\ldots}{not used currently.}
 }
 
 \details{
@@ -43,7 +45,7 @@ Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Edit
 
 \author{Sébastien Déjean, Ignacio González and Kim-Anh Lê Cao}
 
-\seealso{\code{\link{pls}}, \code{\link{spls}}.}
+\seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}}.}
 
 \examples{
 data(linnerud)

@@ -19,25 +19,25 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
-`mat.rank` <-
+mat.rank <-
 function (mat, tol) 
 {
-if (length(dim(mat)) != 2) 
+
+    if (length(dim(mat)) != 2) 
         stop("'mat' must be a numeric matrix.")
-
-mat = as.matrix(mat)
-
-if (!is.numeric(mat)) 
+     
+    mat = as.matrix(mat)
+     
+    if (!is.numeric(mat)) 
         stop("'mat' must be a numeric matrix.")
-
+     
     d = nipals(mat)$eig
     max.d = d[1]
     min.d = d[length(d)]
     if (missing(tol)) 
         tol = max(dim(mat)) * max.d * .Machine$double.eps
     r = sum(d > tol)
-
+     
     return(list(rank = r, tol = tol))
 }
 

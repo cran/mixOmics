@@ -30,7 +30,7 @@ A list containing the following components:
 
 \details{
 The data come from a liver toxicity study (Heinloth et al., 2004) in which
-4 male rats of the inbred strain Fisher 344 were exposed to non-toxic (50 or
+64 male rats of the inbred strain Fisher 344 were exposed to non-toxic (50 or
 150 mg/kg), moderately toxic (1500 mg/kg) or severely toxic (2000 mg/kg)
 doses of acetaminophen (paracetamol) in a controlled experiment. Necropsies
 were performed at 6, 18, 24 and 48 hours after exposure and the mRNA

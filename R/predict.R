@@ -19,57 +19,56 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
-## includes predict.pls, and predict.spls
-
-# ----------------------------PLS or sPLS ---------------------------
-`predict.pls` <- `predict.spls` <-
+predict.pls <- predict.spls <-
 function(object, newdata, ...)
 {
+
+    #-- validation des arguments --#
     if (missing(newdata))
     stop("No new data available.")
-
+     
     X = object$X
     Y = object$Y
     q = ncol(Y)
     p = ncol(X)
     mode = object$mode
-
-    # ---warnings --------------
+     
     if (length(dim(newdata)) == 2) {
         if (ncol(newdata) != p)
             stop("'newdata' must be a numeric matrix with ncol = ", p, 
             " or a vector of length = ", p, ".")
     }
-
+     
     if (length(dim(newdata)) == 0) {
         if (length(newdata) != p)
             stop("'newdata' must be a numeric matrix with ncol = ", p, 
             " or a vector of length = ", p, ".")
         dim(newdata) = c(1, p) 
     }
-
-    if (mode == 'canonical') stop("Only regression, 'classic' or 'invariant' mode are allowed !")
-
+     
+    if (mode == 'canonical') stop("Only 'regression', 'classic' or 'invariant' mode are allowed !")
+     
+    #-- initialisation des matrices --#	
     ncomp = object$ncomp
     a = object$loadings$X
     b = object$loadings$Y
     c = object$mat.c
-
+     
     means.X = attr(X, "scaled:center")
     means.Y = attr(Y, "scaled:center")
     sigma.X = attr(X, "scaled:scale")
     sigma.Y = attr(Y, "scaled:scale")
-
+     
     newdata = as.matrix(newdata)
     ones = matrix(rep(1, nrow(newdata)), ncol = 1)
-    #coeff de regression 
+    ##- coeff de regression 
     B.hat = array(0, dim = c(p, q, ncomp))
-    #prediction
+    ##- prediction
     Y.hat = array(0, dim = c(nrow(newdata), q, ncomp))
-    #variates
+    ##- variates
     t.pred = array(0, dim = c(nrow(newdata), ncomp))
-
+      
+    #-- calcul de la prediction --# 
     for(h in 1:ncomp){
 	    W = a[, 1:h] %*% solve(t(c[, 1:h]) %*% a[, 1:h]) 	
 	    B = W %*% drop(t(b[, 1:h]))   
@@ -81,11 +80,12 @@ function(object, newdata, ...)
 	    t.pred[, h] = scale(newdata, center = means.X, scale = sigma.X) %*% W[, h]
 		B.hat[, , h] = B
     }  #end h
-
+     
+    #-- valeurs sortantes --#
     rownames(t.pred) = rownames(newdata)
     colnames(t.pred) = paste("dim", c(1:ncomp), sep = " ")
     rownames(Y.hat) = rownames(newdata)
     colnames(Y.hat) = colnames(Y)
-
+     
     return(invisible(list(predict = Y.hat, variates = t.pred, B.hat = B.hat)))
 }

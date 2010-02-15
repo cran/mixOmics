@@ -4,31 +4,27 @@
 
 \title{Partial Least Squares (PLS) Regression}
 
-\description{Functions to perform Partial Least Squares (PLS) regression.
+\description{Function to perform Partial Least Squares (PLS) regression.
 
 }
 
 \usage{
-pls(X, Y, ncomp = 3, 
+pls(X, Y, ncomp = 2, 
     mode = c("regression", "canonical", "invariant", "classic"), 
-    max.iter = 500, tol = 1e-06, scaleY=TRUE)
+    max.iter = 500, tol = 1e-06, scaleY = TRUE)
 }	
 
 \arguments{
   \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
   \item{Y}{numeric vector or matrix of responses (for multi-response models). 
     \code{NA}s are allowed.}
-  \item{ncomp}{the number of components to include in the model.  
-    Default is from one to the rank of \code{X}.}
+  \item{ncomp}{the number of components to include in the model. Default to 2.}
   \item{mode}{character string. What type of algorithm to use, (partially) matching 
     one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}. 
 	See Details.}
   \item{max.iter}{integer, the maximum number of iterations.}
   \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
-  \item{scaleY}{should the Y data be scaled ? In the case of a 'discriminant' version of the PLS
-where the Y data are of discrete type, this should be set to \code{FALSE}.}
-  \item{...}{not used currently.}
-
+  \item{scaleY}{should the Y data be scaled ?}
 }
 
 \details{
@@ -41,9 +37,10 @@ algorithms are available: PLS regression \code{("regression")}, PLS canonical an
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS 
 algorithm \code{("classic")} (see References).
 
-The number of components to fit is specified with the argument \code{ncomp}. 
-It this is not supplied, the rank of \code{X} is used. The rank is compute by
-using the \code{\link{mat.rank}} function. 
+The estimation of the missing values can be performed 
+by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
+values are handled by casewise deletion in the \code{pls} function without having to 
+delete the rows with missing data.  
 }
 
 \value{

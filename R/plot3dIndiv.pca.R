@@ -19,15 +19,10 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-plot3dIndiv <-
-function(object, ...) UseMethod("plot3dIndiv")
-
-
-plot3dIndiv.rcc <-
+plot3dIndiv.pca <-
 function (object, 
           comp = 1:3, 
           ind.names = FALSE,
-          rep.space = "XY-variate",
           xlab = NULL, 
           ylab = NULL, 
           zlab = NULL,
@@ -47,31 +42,15 @@ function (object,
     if (!is.numeric(comp) || any(comp < 1))
         stop("invalid vector for 'comp'.")
 
-    dim = min(ncol(object$X), ncol(object$Y))
+    dim = ncol(object$x)
     if (any(comp > dim)) 
         stop("the elements of 'comp' must be smaller or equal than ", dim, ".")
 
     # l'espace de représentation #
     #----------------------------#
-    rep.space = match.arg(rep.space, c("XY-variate", "X-variate", "Y-variate"))
-		
-    if (rep.space == "X-variate") {
-        x = object$variates$X[, comp[1]]
-        y = object$variates$X[, comp[2]]
-		z = object$variates$X[, comp[3]]
-    }
-
-    if (rep.space == "Y-variate") {
-        x = object$variates$Y[, comp[1]]
-        y = object$variates$Y[, comp[2]]
-		z = object$variates$Y[, comp[3]]
-    }
-	
-    if (rep.space == "XY-variate"){
-        x = (object$variates$X[, comp[1]] + object$variates$Y[, comp[1]]) / 2
-        y = (object$variates$X[, comp[2]] + object$variates$Y[, comp[2]]) / 2
-        z = (object$variates$X[, comp[3]] + object$variates$Y[, comp[3]]) / 2
-    }
+    x = object$x[, comp[1]]
+    y = object$x[, comp[2]]
+    z = object$x[, comp[3]]
 
     # le plot des individus #
     #-----------------------#

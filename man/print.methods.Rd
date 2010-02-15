@@ -14,18 +14,18 @@ Produce \code{print} methods for class \code{"rcc"},
 }
 
 \usage{
-\method{print}{rcc}(x, ...)
+\method{print}{rcc}(x, \ldots)
 
-\method{print}{pls}(x, ...)
+\method{print}{pls}(x, \ldots)
 
-\method{print}{spls}(x, ...)
+\method{print}{spls}(x, \ldots)
 
-\method{print}{summary}(x, ...)
+\method{print}{summary}(x, \ldots)
 }
 
 \arguments{
   \item{x}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"spls"} or \code{"summary"}.}
-  \item{...}{not used currently.}
+  \item{\ldots}{not used currently.}
 }
 
 \details{
@@ -55,11 +55,11 @@ Redundancy Analysis and Variable Importance in the Projection (VIP).
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
-nutri.res <- rcc(X, Y, lambda1 = 0.064, lambda2 = 0.008)
+nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 print(nutri.res)
 
 ## print for objects of class 'summary'
-more <- summary(nutri.res, ncomp = 3, cutoff = 0.65)
+more <- summary(nutri.res, cutoff = 0.65)
 print(more)
 
 ## print for objects of class 'pls'
@@ -75,7 +75,7 @@ X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
 toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50), 
                       keepY = c(10, 10, 10))
-print(toxicity.spls, what = "redundancy", keep.var = TRUE)
+print(toxicity.spls)
 }
 
 \keyword{regression}

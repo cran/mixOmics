@@ -19,49 +19,22 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
-`Mfold` <-
-function(X, Y, lambda1, lambda2, folds, M = 10) 
+Mfold <-
+function(X, Y, lambda1, lambda2, folds, M) 
 {
 
-    if (length(dim(X)) != 2 || length(dim(Y)) != 2) 
-        stop("'X' and/or 'Y' must be a numeric matrix.")
-
-X = as.matrix(X)
-Y = as.matrix(Y)
-
-if (!is.numeric(X) || !is.numeric(Y)) 
-        stop("'X' and/or 'Y' must be a numeric matrix.")
-
-p = ncol(X)
-q = ncol(Y)
-
-    if ((nr = nrow(X)) != nrow(Y)) 
-        stop("unequal number of rows in 'X' and 'Y'.")
-
-if(lambda1 < 0 || lambda2 < 0 || !is.numeric(lambda1) || !is.numeric(lambda2)) 
-stop("invalid value for the regularization parameters.")
-
-if (missing(folds)) {
-folds = split(sample(1:nr), rep(1:M, length = nr))
+    xscore = NULL
+    yscore = NULL
+     
+    for (m in 1:M) {
+        omit = folds[[m]]
+        result = rcc(X[-omit, ], Y[-omit, ], 1, lambda1, lambda2)
+        X[omit, ][is.na(X[omit, ])] = 0
+        Y[omit, ][is.na(Y[omit, ])] = 0
+        xscore = c(xscore, X[omit, ] %*% result$loadings$X[, 1])
+        yscore = c(yscore, Y[omit, ] %*% result$loadings$Y[, 1])
+    }
+     
+    cv.score = cor(xscore, yscore, use = "pairwise")
+    return(invisible(cv.score))
 }
-else M = length(folds)
-
-xscore = NULL
-yscore = NULL
-
-X[is.na(X)] = 0
-Y[is.na(Y)] = 0
-
-for (m in 1:M)
-{
-omit = folds[[m]]
-result = rcc(X[-omit, ], Y[-omit, ], lambda1, lambda2)
-xscore = c(xscore, X[omit, ] %*% result$loadings$X[, 1])
-yscore = c(yscore, Y[omit, ] %*% result$loadings$Y[, 1])
-}
-
-cv.score = cor(xscore, yscore, use = "pairwise")
-return(invisible(cv.score))
-}
-

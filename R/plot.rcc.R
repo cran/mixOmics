@@ -19,21 +19,17 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-`plot.rcc` <-
+plot.rcc <-
 function(x, scree.type = c("pointplot", "barplot"), ...) 
 {
 
-## replaced obj by 'x' to fit the generic function plot
-
-
-scree.type = match.arg(scree.type)
-if (scree.type == "pointplot") {
-plot(x$cor, xlab = "Dimension", ylim = c(0, 1),
-ylab = "Canonical correlation", ...)
+    scree.type = match.arg(scree.type)
+    if (scree.type == "pointplot") {
+        plot(x$cor, xlab = "Dimension", ylim = c(0, 1),
+        ylab = "Canonical correlation", ...)
+    }
+    else {
+        barplot(x$cor, xlab = "Dimension", ylim = c(0, 1),
+        ylab = "Canonical correlation", ...)
+    }
 }
-else {
-barplot(x$cor, xlab = "Dimension", ylim = c(0, 1),
-ylab = "Canonical correlation", ...)
-}
-}
-

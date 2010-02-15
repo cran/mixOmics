@@ -19,13 +19,20 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
 plot3dIndiv.pls <- plot3dIndiv.spls <-
-function(object, comp = 1:3, ind.names = TRUE,
-    rep.space = c("X-variate", "Y-variate"),
-    xlab = NULL, ylab = NULL, zlab = NULL,
-    col = "black", cex = 1, pch = "s", font = 1,
-    axes.box = "box", ...) 
+function(object, 
+         comp = 1:3, 
+         ind.names = FALSE,
+         rep.space = "X-variate",
+         xlab = NULL, 
+         ylab = NULL, 
+         zlab = NULL,
+         col = "blue", 
+         cex = 1, 
+         pch = "s", 
+         font = 1,
+         axes.box = "box", 
+         ...) 
 {
 
     # validation des arguments #
@@ -41,7 +48,7 @@ function(object, comp = 1:3, ind.names = TRUE,
 
     # l'espace de représentation #
     #----------------------------#
-    rep.space = match.arg(rep.space)
+    rep.space = match.arg(rep.space, c("XY-variate", "X-variate", "Y-variate"))
 		
     if (rep.space == "X-variate") {
         x = object$variates$X[, comp[1]]
@@ -53,6 +60,12 @@ function(object, comp = 1:3, ind.names = TRUE,
         x = object$variates$Y[, comp[1]]
         y = object$variates$Y[, comp[2]]
 		z = object$variates$Y[, comp[3]]
+    }
+	
+    if (rep.space == "XY-variate"){
+        x = (object$variates$X[, comp[1]] + object$variates$Y[, comp[1]]) / 2
+        y = (object$variates$X[, comp[2]] + object$variates$Y[, comp[2]]) / 2
+        z = (object$variates$X[, comp[3]] + object$variates$Y[, comp[3]]) / 2
     }
 
     # le plot des individus #

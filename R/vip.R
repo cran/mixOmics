@@ -19,38 +19,39 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-`vip` <-
+vip <-
 function(object)
 {
-W = object$loadings$X
-H = object$ncomp
-q = ncol(object$Y)
-p = ncol(object$X)
-VIP = matrix(0, nrow = p, ncol = H)
 
-cor2 = cor(object$Y, object$variates$X)^2
-cor2 = as.matrix(cor2, nrow = q)
-
-Rd = sum(cor2[, 1]) / q
-VIP[, 1] = Rd * W[, 1]^2 / Rd
-
-if (H > 1) {
-for (h in 2:H) {
-if (q == 1) {
-Rd = cor2[, 1:h] 
-VIP[, h] = Rd %*% t(W[, 1:h]^2) / sum(Rd)
+    #-- initialisation des matrices --#
+    W = object$loadings$X
+    H = object$ncomp
+    q = ncol(object$Y)
+    p = ncol(object$X)
+    VIP = matrix(0, nrow = p, ncol = H)
+     
+    cor2 = cor(object$Y, object$variates$X, use = "pairwise")^2
+    cor2 = as.matrix(cor2, nrow = q)
+     
+    VIP[, 1] = W[, 1]^2
+     
+    if (H > 1) {
+        for (h in 2:H) {
+            if (q == 1) {
+                Rd = cor2[, 1:h] 
+                VIP[, h] = Rd %*% t(W[, 1:h]^2) / sum(Rd)
+            }
+            else {
+                Rd = apply(cor2[, 1:h], 2, sum)
+                VIP[, h] = Rd %*% t(W[, 1:h]^2) / sum(Rd)
+            }
+        }
+    }
+     
+    #-- valeurs sortantes --#
+    VIP = sqrt(p * VIP)
+    rownames(VIP) = rownames(W)
+    colnames(VIP)= paste("comp", 1:H)
+     
+    return(invisible(VIP))
 }
-else {
-Rd = apply(cor2[, 1:h], 2, sum) / q
-VIP[, h] = Rd %*% t(W[, 1:h]^2) / sum(Rd)
-}
-}
-}
-
-VIP = sqrt(p * VIP)
-rownames(VIP) = rownames(W)
-colnames(VIP)= paste("comp", 1:H)
-
-return(invisible(VIP))
-}
-

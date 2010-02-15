@@ -1,12 +1,31 @@
-
-export(cim, rcc, 
-jet.colors, estim.regul, imgCor, 
-image.estim.regul, mat.rank, nipals, 
-plotIndiv, plotVar, pls, loo, 
-Mfold, spls, vip, valid, s.match, 
-scatterutil.base, scatterutil.eti, scatterutil.grid, 
+export(
+bin.color, 
+cim,   
+estim.regul, 
+image.estim.regul, 
+imgCor,
+jet.colors,
+loo,
+mat.rank, 
+Mfold,
 network,
-plot3dIndiv, plot3dVar)
+nipals, 
+pca,
+plot3dIndiv, 
+plot3dVar,
+plotIndiv, 
+plotVar, 
+pls,
+plsda, 
+rcc,
+scatterutil.base, 
+scatterutil.eti, 
+scatterutil.grid, 
+s.match,
+spls,
+splsda, 
+vip, 
+valid)
 
 
 S3method(cim, default)
@@ -37,14 +56,16 @@ S3method(print, spls)
 S3method(print, rcc)
 S3method(print, summary)
 
-S3method(network, spls)
-S3method(network, rcc)
-
 S3method(plot3dIndiv, pls)
 S3method(plot3dIndiv, spls)
 S3method(plot3dIndiv, rcc)
+S3method(plot3dIndiv, pca)
 
 S3method(plot3dVar, pls)
 S3method(plot3dVar, spls)
 S3method(plot3dVar, rcc)
+S3method(plot3dVar, pca)
 
+S3method(network, default)
+S3method(network, rcc)
+S3method(network, spls)

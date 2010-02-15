@@ -18,7 +18,7 @@ for anticancer activity.
 \format{
 A list containing the following components:
   \describe{
-    \item{\code{ABC.transp}}{data matrix with 60 rows and 48 columns. 
+    \item{\code{ABC.trans}}{data matrix with 60 rows and 48 columns. 
 		The expression of the 48 human ABC transporters.}
     \item{\code{compound}}{data matrix with 60 rows and 1429 columns. 
 		The activity of 1429 drugs for the 60 cell lines.}

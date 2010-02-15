@@ -12,9 +12,10 @@ grid to determine optimal values for the parameters of regularization in
 }
 
 \usage{
-estim.regul(X, Y, grid1 = NULL, grid2 = NULL, 
+estim.regul(X, Y, grid1 = seq(0.001, 1, length = 5), 
+            grid2 = seq(0.001, 1, length = 5), 
             validation = c("loo", "Mfold"), 
-            folds, M = 10, plt = TRUE, ...)
+            folds, M = 10, plt = TRUE)
 }
 
 \arguments{
@@ -24,7 +25,7 @@ estim.regul(X, Y, grid1 = NULL, grid2 = NULL,
     \code{NA}s are allowed.}
   \item{grid1, grid2}{vector numeric defining the values of \code{lambda1} and \code{lambda2} 
 	at which cross-validation score should be computed. Defaults to 
-	\code{lambda1 = lambda2 = seq(from=0.001, to=1, length=5)}.}
+	\code{grid1 = grid2 = seq(from=0.001, to=1, length=5)}.}
   \item{validation}{character string. What kind of (internal) cross-validation method to use, 
     (partially) matching one of \code{"loo"} (leave-one-out) or \code{"Mfolds"} (M-folds). See Details.}
   \item{folds}{list of vectors (as returned by \code{\link{split}}) 
@@ -32,8 +33,8 @@ estim.regul(X, Y, grid1 = NULL, grid2 = NULL,
   \item{M}{positive integer. Number of folds to use if \code{validation="Mfold"}. Defaults to
     \code{M=10}.}
   \item{plt}{logical argument indicating whether a image map should be
-	plotted by calling the \code{imgCV} function.}
-  \item{...}{not used currently.}	
+	plotted by calling the \code{imgCV} function.}	
+
 }
 
 \details{
@@ -46,6 +47,10 @@ folds is specified with the argument \code{M}.
 If \code{validation="loo"}, 
 leave-one-out cross-validation is performed by calling the 
 \code{loo} function. In this case the arguments \code{folds} and \code{M} are ignored.
+
+The estimation of the missing values can be performed 
+by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
+values are handled by casewise deletion in the \code{rcc} function.
 }
 
 \value{

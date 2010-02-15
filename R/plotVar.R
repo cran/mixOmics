@@ -19,18 +19,27 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#----------------------------------------------#
+#-- Includes plotIndiv for PLS, sPLS and rCC --#
+#----------------------------------------------#
 
-
-#includes plotVar for PLS, sPLS and rCC
-
-`plotVar` <-
+plotVar <-
 function(object, ...) UseMethod("plotVar")
 
-#------------------------ PLS ---------------------
-`plotVar.pls` <- `plotVar.spls` <- 
-function(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, Y.label = FALSE, keep.var = FALSE, 
-        pch = NULL, cex = NULL, col = NULL, font = NULL, ...) 
+
+#--------------------- PLS and sPLS ---------------------#
+plotVar.pls <- plotVar.spls <- 
+function(object, 
+         comp = 1:2, 
+         rad.in = 0.5, 
+         X.label = FALSE, 
+         Y.label = FALSE, 
+         keep.var = FALSE, 
+         pch = NULL, 
+         cex = NULL, 
+         col = NULL, 
+         font = NULL,
+	 ...) 
 {
 
     # validation des arguments #
@@ -47,19 +56,34 @@ function(object, comp = 1:2, rad.in = 0.5,
     comp1 = round(comp[1])
     comp2 = round(comp[2])
 
-    # selection des variables si keep = TRUE #
-    #----------------------------------------#
+    # calcul des coordonnées #
+    #------------------------#
     if (isTRUE(keep.var)) {
         keep.X = apply(abs(object$loadings$X), 1, sum) > 0
         keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
-        cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
+
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
                      use = "pairwise")
-        cord.Y = cor(object$Y[, keep.Y], object$variates$X[, c(comp1, comp2)], 
+            cord.Y = cor(object$Y[, keep.Y], object$variates$Y[, c(comp1, comp2)], 
                      use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
+                     use = "pairwise")
+            cord.Y = cor(object$Y[, keep.Y], object$variates$X[, c(comp1, comp2)], 
+                     use = "pairwise")
+        }
     }
     else {
-        cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-        cord.Y = cor(object$Y, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+            cord.Y = cor(object$Y, object$variates$Y[, c(comp1, comp2)], use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+            cord.Y = cor(object$Y, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+        }
     }
 
     p = ncol(object$X)
@@ -205,12 +229,19 @@ function(object, comp = 1:2, rad.in = 0.5,
 }
 	
 
-
-# -------------------rCC ------------------------------------
-`plotVar.rcc` <-
-function(object, comp = 1:2, rad.in = 0.5, cutoff = NULL, 
-        X.label = FALSE, Y.label = FALSE, 
-        pch = NULL, cex = NULL, col = NULL, font = NULL, ...) 
+#-------------------------- rCC -------------------------#
+plotVar.rcc <-
+function(object, 
+         comp = 1:2, 
+         rad.in = 0.5, 
+         cutoff = NULL, 
+         X.label = FALSE, 
+         Y.label = FALSE, 
+         pch = NULL, 
+         cex = NULL, 
+         col = NULL, 
+         font = NULL,
+	 ...) 
 {
 
     # validation des arguments #
@@ -406,6 +437,3 @@ function(object, comp = 1:2, rad.in = 0.5, cutoff = NULL,
   
 par(def.par)  
 }
-
-
-#        X.label = paste("X", 1:ncol(X), sep = ""), Y.label = paste("Y", 1:ncol(Y), sep = ""))

@@ -24,7 +24,7 @@ valid(X, Y, ncomp = 3,
   \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
   \item{Y}{numeric vector or matrix of responses (for multi-response models). \code{NA}s are allowed.}
   \item{ncomp}{the number of components to include in the model.  Default is from one to the rank of \code{X}.}
-  \item{mode}{character string. What type of algorithm to use, matching one of \code{"regression"}, \code{"invariant"} or \code{"classic"}.}
+  \item{mode}{character string. What type of algorithm to use, matching one of \code{"classic"}, \code{"invariant"} or \code{"regression"}.}
   \item{max.iter}{integer, the maximum number of iterations.}
   \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
   \item{criterion}{character string. What type of validation criterion to use, see details.}
@@ -34,14 +34,15 @@ valid(X, Y, ncomp = 3,
   \item{keepY}{if \code{method="spls"} numeric vector of length \code{ncomp}, the number of variables
     weights to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
   \item{scaleY}{should the Y data be scaled ? In the case of a 'discriminant' version of the (s)PLS
-where the Y data are of discrete type, this should be set to \code{FALSE}.}
+    where the Y data are of discrete type, this should be set to \code{FALSE}.}
   \item{validation}{character.  What kind of (internal) validation to use.  See below.}
   \item{M}{the number of folds in the Mfold cross-validation.}
-
-
 }
 
 \details{
+The estimation of the missing values can be performed 
+by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
+values are handled by casewise deletion in the \code{pls} or \code{spls} function.
 
 If \code{validation = "Mfold"}, M-fold cross-validation is performed. 
 How many folds to generate is selected by specifying the number of folds in \code{M}.
@@ -81,7 +82,8 @@ The cumulative \eqn{(Q_{cum}^2)_{kh}} of a variable is computed as:
 and the cumulative \eqn{(Q_{cum}^2)_h} for the extracted components is computed as:
 
 \deqn{(Q_{cum}^2)_h = 1-\prod_{j=1}^h\frac{\sum_{k=1}^{q}PRESS_{kj}}{\sum_{k=1}^{q}RSS_{k(j-1)}}} 
-}
+
+}
 
 
 \value{

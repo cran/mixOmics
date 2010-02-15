@@ -10,7 +10,7 @@ by the \code{estim.regul} function.
 }
 
 \usage{
-\method{image}{estim.regul}(x, col = heat.colors, ...)
+\method{image}{estim.regul}(x, col = heat.colors, \ldots)
 }
 
 \arguments{
@@ -18,7 +18,7 @@ by the \code{estim.regul} function.
   \item{col}{a character string specifying the colors function to use: 
     \code{\link{terrain.colors}}, \code{\link{topo.colors}}, 
 	\code{\link{rainbow}} or similar functions. Defaults to \code{\link{heat.colors}}.}
-  \item{...}{not used currently.}
+  \item{\ldots}{not used currently.}
 }
 
 \details{

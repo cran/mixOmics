@@ -19,41 +19,22 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-
-`loo` <-
+loo <-
 function (X, Y, lambda1, lambda2) 
 {
 
-if (length(dim(X)) != 2 || length(dim(Y)) != 2) 
-        stop("'X' and/or 'Y' must be a numeric matrix.")
-
-X = as.matrix(X)
-Y = as.matrix(Y)
-
-if (!is.numeric(X) || !is.numeric(Y)) 
-        stop("'X' and/or 'Y' must be a numeric matrix.")
-
-p = ncol(X)
-q = ncol(Y)
-
-if ((nr = nrow(X)) != nrow(Y)) 
-        stop("unequal number of rows in 'X' and 'Y'.")
-
-if(lambda1 < 0 || lambda2 < 0 || !is.numeric(lambda1) || !is.numeric(lambda2)) 
-stop("invalid value for the regularization parameters.")
-
     xscore = vector(mode = "numeric")
     yscore = vector(mode = "numeric")
-
-X[is.na(X)] = 0
-Y[is.na(Y)] = 0
-
+    nr = nrow(X)
+     
     for (i in 1:nr) {
-        rcc.v = rcc(X[-i, ], Y[-i, ], lambda1, lambda2)
+        rcc.v = rcc(X[-i, ], Y[-i, ], 1, lambda1, lambda2)
+        X[i, is.na(X[i, ])] = 0
+        Y[i, is.na(Y[i, ])] = 0
         xscore[i] = crossprod(X[i, ], rcc.v$loadings$X[, 1])
         yscore[i] = crossprod(Y[i, ], rcc.v$loadings$Y[, 1])
     }
-
+     
     cv.score = cor(xscore, yscore)
     return(invisible(cv.score))
 }

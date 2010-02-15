@@ -10,7 +10,7 @@ of a data table that can contain missing values.
 }
 
 \usage{
-nipals(X, ncomp, reconst = FALSE, max.iter = 500, tol = 1e-09)
+nipals(X, ncomp = 1, reconst = FALSE, max.iter = 500, tol = 1e-09)
 }
 
 \arguments{

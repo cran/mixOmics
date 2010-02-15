@@ -11,7 +11,7 @@ to seek correlations between two data matrices.
 }
 
 \usage{
-rcc(X, Y, lambda1 = 0, lambda2 = 0, ...)
+rcc(X, Y, ncomp = 2, lambda1 = 0, lambda2 = 0)
 }
 
 \arguments{
@@ -19,9 +19,9 @@ rcc(X, Y, lambda1 = 0, lambda2 = 0, ...)
     \code{NA}s are allowed.}
   \item{Y}{numeric matrix or data frame \eqn{(n \times q)}, the observations on the \eqn{Y} variables.
     \code{NA}s are allowed.}
+  \item{ncomp}{the number of components to include in the model. Default to 2.}
   \item{lambda1, lambda2}{a not negative real. The regularization parameter for the \emph{X} and
-    \emph{Y} data. Defaults to \code{lambda1=lambda2=0}.}
-  \item{...}{not used currently.}	
+    \emph{Y} data. Defaults to \code{lambda1=lambda2=0}.}	
 }
 
 \details{
@@ -47,8 +47,9 @@ Cov\eqn{(X)+ \lambda_1 I} and Cov\eqn{(Y)+ \lambda_2 I}.
 When \code{lambda1=0} and \code{lambda2=0}, \code{rcc} perform classic
 CCA, if posible.
 
-\code{rcc} was implemented to allows
-the use of data missing.
+The estimation of the missing values can be performed 
+by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
+values are handled by casewise deletion in the \code{rcc} function.
 }
 
 \value{
@@ -70,7 +71,7 @@ Canonical correlation analysis when the data are curves.
 \emph{Journal of the Royal Statistical Society. Series B} \bold{55}, 725-740.
 
 Vinod, H. D. (1976). Canonical ridge and econometrics of joint production. 
-\emph{Journal of Econometrics} 6, 129-137.
+\emph{Journal of Econometrics} \bold{6}, 129-137.
 }
 
 \author{Sébastien Déjean and Ignacio González.}
@@ -90,7 +91,7 @@ linn.res <- rcc(X, Y)
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
-nutri.res <- rcc(X, Y, lambda1 = 0.064, lambda2 = 0.008)
+nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 }
 
 \keyword{multivariate}

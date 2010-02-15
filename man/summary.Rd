@@ -14,18 +14,17 @@ Produce \code{summary} methods for class \code{"rcc"},
 
 \usage{
 \method{summary}{rcc}(object, what = c("all", "communalities", "redundancy"), 
-        ncomp, cutoff = NULL, digits = 4, ...)
+        cutoff = NULL, digits = 4, \ldots)
 		
 \method{summary}{pls}(object, what = c("all", "communalities", "redundancy", 
-        "VIP"), digits = 4, keep.var = FALSE, ...)
+        "VIP"), digits = 4, keep.var = FALSE, \ldots)
 
 \method{summary}{spls}(object, what = c("all", "communalities", "redundancy",
-        "VIP"), digits = 4, keep.var = FALSE, ...)
+        "VIP"), digits = 4, keep.var = FALSE, \ldots)
 }
 
 \arguments{
   \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"} or \code{"spls"}.}
-  \item{ncomp}{the number of components to include in the model.}
   \item{cutoff}{real between 0 and 1. Variables with all correlations components below this cutoff 
     in absolute value are not showed (see Details).}
   \item{digits}{integer, the number of significant digits to use when printing.
@@ -35,7 +34,7 @@ Produce \code{summary} methods for class \code{"rcc"},
 	\code{"VIP"} is only available for (s)PLS. See Details.}
   \item{keep.var}{boolean. If \code{TRUE} only the variables with loadings not zero 
     (as selected by \code{spls}) are showed. Defaults to \code{FALSE}.}	
-  \item{...}{not used currently.}
+  \item{\ldots}{not used currently.}
 }
 
 \details{
@@ -52,7 +51,7 @@ coefficients fit by \code{pls} or \code{spls}.
 If \code{what} is \code{"all"}, all are given.
 
 For class \code{"rcc"}, when a value to \code{cutoff} is specified, the correlations 
-between each variable and the bisector vector between 
+between each variable and the equiangular vector between 
 \eqn{X}- and \eqn{Y}-variates are computed. Variables with at least one correlation componente 
 bigger than \code{cutoff} are showed. The defaults is \code{cutoff=NULL} all the variables
 are given.
@@ -83,8 +82,8 @@ The function \code{summary} returns a list with components:
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
-nutri.res <- rcc(X, Y, lambda1 = 0.064, lambda2 = 0.008)
-more <- summary(nutri.res, ncomp = 3, cutoff = 0.65)
+nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
+more <- summary(nutri.res, cutoff = 0.65)
 
 ## summary for objects of class 'pls'
 data(linnerud)

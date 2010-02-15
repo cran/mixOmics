@@ -1,7 +1,28 @@
-# ------------- print pls -------------------------------------
+# Copyright (C) 2009 
+# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-'print.pls' <-
-function(x, ...){
+
+#------------------ print method for pls ------------------#
+print.pls <-
+function(x, ...) 
+{
 
     mode = paste("'", x$mode, "'", sep = "")
 	
@@ -22,10 +43,10 @@ function(x, ...){
 }
 
 
-# ----------------print spls ----------------------------------
-
-'print.spls' <-
-function(x, ...){
+#----------------- print method for spls ------------------#
+print.spls <-
+function(x, ...)
+{
 
     mode = paste("'", x$mode, "'", sep = "")
     keepX = paste("[", x$keepX, "]", sep = "")
@@ -49,14 +70,14 @@ function(x, ...){
 }
 
 
-# ---------------- print rcc ----------------------------------
-
-'print.rcc' <-
-function(x, ...){
+#------------------ print method for rcc ------------------#
+print.rcc <-
+function(x, ...)
+{
 
     cat("\nCall:\n", deparse(x$call), "\n\n")
-  
-    cat(" rCCA with regularization parameters", x$lambda[1], "and", x$lambda[2], "for the X and Y data. \n")
+
+    cat(" rCCA with", x$ncomp, "components and regularization parameters", x$lambda[1], "and", x$lambda[2], "for the X and Y data. \n")
     cat(" You entered data X of dimensions :", nrow(x$X), ncol(x$X), "\n")
     cat(" You entered data Y of dimensions :", nrow(x$Y), ncol(x$Y), "\n\n")
 	
@@ -70,17 +91,16 @@ function(x, ...){
 }
 
 
-# ------- print for summary with (s)PLS object or rcc ----------
-
-'print.summary' <-
-function(x, ...){
+#------- print for summary with (s)PLS object or rcc ---------#
+print.summary <-
+function(x, ...)
+{
 
     print.gap = 4
     what = x$what
     digits = x$digits
 
-	# --------------------- output pls/spls ---------------------------
-	
+	#--------------------- output pls/spls ---------------------#
     if(x$method == "pls" | x$method == "spls"){
 
         if (x$method == "pls") {
@@ -93,7 +113,6 @@ function(x, ...){
 			cat("\n Number of X-variables selected on each of the sPLS components:", x$keepX)
 			cat("\n Number of Y-variables selected on each of the sPLS components:", x$keepY, "\n")
         }			
-        
 
         #---------- affichage communauté ----------#
         if (any(what == "all") || any(what == "communalities")) { 
@@ -125,8 +144,7 @@ function(x, ...){
 
     }  #end if pls
 
-
-    # --------------------------- output rcc ---------------------------
+    # ---------------------- output rcc ------------------------#
     if(x$method == "rcc" ){
         print.gap = 4
         if (any(what == "all")) {
@@ -160,9 +178,3 @@ function(x, ...){
 
     }  #end rcc
 }
-
-
-
-
-
-
