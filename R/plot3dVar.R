@@ -231,6 +231,7 @@ function(object,
     }
 
     title3d(...)	
+    return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
 }
 
 
@@ -240,7 +241,7 @@ plot3dVar.plsda <-
 function(object, 
          comp = 1:3, 
          rad.in = 1, 
-         X.label = FALSE, 
+         var.label = FALSE, 
          pch = NULL, 
          cex = NULL, 
          col = NULL, 
@@ -268,13 +269,7 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-      if (object$mode == "canonical") {
-          cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
-#          cord.Y = cor(object$Y, object$variates$Y[, comp], use = "pairwise")
-      }
-      else {
-          cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
-      }
+    cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
 
     p = ncol(object$X)
 
@@ -284,8 +279,8 @@ function(object,
     colnames(pch.type) = c("s", "t", "c", "o", "i", "d")
     pch.name = c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")
 	
-    if (length(X.label) > 1 & length(X.label) != p)
-        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
+    if (length(var.label) > 1 & length(var.label) != p)
+        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
 
 
     if (is.null(pch)) {
@@ -319,7 +314,7 @@ function(object,
     }
 
 
-    if (X.label) X.label = object$names$X
+    if (var.label) var.label = object$names$X
     if (is.null(xlab)) xlab = paste("Comp ", comp[1])
 	if (is.null(ylab)) ylab = paste("Comp ", comp[2])
 	if (is.null(zlab)) zlab = paste("Comp ", comp[3])
@@ -334,8 +329,8 @@ function(object,
         axes3d(c('x','y','z'), pos = c(0, 0, 0), nticks = 2, at = c(-1.2, 1.2), 
 		    tick = FALSE, labels = "")
 	
-    if (length(X.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = X.label,
+    if (length(var.label) > 1) {
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = var.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
@@ -372,7 +367,7 @@ function(object,
 	
 	cex = 1.5*cex	
 	
-    if (length(X.label) == 1) {
+    if (length(var.label) == 1) {
         switch(pch.name[pch.type[, pch[1]]], 
             sphere = plot3d(x = cord.X[, 1], y = cord.X[, 2], z = cord.X[, 3], type = "s", 
                             col = col[[1]], radius = cex[1]/50, add = TRUE),
@@ -412,6 +407,7 @@ function(object,
     }
 
     title3d(...)	
+    return(invisible(list(coord.X = cord.X)))
 }
 
 
@@ -450,7 +446,6 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-#    if (isTRUE(keep.var)) {
         keep.X = apply(abs(object$loadings$X), 1, sum) > 0
         keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
 
@@ -635,6 +630,7 @@ function(object,
     }
 
     title3d(...)	
+    return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
 }
 
 # ------------------------------ sPLS-DA ---------------------------------------------
@@ -642,7 +638,7 @@ plot3dVar.splsda <-
 function(object, 
          comp = 1:3, 
          rad.in = 1, 
-         X.label = FALSE, 
+         var.label = FALSE, 
          pch = NULL, 
          cex = NULL, 
          col = NULL, 
@@ -670,16 +666,8 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-      keep.X = apply(abs(object$loadings$X), 1, sum) > 0
-
-##      if (object$mode == "canonical") {
-##          cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
-##                   use = "pairwise")
-##      }
-##      else {
-          cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
-                   use = "pairwise")
-##      }
+    keep.X = apply(abs(object$loadings$X), 1, sum) > 0
+    cord.X = cor(object$X[, keep.X], object$variates$X[, comp], use = "pairwise")
 
     p = ncol(object$X)
 
@@ -689,8 +677,8 @@ function(object,
     colnames(pch.type) = c("s", "t", "c", "o", "i", "d")
     pch.name = c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")
 	
-    if (length(X.label) > 1 & length(X.label) != p)
-        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
+    if (length(var.label) > 1 & length(var.label) != p)
+        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
 
    if (is.null(pch)) {
         pch = c("s")
@@ -724,9 +712,9 @@ function(object,
 
       col[[1]] = col[[1]][keep.X]
 
-    if (X.label) X.label = object$names$X
+    if (var.label) var.label = object$names$X
 
-      if (length(X.label) == p) X.label = X.label[keep.X]
+      if (length(var.label) == p) var.label = var.label[keep.X]
 
     if (is.null(xlab)) xlab = paste("Comp ", comp[1])
 	if (is.null(ylab)) ylab = paste("Comp ", comp[2])
@@ -742,8 +730,8 @@ function(object,
         axes3d(c('x','y','z'), pos = c(0, 0, 0), nticks = 2, at = c(-1.2, 1.2), 
 		    tick = FALSE, labels = "")
 	
-    if (length(X.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = X.label,
+    if (length(var.label) > 1) {
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = var.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
@@ -780,7 +768,7 @@ function(object,
 	
 	cex = 1.5*cex	
 	
-    if (length(X.label) == 1) {
+    if (length(var.label) == 1) {
         switch(pch.name[pch.type[, pch[1]]], 
             sphere = plot3d(x = cord.X[, 1], y = cord.X[, 2], z = cord.X[, 3], type = "s", 
                             col = col[[1]], radius = cex[1]/50, add = TRUE),
@@ -821,6 +809,7 @@ function(object,
     }
 
     title3d(...)	
+    return(invisible(list(coord.X = cord.X)))
 }
 
 
@@ -1068,13 +1057,14 @@ function(object,
     }
 
     title3d(...)	
+    return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
 }
 
 # ------------------------------ PCA object ------------------------------------
 plot3dVar.pca <-
 function(object, 
          comp = 1:3, 
-	 rad.in = 1, 
+	     rad.in = 1, 
          var.label = FALSE, 
          pch = NULL, 
          cex = NULL, 
@@ -1227,15 +1217,8 @@ function(object,
     }
 
     title3d(...)	
+    return(invisible(list(coord.X = cord.X)))
 }
-
-
-
-
-
-
-
-
 
 
 # ----------------------------- sPCA---------------------------------------------
@@ -1271,10 +1254,8 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-      keep.X = apply(abs(object$rotation), 1, sum) > 0
-
-          cord.X = cor(object$X[, keep.X], object$x[, comp], 
-                   use = "pairwise")
+    keep.X = apply(abs(object$rotation), 1, sum) > 0
+    cord.X = cor(object$X[, keep.X], object$x[, comp], use = "pairwise")
 
     p = ncol(object$X)
 
@@ -1415,6 +1396,7 @@ function(object,
         }
     }
 
-    title3d(...)	
+    title3d(...)
+    return(invisible(list(coord.X = cord.X)))	
 }
 

@@ -23,12 +23,12 @@
 plsda <-
 function(X, 
          Y, 
-         ncomp = 2, 
-         max.iter = 500,
-         mode = "regression",		 
+         ncomp = 2,
+         max.iter = 500,		 
          tol = 1e-06,
          ...)
 {
+    X = as.matrix(X)
 	
     #-- validation des arguments --#
     if (length(dim(X)) != 2 || !is.numeric(X)) 
@@ -52,9 +52,13 @@ function(X,
     if ((n != nrow(ind.mat))) 
         stop("unequal number of rows in 'X' and 'Y'.")
 
-    result = pls(X, ind.mat, ncomp = ncomp, mode = mode, 
+    result = pls(X, ind.mat, ncomp = ncomp, mode = "regression", 
                  max.iter = max.iter, tol = tol, ...)
-
+     
+    cl = match.call()
+    cl[[1]] = as.name('plsda')
+    result$call = cl
+    	
     result$ind.mat = ind.mat
     result$names$Y = levels(Y)
     class(result) = "plsda"

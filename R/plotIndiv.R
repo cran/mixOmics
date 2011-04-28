@@ -191,7 +191,7 @@ function (object,
 }
 
 #-------------------------- PCA -------------------------#
-plotIndiv.pca <-
+plotIndiv.pca <- plotIndiv.spca <-
 function (object, 
           comp = 1:2, 
           ind.names = TRUE,

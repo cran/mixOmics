@@ -21,27 +21,32 @@ This function provides variables representation for (regularized) CCA, (sparse) 
         pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
 
 \method{plotVar}{pls}(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, Y.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
+        X.label = FALSE, Y.label = FALSE, pch = NULL, cex = NULL, 
+        col = NULL, font = NULL, \ldots)
 
 \method{plotVar}{plsda}(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)		
+        var.label = FALSE, pch = NULL, cex = NULL, col = NULL, 
+        font = NULL, \ldots)		
 
 \method{plotVar}{spls}(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, Y.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)	 
+        X.label = FALSE, Y.label = FALSE, pch = NULL, cex = NULL, 
+        col = NULL, font = NULL, \ldots)	 
 
 \method{plotVar}{splsda}(object, comp = 1:2, rad.in = 0.5, 
-        X.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
+        var.label = FALSE, pch = NULL, cex = NULL, col = NULL, 
+        font = NULL, \ldots)
 
 \method{plotVar}{pca}(object, comp = 1:2, rad.in = 0.5, 
         var.label = FALSE, \ldots)
 
 \method{plotVar}{spca}(object, comp = 1:2, rad.in = 0.5, 
-        var.label = FALSE, pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)	
+        var.label = FALSE, pch = NULL, cex = NULL, col = NULL, 
+        font = NULL, \ldots)	
 }
 
 \arguments{
   \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"}, 
-    \code{"spls"}, \code{"plsda"} or \code{"pca"}.}
+    \code{"spls"}, \code{"splsda"}, \code{"pca"} or \code{"spca"}.}
   \item{comp}{integer vector of length two. The components that will be used on the horizontal 
 	and the vertical axis respectively to project the variables.}
   \item{rad.in}{numeric between 0 and 1, the radius of the inner circle. Defaults to \code{0.5}.}
@@ -69,10 +74,10 @@ For (sparse) PLS regression mode the components correspond to the \eqn{X}-variat
 canonical, the components for \eqn{X} and \eqn{Y} variables correspond to
 the \eqn{X}- and \eqn{Y}-variates respectively. 
 
-For \code{plsda} and \code{splsda} objects, only the X variables are represented.
+For \code{plsda} and \code{splsda} objects, only the \eqn{X} variables are represented.
 
-For \code{spls} and \code{splsda} objects, only the X and Y variables selected on dimensions \code{comp} are represented.
-
+For \code{spls} and \code{splsda} objects, only the \eqn{X} and \eqn{Y} variables selected on 
+dimensions \code{comp} are represented.
 
 The arguments \code{col}, \code{pch}, \code{cex} and \code{font} can be either vectors of
 length two or a list with two vector components of length \eqn{p} and \eqn{q} respectively, 
@@ -83,6 +88,12 @@ Otherwise, multiple arguments values can be specified so that each point (variab
 can be given its own graphic attributes. In this case, the first component of the list 
 correspond to the \eqn{X} attributs and the second component correspond to 
 the \eqn{Y} attributs. Default values exist for this arguments.  
+}
+
+\value{
+A list containing the following components:
+  \item{coord.X}{matrix of \eqn{X}-variables coordinates.}
+  \item{coord.Y}{matrix of \eqn{Y}-variables coordinates.}
 }
 
 \author{Sébastien Déjean and Ignacio González.}
@@ -112,14 +123,14 @@ plotVar(toxicity.spls, keep.var = TRUE, Y.label = TRUE)
 
 ## variable representation for objects of class 'splsda'
 data(liver.toxicity)
-X = as.matrix(liver.toxicity$gene)
-Y = as.factor(liver.toxicity$treatment[,4])
+X <- liver.toxicity$gene
+Y <- as.factor(liver.toxicity$treatment[, 4])
 
-keepX = 20
-ncomp = 2
+ncomp <- 2
+keepX <- rep(20, ncomp)
 
-splsda.liver = splsda(X, Y, ncomp = ncomp, keepX = c(rep(keepX, ncomp)), mode = 'regression')
-plotVar(splsda.liver, X.label = FALSE, Y.label = TRUE)
+splsda.liver <- splsda(X, Y, ncomp = ncomp, keepX = keepX)
+plotVar(splsda.liver, var.label = FALSE)
 }
 
 \keyword{multivariate}

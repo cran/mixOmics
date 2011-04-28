@@ -11,8 +11,8 @@ in a one-step strategy.
 
 \usage{
 spls(X, Y, ncomp = 2, mode = c("regression", "canonical"),
-     max.iter = 500, tol = 1e-06, keepX = c(rep(ncol(X), ncomp)), 
-     keepY = c(rep(ncol(Y), ncomp)), ...)
+     max.iter = 500, tol = 1e-06, keepX = rep(ncol(X), ncomp), 
+     keepY = rep(ncol(Y), ncomp), ...)
 }	
 
 \arguments{
@@ -55,12 +55,12 @@ that contains the following components:
   \item{Y}{the centered and standardized original response vector or matrix.}
   \item{ncomp}{the number of components included in the model.}
   \item{mode}{the algorithm used to fit the model.}
-  \item{keepX}{number of X variables kept in the model on each component.}
-  \item{keepY}{number of Y variables kept in the model on each component.}
+  \item{keepX}{number of \eqn{X} variables kept in the model on each component.}
+  \item{keepY}{number of \eqn{Y} variables kept in the model on each component.}
   \item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
   \item{variates}{list containing the variates.}
-  \item{loadings}{list containing the estimated loadings for the \code{X} and 
-	\code{Y} variates.}
+  \item{loadings}{list containing the estimated loadings for the \eqn{X} and 
+	\eqn{Y} variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
   \item{nzv}{list containing the zero- or near-zero predictors information.}
 }
@@ -87,7 +87,7 @@ In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N
 \seealso{\code{\link{pls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
-\code{\link{cim}}, \code{\link{network}}.}
+\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{valid}}.}
 
 \examples{
 data(liver.toxicity)

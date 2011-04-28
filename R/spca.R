@@ -29,11 +29,10 @@ function(X,
          ncomp = 3, 
          center = TRUE, 
          scale. = TRUE,
+         keepX = rep(ncol(X), ncomp),
          iter.max = 500, 
-         tol = 1e-06, 
-         keepX = c(rep(ncol(X), ncomp)))
+         tol = 1e-06)
 {
-
 
     #--scaling the data--#
     X=scale(X,center=center,scale=scale.)
@@ -47,6 +46,7 @@ function(X,
     X.temp=as.matrix(X)
     n=nrow(X)
     p=ncol(X)
+    
     # put a names on the rows and columns
     X.names = dimnames(X)[[2]]
     if (is.null(X.names)) X.names = paste("X", 1:p, sep = "")
@@ -69,15 +69,14 @@ function(X,
     vect.keepX=vector(length=ncomp)
     names(vect.keepX) = c(1:ncomp)
 
+# KA: to add if biplot function (but to be fixed!)
+    #sdev = vector(length = ncomp)
+
     mat.u=matrix(nrow=n, ncol=ncomp)
     mat.v=matrix(nrow=p, ncol=ncomp)
     colnames(mat.u)=c(1:ncomp)
     colnames(mat.v)=c(1:ncomp)
     rownames(mat.v)=colnames(X)
-
-    
-    
-    
 
     #--loop on h--#
     for(h in 1:ncomp){
@@ -101,15 +100,21 @@ function(X,
             v.temp=t(X.temp)%*%u.old
             v.old=v.new
             
+            if(h>=2){
+               u.new=(lsfit(y=X%*%v.old, x=X%*%mat.v[,1:(h-1)],intercept=FALSE)$res)
+               u.new=u.new/sqrt(drop(crossprod(u.new)))
+            }
+            
             #--penalisation on loading vectors--#
             if(nx!=0){
                v.new = ifelse(abs(v.temp) > abs(v.temp[order(abs(v.temp))][nx]), 
                (abs(v.temp) - abs(v.temp[order(abs(v.temp))][nx])) * sign(v.temp), 0)
             }
             
-            u.new = as.vector(X.temp %*% v.new)
-            u.new=u.new/sqrt(drop(crossprod(u.new)))
-            
+            if(h==1){  
+               u.new = as.vector(X.temp %*% v.new)
+               u.new=u.new/sqrt(drop(crossprod(u.new)))
+            }
             
             #--checking convergence--#
             if(crossprod(u.new-u.old)<tol){u.stab=TRUE}
@@ -122,40 +127,38 @@ function(X,
 
 
        v.final = v.new/sqrt(drop(crossprod(v.new)))
-       
-       
-       u.final = X%*%v.final
-       u.final = u.final/sqrt(sum(u.final^2))
-        
+             
        #--deflation of data--#
        X.temp= X.temp - svd.X$d[1] * svd.X$u[,1] %*% t(svd.X$v[,1])
        
        
        vect.iter[h]=iter
        mat.v[,h]=v.final
-       mat.u[,h]=u.final
+       mat.u[,h]=u.new
        
        #--calculating adjusted variances explained--#
        X.var = X %*% mat.v[,1:h]%*%solve(t(mat.v[,1:h])%*%mat.v[,1:h])%*%t(mat.v[,1:h])
        vect.varX[h] = sum(X.var^2)
+
+# KA: to add if biplot function (but to be fixed!)
+       #sdev[h] = sqrt(svd.X$d[1])
        
         
     }#fin h
-    varX = vect.varX/sum(X^2)
-    names(varX) =  colnames(mat.u) = colnames(mat.v) = paste("PC", 1:ncomp, sep = "")
-
-    rownames(mat.u)  = ind.names
-    rownames(mat.v)  = X.names    
-
+    
     result = (list(X = X,
-		   ncomp=ncomp,		
-                   varX= varX,
-                   keepX=vect.keepX,
-                   iter=vect.iter,
+		   ncomp = ncomp,	
+                   #sdev = sdev,  # KA: to add if biplot function (but to be fixed!)
+                   #center = center, # KA: to add if biplot function (but to be fixed!)
+                   #scale = scale,   # KA: to add if biplot function (but to be fixed!)
+                   varX = vect.varX/sum(X^2),
+                   keepX = vect.keepX,
+                   iter = vect.iter,
                    rotation = mat.v,
-                   x=mat.u,
+                   x = mat.u,
                    names = list(X = X.names, indiv = ind.names)
               ))
+			  
     class(result) = c("spca", "prcomp", "pca")
     return(invisible(result))
 }

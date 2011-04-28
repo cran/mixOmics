@@ -14,8 +14,8 @@ grid to determine optimal values for the parameters of regularization in
 \usage{
 estim.regul(X, Y, grid1 = seq(0.001, 1, length = 5), 
             grid2 = seq(0.001, 1, length = 5), 
-            validation = c("loo", "Mfold"), 
-            folds, M = 10, plt = TRUE)
+            validation = c("loo", "Mfold"), folds,  
+            M = 10, plt = TRUE)
 }
 
 \arguments{
@@ -25,7 +25,7 @@ estim.regul(X, Y, grid1 = seq(0.001, 1, length = 5),
     \code{NA}s are allowed.}
   \item{grid1, grid2}{vector numeric defining the values of \code{lambda1} and \code{lambda2} 
 	at which cross-validation score should be computed. Defaults to 
-	\code{grid1 = grid2 = seq(from=0.001, to=1, length=5)}.}
+	\code{grid1=grid2=seq(0.001, 1, length=5)}.}
   \item{validation}{character string. What kind of (internal) cross-validation method to use, 
     (partially) matching one of \code{"loo"} (leave-one-out) or \code{"Mfolds"} (M-folds). See Details.}
   \item{folds}{list of vectors (as returned by \code{\link{split}}) 

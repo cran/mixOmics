@@ -35,7 +35,7 @@ function(x, ...)
     cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
     cat(" You entered data Y of dimensions:", nrow(x$Y), ncol(x$Y), "\n\n")
 
-    cat(" No variable selection \n\n")
+    cat(" No variable selection. \n\n")
 	
     cat(" Available components: \n", 
         "-------------------- \n")
@@ -49,16 +49,14 @@ function(x, ...)
 print.plsda <-
 function(x, ...) 
 {
-
-    mode = paste("'", x$mode, "'", sep = "")
 	
     cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
 	
-    cat(" PLS-da (regression mode) with", x$ncomp, "PLS components. \n")
+    cat(" PLS-DA (regression mode) with", x$ncomp, "PLS-DA components. \n")
     cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
-    cat(" You entered data Y with", ncol(x$ind.mat) , "classes \n\n")
+    cat(" You entered data Y with", ncol(x$ind.mat) , "classes. \n\n")
 
-    cat(" No variable selection \n\n")
+    cat(" No variable selection. \n\n")
 	
     cat(" Available components: \n", 
         "-------------------- \n")
@@ -101,18 +99,16 @@ print.splsda <-
 function(x, ...)
 {
 
-    mode = paste("'", x$mode, "'", sep = "")
     keepX = paste("[", x$keepX, "]", sep = "")
     keepY = paste("[", x$keepY, "]", sep = "")
 	
-	cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
-	
-    cat(" sPLS with a regression mode with", x$ncomp, "sPLS components. \n")
+	cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")	
+    cat(" sPLS-DA (regression mode) with", x$ncomp, "sPLS-DA components. \n")
     cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
-    cat(" You entered data Y with", ncol(x$ind.mat) , "classes \n\n")
+    cat(" You entered data Y with", ncol(x$ind.mat) , "classes. \n\n")
 	
-    cat(" Selection of", keepX, "variables on each of the sPLS components on the X data set. \n")
-    cat(" No Y variables can be selection. \n\n")
+    cat(" Selection of", keepX, "variables on each of the sPLS-DA components on the X data set. \n")
+    cat(" No Y variables can be selected. \n\n")
 
     cat(" Available components: \n", 
         "-------------------- \n")
@@ -268,8 +264,6 @@ print.pca <- function(x, ...) {
 print.spca <-
 function(x, ...) 
 {
-
-#    mode = paste("'", x$mode, "'", sep = "")
 	
     cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
 	

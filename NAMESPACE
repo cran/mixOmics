@@ -9,6 +9,7 @@ loo,
 mat.rank, 
 map,
 Mfold,
+nearZeroVar,
 network,
 nipals, 
 pca,
@@ -20,6 +21,8 @@ plotIndiv,
 plotVar, 
 pls,
 plsda, 
+q2.spls,
+q2.pls,
 rcc,
 scatterutil.base, 
 scatterutil.eti, 
@@ -28,14 +31,15 @@ s.match,
 spca,
 spls,
 splsda,
-unmap, 
-vip, 
-valid)
+unmap,
+valid, 
+vip)
 
 
 S3method(cim, default)
 S3method(cim, rcc)
 S3method(cim, spls)
+S3method(cim, pls)
 
 S3method(image, estim.regul)
 
@@ -91,7 +95,7 @@ S3method(plot3dVar, plsda)
 S3method(plot3dVar, splsda)
 S3method(plot3dVar, spca)
 
-
 S3method(network, default)
 S3method(network, rcc)
+S3method(network, pls)
 S3method(network, spls)

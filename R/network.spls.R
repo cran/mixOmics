@@ -19,7 +19,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-network.spls <-
+network.pls <- network.spls <-
 function(object, comp = 1, X.names = NULL, Y.names = NULL, keep.var = TRUE, ...) 		
 {
 

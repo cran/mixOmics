@@ -29,7 +29,7 @@ A list containing the following components:
 }
 
 \details{
-The data come from a liver toxicity study (Heinloth et al., 2004) in which
+The data come from a liver toxicity study (Bushel \emph{et al}., 2007) in which
 64 male rats of the inbred strain Fisher 344 were exposed to non-toxic (50 or
 150 mg/kg), moderately toxic (1500 mg/kg) or severely toxic (2000 mg/kg)
 doses of acetaminophen (paracetamol) in a controlled experiment. Necropsies
@@ -40,12 +40,14 @@ serum enzymes levels are measured numerically. The data were further normalized
 and pre-processed by Bushel \emph{et al}. (2007).
 }
 
-\references{
-Heinloth, A., Irwin, R., Boorman, G., Nettesheim, P., Fannin, R., Sieber,
-S., Snell, M., Tucker, C., Li, L., Travlos, G., et al. (2004). Gene Expression Profiling 
-of Rat Livers Reveals Indicators of Potential Adverse Effects.
-\emph{Toxicological Sciences} \bold{80}(1), 193-202.
+\source{
+The two liver toxicity data sets are a companion resource for the paper of 
+Bushel \emph{et al.} (2007), and was downloaded from:
 
+\url{http://www.biomedcentral.com/1752-0509/1/15/additional/} 
+}
+
+\references{
 Bushel, P., Wolfinger, R. D. and Gibson, G. (2007). Simultaneous clustering of gene 
 expression data with clinical chemistry and pathological evaluations reveals 
 phenotypic prototypes. \emph{BMC Systems Biology} \bold{1}, Number 15.

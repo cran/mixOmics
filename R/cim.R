@@ -54,7 +54,7 @@ function(mat,
     if (length(dim(mat)) != 2) 
         stop("'mat' must be a numeric matrix.")
 
-    mat = as.matrix(mat)
+    mat = simMat = as.matrix(mat)
 
     if (!is.numeric(mat)) 
         stop("'mat' must be a numeric matrix.")
@@ -378,7 +378,7 @@ function(mat,
     }
 
     par(op)
-    res = list(labCol = labCol, labRow = labRow)
+    res = list(simMat = simMat, labCol = labCol, labRow = labRow)
 	
     if (any(dendrogram == "both") || any(dendrogram == "row")) {
         res$rowInd = rowInd

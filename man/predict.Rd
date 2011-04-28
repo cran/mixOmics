@@ -5,44 +5,46 @@
 \alias{predict.pls}
 \alias{predict.spls}
 
-\title{Predict Method for PLS, sparse PLS, PLSDA Regression or Sparse PLSDA}
+\title{Predict Method for PLS, sPLS, PLS-DA or sPLS-DA}
 
 \description{
-Predicted values based on PLS, sparse PLS, PLSDA or sparse PLSDA models. New responses and 
+Predicted values based on PLS, sparse PLS, PLS-DA or sparse PLS-DA models. New responses and 
 variates are predicted using a fitted model and a new matrix of observations.
 }
 
 \usage{
 \method{predict}{pls}(object, newdata, ...)
+
 \method{predict}{spls}(object, newdata, ...)
-\method{predict}{plsda}(object, newdata, method = c("max.dist", "class.dist", "centroids.dist", "mahalanobis.dist"), ...)
-\method{predict}{splsda}(object, newdata, method = c("max.dist", "class.dist", "centroids.dist", "mahalanobis.dist"), ...)
+
+\method{predict}{plsda}(object, newdata, method = c("all", "max.dist", 
+        "centroids.dist", "mahalanobis.dist"), ...)
+
+\method{predict}{splsda}(object, newdata, method = c("all", "max.dist", 
+        "centroids.dist", "mahalanobis.dist"), ...)
 }
 
 \arguments{
   \item{object}{object of class inheriting from \code{"pls"}, \code{"spls"}, \code{"plsda"} or \code{"splsda"}.}
   \item{newdata}{data matrix in which to look for for explanatory variables to be used for prediction.}
-  \item{method}{method to be applied for \code{splsda} or \code{plsda} to predict the class of new data, 
-    (partially) matching one of \code{"class.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"} or 
-    \code{"max.dist"}. See Details.}
-  \item{...}{other arguments to be passed \code{predict.default}.}
+  \item{method}{method to be applied for \code{plsda} or \code{splsda} to predict the class of new data, 
+    should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \code{"max.dist"} (see Details). 
+	Defaults to \code{"all"}.}
+  \item{...}{not used currently.}
 }
 
 \details{
-\code{predict} produces predicted values, obtained by evaluating the PLS/sPLS/PLSDA or sparse PLSDA  
+\code{predict} produces predicted values, obtained by evaluating the PLS, sparse PLS, PLSDA or sparse PLSDA  
 model returned by \code{pls}, \code{spls}, \code{plsda} or \code{splsda} in the frame \code{newdata}. 
 Variates for \code{newdata} are also returned. 
 
-Different class prediction methods are proposed for \code{splsda} or \code{plsda}: \code{max.dist} 
+Different class prediction methods are proposed for \code{plsda} or \code{splsda}: \code{"max.dist"} 
 is the naive method to predict the class. It is based on the predicted matrix (\code{object$predict}) 
 which can be seen as a probability matrix to assign each test data to a class. The class with the largest 
-class value is the predicted class. \code{class.dist} allocates the predicted individual \eqn{x} to the class of 
-\eqn{Y} minimizing \eqn{dist(x, C_l)}, where \eqn{C_l}, \eqn{l = 1,...,L} are 
-the indicator vectors corresponding to each class and \eqn{L} = number of class. 
-\code{centroids.dist} allocates the individual \eqn{x} to the class of \eqn{Y} minimizing 
-\eqn{dist(\code{x-variate}, G_l)}, where \eqn{G_l}, \eqn{l = 1,...,L} are the centroids of 
-the classes calculated on the X-variates of the model. \code{mahalanobis.dist} allocates the individual 
-\eqn{x} to the class of \eqn{Y} as in \code{centroids.dist} but by using the metric Mahalanobis 
+class value is the predicted class. \code{"centroids.dist"} allocates the individual \eqn{x} to the class of 
+\eqn{Y} minimizing \eqn{dist(\code{x-variate}, G_l)}, where \eqn{G_l}, \eqn{l = 1,...,L} are the centroids of 
+the classes calculated on the \eqn{X}-variates of the model. \code{"mahalanobis.dist"} allocates the individual 
+\eqn{x} to the class of \eqn{Y} as in \code{"centroids.dist"} but by using the Mahalanobis metric 
 in the calculation of the distance.
 }
 
@@ -86,31 +88,24 @@ text(pred$variates[, 1], pred$variates[, 2],
 	 
 ## First example with plsda
 data(liver.toxicity)
-X = as.matrix(liver.toxicity$gene)
-Y = as.factor(liver.toxicity$treatment[,4] )
+X <- liver.toxicity$gene
+Y <- as.factor(liver.toxicity$treatment[, 4])
 
-# if training is perfomed on 4/5th of the original data
-samp = sample(1:5, nrow(X), replace = TRUE)  
-test = which(samp == 1)   # testing on the first fold
-train = setdiff(1:nrow(X), test)
+## if training is perfomed on 4/5th of the original data
+samp <- sample(1:5, nrow(X), replace = TRUE)  
+test <- which(samp == 1)   # testing on the first fold
+train <- setdiff(1:nrow(X), test)
 
-plsda.train = plsda(X[train,], Y[train], ncomp = 1,  mode = 'regression')
-test.predict = predict(plsda.train, X[test,], method = "class.dist")
-test.predict$class
+plsda.train <- plsda(X[train, ], Y[train], ncomp = 2)
+test.predict <- predict(plsda.train, X[test, ], method = "max.dist")
+Prediction <- levels(Y)[test.predict$class$max.dist[, 2]]
+cbind(Y = as.character(Y[test]), Prediction)
 
 ## Second example with splsda
-data(liver.toxicity)
-X = as.matrix(liver.toxicity$gene)
-Y = as.factor(liver.toxicity$treatment[, 4])  # time points
-
-# if training is perfomed on 4/5th of the original data
-samp = sample(1:5, nrow(X), replace = TRUE)  
-test = which(samp == 1)   # testing on the first fold
-train = setdiff(1:nrow(X), test)
-
-splsda.train = splsda(X[train,], Y[train], ncomp = 1, keepX = 20, mode = 'regression')
-test.predict = predict(splsda.train, X[test,], method = "class.dist")
-test.predict$class
+splsda.train <- splsda(X[train, ], Y[train], ncomp = 2, keepX = c(30, 30))
+test.predict <- predict(splsda.train, X[test, ], method = "max.dist")
+Prediction <- levels(Y)[test.predict$class$max.dist[, 2]]
+cbind(Y = as.character(Y[test]), Prediction)
 }
 
 \keyword{regression}

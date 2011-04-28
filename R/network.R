@@ -48,7 +48,7 @@ function(mat,
 	if (length(dim(mat)) != 2) 
         stop("'mat' must be a numeric matrix.")
 
-    mat = as.matrix(mat)
+    mat = simMat = as.matrix(mat)
 
     if (!is.numeric(mat)) 
         stop("'mat' must be a numeric matrix.")
@@ -432,7 +432,7 @@ function(mat,
 		if (gE.none != FALSE) gR = gE
 	}
 	
-	return(invisible(gR))
+	return(invisible(list(gR = gR, simMat = simMat)))
 }	
 
 

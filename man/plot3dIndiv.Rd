@@ -7,6 +7,7 @@
 \alias{plot3dIndiv.plsda}
 \alias{plot3dIndiv.splsda}
 \alias{plot3dIndiv.pca}
+\alias{plot3dIndiv.spca}
 
 \title{Plot of Individuals (Experimental Units) in three dimensions}
 
@@ -49,6 +50,11 @@ in three dimensions for (r)CCA, (s)PLS regression and PCA.
 \method{plot3dIndiv}{pca}(object, comp = 1:3, ind.names = FALSE,
             xlab = NULL, ylab = NULL, zlab = NULL,
             col = "blue", cex = 1, pch = "s", font = 1,
+            axes.box = "box", \ldots)
+
+\method{plot3dIndiv}{spca}(object, comp = 1:3, ind.names = FALSE,
+            xlab = NULL, ylab = NULL, zlab = NULL,
+            col = "blue", cex = 1, pch = "s", font = 1,
             axes.box = "box", \ldots)			
 }
 
@@ -63,14 +69,14 @@ in three dimensions for (r)CCA, (s)PLS regression and PCA.
   \item{rep.space}{character string, (partially) matching one of \code{"X-variate"}, 
     \code{"Y-variate"} or \code{"XY-variate"}, determining the subspace to project the 
 	  individuals. Defaults to \code{"XY-variate"} and \code{"X-variate"} for (r)CCA and (s)PLS 
-      respectivvely.}
+      respectively.}
   \item{xlab, ylab, zlab}{\eqn{x}-, \eqn{y}- and \eqn{z}-axis titles.}
   \item{col}{character (or item) color to be used, possibly vector (see Details).}
   \item{cex}{numeric character (or item) expansion, possibly vector (see Details).}
   \item{pch}{character indicating the type of item to plot, possibly vector (see Details).}
   \item{font}{character font to be used, possibly vector (see Details).}
   \item{axes.box}{character string specifying the axes box type. Should be a 
-    of \code{c("box", "bbox", "both")}.}
+    of \code{c("box",} \code{"bbox",} \code{"both")}.}
   \item{\dots}{further title parameters are passed to \code{\link[rgl]{title3d}}.}
 }
 
@@ -86,7 +92,7 @@ length \code{n}. If atomic, this argument value determines the graphical attribu
 In the last case, multiple arguments values can be specified so that each item (individual)
 can be given its own graphic attributes. Default values exist for this arguments. 
 Supported types for \code{pch} are: \code{"s"} for spheres, \code{"t"} for tetrahedrons, \code{"c"} for cubes, 
-\code{"o"} for octahedrons, \code{"i"} for icosahedrons and \code{"d"} dodecahedrons. Partial matching is used.    
+\code{"o"} for octahedrons, \code{"i"} for icosahedrons and \code{"d"} dodecahedrons.    
 
 The pointing device of your graphics user-interface can also be used to set the viewpoint interactively. With the pointing device the buttons are by default set as follows:
 - left adjust viewpoint position
@@ -127,7 +133,7 @@ toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50),
                       keepY = c(10, 10, 10))
 		  	
 Time.Group = liver.toxicity$treatment[, "Time.Group"]				  
-col <- rep(c("blue", "red", "darkgreen", "darkviolet"), c(16, 16, 16, 16))
+col <- rep(c("blue", "red", "darkgreen", "darkviolet"), rep(16, 4))
 plot3dIndiv(toxicity.spls, ind.names = Time.Group, 
                  col = col, cex = 0.8)		  
 		  				  
@@ -140,7 +146,8 @@ data(multidrug)
 pca.res <- pca(multidrug$ABC.trans, ncomp = 4, scale = TRUE)
 
 palette(rainbow(9))
-plot3dIndiv(pca.res, cex = 4, col = as.numeric(as.factor(multidrug$cell.line$Class)))
+col = as.numeric(as.factor(multidrug$cell.line$Class))
+plot3dIndiv(pca.res, cex = 0.25, col = col)
 palette("default")				 
 }
 }

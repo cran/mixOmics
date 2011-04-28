@@ -7,6 +7,7 @@
 \alias{plotIndiv.plsda}
 \alias{plotIndiv.splsda}
 \alias{plotIndiv.pca}
+\alias{plotIndiv.spca}
 
 \title{Plot of Individuals (Experimental Units)}
 
@@ -32,12 +33,15 @@ representation in (r)CCA, (s)PLS regression and PCA.
           col = "black", cex = 1, pch = 1, \ldots)
 
 \method{plotIndiv}{pca}(object, comp = 1:2, ind.names = TRUE,
+          x.label = NULL, y.label = NULL, \ldots)
+
+\method{plotIndiv}{spca}(object, comp = 1:2, ind.names = TRUE,
           x.label = NULL, y.label = NULL, \ldots)		  
 }
 
 \arguments{
   \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"}, 
-    \code{"spls"}, \code{"plsda"} or \code{"pca"}.}
+    \code{"spls"}, \code{"plsda"}, \code{"pca"} or \code{"spca"}.}
   \item{comp}{integer vector of length two. The components that will be used on the horizontal 
 	and the vertical axis respectively to project the individuals.}
   \item{ind.names}{either a character vector of names for the individuals to be plotted, 
@@ -46,7 +50,7 @@ representation in (r)CCA, (s)PLS regression and PCA.
   \item{rep.space}{character string, (partially) matching one of \code{"X-variate"}, 
     \code{"Y-variate"} or \code{"XY-variate"}, determining the subspace to project the 
 	  individuals. Defaults to \code{"XY-variate"} and \code{"X-variate"} for (r)CCA and (s)PLS 
-      respectivvely.}
+      respectively.}
   \item{x.label, y.label}{\eqn{x}- and \eqn{y}-axis titles.}
   \item{col}{character (or symbol) color to be used, possibly vector.}
   \item{cex}{numeric character (or symbol) expansion, possibly vector.}
@@ -96,12 +100,12 @@ Y <- liver.toxicity$clinic
 toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50), 
                       keepY = c(10, 10, 10))
 		  
-col <- rep(c("blue", "red", "darkgreen", "darkviolet"), c(16, 16, 16, 16))
+col <- rep(c("blue", "red", "darkgreen", "darkviolet"), rep(16, 4))
 cex <- rep(c(1, 1.2, 1, 1.4), c(16, 16, 16, 16))
 pch <- rep(c(15, 16, 17, 18), c(16, 16, 16, 16))
 plotIndiv(toxicity.spls, comp = 1:2, ind.names = FALSE,
           rep.space = "X-variate", col = col, cex = cex, pch = pch)
-legend(0.22, -0.24, c("50 mg/kg", "150 mg/kg", "1500 mg/kg", "2000 mg/kg"), 
+legend("topright", c("50 mg/kg", "150 mg/kg", "1500 mg/kg", "2000 mg/kg"), 
        col = c("blue", "red", "darkgreen", "darkviolet"), 
        pch = c(15, 16, 17, 18), pt.cex = c(1, 1.2, 1, 1.4), 
        title = "Treatment")

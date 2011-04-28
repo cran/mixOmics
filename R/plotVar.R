@@ -157,9 +157,6 @@ function(object,
         }
     }
 
-
-    def.par = par(no.readonly = TRUE)
-
     if (isTRUE(X.label)) X.label = object$names$X
     if (isTRUE(Y.label)) Y.label = object$names$Y
 
@@ -189,8 +186,8 @@ function(object,
     lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
     lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
           rad.in * sin(seq(0, 2 * pi, l = 100)))
-  
-    par(def.par)  
+    
+	return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
 }
 
 # ----------------------plsda ---------------------------#
@@ -198,7 +195,7 @@ plotVar.plsda <-
 function(object, 
          comp = 1:2, 
          rad.in = 0.5, 
-         X.label = FALSE, 
+         var.label = FALSE, 
          pch = NULL, 
          cex = NULL, 
          col = NULL, 
@@ -222,19 +219,14 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-        if (object$mode == "canonical") {
-            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-        }
-        else {
-            cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-        }
+    cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
 
     p = ncol(object$X)
 
     # le plot des variables #
     #-----------------------#
-    if (length(X.label) > 1 & length(X.label) != p)
-        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
+    if (length(var.label) > 1 & length(var.label) != p)
+        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
 
     if (is.null(pch)) {
         pch = list(rep(16, p))
@@ -322,16 +314,14 @@ function(object,
         }
     }
 
-    def.par = par(no.readonly = TRUE)
-
-    if (isTRUE(X.label)) X.label = object$names$X
+    if (isTRUE(var.label)) var.label = object$names$X
 
     par(pty = "s")
     plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
          xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
 
-    if (length(X.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], X.label, col = col[[1]], 
+    if (length(var.label) > 1) {
+        text(cord.X[, 1], cord.X[, 2], var.label, col = col[[1]], 
              font = font[[1]], cex = cex[[1]])
     }
     else {
@@ -344,7 +334,7 @@ function(object,
     lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
           rad.in * sin(seq(0, 2 * pi, l = 100)))
   
-    par(def.par)  
+    return(invisible(list(coord.X = cord.X)))
 }
 
 
@@ -494,8 +484,6 @@ function(object,
       font[[1]] = font[[1]][keep.X]
       font[[2]] = font[[2]][keep.Y]
 
-    def.par = par(no.readonly = TRUE)
-
     if (isTRUE(X.label)) X.label = object$names$X
     if (isTRUE(Y.label)) Y.label = object$names$Y
 
@@ -528,8 +516,8 @@ function(object,
     lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
     lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
           rad.in * sin(seq(0, 2 * pi, l = 100)))
-  
-    par(def.par)  
+    
+    return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
 }
 
 	
@@ -539,7 +527,7 @@ plotVar.splsda <-
 function(object, 
          comp = 1:2, 
          rad.in = 0.5, 
-         X.label = FALSE, 
+         var.label = FALSE, 
          pch = NULL, 
          cex = NULL, 
          col = NULL, 
@@ -563,22 +551,16 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-        keep.X = apply(abs(object$loadings$X), 1, sum) > 0
-
-##        if (object$mode == "canonical") {
-##            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
-##                     use = "pairwise")
-##        }else{
-            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
-                     use = "pairwise")
-##        }
+    keep.X = apply(abs(object$loadings$X), 1, sum) > 0
+    cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
+                 use = "pairwise")
 
     p = ncol(object$X)
 
     # le plot des variables #
     #-----------------------#
-    if (length(X.label) > 1 & length(X.label) != p)
-        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
+    if (length(var.label) > 1 & length(var.label) != p)
+        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
 
     if (is.null(pch)) {
         pch = list(rep(16, p))
@@ -601,7 +583,6 @@ function(object,
             }
         }
     }
-
 
     if (is.null(cex)) {
         cex = list(rep(1, p))
@@ -665,18 +646,15 @@ function(object,
         cex[[1]] = cex[[1]][keep.X]
         font[[1]] = font[[1]][keep.X]
 
-    def.par = par(no.readonly = TRUE)
-
-    if (isTRUE(X.label)) X.label = object$names$X
-
-    if (length(X.label) == p) X.label = X.label[keep.X]
+    if (isTRUE(var.label)) var.label = object$names$X
+    if (length(var.label) == p) var.label = var.label[keep.X]
 
     par(pty = "s")
     plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
          xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
 
-    if (length(X.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], X.label, col = col[[1]], 
+    if (length(var.label) > 1) {
+        text(cord.X[, 1], cord.X[, 2], var.label, col = col[[1]], 
              font = font[[1]], cex = cex[[1]])
     }
     else {
@@ -689,7 +667,7 @@ function(object,
     lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
           rad.in * sin(seq(0, 2 * pi, l = 100)))
   
-    par(def.par)  
+    return(invisible(list(coord.X = cord.X)))
 }
 
 
@@ -706,7 +684,7 @@ function(object,
          cex = NULL, 
          col = NULL, 
          font = NULL,
-	 ...) 
+	  ...) 
 {
 
     # validation des arguments #
@@ -863,8 +841,6 @@ function(object,
         font[[2]] = font[[2]][gp.Y]
     }
 
-    def.par = par(no.readonly = TRUE)
-
     if (isTRUE(X.label)) X.label = object$names$X
     if (isTRUE(Y.label)) Y.label = object$names$Y
 
@@ -899,8 +875,8 @@ function(object,
     lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
     lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
           rad.in * sin(seq(0, 2 * pi, l = 100)))
-  
-    par(def.par)  
+   
+    return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
 }
 
 
@@ -934,11 +910,9 @@ function(object,
 
     # calcul des coordonnées #
     #------------------------#
-        keep.X = apply(abs(object$rotation), 1, sum) > 0
-
-
-            cord.X = cor(object$X[, keep.X], object$x[, c(comp1, comp2)], 
-                     use = "pairwise")
+    keep.X = apply(abs(object$rotation), 1, sum) > 0
+    cord.X = cor(object$X[, keep.X], object$x[, c(comp1, comp2)], 
+                 use = "pairwise")
 
     p = ncol(object$X)
 
@@ -1032,10 +1006,7 @@ function(object,
         cex[[1]] = cex[[1]][keep.X]
         font[[1]] = font[[1]][keep.X]
 
-    def.par = par(no.readonly = TRUE)
-
     if (isTRUE(var.label)) var.label = object$names$X
-
     if (length(var.label) == p) var.label = var.label[keep.X]
 
     par(pty = "s")
@@ -1055,8 +1026,8 @@ function(object,
     lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
     lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
           rad.in * sin(seq(0, 2 * pi, l = 100)))
-  
-    par(def.par)  
+    
+    return(invisible(list(coord.X = cord.X)))
 }
 
 
@@ -1077,7 +1048,6 @@ function(object,
     if (!is.numeric(comp) || any(comp < 1))
         stop("invalid vector for 'comp'.")
 
-#    p = ncol(object$rotation)
 	q = nrow(object$rotation)
 	
     if (any(comp > object$ncomp)) 
@@ -1085,11 +1055,6 @@ function(object,
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
-
-
-#    if (any(comp > p)) 
-#        stop("the elements of 'comp' must be smaller or equal than ", p, ".")
-#    comp = round(comp)
 	
     if (is.logical(var.label)) {
         if (isTRUE(var.label)) var.label = rownames(object$rotation)
@@ -1102,14 +1067,10 @@ function(object,
 	
     # calcul des coordonnées #
     #------------------------#
-##    cord.X = object$x[, comp] 
-      cord.X = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
-
+    cord.X = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
 
     # le plot des variables #
-    #-----------------------#
-    def.par = par(no.readonly = TRUE)
-	
+    #-----------------------#	
     par(pty = "s")
     plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
          xlab = paste("Comp ", comp[1]), ylab = paste("Comp ", comp[2]))
@@ -1125,8 +1086,8 @@ function(object,
     lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
     lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
           rad.in * sin(seq(0, 2 * pi, l = 100)))
-  
-    par(def.par)  
+    
+    return(invisible(list(coord.X = cord.X)))
 }
 
 

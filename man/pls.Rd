@@ -52,7 +52,7 @@ that contains the following components:
   \item{ncomp}{the number of components included in the model.}
   \item{mode}{the algoritthm used to fit the model.}
   \item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
-  \item{variates}{list containing the \code{X} and \code{Y} variates.}
+  \item{variates}{list containing the \eqn{X} and \eqn{Y} variates.}
   \item{loadings}{list containing the estimated loadings for the variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
   \item{nzv}{list containing the zero- or near-zero predictors information.}
@@ -67,8 +67,8 @@ In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N
 
 \author{Sébastien Déjean and Ignacio González and Kim-Anh Lê Cao.}
 
-\seealso{\code{\link{spls}}, \code{\link{summary}}, \code{\link{mat.rank}}, 
-\code{\link{plotIndiv}}, \code{\link{plotVar}}.}
+\seealso{\code{\link{spls}}, \code{\link{summary}}, 
+\code{\link{plotIndiv}}, \code{\link{plotVar}}, \code{\link{predict}}, \code{\link{valid}}.}
 
 \examples{
 data(linnerud)

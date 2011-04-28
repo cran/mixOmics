@@ -4,6 +4,7 @@
 \alias{cim.default}
 \alias{cim.rcc}
 \alias{cim.spls}
+\alias{cim.pls}
 
 \title{Clustered Image Maps (CIMs) ("heat maps")}
 
@@ -28,6 +29,9 @@ represent "high-dimensional" data sets.
 
 \method{cim}{spls}(object, comp = 1, X.names = NULL, Y.names = NULL, 
     keep.var = TRUE, \ldots)
+
+\method{cim}{pls}(object, comp = 1, X.names = NULL, Y.names = NULL, \ldots)
+
 }
 
 \arguments{
@@ -51,8 +55,8 @@ represent "high-dimensional" data sets.
   \item{hclustfun}{function used to compute the hierarchical clustering for both rows and columns. 
     Defaults to \code{\link[stats]{hclust}}. Should take as argument a result of \code{distfun} and return 
     an object to which \code{as.dendrogram} can be applied.}
-  \item{dendrogram}{character string indicating whether to draw \code{'none'}, \code{'row'}, 
-    \code{'column'} or \code{'both'} dendrograms. Defaults to \code{'both'}.}	
+  \item{dendrogram}{character string indicating whether to draw \code{"none"}, \code{"row"}, 
+    \code{"column"} or \code{"both"} dendrograms. Defaults to \code{"both"}.}	
   \item{labRow}{character vectors with row labels to use. 
 	Defaults to \code{rownames(mat)}.}
   \item{labCol}{character vectors with column labels to use. 
@@ -106,7 +110,8 @@ from the menu, or from the 'Stop' menu on the graphics window.
 }
 
 \value{
-A object of class \code{"rcc"}, a list containing the following components:
+A list containing the following components:
+  \item{simMat}{the similarity matrix used by \code{cim}.}
   \item{rowInd}{row index permutation vectors as returned 
     by \code{\link{order.dendrogram}}.}
   \item{colInd}{column index permutation vectors as returned 
@@ -143,7 +148,6 @@ Y <- nutrimouse$gene
 cim(cor(X, Y), dendrogram = "none")
 
 ## CIM representation for objects of class 'rcc'
-\dontrun{
 nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 dends <- cim(nutri.res, comp = 1:3, xlab = "genes", 
@@ -152,7 +156,6 @@ dends <- cim(nutri.res, comp = 1:3, xlab = "genes",
 op <- par(mar = c(5, 4, 4, 4), cex = 0.8)			 
 plot(dends$ddr, axes = FALSE, horiz = TRUE)
 par(op)
-}
 
 ## interactive 'zoom' 
 \dontrun{
@@ -161,7 +164,6 @@ cim(nutri.res, comp = 1:3, zoom = TRUE)
 }
 
 ## CIM representation for objects of class 'spls'
-\dontrun{
 data(liver.toxicity)
 X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
@@ -170,7 +172,6 @@ toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50),
                       keepY = c(10, 10, 10))
 
 cim(toxicity.spls, comp = 1:3)
-}
 }
 
 \keyword{multivariate}

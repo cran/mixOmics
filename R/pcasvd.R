@@ -33,7 +33,7 @@ function(X,
     X = as.matrix(X)
 	
 # Borrowed from PRCOMP	
-    result = svd(get("scale", envir=.GlobalEnv)(X, center=center, scale = scale.),nu=0)
+    result = svd(get("scale", envir = .GlobalEnv)(X, center = center, scale = scale.), nu = 0)
     cen = attr(X, "scaled:center")
     sc = attr(X, "scaled:scale")
     if (any(sc == 0)) 
@@ -41,22 +41,25 @@ function(X,
 
 # If ncomp is not defined by user at the beginning then this algorithm will calculate an ncomp to be used         
     if (is.null(ncomp)) {
-        ncomp = min(nrow(X),ncol(X))
+        ncomp = min(nrow(X), ncol(X))
     }
 
 # Borrowed from PRCOMP	
     if (ncomp < ncol(X)) {
-        result$v = result$v[,1:ncomp, drop=F]
+        result$v = result$v[, 1:ncomp, drop = F]
     }
 
-    result$d = result$d/sqrt(max(1,nrow(X) -1))
+    result$d = result$d/sqrt(max(1, nrow(X) - 1))
 
     if(retx) {
-        r = list(sdev=result$d, rotation=result$v, X=as.matrix(X) %*% result$v, center = if (is.null(cen)) FALSE else cen, 
+        r = list(sdev = result$d, rotation = result$v, 
+                 X = as.matrix(X) %*% result$v, 
+                 center = if (is.null(cen)) FALSE else cen, 
                  scale = if (is.null(sc)) FALSE else sc)
     }
+	
     if(!retx) {
-        r <- list(sdev=result$d, rotation=result$v)
+        r = list(sdev = result$d, rotation = result$v)
     }
 	
     class(r) = c("pca", "prcomp")

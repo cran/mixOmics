@@ -1,3 +1,37 @@
+Changes in 2.9-6
+================
+
+New features:
+-------------
+- Modifying the valid function: the Q2 criterion has been implemented
+
+- var.label argument is used in plotVar.plsda, plotVar.splsda, plot3dVar.plsda, plot3dVar.splsda instead of X.label
+
+- New S3 method network for pls
+
+- New code for valid function to PLS-DA and sPLS-DA models validation
+
+- New code for plot.valid to display the results of the valid function for PLS-DA 
+  and sPLS-DA models
+
+- cim and network were modified to obtain the simMat matrix as value
+
+- plotVar was modified to obtain the coordinates for X and Y variables as value
+
+- In predict function, several or all prediction methods are available simultaneously to 
+  predict the classes of test data with plsda and splsda 
+  
+- The argument 'mode' has been removed of plsda and splsda functions
+
+
+Changes in 2.9-5
+================
+
+New features:
+-------------
+- sPCA has been modified to get orthogonal principal components
+
+
 Changes in 2.9-4
 ================
 
@@ -15,41 +49,45 @@ Changes in 2.9-1
 
 New features:
 -------------
-- New S3 methods plotIndiv and plotVar for PCA.
+- New S3 methods plotIndiv and plotVar for PCA
 
-- New S3 method plot.valid to display the results of the valid function.
+- New S3 method plot.valid to display the results of the valid function
 
-- New code for imgCor function for a nicer representation of the correlation matrix.
+- New code for imgCor function for a nicer representation of the correlation matrix
 
 - In predict.plsda and predict.splsda functions the argument 'method' were replaced by
-method = c("max.dist", "class.dist", "centroids.dist", "mahalanobis.dist")
+  method = c("max.dist", "class.dist", "centroids.dist", "mahalanobis.dist")
 
 - New arguments for the cim function:
-* dendrogram
-* ColSideColors, RowSideColors
+  * dendrogram
+  * ColSideColors, RowSideColors
 
 - Modifying the valid function:
-* missing data are allowed
-* Q2 criterion has been removed
+  * missing data are allowed
+  * Q2 criterion has been removed
 
-- Functions pls, plsda, spls and splsda were modified to identify zero- or near-zero variance predictors.
+- Functions pls, plsda, spls and splsda were modified to identify zero- or near-zero variance predictors
 
-- Functions plotVar.plsda, plotVar.splsda, plot3dVar.plsda, plot3dVar.splsda were modified to represent only the X variables
+- Functions plotVar.plsda, plotVar.splsda, plot3dVar.plsda, plot3dVar.splsda were modified to represent 
+  only the X variables
 
 - New function: 'nearZeroVar' for identification of zero- or near-zero variance predictors 
+
 
 Changes in 2.8-1
 ================
 
 New features:
 -------------
-- new arguments ("axis.labelX", "axis.labelY") in the function imgCor, to indicate if the labels of axis have to be shown or not
+- New arguments ("axis.labelX", "axis.labelY") in the function imgCor, to indicate if the labels 
+  of axis have to be shown or not
 
-- new classes splsda and plsda for predict, print, plotIndiv, plot3dIndiv, plotVar, plot3dVar
+- New classes splsda and plsda for predict, print, plotIndiv, plot3dIndiv, plotVar, plot3dVar
 
-- several prediction functions are avaiable to predict the classes of test data with plsda and splsda see predict (argument 'method' ("class.dist", "centroids.dist", "Sr.dist", "max.dist"))
+- Several prediction functions are avaiable to predict the classes of test data with plsda and 
+  splsda see predict (argument 'method' ("class.dist", "centroids.dist", "Sr.dist", "max.dist"))
 
-- new functions map & unmap borrowed from the mclust package
+- New functions map & unmap borrowed from the mclust package
 
 
 Bug fixes:
@@ -62,31 +100,31 @@ Changes in 2.7-1
 New features:
 -------------
 
-- new functions pca, plsda and splsda, as well as extensions of plot3dVar and plot3dIndiv for pca 
+- New functions pca, plsda and splsda, as well as extensions of plot3dVar and plot3dIndiv for pca 
 
-- new network.default function which is called by network.rcc and network.spls
+- New network.default function which is called by network.rcc and network.spls
 
 - bin.color function added in network.default to color edges w.r.t. the values in the simMat matrix
 
 - nipals has been improved to be computationally more efficient
 
-- missing values are treated as in Tenenhaus in pls, spls and valid functions
+- Missing values are treated as in Tenenhaus in pls, spls and valid functions
 
-- new argument 'ncomp' in rcc function, argument 'ncomp' has been removed from 'summary' and 'rcc'
+- New argument 'ncomp' in rcc function, argument 'ncomp' has been removed from 'summary' and 'rcc'
 
-- new option ("XY-variate") for the argument 'rep.space' in the 'plot3dVar'
+- New option ("XY-variate") for the argument 'rep.space' in the 'plot3dVar'
 
 
 Bug fixes:
 ----------
--'tick marks' values have been corrected for color key in cim
+- 'tick marks' values have been corrected for color key in cim
 
--computation of the simMat matrix for pls and spls - canonical mode, and correction in plotVar, plot3dVar, cim and network
+- Computation of the simMat matrix for pls and spls - canonical mode, and correction in 
+  plotVar, plot3dVar, cim and network
 
--correction of the default argument 'rep.space = "XY-variate"' in plotIndiv and plot3dIndiv
+- Correction of the default argument 'rep.space = "XY-variate"' in plotIndiv and plot3dIndiv
 
--correction of the manual
-
+- Correction of the manual
 
 
 Changes in 2.6-0
@@ -94,20 +132,18 @@ Changes in 2.6-0
 
 New features:
 -------------
-- former R package integrOmics has been renamed mixOmics
+- Former R package integrOmics has been renamed mixOmics
 
-- in functions plotIndiv(), plotVar(), cim(), network() the arguments 'dim1', 'dim2', 'ncomp' 
+- In functions plotIndiv, plotVar, cim, network the arguments 'dim1', 'dim2', 'ncomp' 
   were replaced by 'comp', a vector of length 2 (by default 'comp = 1:2')
 
-- network() has a new argument 'alpha'
+- Network has a new argument 'alpha'
 
 User-visible changes:
 ---------------------
 
-
 Bug fixes:
 ----------
-
 
 Internal changes:
 -----------------

@@ -10,7 +10,7 @@ performs the scatter diagram for a paired coordinates.
 s.match(df1xy, df2xy, xax = 1, yax = 2, pch = 20, cpoint = 1, 
         label = row.names(df1xy), clabel = 1, edge = TRUE, 
         xlim = NULL, ylim = NULL, grid = FALSE, addaxes = TRUE, 
-        cgrid = 1, include.origin = TRUE, origin = c(0,0), 
+        cgrid = 1, include.origin = TRUE, origin = c(0, 0), 
         sub = "", csub = 1.25, possub = "bottomleft", 
         pixmap = NULL, contour = NULL, area = NULL, 
         add.plot = FALSE, col, lty = 1)
@@ -41,7 +41,7 @@ s.match(df1xy, df2xy, xax = 1, yax = 2, pch = 20, cpoint = 1,
 	\code{("topleft", "topright", "bottomleft", "bottomright")}.}
   \item{pixmap}{an object \code{pixmap} displayed in the map background.}
   \item{contour}{a data frame with 4 columns to plot the contour of the map : each row gives a segment 
-	\code{(x1,y1,x2,y2)}.}
+	\code{(x1, y1, x2, y2)}.}
   \item{area}{a data frame of class 'area' to plot a set of surface units in contour.}
   \item{add.plot}{if \code{TRUE} uses the current graphics window.}
   \item{col}{vector of size \code{n} (the number of samples) to indicate the biological conditions of each sample.}

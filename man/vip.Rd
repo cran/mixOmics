@@ -40,7 +40,7 @@ Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Edit
 
 \author{Sébastien Déjean and Ignacio González.}
 
-\seealso{\code{\link{pls}}, \code{\link{pls}}, \code{\link{summary}}.}
+\seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{summary}}.}
 
 \examples{
 data(linnerud)
