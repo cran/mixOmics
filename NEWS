@@ -7,6 +7,7 @@ New features:
 -The multilevel methodology has been added as well as the associated S3methods for the graphical outputs (plotVar, plotIndiv)
 -pheatmap clustering is available for multilevel analysis (borrowed from the pheatmap package)
 -tuning functions are available for multilevel analyses
+-a dependency to the package 'igraph0' has been created (instead of 'igraph' as the authors informed us of major changes in this package)
 
 Bug fixes:
 ----------

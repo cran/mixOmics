@@ -1,9 +1,12 @@
-1ba9370b100d3a22e12b81ba16f7fdcb *DESCRIPTION
+3f5ccc7bab4494234d0373ddc772d16b *DESCRIPTION
 0515bdfffeaee615290b0fbcaf676120 *NAMESPACE
-7b9a69b27959e8fff1ed296ff72ae7ef *NEWS
+3fe5f904d91d474d34fa6e6ea35c7320 *NEWS
 9c4eebb78580732850819c237255e34a *R/Mfold.R
 357f48c85d6a2948e20c57fedfbd2fa2 *R/bin.color.R
 df9dc775a54dc3d024152bae0768ce93 *R/cim.R
+86f8fe191ce2e665b4752c5c807fb1d6 *R/cim.pls.R
+ad4d46d6d5d7bc901fcf3c5a935da5a5 *R/cim.rcc.R
+d639315177814fcdc3b3546a4b85ae73 *R/cim.spls.R
 354ada2530f8f018fdb259be40ab06b8 *R/estim.regul.R
 551bf69a430a60c7fdc0fa589717aace *R/ica.def.R
 497e9f99d703f93161a9e03343488a80 *R/ica.par.R
@@ -17,6 +20,8 @@ c2d393e53dc476620c55d4e548aa541f *R/mat.rank.R
 74ec870ff0ee7add897a7e5124d746fc *R/multilevel.R
 1c35d38dd4486b616e59bc5f0986f8cc *R/nearZeroVar.R
 6f4c23b769e0cfc912cf2c35ae75dcb8 *R/network.R
+d69e919e93757bf419451bf2f892186c *R/network.rcc.R
+1483939578bc870f74b0a18b9748d89a *R/network.spls.R
 e9f5d6b172b3a05cab5e2f3427a92f09 *R/nipals.R
 68baef9cfd470c78264159dfdcc6c294 *R/pca.R
 c5b34e3281a693a43769d4bd4c5c227f *R/pcasvd.R
@@ -73,7 +78,7 @@ aa6aa49db6847c0fc21b5bf0e6cced38 *man/mat.rank.Rd
 a25908a3907caaa91829edd1154e03e0 *man/multidrug.Rd
 d7f9d6732ba0e1c5bf021a4d43586351 *man/multilevel.Rd
 0aa76007b68eebcd52d7320bd2135e40 *man/nearZeroVar.Rd
-82c3bc39635f238f5e0db6a179d36540 *man/network.Rd
+d56484692e419dbbf94a25089d3ccdcf *man/network.Rd
 656e8a744c9e292aeeb45d3d52872a24 *man/nipals.Rd
 122d1ca88ab751917784bcada1a1d796 *man/nutrimouse.Rd
 a7d9423bfdf6307417eb0c3eba2de785 *man/pca.Rd
