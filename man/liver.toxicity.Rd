@@ -22,9 +22,12 @@ A list containing the following components:
 		The expression measure of 3116 genes for the 64 subjects (rats).}
     \item{\code{clinic}}{data frame with 64 rows and 10 columns, 
 		containing 10 clinical variables for the same 64 subjects.}
-	\item{\code{treatment}}{data frame with 64 rows and 4 columns, 
-		containing information on the treatment of the 64 subjects, 
+    \item{\code{treatment}}{data frame with 64 rows and 4 columns, 
+		containing the treatment information on the 64 subjects, 
 		such as doses of acetaminophen and times of necropsies.}
+\item{\code{gene.ID}}{data frame with 3116 rows and 2 columns, 
+		containing geneBank IDs and gene titles of the annotated genes}
+
   }
 }
 

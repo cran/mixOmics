@@ -31,7 +31,7 @@ function(X,
          YsideColor = "red",
          symkey = TRUE, 
          keysize = 1, 
-         interactive.div = TRUE,		 
+         interactive.dev = TRUE,		 
          cexRow = NULL, 
          cexCol = NULL, 
          margins = c(5, 5), 
@@ -110,7 +110,7 @@ function(X,
         Ycor = t(Ycor[q:1, ])
         XYcor = XYcor[, q:1]
 		
-        if (interactive.div) {   
+        if (interactive.dev) {   
             cim(Xcor, col = col, dendrogram = "none",
             labRow = NULL, labCol = NULL,		 
             symkey = symkey, keysize = keysize, 

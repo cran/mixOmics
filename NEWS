@@ -1,3 +1,12 @@
+Changes in 3.0
+================
+New features:
+-------------
+- The new methodology IPCA and sIPCA have been added as well as the associated S3methods for the graphical outputs
+
+- GeneBank IDs and gene titles were added in the liver toxicity study
+
+
 Changes in 2.9-6
 ================
 

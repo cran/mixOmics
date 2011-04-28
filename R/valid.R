@@ -61,7 +61,6 @@ function(X,
         Y = as.matrix(Y)
          	
         n = nrow(X)
-        p = ncol(X)
         q = ncol(Y)
         res = list()
 		 
@@ -89,8 +88,8 @@ function(X,
         ncomp = round(ncomp)
 		  
         if (method == "spls") {		
-            if(is.null(keepX)) keepX = c(rep(ncol(X), ncomp))
-            if(is.null(keepY)) keepY = c(rep(ncol(Y), ncomp))
+            if(is.null(keepX)) keepX = rep(ncol(X), ncomp)
+            if(is.null(keepY)) keepY = rep(ncol(Y), ncomp)
              
             if (length(keepX) != ncomp) 
                 stop("length of 'keepX' must be equal to ", ncomp, ".")
@@ -108,7 +107,7 @@ function(X,
         #-- M fold or loo cross validation --#
         ##- define the folds
         if (validation == "Mfold") { 
-            if (is.null(M) || !is.numeric(M) || M < 2 || M > n)
+            if (is.null(M) | !is.numeric(M) | M < 2 | M > n)
                 stop("Invalid number of folds, 'M'.")
             M = round(M)
             fold = split(sample(1:n), rep(1:M, length = n)) 
@@ -140,11 +139,11 @@ function(X,
 	        	 
                 #-- pls or spls --#
                 if (method == "pls") {
-                    object = pls(X = X.train , Y = Y.train, ncomp = ncomp, 
+                    object = pls(X = X.train, Y = Y.train, ncomp = ncomp, 
                                  mode = mode, max.iter = max.iter, tol = tol)
                 } 
                 else {
-                    object = spls(X = X.train , Y = Y.train, ncomp = ncomp, 
+                    object = spls(X = X.train, Y = Y.train, ncomp = ncomp, 
                                   mode = mode, max.iter = max.iter, tol = tol, 
                                   keepX = keepX, keepY = keepY)
                 }

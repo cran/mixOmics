@@ -290,8 +290,8 @@ function (object,
 
 }
 
-# ------------------------------- PCA and SPCA objects ----------------------------------------
-plot3dIndiv.pca <- plot3dIndiv.spca <-
+# ------------------------------- PCA, IPCA, SIPCA and SPCA objects ----------------------------------------
+plot3dIndiv.pca <- plot3dIndiv.spca <- plot3dIndiv.ipca <- plot3dIndiv.sipca <-
 function (object, 
           comp = 1:3, 
           ind.names = FALSE,
@@ -407,3 +407,4 @@ function (object,
     title3d(...)	
 
 }
+

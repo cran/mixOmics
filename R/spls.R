@@ -181,13 +181,14 @@ function(X,
                 a = ifelse(abs(a) > abs(a[order(abs(a))][nx]), 
                     (abs(a) - abs(a[order(abs(a))][nx])) * sign(a), 0)
             }
+            a = a / drop(crossprod(u))
             a = a / drop(sqrt(crossprod(a)))
 		     
             if (ny != 0) {
                 b = ifelse(abs(b) > abs(b[order(abs(b))][ny]),
                     (abs(b) - abs(b[order(abs(b))][ny])) * sign(b), 0)
             }
-            b = b / drop(sqrt(crossprod(b)))
+            b = b / drop(crossprod(t))
 			 
             if (na.X) {
                 t = X.aux %*% a
@@ -311,7 +312,7 @@ function(X,
                   loadings = list(X = mat.a, Y = mat.b),
                   names = list(X = X.names, Y = Y.names, indiv = ind.names))
     if (length(nzv$Position > 0)) result$nzv = nzv
-	
+
     class(result) = c("spls", "pls") 
     return(invisible(result))
 }

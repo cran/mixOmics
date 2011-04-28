@@ -1,9 +1,12 @@
 export(
 bin.color, 
 cim,   
-estim.regul, 
+estim.regul,
+ica.par,
+ica.def,
 image.estim.regul, 
 imgCor,
+ipca,
 jet.colors,
 loo,
 mat.rank, 
@@ -27,6 +30,7 @@ rcc,
 scatterutil.base, 
 scatterutil.eti, 
 scatterutil.grid, 
+sipca,
 s.match,
 spca,
 spls,
@@ -53,6 +57,8 @@ S3method(plotIndiv, plsda)
 S3method(plotIndiv, splsda)
 S3method(plotIndiv, rcc)
 S3method(plotIndiv, pca)
+S3method(plotIndiv, ipca)
+S3method(plotIndiv, sipca)
 
 S3method(plotVar, pls)
 S3method(plotVar, spls)
@@ -61,6 +67,8 @@ S3method(plotVar, splsda)
 S3method(plotVar, rcc)
 S3method(plotVar, pca)
 S3method(plotVar, spca)
+S3method(plotVar, ipca)
+S3method(plotVar, sipca)
 
 S3method(predict, pls)
 S3method(predict, spls)
@@ -79,6 +87,8 @@ S3method(print, rcc)
 S3method(print, summary)
 S3method(print, pca)
 S3method(print, spca)
+S3method(print, ipca)
+S3method(print, sipca)
 
 S3method(plot3dIndiv, pls)
 S3method(plot3dIndiv, spls)
@@ -86,6 +96,8 @@ S3method(plot3dIndiv, plsda)
 S3method(plot3dIndiv, splsda)
 S3method(plot3dIndiv, rcc)
 S3method(plot3dIndiv, pca)
+S3method(plot3dIndiv, ipca)
+S3method(plot3dIndiv, sipca)
 
 S3method(plot3dVar, pls)
 S3method(plot3dVar, spls)
@@ -94,6 +106,8 @@ S3method(plot3dVar, pca)
 S3method(plot3dVar, plsda)
 S3method(plot3dVar, splsda)
 S3method(plot3dVar, spca)
+S3method(plot3dVar, ipca)
+S3method(plot3dVar, sipca)
 
 S3method(network, default)
 S3method(network, rcc)

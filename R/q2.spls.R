@@ -163,7 +163,7 @@ function(X, Y, ncomp, mode, keepX, keepY, M, fold, max.iter, tol)
      
     #-- valeurs sortantes --#
     if (q > 1) {
-        Q2.total = 1 - rowSums(PRESS/rowSums(RSS[-ncomp, ]))
+        Q2.total = 1 - rowSums(PRESS)/rowSums(RSS[-ncomp, ])
         Q2 = cbind(Q2, Q2.total)
     }
 	 

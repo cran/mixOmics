@@ -250,3 +250,65 @@ function (object,
         }
     }
 }
+
+
+#-------------------------- IPCA -------------------------#
+plotIndiv.ipca <- plotIndiv.sipca <-
+function (object, 
+          comp = 1:2, 
+          ind.names = TRUE,
+          x.label = NULL, 
+          y.label = NULL,
+          ...) 
+{
+
+    # validation des arguments #
+    #--------------------------#
+    if (length(comp) != 2)
+        stop("'comp' must be a numeric vector of length 2.")
+
+    if (!is.numeric(comp) || any(comp < 1) || comp[1] == comp[2])
+        stop("invalid vector for 'comp'.")
+		
+    if (any(comp > object$ncomp)) 
+        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+
+    comp1 = round(comp[1])
+    comp2 = round(comp[2])
+	
+    if (is.logical(ind.names)) {
+        if (isTRUE(ind.names)) ind.names = rownames(object$x)
+    }
+	
+	if (length(ind.names) > 1) {
+        if (length(ind.names) != nrow(object$x))
+            stop("'ind.names' must be a character vector of length ", nrow(object$x), " or a boolean atomic vector.")
+    }
+	
+    # l'espace de représentation #
+    #----------------------------#
+    x = object$x[, comp[1]]
+    y = object$x[, comp[2]]
+
+    if (is.null(x.label)) x.label = paste("Dimension ", comp1)
+    if (is.null(y.label)) y.label = paste("Dimension ", comp2)
+
+    # le plot des individus #
+    #-----------------------#
+    if (length(ind.names) > 1) {
+        plot(x, y, type = "n", xlab = x.label, ylab = y.label)
+        text(x, y, ind.names, ...)
+        abline(v = 0, h = 0, lty = 2)
+    }
+    else {
+        if (isTRUE(ind.names)) {
+            plot(x, y, type = "n", xlab = x.label, ylab = y.label)
+            text(x, y, ind.names, ...)
+            abline(v = 0, h = 0, lty = 2)
+        }
+        else {
+            plot(x, y, xlab = x.label, ylab = y.label, ...)
+            abline(v = 0, h = 0, lty = 2)
+        }
+    }
+}

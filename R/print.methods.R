@@ -4,7 +4,10 @@
 # Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 # Leigh Coonan, Student, University of Queensland, Australia
-# Fangzhou Yao, Student, University of Queensland, Australia
+# Fangzhou Yao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia and
+# Shangai University of Finance and Economics, Shanghai, P.R. China
+# Jeff Coquery, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia and
+# Sup Biotech, Paris, France
 
 #
 # This program is free software; you can redistribute it and/or
@@ -281,4 +284,50 @@ function(x, ...)
     cat(" variable names: see object$names \n")
 
 }
+
+# ------------------------ print for ipca -------------------------
+print.ipca <-
+function(x, ...) 
+{
+	
+    cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
+	
+    cat(" IPCA with", x$ncomp, "independent components. \n")
+    cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
+
+    cat(" Available components: \n", 
+        "-------------------- \n")
+	
+    cat(" unmixing matrix: see object$unmixing \n")
+    cat(" independent principal components: see object$x \n")
+    cat(" mxing matrix: see object$mixing \n")
+    cat(" kurtosis: see object$kurtosis \n")
+    cat(" variable names: see object$names \n")
+    cat(" independent loading vectors: see object$loadings \n")
+}
+
+# ------------------------ print for sipca -------------------------
+print.sipca <-
+function(x, ...) 
+{
+	
+    cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
+	
+    cat(" Sparse IPCA with", x$ncomp, "independent components. \n")
+    cat(" You entered data X of dimensions:", nrow(x$X), ncol(x$X), "\n")
+	
+	cat(" Selection of", x$keepX, "variables on each of the principal components on the X data set. \n")
+
+    cat(" Available components: \n", 
+        "-------------------- \n")
+	
+    cat(" unmixing matrix: see object$unmixing \n")
+	cat(" independent principal components: see object$x \n")
+    cat(" mxing matrix: see object$mixing \n")
+    cat(" kurtosis: see object$kurtosis \n")
+    cat(" variable names: see object$names \n")
+    cat(" independent loading vectors: see object$loadings \n")
+
+}
+
 

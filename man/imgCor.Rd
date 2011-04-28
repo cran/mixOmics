@@ -14,7 +14,7 @@ two data sets.
 imgCor(X, Y, type = c("combine", "separate"), col = jet.colors, 
        X.names = TRUE, Y.names = TRUE,		 
        XsideColor = "blue", YsideColor = "red",
-       symkey = TRUE, keysize = 1, interactive.div = TRUE,		 
+       symkey = TRUE, keysize = 1, interactive.dev = TRUE,		 
        cexRow = NULL, cexCol = NULL, 
        margins = c(5, 5), lhei = NULL, lwid = NULL) 
 }
@@ -40,7 +40,7 @@ imgCor(X, Y, type = c("combine", "separate"), col = jet.colors,
   \item{symkey}{boolean indicating whether the color key should be made symmetric about 0. 
 	Defaults to \code{TRUE}.}
   \item{keysize}{positive numeric value indicating the size of the color key.}  
-  \item{interactive.div}{boolean. The current graphics device that  will be opened is interactive ?}
+  \item{interactive.dev}{boolean. The current graphics device that will be opened is interactive?}
   \item{cexRow, cexCol}{positive numbers, used as \code{cex.axis} in for the row or column 
 	axis labeling. The defaults currently only use number of rows or columns, respectively.}
   \item{margins}{numeric vector of length two containing the margins (see \code{\link{par}(mar)}) 
