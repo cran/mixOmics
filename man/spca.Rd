@@ -57,7 +57,7 @@ low rank matrix approximation. \emph{Journal of Multivariate Analysis} \bold{99}
 
 \author{Kim-Anh Lê Cao, Fangzhou Yao, Leigh Coonan}
 
-\seealso{\code{\link{pca}}} 
+\seealso{\code{\link{pca}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.} 
 
 \examples{
 data(liver.toxicity)

@@ -87,7 +87,7 @@ In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N
 \seealso{\code{\link{pls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
-\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{valid}}.}
+\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{valid}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 data(liver.toxicity)

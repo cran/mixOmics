@@ -65,7 +65,7 @@ Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Edit
 
 \author{Sébastien Déjean, Ignacio González, Kim-Anh Lê Cao and Pierre Monget}
 
-\seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}}.}
+\seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 data(linnerud)

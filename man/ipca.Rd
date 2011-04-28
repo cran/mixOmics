@@ -9,7 +9,7 @@ Performs independent principal component analysis on the given data matrix, a co
 }
 
 \usage{
-ipca(X, ncomp, mode = c("deflation","parallel"),
+ipca(X, ncomp = 3, mode = c("deflation","parallel"),
           fun = c("logcosh", "exp"),
           scale = FALSE, max.iter = 200, 
           tol = 1e-04, w.init=NULL)
@@ -17,7 +17,7 @@ ipca(X, ncomp, mode = c("deflation","parallel"),
 
 \arguments{
   \item{X}{a numeric matrix (or data frame) which provides the data for the principal component analysis.}
-  \item{ncomp}{integer, number of independent component to choose. If \code{NULL}, function sets \code{ncomp = min(nrow(X), ncol(X))}}	
+  \item{ncomp}{integer, number of independent component to choose. Set by default to 3.}	
   \item{mode}{character string. What type of algorithm to use when estimating the unmixing matrix, choose 
     one of \code{"deflation"}, \code{"parallel"}. Default set to \code{deflation}.}
   \item{fun}{the function used in approximation to neg-entropy in the FastICA algorithm. Default set to \code{logcosh}, see details of FastICA.}
@@ -71,7 +71,8 @@ J L Marchini, C Heaton and B D Ripley (2010). fastICA: FastICA Algorithms to per
 
 \seealso{\code{\link{sipca}}, \code{\link{pca}},
 \code{\link{plotIndiv}}, \code{\link{plotVar}},
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}.}
+\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}
+and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details..}
 
 \examples{
 data(liver.toxicity)

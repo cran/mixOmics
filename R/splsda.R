@@ -24,7 +24,7 @@ splsda <-
 function(X, 
          Y,		
          ncomp = 2, 
-		 keepX = rep(ncol(X), ncomp),
+	 keepX = rep(ncol(X), ncomp),
          max.iter = 500,		 
          tol = 1e-06,
          ...)

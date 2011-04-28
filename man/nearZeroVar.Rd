@@ -2,10 +2,10 @@
 \encoding{latin1}
 \alias{nearZeroVar}
 
-\title{Identification of zero- or near-zero variance predictors}
+\title{Identification of zero- or near-zero variance predictors from the caret package}
 
 \description{
-Borrowed from the \pkg{mclust} package and, used as internal function.
+Borrowed from the \pkg{caret} package and, used as internal function.
 This function diagnoses predictors that have one unique value (i.e. are zero variance predictors) 
 or predictors that are have both of the following characteristics: they have very few unique values 
 relative to the number of samples and the ratio of the frequency of the most common value to the 
@@ -46,6 +46,11 @@ percentage is 0.0001.
     for the most common value over the second most common value and, \code{percentUnique}, 
     the percentage of unique data points out of the total number of data points.}
 }
+
+\author{Max Kuhn, with speed improvements to nearZerVar by Allan Engelhardt}
+
+
+
 
 \keyword{utilities}
 

@@ -98,7 +98,7 @@ A list containing the following components:
 
 \author{Sébastien Déjean and Ignacio González.}
 
-\seealso{\code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}}, \code{\link{par}}.}
+\seealso{\code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}}, \code{\link{par}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 ## variable representation for objects of class 'rcc'
@@ -119,7 +119,7 @@ Y <- liver.toxicity$clinic
 toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50), 
                       keepY = c(10, 10, 10))
 	
-plotVar(toxicity.spls, keep.var = TRUE, Y.label = TRUE)	
+plotVar(toxicity.spls, keep.var = TRUE, Y.label = TRUE, cex = c(1,0.8))	
 
 ## variable representation for objects of class 'splsda'
 data(liver.toxicity)

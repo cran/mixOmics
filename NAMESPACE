@@ -12,12 +12,16 @@ loo,
 mat.rank, 
 map,
 Mfold,
+multilevel,
+multilevel.splsda,
+multilevel.spls,
 nearZeroVar,
 network,
 nipals, 
 pca,
 pcatune,
 pcasvd,
+pheatmap.multilevel,
 plot3dIndiv, 
 plot3dVar,
 plotIndiv, 
@@ -33,8 +37,14 @@ scatterutil.grid,
 sipca,
 s.match,
 spca,
+Split.variation.one.level,
+Split.variation.two.level,
 spls,
 splsda,
+tune.multilevel,
+tune.splsdalevel1,
+tune.splsdalevel2,
+tune.splslevel,
 unmap,
 valid, 
 vip)
@@ -113,3 +123,6 @@ S3method(network, default)
 S3method(network, rcc)
 S3method(network, pls)
 S3method(network, spls)
+
+S3method(pheatmap.multilevel, splsda1fact)
+S3method(pheatmap.multilevel, splsda2fact)

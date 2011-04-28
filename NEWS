@@ -1,3 +1,18 @@
+
+
+Changes in 4.0
+================
+New features:
+-------------
+-The multilevel methodology has been added as well as the associated S3methods for the graphical outputs (plotVar, plotIndiv)
+-pheatmap clustering is available for multilevel analysis (borrowed from the pheatmap package)
+-tuning functions are available for multilevel analyses
+
+Bug fixes:
+----------
+-pls and spls have been modified to better handle NA values
+
+
 Changes in 3.0
 ================
 New features:

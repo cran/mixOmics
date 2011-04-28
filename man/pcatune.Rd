@@ -59,7 +59,7 @@ actually  done with the singular values of the data matrix).}
 
 \seealso{\code{\link{nipals}}, \code{\link{biplot}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}},
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}.}
+\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details..}
 
 \examples{
 data(liver.toxicity)

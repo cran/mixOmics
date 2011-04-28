@@ -12,6 +12,8 @@
 \alias{ica.def}
 \alias{ica.par}
 
+\alias{Split.variation.one.level}
+\alias{Split.variation.two.level}
 
 
 \title{Internal Functions}

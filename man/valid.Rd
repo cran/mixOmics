@@ -87,7 +87,7 @@ Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of C
 
 \author{Sébastien Déjean, Ignacio González and Kim-Anh Lê Cao.}
 
-\seealso{\code{\link{predict}}, \code{\link{nipals}}, \code{\link{plot.valid}}.}
+\seealso{\code{\link{predict}}, \code{\link{nipals}}, \code{\link{plot.valid}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 ## validation for objects of class 'pls' or 'spls'

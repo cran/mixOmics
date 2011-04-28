@@ -48,29 +48,8 @@ that contains the following components:
 }
 
 \references{
-Lê Cao, K.-A., Martin, P.G.P., Robert-Granié, C. and Besse, P. (2009). Sparse canonical 
-methods for biological data integration: application to a cross-platform study. 
-\emph{BMC Bioinformatics} \bold{10}:34.
-
-Lê Cao, K.-A., Rossouw, D., Robert-Granié, C. and Besse, P. (2008). A sparse PLS for variable 
-selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular 
-Biology} \bold{7}, article 35.
-
-Shen, H. and Huang, J. Z. (2008). Sparse principal component analysis via regularized 
-low rank matrix approximation. \emph{Journal of Multivariate Analysis} \bold{99}, 1015-1034.    
-
-Pérez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
-a partial least squares discriminant analysis (PLS-DA) approach. \emph{Human Genetics} 
-\bold{112}, 581-592.
-
-Nguyen, D. V. and Rocke, D. M. (2002). Tumor classification by partial
-least squares using microarray gene expression data. \emph{Bioinformatics}
-\bold{18}, 39-50.
-
-Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.
-
-Wold H. (1966). Estimation of principal components and related models by iterative least squares. 
-In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
+On sPLS-DA:
+Lê Cao, K.-A., Boitard, S. and Besse, P. (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. \emph{BMC Bioinformatics} \bold{12}:253.
 }
 
 \author{Ignacio González, Kim-Anh Lê Cao and Pierre Monget.}
@@ -78,7 +57,7 @@ In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N
 \seealso{\code{\link{spls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
-\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{valid}}.}
+\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{valid}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 ## First example
@@ -88,10 +67,10 @@ Y <- breast.tumors$sample$treatment
 
 res <- splsda(X, Y, ncomp = 2, keepX = c(25, 25))
 palette(c("red", "blue"))
-col <- as.numeric(as.factor(Y))
-plotIndiv(res, ind.names = TRUE, col = col)
-legend(-0.35, -0.19, c("After", "Before"), pch = c(16, 16), 
-       col = c("red", "blue"), cex = 1, pt.cex = c(1.2, 1.2), 
+col.breast <- as.numeric(as.factor(Y))
+plotIndiv(res, ind.names = TRUE, col = col.breast)
+legend('bottomleft', c("After", "Before"), pch = c(16, 16), 
+       col = unique(col.breast), cex = 1, pt.cex = c(1.2, 1.2), 
        title = "Treatment")
 palette("default")
 
@@ -101,8 +80,9 @@ X <- as.matrix(liver.toxicity$gene)
 Y <- liver.toxicity$treatment[, 4]
 
 splsda.liver = splsda(X, Y, ncomp = 2, keepX = c(20, 20))
-col <- as.numeric(as.factor(Y))
-plotIndiv(splsda.liver, col = col, ind.names = Y)
+col.rat <- as.numeric(as.factor(Y))
+plotIndiv(splsda.liver, col = col.rat, ind.names = Y)
+
 }
 
 \keyword{regression}

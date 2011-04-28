@@ -134,21 +134,21 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(X.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = X.label,
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, texts = X.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
     if (length(Y.label) > 1) {
-        text3d(cord.Y[, 1] + 0.05, cord.Y[, 2], cord.Y[, 3] + 0.05, text = Y.label,
+        text3d(cord.Y[, 1] + 0.05, cord.Y[, 2], cord.Y[, 3] + 0.05, texts = Y.label,
                color = col[[2]], font = font[2], cex = cex[2])
     }
 	par3d(cex = 0.8)	
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
@@ -330,7 +330,7 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(var.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = var.label,
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, texts = var.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
@@ -338,9 +338,9 @@ function(object,
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
@@ -533,21 +533,21 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(X.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = X.label,
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, texts = X.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
     if (length(Y.label) > 1) {
-        text3d(cord.Y[, 1] + 0.05, cord.Y[, 2], cord.Y[, 3] + 0.05, text = Y.label,
+        text3d(cord.Y[, 1] + 0.05, cord.Y[, 2], cord.Y[, 3] + 0.05, texts = Y.label,
                color = col[[2]], font = font[2], cex = cex[2])
     }
 	par3d(cex = 0.8)	
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
@@ -731,7 +731,7 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(var.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = var.label,
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, texts = var.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
@@ -739,9 +739,9 @@ function(object,
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
@@ -960,21 +960,21 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(X.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = X.label,
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, texts = X.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
     if (length(Y.label) > 1) {
-        text3d(cord.Y[, 1] + 0.05, cord.Y[, 2], cord.Y[, 3] + 0.05, text = Y.label,
+        text3d(cord.Y[, 1] + 0.05, cord.Y[, 2], cord.Y[, 3] + 0.05, texts = Y.label,
                color = col[[2]], font = font[2], cex = cex[2])
     }
 	par3d(cex = 0.8)	
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
@@ -1136,7 +1136,7 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(var.label) > 1) {
-        text3d(cord.X[, 1], cord.X[, 2], cord.X[, 3], text = var.label,
+        text3d(cord.X[, 1], cord.X[, 2], cord.X[, 3], texts = var.label,
                color = col, font = font, cex = cex)
     }
 	
@@ -1144,9 +1144,9 @@ function(object,
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
@@ -1319,7 +1319,7 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(var.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = var.label,
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, texts = var.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
@@ -1327,9 +1327,9 @@ function(object,
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
@@ -1477,7 +1477,7 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(var.label) > 1) {
-        text3d(cord.X[, 1], cord.X[, 2], cord.X[, 3], text = var.label,
+        text3d(cord.X[, 1], cord.X[, 2], cord.X[, 3], texts = var.label,
                color = col, font = font, cex = cex)
     }
 	
@@ -1485,9 +1485,9 @@ function(object,
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
@@ -1660,7 +1660,7 @@ function(object,
 		    tick = FALSE, labels = "")
 	
     if (length(var.label) > 1) {
-        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, text = var.label,
+        text3d(cord.X[, 1] + 0.05, cord.X[, 2], cord.X[, 3] + 0.05, texts = var.label,
                color = col[[1]], font = font[1], cex = cex[1])
     }
 	
@@ -1668,9 +1668,9 @@ function(object,
 	
     if (any(axes.box == "axes") || any(axes.box == "all")) { 
         if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
-            text3d(1.2, -0.05, 0, text = xlab, cex = 0.8, color = "black")
-            text3d(0, 1.27, 0, text = ylab, cex = 0.8, color = "black")
-            text3d(0, -0.05, 1.2, text = zlab, cex = 0.8, color = "black")
+            text3d(1.2, -0.05, 0, texts = xlab, cex = 0.8, color = "black")
+            text3d(0, 1.27, 0, texts = ylab, cex = 0.8, color = "black")
+            text3d(0, -0.05, 1.2, texts = zlab, cex = 0.8, color = "black")
 		}
 		
         x =	c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,

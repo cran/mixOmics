@@ -65,7 +65,7 @@ The returned value is a list with components:
 
 \author{Sébastien Déjean and Ignacio González.}
 
-\seealso{\code{\link{loo}}, \code{\link{Mfold}}, \code{\link{image.estim.regul}}.}
+\seealso{\code{\link{loo}}, \code{\link{Mfold}}, \code{\link{image.estim.regul}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 data(nutrimouse)

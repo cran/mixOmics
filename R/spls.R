@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# S?bastien D?jean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonz?lez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh L? Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
@@ -100,10 +100,9 @@ function(X,
         rownames(X) = rownames(Y) = ind.names
     }
      
-    #-- centrer et réduire les données --#
+    #-- centrer et r?duire les donn?es --#
     X = scale(X, center = TRUE, scale = TRUE)
     Y = scale(Y, center = TRUE, scale = TRUE) 
-
 
     X.temp = X
     Y.temp = Y
@@ -113,6 +112,7 @@ function(X,
     mat.b = matrix(nrow = q, ncol = ncomp)
     mat.c = matrix(nrow = p, ncol = ncomp)
     mat.d = matrix(nrow = q, ncol = ncomp)
+    mat.e = matrix(nrow = q, ncol = ncomp)
 	n.ones = rep(1, n)
 	p.ones = rep(1, p)
 	q.ones = rep(1, q)
@@ -129,10 +129,10 @@ function(X,
         ny = q - keepY[h]
          
         #-- svd de M = t(X)*Y --#
-        X.aux = X.temp        
+        X.aux = X.temp		
         if (na.X) X.aux[is.na.X] = 0
          
-        Y.aux = Y.temp         
+        Y.aux = Y.temp       	
         if (na.Y) Y.aux[is.na.Y] = 0
          
         M = crossprod(X.aux, Y.aux)
@@ -144,7 +144,7 @@ function(X,
         if (na.X) {
             t = X.aux %*% a.old
             A = drop(a.old) %o% n.ones
-            A[is.na.X] = 0
+            A[t(is.na.X)] = 0
             a.norm = crossprod(A)
             t = t / diag(a.norm)
             t = t / drop(sqrt(crossprod(t)))			
@@ -157,7 +157,7 @@ function(X,
         if (na.Y) {
             u = Y.aux %*% b.old
             B = drop(b.old) %o% n.ones
-            B[is.na.Y] = 0
+            B[t(is.na.Y)] = 0
             b.norm = crossprod(B)
             u = u / diag(b.norm)
             u = u / drop(sqrt(crossprod(u)))			
@@ -169,7 +169,7 @@ function(X,
          
         iter = 1
          
-        #-- boucle jusqu'à convergence de a et de b --#
+        #-- boucle jusqu'? convergence de a et de b --#
         repeat {
             if (na.X) a = t(X.aux) %*% u
             else a = t(X.temp) %*% u
@@ -193,7 +193,7 @@ function(X,
             if (na.X) {
                 t = X.aux %*% a
                 A = drop(a) %o% n.ones
-                A[is.na.X] = 0
+                A[t(is.na.X)] = 0
                 a.norm = crossprod(A)
                 t = t / diag(a.norm)
                 t = t / drop(sqrt(crossprod(t)))			
@@ -206,7 +206,7 @@ function(X,
             if (na.Y) {
                 u = Y.aux %*% b
                 B = drop(b) %o% n.ones
-                B[is.na.Y] = 0
+                B[t(is.na.Y)] = 0
                 b.norm = crossprod(B)
                 u = u / diag(b.norm)
                 u = u / drop(sqrt(crossprod(u)))			
@@ -265,7 +265,7 @@ function(X,
          
         #-- mode regression --#
         if(mode == "regression") {
-            if (na.Y) {
+            if (TRUE) {#na.Y
                 Y.aux = Y.temp
                 Y.aux[is.na.Y] = 0
                 d = crossprod(Y.aux, t)
@@ -287,6 +287,8 @@ function(X,
         mat.b[, h] = b
         mat.c[, h] = c
         if (mode == "regression") mat.d[, h] = d
+	if (mode == "canonical") mat.e[, h] = e
+
          
     } #-- fin boucle sur h --#
      
@@ -294,6 +296,7 @@ function(X,
     rownames(mat.a) = rownames(mat.c) = X.names
     rownames(mat.b) = Y.names
     rownames(mat.t) = rownames(mat.u) = ind.names
+
      
     dim = paste("comp", 1:ncomp)
     colnames(mat.t) = colnames(mat.u) = dim
@@ -306,8 +309,9 @@ function(X,
                   X = X, Y = Y, ncomp = ncomp, mode = mode, 
                   keepX = keepX,
                   keepY = keepY,
-                  mat.c = mat.c, 
-                  mat.t = mat.t, 
+                  mat.c = mat.c,
+		              mat.d = mat.d,
+		              mat.e = mat.e, 
                   variates = list(X = mat.t, Y = mat.u),
                   loadings = list(X = mat.a, Y = mat.b),
                   names = list(X = X.names, Y = Y.names, indiv = ind.names))
@@ -316,3 +320,4 @@ function(X,
     class(result) = c("spls", "pls") 
     return(invisible(result))
 }
+

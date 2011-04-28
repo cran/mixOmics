@@ -137,7 +137,7 @@ pharmacology of cancer. \emph{Science} \bold{275}, 343-349.
 \author{Ignacio González.}
 
 \seealso{\code{\link{image}}, \code{\link{heatmap}}, \code{\link{hclust}}, \code{\link{plotVar}}, 
-\code{\link{plot3dVar}}, \code{\link{network}}.}
+\code{\link{plot3dVar}}, \code{\link{network}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 ## default method

@@ -58,7 +58,7 @@ Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Edit
 
 \seealso{\code{\link{splsda}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}, \code{\link{predict}}, \code{\link{valid}}.}
+\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}, \code{\link{predict}}, \code{\link{valid}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 ## First example
@@ -68,10 +68,10 @@ Y <- breast.tumors$sample$treatment
 
 plsda.breast <- plsda(X, Y, ncomp = 2)
 palette(c("red", "blue"))
-col <- as.numeric(as.factor(Y))
-plotIndiv(plsda.breast, ind.names = TRUE, col = col)
-legend(18, -9, c("After", "Before"), pch = c(16, 16), 
-       col = c("red", "blue"), cex = 1, pt.cex = c(1.2, 1.2), 
+col.breast <- as.numeric(as.factor(Y))
+plotIndiv(plsda.breast, ind.names = TRUE, col = col.breast)
+legend('bottomleft', c("After", "Before"), pch = c(16, 16), 
+       col = unique(col.breast), cex = 1, pt.cex = c(1.2, 1.2), 
        title = "Treatment")
 palette("default")
 
@@ -81,8 +81,8 @@ X <- liver.toxicity$gene
 Y <- liver.toxicity$treatment[, 4]
 
 plsda.liver <- plsda(X, Y, ncomp = 2)
-col <- as.numeric(as.factor(Y))
-plotIndiv(plsda.liver, col = col, ind.names = Y)
+col.rat <- as.numeric(as.factor(Y))
+plotIndiv(plsda.liver, col = col.rat, ind.names = Y)
 }
 
 \keyword{regression}

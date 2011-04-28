@@ -1,0 +1,115 @@
+export(
+bin.color, 
+cim,   
+estim.regul,
+ica.par,
+ica.def,
+image.estim.regul, 
+imgCor,
+ipca,
+jet.colors,
+loo,
+mat.rank, 
+map,
+Mfold,
+nearZeroVar,
+network,
+nipals, 
+pca,
+pcatune,
+pcasvd,
+plot3dIndiv, 
+plot3dVar,
+plotIndiv, 
+plotVar, 
+pls,
+plsda, 
+q2.spls,
+q2.pls,
+rcc,
+scatterutil.base, 
+scatterutil.eti, 
+scatterutil.grid, 
+sipca,
+s.match,
+spca,
+spls,
+splsda,
+unmap,
+valid, 
+vip)
+
+
+S3method(cim, default)
+S3method(cim, rcc)
+S3method(cim, spls)
+S3method(cim, pls)
+
+S3method(image, estim.regul)
+
+S3method(plot, rcc)
+S3method(plot, valid)
+S3method(plot, pca)
+
+S3method(plotIndiv, pls)
+S3method(plotIndiv, spls)
+S3method(plotIndiv, plsda)
+S3method(plotIndiv, splsda)
+S3method(plotIndiv, rcc)
+S3method(plotIndiv, pca)
+S3method(plotIndiv, ipca)
+S3method(plotIndiv, sipca)
+
+S3method(plotVar, pls)
+S3method(plotVar, spls)
+S3method(plotVar, plsda)
+S3method(plotVar, splsda)
+S3method(plotVar, rcc)
+S3method(plotVar, pca)
+S3method(plotVar, spca)
+S3method(plotVar, ipca)
+S3method(plotVar, sipca)
+
+S3method(predict, pls)
+S3method(predict, spls)
+S3method(predict, plsda)
+S3method(predict, splsda)
+
+S3method(summary, pls)
+S3method(summary, spls)
+S3method(summary, rcc)
+
+S3method(print, pls)
+S3method(print, spls)
+S3method(print, plsda)
+S3method(print, splsda)
+S3method(print, rcc)
+S3method(print, summary)
+S3method(print, pca)
+S3method(print, spca)
+S3method(print, ipca)
+S3method(print, sipca)
+
+S3method(plot3dIndiv, pls)
+S3method(plot3dIndiv, spls)
+S3method(plot3dIndiv, plsda)
+S3method(plot3dIndiv, splsda)
+S3method(plot3dIndiv, rcc)
+S3method(plot3dIndiv, pca)
+S3method(plot3dIndiv, ipca)
+S3method(plot3dIndiv, sipca)
+
+S3method(plot3dVar, pls)
+S3method(plot3dVar, spls)
+S3method(plot3dVar, rcc)
+S3method(plot3dVar, pca)
+S3method(plot3dVar, plsda)
+S3method(plot3dVar, splsda)
+S3method(plot3dVar, spca)
+S3method(plot3dVar, ipca)
+S3method(plot3dVar, sipca)
+
+S3method(network, default)
+S3method(network, rcc)
+S3method(network, pls)
+S3method(network, spls)

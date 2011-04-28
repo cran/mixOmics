@@ -55,7 +55,7 @@ on mathematical and statistical model building}. Academic Press, N.Y., 307-357.
 
 \author{Sébastien Déjean and Ignacio González.}
 
-\seealso{\code{\link{svd}}, \code{\link{princomp}}, \code{\link{prcomp}}, \code{\link{eigen}}}
+\seealso{\code{\link{svd}}, \code{\link{princomp}}, \code{\link{prcomp}}, \code{\link{eigen}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 ## Hilbert matrix

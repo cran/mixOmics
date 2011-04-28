@@ -271,7 +271,7 @@ function (object,
         stop("invalid vector for 'comp'.")
 		
     if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+        stop("the elements of 'comp' must be smaller than or equal to ", object$ncomp, ".")
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])

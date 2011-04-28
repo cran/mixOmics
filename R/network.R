@@ -22,7 +22,9 @@
 network <-
 function(...) UseMethod("network")
 
-
+# ----------------------------------
+# network default
+# ----------------------------------
 network.default <-
 function(mat, 
          threshold = 0.5, 
@@ -280,7 +282,8 @@ function(mat,
 		repeat {
 			grDevices::dev.set(DEV.x)
 
-			z = .Internal(locator(1, type = "n"))
+##			z = .Internal(locator(1, type = "n"))
+			z = locator(1, type = "n")
 			x = z[[1]]
 			y = z[[2]]
 			flag = z[[3]]
@@ -435,4 +438,120 @@ function(mat,
 	return(invisible(list(gR = gR, simMat = simMat)))
 }	
 
+# ---------------------------------------------------
+# network for rcc object
+# ---------------------------------------------------
+network.rcc <-
+function(object, comp = 1, X.names = NULL, Y.names = NULL, ...) 
+{
+
+    # validation des arguments #
+	#--------------------------#
+		
+	p = ncol(object$X)
+	q = ncol(object$Y)
+    dim = min(p, q)	
+	
+    if (length(comp) == 1) {
+	    if (is.null(comp) || !is.numeric(comp) || comp <= 0 || comp > dim)
+            stop("invalid value for 'comp'.")
+    }
+	
+    if (length(comp) > 1) {
+        if(length(comp) > dim) 
+            stop("the length of 'comp' must be smaller or equal than ", dim, ".")
+        if (!is.numeric(comp) || any(comp < 1))
+            stop("invalid vector for 'comp'.")
+        if (any(comp > dim)) 
+            stop("the elements of 'comp' must be smaller or equal than ", dim, ".")
+    }
+
+	if (is.null(X.names)) X.names = object$names$X
+	if (is.null(Y.names)) Y.names = object$names$Y
+
+	# Calcul de la matrice des associations entre les variables X et Y #
+	#------------------------------------------------------------------#
+	bisect = object$variates$X[, comp] + object$variates$Y[, comp]
+	cord.X = cor(object$X, bisect, use = "pairwise")
+    cord.Y = cor(object$Y, bisect, use = "pairwise")
+    simMat = cord.X %*% t(cord.Y)
+	
+	network.default(simMat, ...)
+}	
+
+# ---------------------------------------------------
+# network for (s)pls objects
+# ---------------------------------------------------
+
+network.pls <- network.spls <-
+function(object, comp = 1, X.names = NULL, Y.names = NULL, keep.var = TRUE, ...) 		
+{
+
+	# validation des arguments #
+	#--------------------------#
+		
+    dim = object$ncomp	
+	
+    if (length(comp) == 1) {
+	    if (is.null(comp) || !is.numeric(comp) || comp <= 0)
+            stop("invalid value for 'comp'.")
+        if (comp > dim) 
+            stop("'comp' must be smaller or equal than ", dim, ".")
+    }
+	
+    if (length(comp) > 1) {
+        if(length(comp) > dim) 
+            stop("the length of 'comp' must be smaller or equal than ", dim, ".")
+        if (!is.numeric(comp) || any(comp < 1))
+            stop("invalid vector for 'comp'.")
+        if (any(comp > dim)) 
+            stop("the elements of 'comp' must be smaller or equal than ", dim, ".")
+    }
+		
+	# Calcul de la matrice des associations entre les variables X et Y #
+	#------------------------------------------------------------------#	
+    if (isTRUE(keep.var)) {
+        keep.X = apply(abs(object$loadings$X), 1, sum) > 0
+        keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
+
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
+                     use = "pairwise")
+            cord.Y = cor(object$Y[, keep.Y], object$variates$Y[, comp], 
+                     use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X[, keep.X], object$variates$X[, comp], 
+                     use = "pairwise")
+            cord.Y = cor(object$Y[, keep.Y], object$variates$X[, comp], 
+                     use = "pairwise")
+        }		
+		
+        if (is.null(X.names)) X.names = object$names$X[keep.X]
+	    if (is.null(Y.names)) Y.names = object$names$Y[keep.Y]
+		
+		p = length(X.names)
+	    q = length(Y.names)
+    }
+    else {
+        if (object$mode == "canonical") {
+            cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
+            cord.Y = cor(object$Y, object$variates$Y[, comp], use = "pairwise")
+        }
+        else {
+            cord.X = cor(object$X, object$variates$X[, comp], use = "pairwise")
+            cord.Y = cor(object$Y, object$variates$X[, comp], use = "pairwise")
+        }
+		
+		if (is.null(X.names)) X.names = object$names$X
+	    if (is.null(Y.names)) Y.names = object$names$Y
+		
+		p = ncol(object$X)
+	    q = ncol(object$Y)
+    }
+	
+    simMat = cord.X %*% t(cord.Y)
+	
+	network.default(simMat, ...)
+}	
 

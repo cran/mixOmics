@@ -100,12 +100,12 @@ function(object,
     par3d(userMatrix = rotationMatrix(pi/80, 1, -1/(100*pi), 0))
 	
     if (length(ind.names) > 1) {
-        text3d(x, y, z, text = ind.names,
+        text3d(x, y, z, texts = ind.names,
                color = col, font = font, cex = cex)
     }
     else {
         if (isTRUE(ind.names)) {
-            text3d(x, y, z, text = ind.names,
+            text3d(x, y, z, texts = ind.names,
                color = col, font = font, cex = cex[1])    
         }
         else {
@@ -234,12 +234,12 @@ function (object,
 	par3d(userMatrix = rotationMatrix(pi/80, 1, -1/(100*pi), 0))
 	
     if (length(ind.names) > 1) {
-        text3d(x, y, z, text = ind.names,
+        text3d(x, y, z, texts = ind.names,
                color = col, font = font, cex = cex)
     }
     else {
         if (isTRUE(ind.names)) {
-            text3d(x, y, z, text = ind.names,
+            text3d(x, y, z, texts = ind.names,
                color = col, font = font, cex = cex[1])    
         }
         else {
@@ -351,12 +351,12 @@ function (object,
 	par3d(userMatrix = rotationMatrix(pi/80, 1, -1/(100*pi), 0))
 	
     if (length(ind.names) > 1) {
-        text3d(x, y, z, text = ind.names,
+        text3d(x, y, z, texts = ind.names,
                color = col, font = font, cex = cex)
     }
     else {
         if (isTRUE(ind.names)) {
-            text3d(x, y, z, text = ind.names,
+            text3d(x, y, z, texts = ind.names,
                color = col, font = font, cex = cex[1])    
         }
         else {

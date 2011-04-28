@@ -149,7 +149,8 @@ and Transcriptome in Human Hepatoma Cells. \emph{Molecular Cancer Therapeutics} 
 
 \author{Sébastien Déjean, Ignacio González and Kim-Anh Lê Cao.}
 
-\seealso{\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}.}
+\seealso{\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}
+ and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details..}
 
 \examples{
 require(igraph)

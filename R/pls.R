@@ -98,6 +98,7 @@ function(X,
     mat.b = matrix(nrow = q, ncol = ncomp)
     mat.c = matrix(nrow = p, ncol = ncomp)
     mat.d = matrix(nrow = q, ncol = ncomp)
+    mat.e = matrix(nrow = q, ncol = ncomp)
 	n.ones = rep(1, n)
 	p.ones = rep(1, p)
 	q.ones = rep(1, q)
@@ -139,7 +140,7 @@ function(X,
                 a = a / drop(sqrt(crossprod(a)))
                 t = X.aux %*% a
                 A = drop(a) %o% n.ones
-                A[is.na.X] = 0
+                A[t(is.na.X)] = 0
                 a.norm = crossprod(A)
                 t = t / diag(a.norm)				
             }
@@ -158,7 +159,7 @@ function(X,
                 b = b / diag(t.norm)
                 u = Y.aux %*% b
                 B = drop(b) %o% n.ones
-                B[is.na.Y] = 0
+                B[t(is.na.Y)] = 0
                 b.norm = crossprod(B)
                 u = u / diag(b.norm)					
             }
@@ -243,6 +244,8 @@ function(X,
         mat.a[, h] = a
         mat.b[, h] = b
         mat.c[, h] = c
+        if (mode == "regression") mat.d[, h] = d
+	if (mode == "canonical") mat.e[, h] = e
      
     } #-- fin boucle sur h --#
 
@@ -264,6 +267,8 @@ function(X,
 	              ncomp = ncomp, 
 	              mode = mode, 
 	              mat.c = mat.c,
+		      mat.d = mat.d,
+		      mat.e = mat.e, 
 	              variates = list(X = mat.t, Y = mat.u),
 	              loadings = list(X = mat.a, Y = mat.b), 
 	              names = list(X = X.names, Y = Y.names, indiv = ind.names)
@@ -273,3 +278,4 @@ function(X,
     class(result) = "pls"
     return(invisible(result))
 }
+
