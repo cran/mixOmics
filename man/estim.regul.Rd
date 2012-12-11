@@ -73,7 +73,9 @@ X <- nutrimouse$lipid
 Y <- nutrimouse$gene
 
 ## this can take some seconds
+\dontrun{
 estim.regul(X, Y, validation = "Mfold")
+}
 }
 
 \keyword{multivariate}

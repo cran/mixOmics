@@ -94,8 +94,8 @@ data(liver.toxicity)
 X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
 
-toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50), 
-                      keepY = c(10, 10, 10))
+toxicity.spls <- spls(X, Y, ncomp = 2, keepX = c(50, 50), 
+                      keepY = c(10, 10))
 }
 
 \keyword{regression}

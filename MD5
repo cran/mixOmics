@@ -1,8 +1,8 @@
-f514489da81ac9953a1bdbfed812c22b *DESCRIPTION
+cf810c68bee6313474b25792ef076210 *DESCRIPTION
 b084a6f04a5d5dca3bfd2c806211d0c1 *NAMESPACE
 ed170b76edd253b39f530fe73b02e0a6 *NEWS
 9c4eebb78580732850819c237255e34a *R/Mfold.R
-db2ecca27379ae4bfa51e061d8701ef3 *R/bin.color.R
+d709f39c0a842f3696a2482d930badcf *R/bin.color.R
 df9dc775a54dc3d024152bae0768ce93 *R/cim.R
 86f8fe191ce2e665b4752c5c807fb1d6 *R/cim.pls.R
 ad4d46d6d5d7bc901fcf3c5a935da5a5 *R/cim.rcc.R
@@ -19,7 +19,7 @@ a58a5c42e50278ce5226fcf42a69b33e *R/map.R
 c2d393e53dc476620c55d4e548aa541f *R/mat.rank.R
 74ec870ff0ee7add897a7e5124d746fc *R/multilevel.R
 1c35d38dd4486b616e59bc5f0986f8cc *R/nearZeroVar.R
-6f4c23b769e0cfc912cf2c35ae75dcb8 *R/network.R
+10ac9b4c708942d4cf5f15aa4a1dec8f *R/network.R
 d69e919e93757bf419451bf2f892186c *R/network.rcc.R
 1483939578bc870f74b0a18b9748d89a *R/network.spls.R
 e9f5d6b172b3a05cab5e2f3427a92f09 *R/nipals.R
@@ -70,7 +70,7 @@ eaee1dfb2e6dd9eb246e6d42bc5dfee3 *data/prostate.rda
 292a3401ea42d52a372d2d6c59f05dea *man/breast.tumors.Rd
 1877bca4bce388377948d182e58b4243 *man/cim.Rd
 76313e803b522efb00298b32c1b4fa60 *man/data.simu.Rd
-f8a6516f4ae77aa8612b4f47e4f71743 *man/estim.regul.Rd
+bd52778310b69d8dca7e6d5db2d7a3ed *man/estim.regul.Rd
 c33147fba8304dc95b0a3a5a4daf6709 *man/image.estim.regul.Rd
 3210c8af62d4db29c28bd5599bd7c600 *man/imgCor.Rd
 87d2f92589da9dda2545fe4901adac07 *man/internal-functions.Rd
@@ -105,7 +105,7 @@ e588a81e1558b4f2024b012252fa53a7 *man/scatterutil.Rd
 223b1bed3bbcb90061aae0df8ac94eef *man/select.var.Rd
 244a9aa4162de9ebd9a5a26f4d118685 *man/sipca.Rd
 9ae1fbe874e1f633559cbb53a0acb32f *man/spca.Rd
-dbf6b16de6f42f4d451bd5f7ea66ab0e *man/spls.Rd
+413dad02cc99f541aa38924cda477f39 *man/spls.Rd
 64a2ab052d2191e70eca40fc912784f2 *man/splsda.Rd
 1d2dce9d413f1f68992559ac734bdd7c *man/srbct.Rd
 09d1d275260607bc9a9560f368da8968 *man/summary.Rd

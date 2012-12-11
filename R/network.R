@@ -85,6 +85,7 @@ function(mat,
 		
     id = bin.color(t(mat), threshold = threshold, breaks = breaks, col = color.edge, symkey = symkey)
     mat = as.vector(t(mat))
+    ##col.id = as.vector(id$bin)	
     col.id = as.vector(id$bin)	
 	color.edge = id$col[col.id[1]]
 
@@ -228,7 +229,7 @@ function(mat,
 		max.cut = max(mat)
 		threshold.old = threshold
 
-		getOption("device")("width" = 4, "height" = 2, "xpos" = 250, "ypos" = 0) 
+		getOption("device")("width" = 4, "height" = 2)  #, "xpos" = 250, "ypos" = 0) 
 		def.par = par(no.readonly = TRUE)
 
 		cuts = seq(0, 1, length = 21)
@@ -286,9 +287,9 @@ function(mat,
 			z = locator(1, type = "n")
 			x = z[[1]]
 			y = z[[2]]
-			flag = z[[3]]
+			#flag = z[[3]]
 
-			if (flag == 0) break
+			#if (flag == 0) break
 
 			if (0 <= x & x <= 1 & -0.22 <= y & y <= 0.22) {
 				rect(0, -0.045, x, 0.04, col = "red")

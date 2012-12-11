@@ -1,7 +1,7 @@
 Package: mixOmics
 Type: Package
 Title: Omics Data Integration Project
-Version: 4.1-3
+Version: 4.1-4
 Date: 2012-12-11
 Depends: R (>= 2.10), igraph0, rgl, lattice, pheatmap
 Author: Sebastien Dejean, Ignacio Gonzalez, Kim-Anh Le Cao with
@@ -27,6 +27,6 @@ Description: The package provide statistical integrative techniques and
         multilevel analysis using variance decomposition of the data.
 License: GPL (>= 2)
 Repository: CRAN
-Date/Publication: 2013-02-20 07:40:24
-Packaged: 2013-02-19 22:16:52 UTC; k.lecao
+Date/Publication: 2013-03-06 07:22:35
+Packaged: 2013-03-06 03:33:40 UTC; k.lecao
 NeedsCompilation: no
