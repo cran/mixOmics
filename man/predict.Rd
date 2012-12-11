@@ -36,7 +36,7 @@ variates are predicted using a fitted model and a new matrix of observations.
 \details{
 \code{predict} produces predicted values, obtained by evaluating the PLS, sparse PLS, PLSDA or sparse PLSDA  
 model returned by \code{pls}, \code{spls}, \code{plsda} or \code{splsda} in the frame \code{newdata}. 
-Variates for \code{newdata} are also returned. 
+Variates for \code{newdata} are also returned. The prediction values are calculated based on the regression coefficients of \code{object$Y} onto \code{object$variates$X}.
 
 Different class prediction methods are proposed for \code{plsda} or \code{splsda}: \code{"max.dist"} 
 is the naive method to predict the class. It is based on the predicted matrix (\code{object$predict}) 
@@ -56,14 +56,15 @@ in the calculation of the distance.
   \item{B.hat}{matrix of regression coefficients (without the intercept).}
   \item{class}{vector or matrix of predicted class by using \eqn{1,...,}\code{ncomp} 
     (sparse)PLS-DA components.}
-  \item{centroid}{matrix of coordinates for centroids.}
+  \item{centroids}{matrix of coordinates for centroids.}
 }
 
 \references{
-Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.  
+Tenenhaus, M. (1998). \emph{La r?gression PLS: th?orie et pratique}. Paris: Editions Technic.  
 }
 
-\author{Sébastien Déjean, Ignacio González, Kim-Anh Lê Cao and Pierre Monget}
+\author{S\'ebastien D\'ejean, Ignacio Gonz`alez, Kim-Anh L\^e Cao and Pierre Monget}
+
 
 \seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 

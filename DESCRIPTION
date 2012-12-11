@@ -1,7 +1,7 @@
 Package: mixOmics
 Type: Package
 Title: Omics Data Integration Project
-Version: 5.0-2
+Version: 5.0-3
 Date: 2012-12-11
 Depends: R (>= 2.10), MASS, lattice
 Imports: RGCCA, igraph, rgl, pheatmap
@@ -28,6 +28,6 @@ Description: The package provide statistical integrative techniques and
         multilevel analysis using variance decomposition of the data.
 License: GPL (>= 2)
 Repository: CRAN
-Date/Publication: 2014-08-11 00:10:32
-Packaged: 2014-08-10 08:05:47 UTC; klecao
+Date/Publication: 2014-09-01 15:47:59
+Packaged: 2014-09-01 11:59:23 UTC; klecao
 NeedsCompilation: no

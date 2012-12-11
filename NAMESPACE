@@ -50,6 +50,7 @@ tune.splslevel,
 tune.pca,
 tune.rcc,
 unmap,
+valid,
 vip,
 wrapper.rgcca,
 wrapper.sgcca)

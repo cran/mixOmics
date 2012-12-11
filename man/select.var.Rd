@@ -54,7 +54,7 @@ Y = liver.toxicity$clinic
 
 # example with sPCA
 # ------------------
-liver.spca <- spca(X, ncomp = 3, keepX = rep(10, 3))
+liver.spca <- spca(X, ncomp = 1, keepX = 10)
 select.var(liver.spca, comp = 1)$name
 select.var(liver.spca, comp = 1)$value
 

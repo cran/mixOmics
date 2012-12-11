@@ -69,16 +69,17 @@ A feature stability measure is output for the user to assess how often the varia
 
 \value{
 For PLS and sPLS models, \code{perf} produces a list with the following components: 
-  \item{MSEP}{Mean Square Error Prediction for each \eqn{Y} variable.}
+  \item{MSEP}{Mean Square Error Prediction for each \eqn{Y} variable, only applies to object inherited from \code{"pls"}, and \code{"spls"}.}
   \item{R2}{a matrix of \eqn{R^2} values of the \eqn{Y}-variables for models 
-    with \eqn{1, \ldots ,}\code{ncomp} components.}
+    with \eqn{1, \ldots ,}\code{ncomp} components, only applies to object inherited from \code{"pls"}, and \code{"spls"}.}
   \item{Q2}{if \eqn{Y} containts one variable, a vector of \eqn{Q^2} values else a list with 
-    a matrix of \eqn{Q^2} values for each \eqn{Y}-variable. Note that in the specific case of an sPLS model, it is better to have a look at the Q2.total criterion.}	
-    \item{Q2.total}{a vector of \eqn{Q^2}-total values for models with \eqn{1, \ldots ,}\code{ncomp} components.}
+    a matrix of \eqn{Q^2} values for each \eqn{Y}-variable. Note that in the specific case of an sPLS model, it is better to have a look at the Q2.total criterion, only applies to object inherited from \code{"pls"}, and \code{"spls"}}	
+    \item{Q2.total}{a vector of \eqn{Q^2}-total values for models with \eqn{1, \ldots ,}\code{ncomp} components, only applies to object inherited from \code{"pls"}, and \code{"spls"}}
     \item{features}{a list of features selected across the folds (\code{$stable.X} and \code{$stable.Y}) or on the whole data set (\code{$final}) for the \code{keepX} and \code{keepY} parameters from the input object.}
-	
+    \item{error.rate}{
 For PLS-DA and sPLS-DA models, \code{perf} produces a matrix of classification error rate estimation. 
 The dimensions correspond to the components in the model and to the prediction method used, respectively. Note that error rates reported in any component include the performance of the model in earlier components for the specified \code{keepX} parameters (e.g. error rate reported for component 3 for \code{keepX = 20} already includes the fitted model on components 1 and 2 for  \code{keepX = 20}). For more advanced usage of the \code{perf} function, see \url{http://perso.math.univ-toulouse.fr/mixomics/methods/spls-da/} and consider using the \code{predict} function.}
+}
 
 \references{
 Tenenhaus, M. (1998). \emph{La r\'egression PLS: th\'eorie et pratique}. Paris: Editions Technic.  

@@ -1,8 +1,8 @@
-# Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Copyright (C) 2014 
 # Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
-# Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
+# Kim-Anh Lê Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+# Amrit Singh, University of British Columbia, Vancouver.
+# Florian Rohart, Australian Institute for Bioengineering and Nanotechnology, University of Queensland, Brisbane, QLD.
 # Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
 #
 # This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
 
 
 predict.pls <- predict.spls <-
-function(object, newdata, ...)
+function(object, newdata,  ...)
 {
 
     #-- validation des arguments --#
@@ -63,20 +63,30 @@ function(object, newdata, ...)
     B.hat = array(0, dim = c(p, q, ncomp))
     ##- prediction
     Y.hat = array(0, dim = c(nrow(newdata), q, ncomp))
+    Y.hat2 = array(0, dim = c(nrow(newdata), q, ncomp))
     ##- variates
     t.pred = array(0, dim = c(nrow(newdata), ncomp))
-      
-    #-- calcul de la prediction --# 
+    
+    variates.X = object$variates$X
+    betay = list()
+    
+    #-- prediction --#
     for(h in 1:ncomp){
-	    W = a[, 1:h] %*% solve(t(c[, 1:h]) %*% a[, 1:h]) 	
-	    B = W %*% drop(t(b[, 1:h]))   
-	    B = scale(B, center = FALSE, scale = 1 / sigma.Y)
-	    B = as.matrix(scale(t(B), center = FALSE, scale = sigma.X))		
-	    intercept = -scale(B, center = FALSE, scale = 1 / means.X)
-	    intercept = matrix(apply(intercept, 1, sum) + means.Y, nrow = 1)
-	    Y.hat[, , h] = newdata %*% t(B) + ones %*% intercept
-	    t.pred[, h] = scale(newdata, center = means.X, scale = sigma.X) %*% W[, h]
-		B.hat[, , h] = B
+        
+        dd= coefficients(lm(Y~variates.X[,1:h,drop=FALSE])) #regression of Y on variates.global.X => =loadings.global.Y at a scale factor
+        if(q==1){betay[[h]]=(dd[-1])}
+        if(q>=2){betay[[h]]=(dd[-1,])}
+        
+        W = a[, 1:h,drop=FALSE] %*% solve(t(c[, 1:h,drop=FALSE]) %*% a[, 1:h,drop=FALSE])
+        B = W %*% drop(betay[[h]])
+
+        Y.temp=scale(newdata,center=means.X,scale=sigma.X) %*% as.matrix(B) #so far: gives a prediction of Y centered and scaled
+        Y.temp2=scale(Y.temp,center=FALSE,scale=1/sigma.Y) #so far: gives a prediction of Y centered, with the right scaling
+        Y.temp3=scale(Y.temp2,center=-means.Y,scale=FALSE) #so far: gives a prediction of Y with the right centering and scaling
+        
+        Y.hat[, , h] = Y.temp3 # we add the variance and the mean of Y used in object to predict
+        t.pred[, h] = scale(newdata, center = means.X, scale = sigma.X) %*% W[, h]
+        B.hat[, , h] = B
     }  #end h
      
     #-- valeurs sortantes --#
@@ -85,7 +95,7 @@ function(object, newdata, ...)
     rownames(Y.hat) = rownames(newdata)
     colnames(Y.hat) = colnames(Y)
      
-    return(invisible(list(predict = Y.hat, variates = t.pred, B.hat = B.hat)))
+    return(invisible(list(predict = Y.hat, variates = t.pred, B.hat = B.hat,betay=betay)))
 }
 
 
@@ -136,23 +146,30 @@ function(object, newdata,
     Y.hat = array(0, dim = c(nrow(newdata), q, ncomp))
     ##- variates
     t.pred = array(0, dim = c(nrow(newdata), ncomp))
-      
-    #-- calcul de la prediction --# 
+    variates.X = object$variates$X
+    betay = list()
+    
+    #-- prediction --#
     for(h in 1:ncomp){
-	    W = a[, 1:h] %*% solve(t(c[, 1:h]) %*% a[, 1:h]) 	
-	    B = W %*% drop(t(b[, 1:h]))   
-	    B = scale(B, center = FALSE, scale = 1 / sigma.Y)
-	    B = as.matrix(scale(t(B), center = FALSE, scale = sigma.X))		
-	    intercept = -scale(B, center = FALSE, scale = 1 / means.X)
-	    intercept = matrix(apply(intercept, 1, sum) + means.Y, nrow = 1)
-	    Y.hat[, , h] = newdata %*% t(B) + ones %*% intercept
-	    t.pred[, h] = scale(newdata, center = means.X, scale = sigma.X) %*% W[, h]
+        dd= coefficients(lm(Y~variates.X[,1:h,drop=FALSE])) #regression of Y on variates.global.X => =loadings.global.Y at a scale factor
+        if(q==1){betay[[h]]=(dd[-1])}
+        if(q>=2){betay[[h]]=(dd[-1,])}
+
+        W = a[, 1:h,drop=FALSE] %*% solve(t(c[, 1:h,drop=FALSE]) %*% a[, 1:h,drop=FALSE])
+        B = W %*% drop(betay[[h]])
+
+        Y.temp=scale(newdata,center=means.X,scale=sigma.X) %*% as.matrix(B) #so far: gives a prediction of Y centered and scaled
+        Y.temp2=scale(Y.temp,center=FALSE,scale=1/sigma.Y) #so far: gives a prediction of Y centered, with the right scaling
+        Y.temp3=scale(Y.temp2,center=-means.Y,scale=FALSE) #so far: gives a prediction of Y with the right centering and scaling
+
+        Y.hat[, , h] = Y.temp3 # we add the variance and the mean of Y used in object to predict
+        t.pred[, h] = scale(newdata, center = means.X, scale = sigma.X) %*% W[, h]
         B.hat[, , h] = B
     }  #end h
-    	
-    G = matrix(0, nrow = q, ncol = ncomp)  
+    
+    G = matrix(0, nrow = q, ncol = ncomp)
     cls = list()
-     
+    
     for (i in 1:q) {
         if(ncomp > 1) {
             G[i, ] = apply(object$variates$X[Yprim[, i] == 1, ], 2, mean)

@@ -1,5 +1,18 @@
 
 
+Changes in 5.0-3
+================
+
+Bug fixes:
+----------
+-the perf and predict functions have been updated. The prediction values are calculated based on the regression coefficients of Y onto the latent variables associated to X.
+
+-scaling issues in perf/old-valid have been fixed
+
+-one warning on the plotIndiv.rcc has been fixed.
+
+-transition from valid() to perf() announced.
+
 Changes in 5.0-2
 ================
 
