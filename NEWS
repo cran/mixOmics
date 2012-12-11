@@ -1,13 +1,22 @@
+Changes in 4.1
+================
+
+New features:
+-------------
+- New S3 method valid for objects of class psl, spls, plsda and splsda
+- New select.var function to directly extract the selected variables from spls, spca, sipca
+- New data set vac18 for multilevel data
 
 
 Changes in 4.0
 ================
+
 New features:
 -------------
--The multilevel methodology has been added as well as the associated S3methods for the graphical outputs (plotVar, plotIndiv)
--pheatmap clustering is available for multilevel analysis (borrowed from the pheatmap package)
--tuning functions are available for multilevel analyses
--a dependency to the package 'igraph0' has been created (instead of 'igraph' as the authors informed us of major changes in this package)
+- The multilevel methodology has been added as well as the associated S3 methods for the graphical outputs (plotVar, plotIndiv)
+- pheatmap clustering is available for multilevel analysis (borrowed from the pheatmap package)
+- tuning functions are available for multilevel analyses
+- a dependency to the package 'igraph0' has been created (instead of 'igraph' as the authors informed us of major changes in this package)
 
 Bug fixes:
 ----------
@@ -16,9 +25,10 @@ Bug fixes:
 
 Changes in 3.0
 ================
+
 New features:
 -------------
-- The new methodology IPCA and sIPCA have been added as well as the associated S3methods for the graphical outputs
+- The new methodology IPCA and sIPCA have been added as well as the associated S3 methods for the graphical outputs
 
 - GeneBank IDs and gene titles were added in the liver toxicity study
 

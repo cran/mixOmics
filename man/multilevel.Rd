@@ -4,10 +4,10 @@
 \alias{multilevel.splsda}
 \alias{multilevel.spls}
 
-\title{Multilevel analysis for repeated measurements 9cross-over design), either with a discriminant or an integrative analysis}
+\title{Multilevel analysis for repeated measurements (cross-over design)}
 
 \description{
-The analysis of repeated measurements is performed by combining a multilevel approach with multivariate approaches: sPLS-DA (Discriminant Analysis) or sPLS (Integrative analysis). Both approaches embbed variable selection.
+The analysis of repeated measurements is performed by combining a multilevel approach with multivariate methods: sPLS-DA (Discriminant Analysis) or sPLS (Integrative analysis). Both approaches embbed variable selection.
 }
 
 \usage{
@@ -16,7 +16,7 @@ multilevel(X, Y = NULL,
            sample = NULL,
            ncomp = 1,
            keepX = rep(ncol(X), ncomp),
-           keepY = NULL,  # for spls
+           keepY = NULL,
            method = NULL,
            tab.prob.gene=NULL, 
            max.iter = 500, 
@@ -41,7 +41,7 @@ multilevel(X, Y = NULL,
 }
 
 \details{
-\code{multilevel} function first decomposes the variance in the data sets X (and Y) and applies either sPLS-DA (\code{method = 'splsda'}) or sPLS ((\code{method = 'splsda'})) on the within-subject deviation. 
+\code{multilevel} function first decomposes the variance in the data sets X (and Y) and applies either sPLS-DA (\code{method = 'splsda'}) or sPLS ((\code{method = 'spls'})) on the within-subject deviation. 
 
 One or two-factor analyses are available for (\code{method = 'splsda'}).
 
@@ -86,8 +86,8 @@ For sPLS-DA analysis, \code{multilevel} returns either an object of class \code{
 
 \references{
 On multilevel analysis:
-Liquet, B., Lê Cao, K.-A., Hocini, H. and Thiebaut, R. A novel approach for biomarker selection and the
-integration of repeated measures experiments from two platforms. \emph{Submitted}.
+Liquet, B., Lê Cao, K.-A., Hocini, H. and Thiebaut, R. (2012) A novel approach for biomarker selection and the
+integration of repeated measures experiments from two platforms. \emph{BMC Bioinformatics} \bold{13}:325.
 
 Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010). Multivariate paired data analysis: multilevel PLSDA versus OPLSDA. \emph{Metabolomics}, \bold{6}(1), 119-128.
 
@@ -105,7 +105,7 @@ Biology} \bold{7}, article 35.
 
 }
 
-\author{Benoit Liquet, Kim-Anh Lê Cao.}
+\author{Benoit Liquet, Kim-Anh L\^e Cao.}
 
 \seealso{\code{\link{spls}}, \code{\link{splsda}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
@@ -114,23 +114,37 @@ Biology} \bold{7}, article 35.
 
 \examples{
 ## First example: one-factor analysis with sPLS-DA
-data(data.simu) # simulated data
-res.1level <- multilevel(data.simu$X, cond = data.simu$stimu, sample=data.simu$sample, ncomp=3,
-                         keepX=c(200,200,200),tab.prob.gene=NULL, method = 'splsda')
+data(vac18) # vac18 study
+X <- vac18$genes
+Y <- vac18$stimulation
 
+res <- multilevel(X, cond = Y, ncomp = 3,
+tab.prob.gene = vac18$tab.prob.gene,
+sample = vac18$sample, method = "splsda",
+keepX = c(30, 137, 123))
 
-plot3dIndiv(res.1level, col = as.numeric(data.simu$stimu), cex = 0.6)
+# color for plot3dIndiv
+col_stim <- c("darkblue", "purple", "green4","red3")
+cols <- Y
+levels(cols) <- col_stim
+cols <- as.character(cols)
+
+plot3dIndiv(res, ind.names = Y, col = cols,
+cex = 0.3, axes.box = "both")
 
 
 ## Second example: two-factor analysis with sPLS-DA
 data(data.simu) # simulated data
 
 time = factor(rep(c(rep('t1', 6), rep('t2', 6)), 4))
-stimu.time = data.frame(cbind(as.character(data.simu$stimu), as.character(time)))
+stimu.time = data.frame(cbind(as.character(data.simu$stimu), 
+                        as.character(time)))
 repeat.simu2 = rep(c(1:6), 8)
 
-res.2level <- multilevel(data.simu$X, cond = stimu.time,sample=repeat.simu2, 
-                        ncomp=2,keepX=c(200, 200),tab.prob.gene=NULL, method = 'splsda')
+res.2level <- multilevel(data.simu$X, cond = stimu.time,
+                         sample = repeat.simu2, ncomp = 2,
+                         keepX = c(200, 200), tab.prob.gene = NULL, 
+                         method = 'splsda')
 
 # color for plotIndiv
 col.stimu = as.numeric(data.simu$stimu)
@@ -138,25 +152,34 @@ col.stimu = as.numeric(data.simu$stimu)
 pch.time = rep(20, 48)
 pch.time[time == 't2'] = 4
 
-
 plotIndiv(res.2level, col = col.stimu, pch = pch.time, ind.names = FALSE)
-legend('bottomright', col = unique(col.stimu), legend = levels(data.simu$stimu),  pch = 20, cex = 0.8)
-legend('topright', col = 'black', legend = levels(time),  pch = unique(pch.time), cex = 0.8)
+legend('bottomright', col = unique(col.stimu), 
+       legend = levels(data.simu$stimu),  pch = 20, cex = 0.8)
+legend('topright', col = 'black', legend = levels(time),  
+       pch = unique(pch.time), cex = 0.8)
 
 
 ## Third example: one-factor integrative analysis with sPLS
+\dontrun{
 data(liver.toxicity)
-repeat.indiv = c(1,2, 1,  2,  1,  2,  1,  2,  3,  3,  4,  3,  4,  3,  4,  4,  5,  6,  5,  5,  6,  5,  6,  7,  7,  8,  6,  7,  8,  7,  8,  8,  9, 10,  9, 10, 11, 9,  9, 10, 11, 12, 12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 14, 13, 14, 15, 16, 15, 16, 15, 16, 15, 16)
+repeat.indiv = c(1, 2, 1, 2, 1, 2, 1, 2, 3, 3, 4, 3, 4, 3, 4, 4, 5, 6, 5, 5,
+                 6, 5, 6, 7, 7, 8, 6, 7, 8, 7, 8, 8, 9, 10, 9, 10, 11, 9, 9, 
+                 10, 11, 12, 12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 14, 
+                 13, 14, 15, 16, 15, 16, 15, 16, 15, 16)
 
-
-result.rat <- multilevel(X = liver.toxicity$gene, Y=liver.toxicity$clinic, cond = liver.toxicity$treatment$Dose.Group, sample=repeat.indiv, ncomp = 2, keepX= c(50,50), keepY= c(5, 5), method = 'spls') 
+result.rat <- multilevel(X = liver.toxicity$gene, Y=liver.toxicity$clinic, 
+                         cond = liver.toxicity$treatment$Dose.Group, 
+                         sample = repeat.indiv, ncomp = 2, keepX = c(50, 50), 
+                         keepY = c(5, 5), method = 'spls') 
 
 # variable plots
-plotVar(result.rat,comp=1:2,X.label=TRUE,Y.label=TRUE,cex=c(0.5,0.9)) 
+plotVar(result.rat, comp = 1:2, X.label = TRUE, Y.label = TRUE, 
+        cex = c(0.5, 0.9)) 
 
-CIM <- cim(result.rat , comp = 1:2, xlab = "genes", ylab = "clinic var", margins = c(5,6), zoom = FALSE)
+CIM <- cim(result.rat, comp = 1:2, xlab = "genes", ylab = "clinic var", 
+           margins = c(5, 6), zoom = FALSE)
 
-\dontrun{
+
 network(result.rat, comp = 1:2, threshold = 0.8, 
         Y.names = NULL, keep.var = TRUE,
         color.node = c( "lightcyan","mistyrose"),

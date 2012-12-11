@@ -1,6 +1,10 @@
 \name{valid}
 \encoding{latin1}
 \alias{valid}
+\alias{valid.pls}
+\alias{valid.spls}
+\alias{valid.plsda}
+\alias{valid.splsda}
 
 \title{Compute validation criterion for PLS, sPLS, PLS-DA and sPLS-DA}
 
@@ -10,36 +14,36 @@ PLS-DA and sparse PLS-DA models. M-fold and leave-one-out cross-validation are i
 }
 
 \usage{
-valid(X, Y, ncomp = min(6, ncol(X)), 
-      method = c("pls", "spls", "plsda", "splsda"),
-      mode = c("regression", "invariant", "classic"),
-      pred.method = c("all", "max.dist", 
-                      "centroids.dist", "mahalanobis.dist"),
-      criterion = c("all", "MSEP", "R2", "Q2"),
-      keepX = NULL, keepY = NULL, 
-      validation = c("Mfold", "loo"), M = 10,
-      max.iter = 500, tol = 1e-06, ...)
+\method{valid}{pls}(object, criterion = c("all", "MSEP", "R2", "Q2"), 
+      validation = c("Mfold", "loo"), folds = 10,
+      max.iter = 500, tol = 1e-06, \ldots)	
+
+\method{valid}{spls}(object, criterion = c("all", "MSEP", "R2", "Q2"), 
+      validation = c("Mfold", "loo"), folds = 10,
+         max.iter = 500, tol = 1e-06, \ldots)
+
+\method{valid}{plsda}(object, method = c("all", "max.dist", "centroids.dist", 
+                                         "mahalanobis.dist"),
+         validation = c("Mfold", "loo"), folds = 10,
+         max.iter = 500, tol = 1e-06, \ldots)	
+
+\method{valid}{splsda}(object, method = c("all", "max.dist", "centroids.dist", 
+                                          "mahalanobis.dist"),
+         validation = c("Mfold", "loo"), folds = 10,
+         max.iter = 500, tol = 1e-06, \ldots)		  
 }
 
 \arguments{
-  \item{X}{numeric matrix of predictors.}
-  \item{Y}{numeric vector or matrix of responses (for multi-response models).}
-  \item{ncomp}{the number of components to include in the model. Default is \code{1:min(6, ncol(X))}.}
-  \item{method}{Choose between \code{pls}, \code{spls}, \code{plsda} or \code{splsda}.}
-  \item{mode}{character string. What type of algorithm to use, matching one of \code{"classic"}, \code{"invariant"} 
-    or \code{"regression"}.}
-  \item{pred.method}{prediction method to be applied for \code{plsda} or \code{splsda}. Should be a subset 
-    of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. 
-	Default is \code{"all"}. See \code{\link{predict}}.}
+  \item{object}{object of class inheriting from \code{"pls"}, \code{"plsda"}, 
+    \code{"spls"} or \code{"splsda"}.}
   \item{criterion}{what type of validation criterion to be used for \code{pls} or \code{spls}. Should be a subset 
     of \code{"MSEP"}, \code{"R2"} or \code{"Q2"}. Default is \code{"all"}.}
-  \item{keepX}{if \code{method="spls"} numeric vector of length \code{ncomp}, the number of variables
-    weights to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
-  \item{keepY}{if \code{method="spls"} numeric vector of length \code{ncomp}, the number of variables
-    weights to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
+  \item{method}{prediction method to be applied for \code{plsda} or \code{splsda}. Should be a subset 
+    of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. 
+	Default is \code{"all"}. See \code{\link{predict}}.}
   \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or 
     \code{"loo"} (see below). Default is \code{"Mfold"}.}
-  \item{M}{the number of folds in the Mfold cross-validation.}
+  \item{folds}{the folds in the Mfold cross-validation. See Details.}
   \item{max.iter}{integer, the maximum number of iterations.}
   \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
   \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
@@ -53,7 +57,10 @@ leave-one-out cross-validation. Note that only the \code{classic}, \code{regress
 \code{invariant} modes can be applied.
 
 If \code{validation = "Mfold"}, M-fold cross-validation is performed. 
-How many folds to generate is selected by specifying the number of folds in \code{M}.
+How many folds to generate is selected by specifying the number of folds in \code{folds}.
+The folds also can be supplied as a list of vectors containing the indexes defining each 
+fold as produced by \code{split}.
+
 If \code{validation = "loo"}, leave-one-out cross-validation is performed.
 
 For fitted PLS-DA and sPLS-DA models, \code{valid} estimates the classification error rate 
@@ -96,8 +103,8 @@ data(liver.toxicity)
 X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
 
-liver.val <- valid(X, Y, ncomp = 5, mode = "regression", 
-                   method = "pls", validation = "Mfold")
+liver.pls <- pls(X, Y, ncomp = 3)
+liver.val <- valid(liver.pls, validation = "Mfold")
 				   
 plot(liver.val, criterion = "R2", type = "l", layout = c(2, 2))
 }
@@ -106,9 +113,11 @@ plot(liver.val, criterion = "R2", type = "l", layout = c(2, 2))
 data(srbct)
 X <- srbct$gene
 Y <- srbct$class  
-  
-error <- valid(X, Y, ncomp = 10, method = "splsda", M = 3, 
-               keepX = rep(10, 10), pred.method = "all")
+
+ncomp = 5
+srbct.splsda <- splsda(X, Y, ncomp = ncomp, keepX = rep(10, ncomp))  
+error <- valid(srbct.splsda, validation = "Mfold", folds = 8, 
+               method = "all")
 
 plot(error, type = "l")
 }

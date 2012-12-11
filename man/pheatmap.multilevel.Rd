@@ -12,34 +12,33 @@ A function to draw clustered heatmaps from the pheatmap package.
 
 \usage{
 \method{pheatmap.multilevel}{splsda1fact}(result, cluster = NULL,
-                                       color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF",
-                                                                                           "#E0F3F8", "#91BFDB", "#4575B4")))(100),
-                                             col_sample=NULL, col_stimulation=NULL,label_annotation=NULL, 
-                                        breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, 
-                                        scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, 
-                                        clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", 
-                                        clustering_method = "complete", treeheight_row = ifelse(cluster_rows, 
-                                                                                                50, 0), treeheight_col = ifelse(cluster_cols, 50, 0), 
-                                        legend = TRUE, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, 
-                                        show_rownames = TRUE, show_colnames = TRUE, fontsize = 10, fontsize_row = fontsize, 
-                                        fontsize_col = fontsize, filename = NA, width = NA, height = NA,order_sample=NULL, 
-                                        ...) 
+                    color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF",
+                                                 "#E0F3F8", "#91BFDB", "#4575B4")))(100),
+                    col_sample=NULL, col_stimulation=NULL,label_annotation=NULL, 
+                    breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, 
+                    scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, 
+                    clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", 
+                    clustering_method = "complete", treeheight_row = ifelse(cluster_rows, 50, 0), 
+                    treeheight_col = ifelse(cluster_cols, 50, 0), 
+                    legend = TRUE, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, 
+                    show_rownames = TRUE, show_colnames = TRUE, fontsize = 10, fontsize_row = fontsize, 
+                    fontsize_col = fontsize, filename = NA, width = NA, height = NA,order_sample=NULL, 
+                    ...) 
 \method{pheatmap.multilevel}{splsda2fact}(result,  cluster = NULL,
-                                        color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF",
-                                                                     "#E0F3F8", "#91BFDB", "#4575B4")))(100),
-                                        col_sample=NULL, col_stimulation=NULL, col_time=NULL,   
-                                        label_color_stimulation=NULL,label_color_time=NULL, 
-                                        label_annotation=NULL, 
-                                        breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, 
-                                        scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, 
-                                        clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", 
-                                        clustering_method = "complete", treeheight_row = ifelse(cluster_rows, 
-                                        50, 0), treeheight_col = ifelse(cluster_cols, 50, 0), 
-                                        legend = TRUE, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, 
-                                        show_rownames = TRUE, show_colnames = TRUE, fontsize = 10, fontsize_row = fontsize, 
-                                        fontsize_col = fontsize, filename = NA, width = NA, height = NA,order_sample=NULL, 
-                                        ...)
-
+                    color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF",
+                                                 "#E0F3F8", "#91BFDB", "#4575B4")))(100),
+                    col_sample=NULL, col_stimulation=NULL, col_time=NULL,   
+                    label_color_stimulation=NULL,label_color_time=NULL, 
+                    label_annotation=NULL, 
+                    breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, 
+                    scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, 
+                    clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", 
+                    clustering_method = "complete", treeheight_row = ifelse(cluster_rows, 50, 0), 
+                    treeheight_col = ifelse(cluster_cols, 50, 0), 
+                    legend = TRUE, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, 
+                    show_rownames = TRUE, show_colnames = TRUE, fontsize = 10, fontsize_row = fontsize, 
+                    fontsize_col = fontsize, filename = NA, width = NA, height = NA,order_sample=NULL, 
+                    ...)
 }	
 
 \arguments{
@@ -97,8 +96,8 @@ In the \code{multilevel} function, the factors indicated in the vector or the da
 
 \references{
 On multilevel analysis:
-Liquet, B., Lê Cao, K.-A., Hocini, H. and Thiebaut, R. A novel approach for biomarker selection and the
-integration of repeated measures experiments from two platforms. \emph{Submitted}.
+Liquet, B., Lê Cao, K.-A., Hocini, H. and Thiebaut, R. (2012) A novel approach for biomarker selection and the
+integration of repeated measures experiments from two platforms. \emph{BMC Bioinformatics} \bold{13}:325.
 
 Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010). Multivariate paired data analysis: multilevel PLSDA versus OPLSDA. \emph{Metabolomics}, \bold{6}(1), 119-128.
 }

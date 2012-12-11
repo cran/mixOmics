@@ -88,9 +88,9 @@ function(mat, threshold, breaks, col, symkey)
     mat[mat < min.breaks] = min.breaks
     mat[mat > max.breaks] = max.breaks
 	
-    bin <- .C("bincode", as.double(mat), length(mat), as.double(breaks), 
-            length(breaks), code = integer(length(mat)), (TRUE), 
-            (TRUE), nok = TRUE, NAOK = TRUE, DUP = FALSE, PACKAGE = "base")$code
+    #bin <- .C("bincode", as.double(mat), length(mat), as.double(breaks), 
+    #        length(breaks), code = integer(length(mat)), (TRUE), 
+    #        (TRUE), nok = TRUE, NAOK = TRUE, DUP = FALSE, PACKAGE = "base")$code
 
     return(invisible(list(bin = bin, col = col, breaks = breaks, lim = c(min.mat, max.mat))))		
 }

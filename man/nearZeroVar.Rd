@@ -2,7 +2,7 @@
 \encoding{latin1}
 \alias{nearZeroVar}
 
-\title{Identification of zero- or near-zero variance predictors from the caret package}
+\title{Identification of zero- or near-zero variance predictors}
 
 \description{
 Borrowed from the \pkg{caret} package and, used as internal function.

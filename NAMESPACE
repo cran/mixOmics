@@ -34,6 +34,7 @@ rcc,
 scatterutil.base, 
 scatterutil.eti, 
 scatterutil.grid, 
+select.var,
 sipca,
 s.match,
 spca,
@@ -41,6 +42,8 @@ Split.variation.one.level,
 Split.variation.two.level,
 spls,
 splsda,
+spls.model,
+splsda.model,
 tune.multilevel,
 tune.splsdalevel1,
 tune.splsdalevel2,
@@ -119,6 +122,11 @@ S3method(plot3dVar, spca)
 S3method(plot3dVar, ipca)
 S3method(plot3dVar, sipca)
 
+S3method(select.var, spls)
+S3method(select.var, splsda)
+S3method(select.var, spca)
+S3method(select.var, sipca)
+
 S3method(network, default)
 S3method(network, rcc)
 S3method(network, pls)
@@ -126,3 +134,8 @@ S3method(network, spls)
 
 S3method(pheatmap.multilevel, splsda1fact)
 S3method(pheatmap.multilevel, splsda2fact)
+
+S3method(valid, pls)
+S3method(valid, spls)
+S3method(valid, plsda)
+S3method(valid, splsda)

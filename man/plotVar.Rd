@@ -122,6 +122,7 @@ toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50),
 plotVar(toxicity.spls, keep.var = TRUE, Y.label = TRUE, cex = c(1,0.8))	
 
 ## variable representation for objects of class 'splsda'
+\dontrun{
 data(liver.toxicity)
 X <- liver.toxicity$gene
 Y <- as.factor(liver.toxicity$treatment[, 4])
@@ -131,6 +132,7 @@ keepX <- rep(20, ncomp)
 
 splsda.liver <- splsda(X, Y, ncomp = ncomp, keepX = keepX)
 plotVar(splsda.liver, var.label = FALSE)
+}
 }
 
 \keyword{multivariate}

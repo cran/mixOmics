@@ -62,7 +62,7 @@ components.
 \author{Fangzhou Yao and Jeff Coquery.}
 
 \references{
-Yao, F., Coquery, J. and Lê Cao, K.-A.(2011) Principal component analysis with independent loadings: a combination of PCA and ICA. (in preparation)
+Yao, F., Coquery, J. and L\^e Cao, K.-A.(2011) Principal component analysis with independent loadings: a combination of PCA and ICA. (in preparation)
 
 A. Hyvarinen and E. Oja (2000) Independent Component Analysis: Algorithms and Applications, \emph{Neural Networks}, \bold{13(4-5)}:411-430
 
@@ -89,7 +89,8 @@ plot3dIndiv(ipca.res, cex = 0.01,
 
 # variables representation
 plotVar(ipca.res, var.label = TRUE, cex = 0.5)
-plot3dVar(ipca.res, rad.in = 0.5, cex = 0.5, col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
+plot3dVar(ipca.res, rad.in = 0.5, cex = 0.5, 
+          col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
 }
 
 \keyword{algebra}

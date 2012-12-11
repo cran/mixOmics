@@ -6,6 +6,10 @@
 \alias{map}
 \alias{unmap}
 \alias{pcasvd}
+
+\alias{spls.model}
+\alias{splsda.model}
+
 \alias{q2.spls}
 \alias{q2.pls}
 

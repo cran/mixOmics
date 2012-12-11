@@ -26,30 +26,30 @@ function(X, Y, ncomp, mode, M, fold, max.iter, tol)
 	p = ncol(X)
 	q = ncol(Y)
 	n = nrow(X)
-     
-    X.temp = scale(X)
-    Y.temp = scale(Y)
-    RSS = rbind(rep(n - 1, q), matrix(nrow = ncomp, ncol = q))
-    PRESS = Q2 = matrix(nrow = ncomp, ncol = q)
+  
+	X = scale(X)
+	Y = scale(Y)
+  RSS = rbind(rep(n - 1, q), matrix(nrow = ncomp, ncol = q))
+  PRESS = Q2 = matrix(nrow = ncomp, ncol = q)
      
     #-- boucle sur h --#
     for (h in 1:ncomp) {
         
         #-- initialisation --#
-        u = Y.temp[, 1] 
+        u = Y[, 1] 
         a.old = 0
         b.old = 0
         iter = 1
          
         repeat {
             #-- compute loading vectors and variates associated to X --#
-            a = crossprod(X.temp, u) / drop(crossprod(u))
+            a = crossprod(X, u) / drop(crossprod(u))
             a = a / drop(sqrt(crossprod(a)))
-            t = X.temp %*% a / drop(crossprod(a))
+            t = X %*% a / drop(crossprod(a))
             
             #-- compute loading vectors and variates associated to Y --#		
-            b = crossprod(Y.temp, t) / drop(crossprod(t))
-            u = Y.temp %*% b / drop(crossprod(b))
+            b = crossprod(Y, t) / drop(crossprod(t))
+            u = Y %*% b / drop(crossprod(b))
 				
             if ((crossprod(a - a.old) < tol) || (iter == max.iter)) break
              
@@ -57,17 +57,17 @@ function(X, Y, ncomp, mode, M, fold, max.iter, tol)
             iter = iter + 1
         }
 		 
-        RSS[h + 1, ] = colSums((Y.temp - t %*% t(b))^2) 
+        RSS[h + 1, ] = colSums((Y - t %*% t(b))^2) 
 		
         #-- compute PRESS --#
         press = matrix(nrow = n, ncol = q)
 		
         for (i in 1:M) {
             omit = fold[[i]]
-            X.train = as.matrix(X.temp[-omit, ])
-            Y.train = as.matrix(Y.temp[-omit, ])
-            X.test = matrix(X.temp[omit, ], nrow = length(omit))
-            Y.test = matrix(Y.temp[omit, ], nrow = length(omit))
+            X.train = as.matrix(X[-omit, ])
+            Y.train = as.matrix(Y[-omit, ])
+            X.test = matrix(X[omit, ], nrow = length(omit))
+            Y.test = matrix(Y[omit, ], nrow = length(omit))
             u.cv = Y.train[, 1] 
             a.old.cv = 0
             iter.cv = 1
@@ -91,26 +91,26 @@ function(X, Y, ncomp, mode, M, fold, max.iter, tol)
         }
 		 
         #-- deflation des matrices --#
-        c = crossprod(X.temp, t) / drop(crossprod(t))		
-        X.temp = X.temp - t %*% t(c)   
+        c = crossprod(X, t) / drop(crossprod(t))		
+        X = X - t %*% t(c)   
          
         #-- mode canonique --#
         if (mode == "canonical") {
-            e = crossprod(Y.temp, u) / drop(crossprod(u))
-            Y.temp = Y.temp - u %*% t(e)
+            e = crossprod(Y, u) / drop(crossprod(u))
+            Y = Y - u %*% t(e)
         }
          
         #-- mode classic --#
-        if(mode == "classic") Y.temp = Y.temp - t %*% t(b)                 
+        if(mode == "classic") Y = Y - t %*% t(b)                 
          
         #-- mode regression --#
         if(mode == "regression") {
-            d = crossprod(Y.temp, t) / drop(crossprod(t))
-            Y.temp = Y.temp - t %*% t(d)
+            d = crossprod(Y, t) / drop(crossprod(t))
+            Y = Y - t %*% t(d)
         }
 		
         #-- mode invariant --#
-        if (mode == "invariant") Y.temp = Y	
+        #Y = Y	
           
         PRESS[h, ] = colSums(press)
         Q2[h, ] = 1 - PRESS[h, ]/RSS[h, ]

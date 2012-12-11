@@ -75,6 +75,7 @@ legend('bottomleft', c("After", "Before"), pch = c(16, 16),
 palette("default")
 
 ## Second example
+\dontrun{
 data(liver.toxicity)
 X <- as.matrix(liver.toxicity$gene)
 Y <- liver.toxicity$treatment[, 4]
@@ -82,7 +83,7 @@ Y <- liver.toxicity$treatment[, 4]
 splsda.liver = splsda(X, Y, ncomp = 2, keepX = c(20, 20))
 col.rat <- as.numeric(as.factor(Y))
 plotIndiv(splsda.liver, col = col.rat, ind.names = Y)
-
+}
 }
 
 \keyword{regression}
