@@ -95,7 +95,10 @@ data(liver.toxicity)
 dose = liver.toxicity$treatment$Dose.Group
 time = liver.toxicity$treatment$Time.Group
 dose.time = cbind(dose, time)
-repeat.indiv = c(1,2, 1,  2,  1,  2,  1,  2,  3,  3,  4,  3,  4,  3,  4,  4,  5,  6,  5,  5,  6,  5,  6,  7,  7,  8,  6,  7,  8,  7,  8,  8,  9, 10,  9, 10, 11, 9,  9, 10, 11, 12, 12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 14, 13, 14, 15, 16, 15, 16, 15, 16, 15, 16)
+repeat.indiv = c(1, 2, 1, 2, 1, 2, 1, 2, 3, 3, 4, 3, 4, 3, 4, 4, 5, 6, 5, 5,
+6, 5, 6, 7, 7, 8, 6, 7, 8, 7, 8, 8, 9, 10, 9, 10, 11, 9, 9, 10, 11, 12,
+12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 14, 13, 14, 15, 16, 15, 16,
+15, 16, 15, 16)
 
 
 result.ex2 = tune.multilevel (liver.toxicity$gene,

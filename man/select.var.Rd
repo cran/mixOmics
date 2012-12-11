@@ -71,7 +71,8 @@ Y = srbct$class
 srbct.splsda = splsda(X, Y, ncomp = 2, keepX = c(5, 10))
 select = select.var(srbct.splsda, comp = 2)
 select
-srbct$gene.name[substr(select$select, 2,5),]  # this is a very specific case where a data set has no rownames. 
+srbct$gene.name[substr(select$select, 2,5),]
+# this is a very specific case where a data set has no rownames. 
 }
 }
 

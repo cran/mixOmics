@@ -1,3 +1,8 @@
+import(rgl)
+import(lattice)
+import(igraph)
+importFrom(pheatmap, pheatmap)
+
 export(
 bin.color, 
 cim,   
