@@ -1,5 +1,6 @@
 # Copyright (C) 2012 
-# Kim-Anh Lê Cao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Brisbane, Australia
+# Kim-Anh Lê Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -94,11 +95,16 @@ tune.multilevel <- function(X,
 # ----------------------------------------
 # tune for splsda with one factor: use cross validation
 # ----------------------------------------
-tune.splsdalevel1 <- function(X, cond, ncomp=1,test.keepX,sample,dist= NULL, already.tested.X = NULL,
-                                validation,folds){  
+tune.splsdalevel1 <- function(X, cond, ncomp=1,test.keepX, sample,dist= NULL, already.tested.X = NULL,
+                                validation, folds){  
   
   # put a warning message explain the tuning parameter
-  cat(paste('For a one-factor analysis, the tuning criterion is based on', folds, 'cross validation'), '\n')
+  if(validation == 'Mfold'){
+    cat(paste('For a one-factor analysis, the tuning criterion is based on', folds, 'cross validation'), '\n')
+  }else{
+    cat(paste('For a one-factor analysis, the tuning criterion is based on leave-one-out cross validation'), '\n')
+  }
+  
   
   # Check input cond
   if(!is.factor(cond)){
@@ -116,17 +122,11 @@ tune.splsdalevel1 <- function(X, cond, ncomp=1,test.keepX,sample,dist= NULL, alr
   
   # put a warning message to make things clear
   if(!is.null(already.tested.X)) cat('Number of variables selected on the first ', ncomp -1, 'component(s) was ', already.tested.X)
-  
-  # compute error rate
-  vect.error = vector(length  = length(test.keepX))
-  names(vect.error) = paste('var', test.keepX, sep = '')
-  error.sw = matrix(nrow = length(unique(sample)), ncol = length(test.keepX), data = 0) #collects the errors
-  
+
   
   #-- M fold or loo cross validation --#
   # we need to sample the SAME inviduals across the folds
-  k=0
-  n = length(sample)
+  n = length(unique(sample))
   
   #- define the folds  # !!! to redefine
   if(validation == "Mfold"){
@@ -147,25 +147,28 @@ tune.splsdalevel1 <- function(X, cond, ncomp=1,test.keepX,sample,dist= NULL, alr
       }
     }
   } 
-  else{ 
+  else{ # loocv
     folds = split(1:n, rep(1:n, length = n)) 
     M = n
   }
   
+  # compute error rate
+  vect.error = vector(length  = length(test.keepX))
+  names(vect.error) = paste('var', test.keepX, sep = '')
+  error.sw = matrix(nrow = M, ncol = length(test.keepX), data = 0) 
+  
   # start loop on the fold cross validation
   for(j in 1:M){
-    k = k+1     # to fill the error matrix
     
     #define training and testing sets
-    # !!! change here
-    omit = folds[[j]]
+    omit = which(sample%in%folds[[j]]==TRUE)  #folds[[j]]
     X.train = X[-c(omit), ]
     cond.train = cond[-c(omit)]
     X.test = matrix(X[omit, ], nrow = length(omit))
     cond.test =   cond[omit]  #matrix(cond[omit], nrow = length(omit))
     
     #renormalise the test set
-    xwtest <- X.test - matrix(colMeans(X.test),ncol=ncol(X.test),nrow=length(omit),byrow=TRUE)
+    xwtest <- X.test - matrix(colMeans(X.test), ncol=ncol(X.test), nrow=length(omit),byrow=TRUE)
     
     #decompose matrix
     samplew <- sample[-omit]
@@ -192,9 +195,11 @@ tune.splsdalevel1 <- function(X, cond, ncomp=1,test.keepX,sample,dist= NULL, alr
       }
       test.predict.sw <- predict(result.sw, xwtest, dist = dist)
       Prediction.sw <- levels(cond)[test.predict.sw$class[[dist]][, ncomp]]
-      error.sw[k, i] <- sum(as.character(cond.test)!=Prediction.sw)
+      error.sw[j, i] <- sum(as.character(cond.test)!=Prediction.sw)
+      #print(error.sw)
     }    
-  }	
+   
+  } # end j	
   result <- apply(error.sw, 2, sum)/length(cond)
   names(result) = paste('var', test.keepX, sep = '')  
   return(list(error = result))
@@ -212,7 +217,7 @@ tune.splsdalevel2 <- function(X,
                               test.keepX=c(5, 10, 15), 
                               already.tested.X = NULL){  
   
-  # put a warning message explain the tuning parameter
+  # put a warning message explaining the tuning parameter
   cat('For a two-factor analysis, the tuning criterion is based on the maximisation of the correlation between the components on the whole data set', '\n')
   
   # put a warning message to make things clear

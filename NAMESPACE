@@ -3,7 +3,8 @@ import(MASS, lattice, RGCCA, igraph, rgl, pheatmap)
 
 export(
 bin.color, 
-cim,   
+cim,  
+check.one.level,
 ica.par,
 ica.def,
 image.tune.rcc, 
@@ -22,6 +23,7 @@ network,
 nipals, 
 pca,
 pcasvd,
+perf,
 pheatmap.multilevel,
 plot3dIndiv, 
 plot3dVar,
@@ -41,8 +43,6 @@ Split.variation.one.level,
 Split.variation.two.level,
 spls,
 splsda,
-spls.model,
-splsda.model,
 tune.multilevel,
 tune.splsdalevel1,
 tune.splsdalevel2,
@@ -50,7 +50,6 @@ tune.splslevel,
 tune.pca,
 tune.rcc,
 unmap,
-valid, 
 vip,
 wrapper.rgcca,
 wrapper.sgcca)
@@ -61,10 +60,16 @@ S3method(cim, rcc)
 S3method(cim, spls)
 S3method(cim, pls)
 
+S3method(perf, pls)
+S3method(perf, spls)
+S3method(perf, plsda)
+S3method(perf, splsda)
+
+
 S3method(image, tune.rcc)
 
+S3method(plot, perf)
 S3method(plot, rcc)
-S3method(plot, valid)
 S3method(plot, pca)
 
 S3method(plotIndiv, pls)
@@ -145,7 +150,3 @@ S3method(network, spls)
 S3method(pheatmap.multilevel, splsda1fact)
 S3method(pheatmap.multilevel, splsda2fact)
 
-S3method(valid, pls)
-S3method(valid, spls)
-S3method(valid, plsda)
-S3method(valid, splsda)

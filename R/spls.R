@@ -1,8 +1,9 @@
 # Copyright (C) 2009 
-# S?bastien D?jean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonz?lez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh L? Cao, French National Institute for Agricultural Research and 
-# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+# Seébastien Deéjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzàlez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Lê Cao, French National Institute for Agricultural Research, Toulouse France and 
+# The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+# Florian Rohart,  Australian Institute for Bioengineering and Nanotechnology, The University of Queensland, Brisbane, QLD 
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -150,11 +151,11 @@ function(X,
             A[t(is.na.X)] = 0
             a.norm = crossprod(A)
             t = t / diag(a.norm)
-            t = t / drop(sqrt(crossprod(t)))			
+            # update 5.0-2: t is not normed
+            #t = t / drop(sqrt(crossprod(t)))
         }
         else {
-            t = X.temp %*% a.old ##/ drop(crossprod(a.old))
-            t = t / drop(sqrt(crossprod(t)))
+            t = X.temp %*% a.old / drop(crossprod(a.old))
         }
          
         if (na.Y) {
@@ -163,35 +164,34 @@ function(X,
             B[t(is.na.Y)] = 0
             b.norm = crossprod(B)
             u = u / diag(b.norm)
-            u = u / drop(sqrt(crossprod(u)))			
+            # update 5.0-2: u is not normed
+            #u = u / drop(sqrt(crossprod(u)))
         }
         else {
-            u = Y.temp %*% b.old ##/ drop(crossprod(b.old))
-            u = u / drop(sqrt(crossprod(u)))
+            u = Y.temp %*% b.old / drop(crossprod(b.old))
         }
          
         iter = 1
          
-        #-- boucle jusqu'? convergence de a et de b --#
+        #-- convergence of a  --#
         repeat {
             if (na.X) a = t(X.aux) %*% u
-            else a = t(X.temp) %*% u
+            else a = t(X.temp) %*% u #/ drop(crossprod(u)), useless because a is scaled after soft_thresholding
 			
 			if (na.Y) b = t(Y.aux) %*% t
-            else b = t(Y.temp) %*% t
+            else b = t(Y.temp) %*% t #/ drop(crossprod(t)), useless because b is scaled after soft_thresholding
              
             if (nx != 0) { 
                 a = ifelse(abs(a) > abs(a[order(abs(a))][nx]), 
                     (abs(a) - abs(a[order(abs(a))][nx])) * sign(a), 0)
             }
-            ##a = a / drop(crossprod(u))
             a = a / drop(sqrt(crossprod(a)))
 		     
             if (ny != 0) {
                 b = ifelse(abs(b) > abs(b[order(abs(b))][ny]),
                     (abs(b) - abs(b[order(abs(b))][ny])) * sign(b), 0)
             }
-            b = b / drop(crossprod(t))
+            b = b / drop(sqrt(crossprod(b)))
 			 
             if (na.X) {
                 t = X.aux %*% a
@@ -199,11 +199,11 @@ function(X,
                 A[t(is.na.X)] = 0
                 a.norm = crossprod(A)
                 t = t / diag(a.norm)
-                t = t / drop(sqrt(crossprod(t)))			
+                # update 5.0-2: t is not normed
+                #t = t / drop(sqrt(crossprod(t)))
             }
             else {
-                t = X.temp %*% a ##/ drop(crossprod(a))
-                t = t / drop(sqrt(crossprod(t)))
+                t = X.temp %*% a / drop(crossprod(a))
             }
              
             if (na.Y) {
@@ -212,11 +212,11 @@ function(X,
                 B[t(is.na.Y)] = 0
                 b.norm = crossprod(B)
                 u = u / diag(b.norm)
-                u = u / drop(sqrt(crossprod(u)))			
+                # update 5.0-2: u is not normed
+                #u = u / drop(sqrt(crossprod(u)))
             }
             else {
-                u = Y.temp %*% b ##/ drop(crossprod(b))
-                u = u / drop(sqrt(crossprod(u)))
+                u = Y.temp %*% b / drop(crossprod(b))
             }
            
             if (crossprod(a - a.old) < tol) break
@@ -317,7 +317,10 @@ function(X,
 		              mat.e = mat.e, 
                   variates = list(X = mat.t, Y = mat.u),
                   loadings = list(X = mat.a, Y = mat.b),
-                  names = list(X = X.names, Y = Y.names, indiv = ind.names))
+                  names = list(X = X.names, Y = Y.names, indiv = ind.names),
+		              tol = tol,
+		              max.iter = max.iter,iter=iter
+)
                   
     if (length(nzv$Position > 0)) result$nzv = nzv
 

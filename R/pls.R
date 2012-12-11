@@ -1,8 +1,9 @@
 # Copyright (C) 2009 
-# S?bastien D?jean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonz?lez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh L? Cao, French National Institute for Agricultural Research and 
-# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+# Seébastien Deéjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzàlez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Lê Cao, French National Institute for Agricultural Research, Toulouse France and 
+# The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+# Florian Rohart,  Australian Institute for Bioengineering and Nanotechnology, The University of Queensland, Brisbane, QLD 
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -148,7 +149,7 @@ if(near.zero.var == TRUE){
                 t = t / diag(a.norm)				
             }
             else {			
-                a = crossprod(X.temp, u) / drop(crossprod(u))
+                a = crossprod(X.temp, u) #/ drop(crossprod(u)), not useful as a is scaled below
                 a = a / drop(sqrt(crossprod(a)))
                 t = X.temp %*% a / drop(crossprod(a))
             }
@@ -167,7 +168,8 @@ if(near.zero.var == TRUE){
                 u = u / diag(b.norm)					
             }
             else {			
-                b = crossprod(Y.temp, t) / drop(crossprod(t))
+                b = crossprod(Y.temp, t) #/ drop(crossprod(t)), not useful as b is scaled below
+                b=b / drop(sqrt(crossprod(b)))
                 u = Y.temp %*% b / drop(crossprod(b))
             }
 				
@@ -274,9 +276,12 @@ if(near.zero.var == TRUE){
 		      mat.e = mat.e, 
 	              variates = list(X = mat.t, Y = mat.u),
 	              loadings = list(X = mat.a, Y = mat.b), 
-	              names = list(X = X.names, Y = Y.names, indiv = ind.names)
+	              names = list(X = X.names, Y = Y.names, indiv = ind.names),
+          tol = tol,
+          max.iter = max.iter,
+          iter=iter
                 )
-    if (near.zero.var == T & length(nzv$Position > 0)) result$nzv = nzv  
+    if (near.zero.var == TRUE & length(nzv$Position > 0)) result$nzv = nzv  
 	
     class(result) = "pls"
     return(invisible(result))

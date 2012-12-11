@@ -1,5 +1,19 @@
 
 
+Changes in 5.0-2
+================
+
+New features:
+-------------
+- The valid function has been superseded by the perf function. Although similar in essence, few bugs have been fixed to estimate the performance of the sPLS and sPLS-DA models with no selection bias. A variable stability frequency has been added to the output. Functions spls.model and pls.model have been removed.
+
+Bug fixes:
+----------
+-pls and spls function have been modified and harmonised w.r.t to scaling. Loading vectors a and b are now scaled to 1. Latent variables t and u are not scaled (following Table 21 of the Tenenhaus book - which is in French, sorry!).
+
+-the argument abline.line has been set to FALSE by default in all plotIndiv functions.
+
+- tune.multilevel for one factor has been fixed.
 
 Changes in 5.0-1
 ================

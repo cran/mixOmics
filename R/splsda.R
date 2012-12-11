@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# S?bastien D?jean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonz?lez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh L? Cao, French National Institute for Agricultural Research and 
 # Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
 # Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
 #
@@ -64,6 +64,10 @@ function(X,
     result$ind.mat = ind.mat
     result$names$Y = levels(Y)
     result$near.zero.var = near.zero.var
+    
+    result$tol = tol
+    result$max.iter = max.iter
+    
     class(result) = "splsda"
     return(invisible(result))	
 }

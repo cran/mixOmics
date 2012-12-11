@@ -67,7 +67,7 @@ function(object,
     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
     
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
     
 
     # calcul des coordonnées #
@@ -400,7 +400,7 @@ function(object,
     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
     
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
     
 
     # calcul des coordonnées #
@@ -598,7 +598,7 @@ function(object,
     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
     
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
     
 
     # calcul des coordonnées #
@@ -773,7 +773,7 @@ function(object,
     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
     
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
     
 
     # coordonnées des variables #
@@ -990,7 +990,7 @@ function(object,
     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
     
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
     
 
 
@@ -1162,8 +1162,8 @@ function(object,
     match.function = c('object', 'comp', 'rad.in', 'var.label')
     
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
-    
+	if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+	
 	
     # calcul des coordonnées #
     #------------------------#
@@ -1236,8 +1236,8 @@ function(object,
     match.function = c('object', 'comp', 'rad.in', 'var.label')
     
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
-    
+	if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+	
 	
     # calcul des coordonnées #
     #------------------------#
@@ -1304,7 +1304,7 @@ function(object,
     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
     
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
     
 
 
@@ -1480,7 +1480,7 @@ plotVar.sgcca <-
     # what the function is expecting
     match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
     
     
     
@@ -1667,7 +1667,7 @@ plotVar.rgcca <-
     # what the function is expecting
     match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
     
     
     

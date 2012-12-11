@@ -7,13 +7,12 @@
 \alias{unmap}
 \alias{pcasvd}
 
-\alias{spls.model}
-\alias{splsda.model}
 
 
 \alias{ica.def}
 \alias{ica.par}
 
+\alias{check.one.level}
 \alias{Split.variation.one.level}
 \alias{Split.variation.two.level}
 

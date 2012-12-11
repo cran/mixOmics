@@ -23,36 +23,36 @@ representation in (regularized) CCA, (sparse) PLS regression, (sparse)RGCCA and 
           rep.space = "XY-variate",
           X.label = NULL, Y.label = NULL,
           col = "black", cex = 1, pch = 1, 
-          abline.line = TRUE, \ldots)
+          abline.line = FALSE, \ldots)
 	  
 \method{plotIndiv}{pls}(object, comp = 1:2, 
 			ind.names = TRUE,
           rep.space = "X-variate",
           X.label = NULL, Y.label = NULL,  
           col = "black", cex = 1, pch = 1, 
-          abline.line = TRUE,\ldots)	
+          abline.line = FALSE,\ldots)	
 
 \method{plotIndiv}{spls}(object, comp = 1:2, ind.names = TRUE,
           rep.space = "X-variate",
           X.label = NULL, Y.label = NULL,  
           col = "black", cex = 1, pch = 1, 
-          abline.line = TRUE,\ldots)
+          abline.line = FALSE,\ldots)
 
 \method{plotIndiv}{pca}(object, comp = 1:2, ind.names = TRUE,
           X.label = NULL, Y.label = NULL, 
-          abline.line = TRUE,\ldots)
+          abline.line = FALSE,\ldots)
 
 \method{plotIndiv}{spca}(object, comp = 1:2, ind.names = TRUE,
           X.label = NULL, Y.label = NULL, 
-          abline.line = TRUE,\ldots)
+          abline.line = FALSE,\ldots)
 
 \method{plotIndiv}{rgcca}(object, comp = 1:2, ind.names = TRUE, rep.space = 1,
     X.label = NULL, Y.label = NULL,  col = "black", cex = 1, pch = 1, 
-    abline.line = TRUE,\ldots)
+    abline.line = FALSE,\ldots)
 
 \method{plotIndiv}{sgcca}(object, comp = 1:2, ind.names = TRUE, rep.space = 1,
     X.label = NULL, Y.label = NULL,  col = "black", cex = 1, pch = 1, 
-    abline.line = TRUE, \ldots)
+    abline.line = FALSE, \ldots)
 
 		  
 }
@@ -74,7 +74,7 @@ For objects of class \code{"rgcca"} and \code{"sgcca"}, numerical value indicati
   \item{cex}{numeric character (or symbol) expansion, possibly vector.}
   \item{pch}{plot character. A character string or a vector of single characters 
 	or integers. See \code{\link{points}} for all alternatives.}
-\item{abline.line}{should the vertical and horizontal line through the center be plotted?default set to \code{TRUE}}
+\item{abline.line}{should the vertical and horizontal line through the center be plotted?default set to \code{FALSE}}
   \item{\dots}{further graphical parameters are passed 
 	to \code{\link{text}}.}
 }

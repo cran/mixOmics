@@ -65,6 +65,9 @@ that contains the following components:
 	\eqn{Y} variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
   \item{nzv}{list containing the zero- or near-zero predictors information.}
+  \item{tol}{the tolerance used in the iterative algorithm, used for subsequent S3 methods}
+  \item{max.iter}{the maximum number of iterations, used for subsequent S3 methods}
+
 }
 
 \references{
@@ -89,7 +92,7 @@ In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N
 \seealso{\code{\link{pls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
-\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{valid}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{perf}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 data(liver.toxicity)

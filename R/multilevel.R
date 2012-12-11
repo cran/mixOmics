@@ -1,5 +1,5 @@
 # Copyright (C) 2012 
-# Benoit Liquet, Universite de Bordeaux, France
+# Benoit Liquet, Université de Bordeaux, France
 # Kim-Anh Lê Cao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Brisbane, Australia
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -30,46 +30,60 @@ multilevel <-  function (X, Y = NULL,
                          max.iter = 500, 
                          tol = 1e-06,...) {
   
-  # checking general input parameters
-  X = as.matrix(X)
-  # X input
-  if (length(dim(X)) != 2 || !is.numeric(X)) 
-    stop("'X' must be a numeric matrix.")
+  # check parameter input
+  check.one.level(X, Y, 
+                  cond ,                  
+                  sample,
+                  ncomp,
+                  keepX,
+                  keepY,  # for spls
+                  method ,
+                  tab.prob.gene, # remove?
+                  max.iter, 
+                  tol,...)
   
-  # Testing the cond vector
-  if(is.null(cond)) stop('Vector cond is missing', call. = FALSE)
-    
-  # ncomp
-  if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0) stop("invalid number of components, 'ncomp'.")
+  #   # checking general input parameters
+  #   X = as.matrix(X)
+  #   # X input
+  #   if (length(dim(X)) != 2 || !is.numeric(X)) 
+  #     stop("'X' must be a numeric matrix.")
+  #   
+  #   # Testing the cond vector
+  #   if(is.null(cond)) stop('Vector cond is missing', call. = FALSE)
+  #     
+  #   # ncomp
+  #   if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0) stop("invalid number of components, 'ncomp'.")
+  #   
+  #   #checking sample
+  #   if(is.null(sample)) stop('Vector sample is missing', call. = FALSE)
+  #   if(!is.null(dim(sample))) stop('sample should be a vector indicating the repeated measurements')
+  #   if(length(sample) != nrow(X)) stop('X and the vector sample should have the same number of subjects')
+  #   # check that the sample numbers are repeated
+  #   if(length(summary(as.factor(sample))) == nrow(X)) stop('Check that the vector sample reflects the repeated measurements')
   
-  #checking sample
-  if(is.null(sample)) stop('Vector sample is missing', call. = FALSE)
-  if(!is.null(dim(sample))) stop('sample should be a vector indicating the repeated measurements')
-  if(length(sample) != nrow(X)) stop('X and the vector sample should have the same number of subjects')
-  # check that the sample numbers are repeated
-  if(length(summary(as.factor(sample))) == nrow(X)) stop('Check that the vector sample reflects the repeated measurements')
   if(is.factor(sample)){
     sample = as.numeric(sample)
     warning('the vector sample was converted into a numeric vector', call. = FALSE)
   }
-  #check that the sample are numbered from 1
-  if(!any(names(summary(as.factor(sample))) == '1')) {
-    cat('The vector sample includes the values: ', as.vector(names(summary(as.factor(sample)))), '\n')
-    stop('sample vector', call. =FALSE)
-  }
   
-  # method
-  if(is.null(method)) stop('Input method missing, should be set to splsda or spls', call. = FALSE)
+  #   #check that the sample are numbered from 1
+  #   if(!any(names(summary(as.factor(sample))) == '1')) {
+  #     cat('The vector sample includes the values: ', as.vector(names(summary(as.factor(sample)))), '\n')
+  #     stop('sample vector', call. =FALSE)
+  #   }
+  #   
+  #   # method
+  #   if(is.null(method)) stop('Input method missing, should be set to splsda or spls', call. = FALSE)
   
   
   # call the multilevel approach
   if(method == 'splsda'){
     # apply one or two-factor analysis with splsda
-      result = multilevel.splsda(X = X, cond = cond, sample = sample, ncomp=ncomp, keepX = keepX, tab.prob.gene = tab.prob.gene)
-    }else{
-      # spls
-      result = multilevel.spls(X = X, Y=Y, cond = cond, sample = sample, ncomp = ncomp, keepX=keepX, keepY = keepY, tab.prob.gene = tab.prob.gene)
-    }
+    result = multilevel.splsda(X = X, cond = cond, sample = sample, ncomp=ncomp, keepX = keepX, tab.prob.gene = tab.prob.gene)
+  }else{
+    # spls
+    result = multilevel.spls(X = X, Y=Y, cond = cond, sample = sample, ncomp = ncomp, keepX=keepX, keepY = keepY, tab.prob.gene = tab.prob.gene)
+  }
   
   return(result)
 }
@@ -92,7 +106,7 @@ multilevel.splsda <-  function (X,
   factor2 = FALSE
   
   #-- check input parameters --#
-
+  
   # Testing the input cond and setting the 1 or 2 factor analysis   
   if (is.null(dim(cond))) {  # if cond is a vector: 1 factor analysis
     factor1 = TRUE
@@ -124,7 +138,7 @@ multilevel.splsda <-  function (X,
     if(nrow(X) != nrow(cond)) stop('X and cond should have the same number of subjects')
   }
   
-
+  
   
   # --multilevel analysis  
   # Variance decomposition for 1 or 2 factors
@@ -161,12 +175,12 @@ multilevel.spls <-  function (X, Y,
                               max.iter = 500, tol = 1e-06,...) {
   
   #-- check input parameters --#
-
+  
   # Y input
   Y = as.matrix(Y)
   if (length(dim(Y)) != 2 || !is.numeric(Y)) 
     stop("'Y' must be a numeric matrix.")
-
+  
   
   # set the mode 
   mode="canonical"
@@ -192,11 +206,68 @@ multilevel.spls <-  function (X, Y,
 
 
 
-###########################################################################################
+# -----------------------------------------------------------------------------------------
+#                               internal functions
+# ----------------------------------------------------------------------------------------
+
+# ----------------
+# check.one.level
+# -----------------
+check.one.level = function(X, Y, 
+                           cond ,                  
+                           sample,
+                           ncomp,
+                           keepX,
+                           keepY,  # for spls
+                           method ,
+                           tab.prob.gene, # remove?
+                           max.iter, 
+                           tol,...){
+  
+  # checking general input parameters
+  X = as.matrix(X)
+  # X input
+  if (length(dim(X)) != 2 || !is.numeric(X)) 
+    stop("'X' must be a numeric matrix.")
+  
+  # Testing the cond vector
+  if(is.null(cond)) stop('Vector cond is missing', call. = FALSE)
+  
+  # ncomp
+  if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0) stop("invalid number of components, 'ncomp'.")
+  
+  #checking sample
+  if(is.null(sample)) stop('Vector sample is missing', call. = FALSE)
+  if(!is.null(dim(sample))) stop('sample should be a vector indicating the repeated measurements')
+  if(length(sample) != nrow(X)) stop('X and the vector sample should have the same number of subjects')
+  # check that the sample numbers are repeated
+  if(length(summary(as.factor(sample))) == nrow(X)) stop('Check that the vector sample reflects the repeated measurements')
+  
+  
+  #check that the sample are numbered from 1
+  if(!any(names(summary(as.factor(sample))) == '1')) {
+    cat('The vector sample includes the values: ', as.vector(names(summary(as.factor(sample)))), '\n')
+    stop('sample vector', call. =FALSE)
+  }
+  
+  # method
+  if(is.null(method)) stop('Input method missing, should be set to splsda or spls', call. = FALSE)
+  
+}
+
+# --------------------------------------
 ### Split.variation.one.level: decomposition of the variance (within matrix and between matrix) for one level
-###########################################################################################
+# --------------------------------------
 
 Split.variation.one.level <- function(X,Y,sample){
+  
+  X = as.matrix(X)
+  
+  # check sample is numeric
+  if(is.factor(sample)){
+    sample = as.numeric(sample)
+    warning('the vector sample was converted into a numeric vector', call. = FALSE)
+  }
   
   Xmi <- colMeans(X)
   Xm <- matrix(Xmi,nrow=nrow(X),ncol=ncol(X),byrow=T)
@@ -214,13 +285,18 @@ Split.variation.one.level <- function(X,Y,sample){
 }
 
 
-
-###########################################################################################
+###--------------------------------------
 ### Split.variation.two.level: decomposition of the variance (within matrix and between matrix) for two level
-###########################################################################################
+###--------------------------------------
 
 
-Split.variation.two.level <- function(X,factor1,factor2,sample){
+Split.variation.two.level <- function(X, factor1, factor2, sample){
+  
+  if(is.factor(sample)){
+    sample = as.numeric(sample)
+    warning('the vector sample was converted into a numeric vector', call. = FALSE)
+  }
+  
   ######## off set term
   Xmi <- colMeans(X)
   Xm <- matrix(Xmi,nrow=nrow(X),ncol=ncol(X),byrow=T)
@@ -250,13 +326,13 @@ Split.variation.two.level <- function(X,factor1,factor2,sample){
     xbfactor2[indice,] <- t(res1)
   }
   
-  ###fixed effect#########################################################################################
+  ###fixed effect###
   matfactor1 <- matrix(factor1,nrow=1,ncol=length(factor1))
   XFACTOR1 <- apply(matfactor1,MARGIN=2,FUN=function(x,matfactor1){indice<-which(matfactor1==x[1]);res <- colMeans(X[indice,]);return(res)},matfactor1=matfactor1)
   
   matfactor2 <- matrix(factor2,nrow=1,ncol=length(factor2))
   XFACTOR2 <- apply(matfactor2,MARGIN=2,FUN=function(x,matfactor2){indice<-which(matfactor2==x[1]);res <- colMeans(X[indice,]);return(res)},matfactor2=matfactor2)
-  ########################################################################################################
+  #########
   
   XCS <- xbfactor1-Xs+Xm-t(XFACTOR1)
   XTS <- xbfactor2-Xs+Xm-t(XFACTOR2)

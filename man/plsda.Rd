@@ -42,10 +42,13 @@ that contains the following components:
   \item{loadings}{list containing the estimated loadings for the variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
   \item{nzv}{list containing the zero- or near-zero predictors information.}
+   \item{tol}{the tolerance used in the iterative algorithm, used for subsequent S3 methods}
+  \item{max.iter}{the maximum number of iterations, used for subsequent S3 methods}
+
 }
 
 \references{
-Pérez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
+PÃ©rez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
 a partial least squares discriminant analysis (PLS-DA) approach. \emph{Human Genetics} 
 \bold{112}, 581-592.
 
@@ -53,14 +56,14 @@ Nguyen, D. V. and Rocke, D. M. (2002). Tumor classification by partial
 least squares using microarray gene expression data. \emph{Bioinformatics}
 \bold{18}, 39-50.
 
-Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.
+Tenenhaus, M. (1998). \emph{La rÃ©gression PLS: thÃ©orie et pratique}. Paris: Editions Technic.
 }
 
-\author{Ignacio González, Kim-Anh Lê Cao and Pierre Monget.}
+\author{Ignacio GonzÃ¡lez, Kim-Anh LÃª Cao and Pierre Monget.}
 
 \seealso{\code{\link{splsda}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}, \code{\link{predict}}, \code{\link{valid}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}, \code{\link{predict}}, \code{\link{perf}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 ## First example
