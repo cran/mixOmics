@@ -19,17 +19,17 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-pcatune <-
+tune.pca <-
 function(X, 
          ncomp = NULL, 
          center = TRUE, 	# sets the mean of the data to zero, ensures that the first PC describes the direction of the maximum variance
-         scale. = FALSE, 	# variance is unit accross different units
+         scale = FALSE, 	# variance is unit accross different units
          max.iter = 500,      
          tol = 1e-09)
      
 {
     X = as.matrix(X) 	
-    X = scale(X, center = center, scale = scale.)
+    X = scale(X, center = center, scale = scale)
     sc = attr(X, "scaled:scale")
     if (any(sc == 0)) {
             stop("cannot rescale a constant/zero column to unit variance.")###???? is this where this should be?
@@ -58,7 +58,7 @@ function(X,
         result$sdev =(result$eig/sqrt(max(1, nrow(X) - 1)))^2
         }
     if(!na.X){
-        result = pcasvd(X, ncomp = ncomp., center = center, scale. = scale.)
+        result = pcasvd(X, ncomp = ncomp., center = center, scale = scale)
         result$sdev = result$sdev^2
         }
     }

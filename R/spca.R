@@ -28,19 +28,30 @@ spca <-
 function(X, 
          ncomp = 3, 
          center = TRUE, 
-         scale. = TRUE,
+         scale = TRUE,
          keepX = rep(ncol(X), ncomp),
-         iter.max = 500, 
+         max.iter = 500, 
          tol = 1e-06)
 {
 
     #--scaling the data--#
-    X=scale(X,center=center,scale=scale.)
+    X=scale(X,center=center,scale=scale)
     cen = attr(X, "scaled:center")
     sc = attr(X, "scaled:scale")
     if (any(sc == 0)) 
         stop("cannot rescale a constant/zero column to unit variance.")
 
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('X', 'ncomp', 'center', 'scale', 'keepX', 'max.iter', 'tol')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
+    
     #--initialization--#
     X=as.matrix(X)
     X.temp=as.matrix(X)
@@ -120,7 +131,7 @@ function(X,
             if(crossprod(u.new-u.old)<tol){u.stab=TRUE}
             if(crossprod(v.new-v.old)<tol){v.stab=TRUE}
             
-            if ((is.na(v.stab)) | (is.na(u.stab)) | (iter >= iter.max))
+            if ((is.na(v.stab)) | (is.na(u.stab)) | (iter >= max.iter))
             {v.stab=TRUE; u.stab=TRUE}
         
        }##fin while v
@@ -148,7 +159,10 @@ function(X,
     
     rownames(mat.u) = ind.names
 
-    result = (list(X = X,
+    cl = match.call()
+		cl[[1]] = as.name('spca')
+
+    result = (list(call = cl, X = X,
 		   ncomp = ncomp,	
                    #sdev = sdev,  # KA: to add if biplot function (but to be fixed!)
                    #center = center, # KA: to add if biplot function (but to be fixed!)

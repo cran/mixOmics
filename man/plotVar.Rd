@@ -8,11 +8,13 @@
 \alias{plotVar.splsda}
 \alias{plotVar.pca}
 \alias{plotVar.spca}
+\alias{plotVar.sgcca}
+\alias{plotVar.rgcca}
 
 \title{Plot of Variables}
 
 \description{
-This function provides variables representation for (regularized) CCA, (sparse) PLS regression and PCA.
+This function provides variables representation for (regularized) CCA, (sparse) PLS regression, PCA nd (sparse) Regularized generalised CCA.
 }
 
 \usage{
@@ -42,6 +44,21 @@ This function provides variables representation for (regularized) CCA, (sparse) 
 \method{plotVar}{spca}(object, comp = 1:2, rad.in = 0.5, 
         var.label = FALSE, pch = NULL, cex = NULL, col = NULL, 
         font = NULL, \ldots)	
+
+\method{plotVar}{rgcca}(object, comp = c(1,2), block = c(1,2),
+           labels = FALSE, pch = c(16,17), cex =  c(0.5, 0.5), 
+           col = c('green', 'blue'), font = c(2,3), rad.in = 0.5, 
+           \ldots) 
+        
+\method{plotVar}{sgcca}(object, 
+comp = c(1,2), 
+block = c(1,2), ncomp.select = c(1,2), 
+labels = FALSE, pch = c(16,17), 
+cex =  c(0.5, 0.5), 
+col = c('green', 'blue'), 
+font = c(2,3), 
+rad.in = 0.5,\ldots)	
+         
 }
 
 \arguments{
@@ -52,15 +69,17 @@ This function provides variables representation for (regularized) CCA, (sparse) 
   \item{rad.in}{numeric between 0 and 1, the radius of the inner circle. Defaults to \code{0.5}.}
   \item{cutoff}{numeric between 0 and 1. Variables with correlations below this cutoff 
     in absolute value are not plotted (see Details).}
-  \item{X.label, Y.label, var.label}{either a character vector of names for the variables 
+  \item{X.label, Y.label, var.label, labels}{either a character vector of names for the variables 
     or \code{FALSE} for no names. If \code{TRUE}, the columns names 
 	of the matrice are used as labels.}	
-  \item{col}{character or integer vector of colors for plotted character and symbols. 
+  \item{col}{character or integer vector of colors for plotted character and symbols, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables). 
 	See Details.}
   \item{pch}{plot character. A vector of single characters 
-	or integers. See \code{\link{points}} for all alternatives.}
-  \item{cex}{numeric vector of character expansion sizes for the plotted character and symbols.}
-  \item{font}{numeric vector of font to be used. See \code{\link{par}} for details.}
+	or integers, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables). See \code{\link{points}} for all alternatives.}
+  \item{cex}{numeric vector of character expansion sizes for the plotted character and symbols, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables).}
+  \item{font}{numeric vector of font to be used, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables). See \code{\link{par}} for details.}
+  \item{block}{for an object of class \code{"rgcca"} or \code{"sgcca"}, a numerical vector indicating the block variables to display.}
+  \item{ncomp.select}{for the sparse versions, an input vector indicating the components on which the variables were selected. Only those selected variables are displayed.}
   \item{\ldots}{not used currently.}
 }
 
@@ -96,12 +115,16 @@ A list containing the following components:
   \item{coord.Y}{matrix of \eqn{Y}-variables coordinates.}
 }
 
-\author{Sébastien Déjean and Ignacio González.}
+\author{S\'ebastien D\'ejean, Ignacio Gonz\'alez, Kim-Anh L\^e Cao.}
+
+\references{Gonz\'alez I., L\^e Cao K-A., Davis, M.J. and D\'ejean, S. (2012). Visualising associations between paired ?omics? data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}}
+
 
 \seealso{\code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}}, \code{\link{par}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
 ## variable representation for objects of class 'rcc'
+# ----------------------------------------------------
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
@@ -113,6 +136,7 @@ plotVar(nutri.res, comp = 1:2, cutoff = 0.5,
         X.label = TRUE, Y.label = TRUE)
 
 ## variable representation for objects of class 'pls' or 'spls'
+# ----------------------------------------------------
 data(liver.toxicity)
 X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
@@ -122,6 +146,7 @@ toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50),
 plotVar(toxicity.spls, keep.var = TRUE, Y.label = TRUE, cex = c(1,0.8))	
 
 ## variable representation for objects of class 'splsda'
+# ----------------------------------------------------
 \dontrun{
 data(liver.toxicity)
 X <- liver.toxicity$gene
@@ -133,6 +158,30 @@ keepX <- rep(20, ncomp)
 splsda.liver <- splsda(X, Y, ncomp = ncomp, keepX = keepX)
 plotVar(splsda.liver, var.label = FALSE)
 }
+
+## variable representation for objects of class 'sgcca' (or 'rgcca')
+# ----------------------------------------------------
+data(nutrimouse)
+
+# need to unmap the Y factor diet
+Y = unmap(nutrimouse$diet)
+data = list(nutrimouse$gene, nutrimouse$lipid,Y)
+# with this design, gene expression and lipids are connected to the diet factor
+# and gene expression and lipids are also connected
+design = matrix(c(0,1,1,
+                  1,0,1,
+                  1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
+
+#note: the penalty parameters will need to be tuned
+wrap.result.sgcca = wrapper.sgcca(data = data, design = design, penalty = c(.3,.5, 1), 
+                                  ncomp = c(2, 2, 1),
+                                  scheme = "centroid", verbose = FALSE)
+par(mfrow=c(2,2))
+plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = c(1,2))
+plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = c(1,2), labels = TRUE)
+plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = 1, labels = TRUE)
+plotVar(wrap.result.sgcca, comp = c(1,2), block = 1, ncomp.select = 1, labels = TRUE)
+par(mfrow=c(1,1))
 }
 
 \keyword{multivariate}

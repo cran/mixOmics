@@ -14,12 +14,10 @@ PLS-DA and sparse PLS-DA models. M-fold and leave-one-out cross-validation are i
 }
 
 \usage{
-\method{valid}{pls}(object, criterion = c("all", "MSEP", "R2", "Q2"), 
-      validation = c("Mfold", "loo"), folds = 10,
+\method{valid}{pls}(object, validation = c("Mfold", "loo"), folds = 10,
       max.iter = 500, tol = 1e-06, \ldots)	
 
-\method{valid}{spls}(object, criterion = c("all", "MSEP", "R2", "Q2"), 
-      validation = c("Mfold", "loo"), folds = 10,
+\method{valid}{spls}(object,  validation = c("Mfold", "loo"), folds = 10,
          max.iter = 500, tol = 1e-06, \ldots)
 
 \method{valid}{plsda}(object, method = c("all", "max.dist", "centroids.dist", 
@@ -36,8 +34,6 @@ PLS-DA and sparse PLS-DA models. M-fold and leave-one-out cross-validation are i
 \arguments{
   \item{object}{object of class inheriting from \code{"pls"}, \code{"plsda"}, 
     \code{"spls"} or \code{"splsda"}.}
-  \item{criterion}{what type of validation criterion to be used for \code{pls} or \code{spls}. Should be a subset 
-    of \code{"MSEP"}, \code{"R2"} or \code{"Q2"}. Default is \code{"all"}.}
   \item{method}{prediction method to be applied for \code{plsda} or \code{splsda}. Should be a subset 
     of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. 
 	Default is \code{"all"}. See \code{\link{predict}}.}
@@ -52,9 +48,7 @@ PLS-DA and sparse PLS-DA models. M-fold and leave-one-out cross-validation are i
 \details{
 For fitted PLS and sPLS regression models, \code{valid} estimates the 
 mean squared error of prediction (MSEP), \eqn{R^2}, and \eqn{Q^2} to assess the predictive 
-validity of the model using M-fold or 
-leave-one-out cross-validation. Note that only the \code{classic}, \code{regression} and 
-\code{invariant} modes can be applied.
+validity of the model using M-fold or leave-one-out cross-validation. Note that only the \code{classic}, \code{regression} and  \code{invariant} modes can be applied.
 
 If \code{validation = "Mfold"}, M-fold cross-validation is performed. 
 How many folds to generate is selected by specifying the number of folds in \code{folds}.
@@ -74,8 +68,8 @@ For PLS and sPLS models, \code{valid} produces a list with the following compone
   \item{R2}{a matrix of \eqn{R^2} values of the \eqn{Y}-variables for models 
     with \eqn{1, \ldots ,}\code{ncomp} components.}
   \item{Q2}{if \eqn{Y} containts one variable, a vector of \eqn{Q^2} values else a list with 
-    a matrix of \eqn{Q^2} values for each \eqn{Y}-variable and a vector of \eqn{Q^2}-total values for models 
-    with \eqn{1, \ldots ,}\code{ncomp} components.}	
+    a matrix of \eqn{Q^2} values for each \eqn{Y}-variable. Note that in the specific case of an sPLS model, it is better to have a look at the Q2.total criterion.}	
+    \item{Q2.total}{a vector of \eqn{Q^2}-total values for models with \eqn{1, \ldots ,}\code{ncomp} components.}
 	
 For PLS-DA and sPLS-DA models, \code{valid} produces a matrix of classification error rate estimation. 
 The dimensions correspond to the components in the model and to the prediction method used, respectively.
@@ -97,29 +91,87 @@ Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of C
 \seealso{\code{\link{predict}}, \code{\link{nipals}}, \code{\link{plot.valid}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
-## validation for objects of class 'pls' or 'spls'
+## validation for objects of class 'pls' (regression)
+# ----------------------------------------
 \dontrun{
 data(liver.toxicity)
 X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
 
-liver.pls <- pls(X, Y, ncomp = 3)
-liver.val <- valid(liver.pls, validation = "Mfold")
-				   
-plot(liver.val, criterion = "R2", type = "l", layout = c(2, 2))
-}
 
-## validation for objects of class 'plsda' or 'splsda'
+# try tune the number of component to choose
+# ---------------------
+# first learn the full model
+liver.pls <- pls(X, Y, ncomp = 10)
+
+# with 5-fold cross validation: we use the same parameters as in model above
+# but we perform cross validation to compute the MSEP, Q2 and R2 criteria
+# ---------------------------
+liver.val <- valid(liver.pls, validation = "Mfold", folds = 5)
+
+# Q2 total should decrease until it reaches a threshold
+liver.val$Q2.total
+
+# ncomp = 3 is enough
+plot(liver.val$Q2.total, type = 'l', col = 'red', ylim = c(-0.1, 0.5), 
+	xlab = 'PLS components', ylab = 'Q2 total')
+abline(h = 0.0975, col = 'darkgreen')
+legend('topright', col = c('red', 'darkgreen'), legend = c('Q2 total', 'threshold 0.0975')
+	, lty = 1)
+title('Liver toxicity PLS 5-fold, Q2 values')
+
+#have a look at the other criteria
+# ----------------------
+# R2
+liver.val$R2
+matplot(t(liver.val$R2), type = 'l', xlab = 'PLS components', ylab = 'R2 for each variable')
+title('Liver toxicity PLS 5-fold, R2 values')
+
+# MSEP
+liver.val$MSEP
+matplot(t(liver.val$MSEP), type = 'l', xlab = 'PLS components', ylab = 'MSEP for each variable')
+title('Liver toxicity PLS 5-fold, MSEP values')
+
+
+## validation for objects of class 'spls' (regression)
+# ----------------------------------------
+ncomp = 7
+# first, learn the model on the whole data set
+model.spls = spls(X, Y, ncomp = ncomp, mode = 'regression',
+	 keepX = c(rep(5, ncomp)), keepY = c(rep(2,ncomp)))
+
+
+# with leave-one-out cross validation
+set.seed(45)
+model.spls.loo.val <- valid(model.spls, validation = "loo")
+
+#Q2 total
+model.spls.loo.val$Q2.total
+
+# R2:we can see how the performance degrades when ncomp increases
+# results are similar to 5-fold
+model.spls.loo.val$R2
+
+
+## validation for objects of class 'splsda' (classification)
+# ----------------------------------------
 data(srbct)
 X <- srbct$gene
 Y <- srbct$class  
 
 ncomp = 5
+
 srbct.splsda <- splsda(X, Y, ncomp = ncomp, keepX = rep(10, ncomp))  
+
+# with Mfold
+# ---------
+set.seed(45)
 error <- valid(srbct.splsda, validation = "Mfold", folds = 8, 
                method = "all")
 
 plot(error, type = "l")
+}
+
 }
 
 \keyword{regression}

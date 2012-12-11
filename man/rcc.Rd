@@ -76,7 +76,7 @@ Vinod, H. D. (1976). Canonical ridge and econometrics of joint production.
 
 \author{Sébastien Déjean and Ignacio González.}
 
-\seealso{\code{\link{summary}}, \code{\link{estim.regul}}, 
+\seealso{\code{\link{summary}}, \code{\link{tune.rcc}}, 
 \code{\link{plot.rcc}}, \code{\link{plotIndiv}}, \code{\link{plot3dIndiv}},
 \code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 

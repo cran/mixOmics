@@ -45,7 +45,7 @@ function(mat,
 	 ...) 
 {
 
-    # validation des arguments #
+  # validation des arguments #
 	#--------------------------#
 	if (length(dim(mat)) != 2) 
         stop("'mat' must be a numeric matrix.")
@@ -142,7 +142,8 @@ function(mat,
 	E(gR)$width = lwd.edge[1]
 	E(gR)$width[E(gR)$weight < 0] = lwd.edge[2]
 	
-	gR = delete.vertices(gR, which(degree(gR) == 0) - 1)
+#	gR = delete.vertices(gR, which(degree(gR) == 0) - 1)
+	gR = delete.vertices(gR, which(degree(gR) == 0))
 	
 	# Attributs pour le plot #
 	#------------------------#
@@ -333,7 +334,8 @@ function(mat,
 				# Génère un graphe avec toutes les arêtes signifiantes #
 				#------------------------------------------------------#
 				gE = delete.edges(gR, supp.edge)
-				gE = delete.vertices(gE, which(degree(gE) == 0) - 1)
+#				gE = delete.vertices(gE, which(degree(gE) == 0) - 1)
+				gE = delete.vertices(gE, which(degree(gE) == 0))
 				
 				# Plot du graphe #
 				#----------------#
@@ -385,7 +387,8 @@ function(mat,
 				# Génère un graphe avec toutes les arêtes signifiantes #
 				#------------------------------------------------------#
 				gE = delete.edges(gR, supp.edge)
-				gE = delete.vertices(gE, which(degree(gE) == 0) - 1)
+#				gE = delete.vertices(gE, which(degree(gE) == 0) - 1)
+				gE = delete.vertices(gE, which(degree(gE) == 0))
 
 				# Plot du graphe #
 				#----------------#

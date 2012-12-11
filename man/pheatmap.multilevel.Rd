@@ -12,33 +12,73 @@ A function to draw clustered heatmaps from the pheatmap package.
 
 \usage{
 \method{pheatmap.multilevel}{splsda1fact}(result, cluster = NULL,
-color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF",
-                   "#E0F3F8", "#91BFDB", "#4575B4")))(100),
-col_sample=NULL, col_stimulation=NULL,label_annotation=NULL, 
-breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, 
-scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, 
-clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", 
-clustering_method = "complete", treeheight_row = ifelse(cluster_rows, 50, 0), 
-treeheight_col = ifelse(cluster_cols, 50, 0), 
-legend = TRUE, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, 
-show_rownames = TRUE, show_colnames = TRUE, fontsize = 10, fontsize_row = fontsize, 
-fontsize_col = fontsize, filename = NA, width = NA, height = NA,order_sample=NULL, 
-...) 
+                    color=colorRampPalette(rev(c("#D73027", 
+                    "#FC8D59", "#FEE090", "#FFFFBF",
+                    "#E0F3F8", "#91BFDB", "#4575B4")))(100),
+                    col_sample=NULL, 
+                    col_stimulation=NULL,
+                    label_annotation=NULL, 
+                    breaks = NA, 
+                    border_color = "grey60", 
+                    cellwidth = NA, 
+                    cellheight = NA, 
+                    scale = "none", 
+                    cluster_rows = TRUE, 
+                    cluster_cols = TRUE, 
+                    clustering_distance_rows = "euclidean", 
+                    clustering_distance_cols = "euclidean", 
+                    clustering_method = "complete", 
+                    treeheight_row = ifelse(cluster_rows, 50, 0), 
+                    treeheight_col = ifelse(cluster_cols, 50, 0), 
+                    legend = TRUE, annotation = NA, 
+                    annotation_colors = NA, 
+                    annotation_legend = TRUE, 
+                    show_rownames = TRUE, 
+                    show_colnames = TRUE, 
+                    fontsize = 10, 
+                    fontsize_row = fontsize, 
+                    fontsize_col = fontsize, 
+                    filename = NA, 
+                    width = NA, 
+                    height = NA,
+                    order_sample=NULL, 
+                    ...) 
 \method{pheatmap.multilevel}{splsda2fact}(result,  cluster = NULL,
-color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF",
-         "#E0F3F8", "#91BFDB", "#4575B4")))(100),
-col_sample=NULL, col_stimulation=NULL, col_time=NULL,   
-label_color_stimulation=NULL,label_color_time=NULL, 
-label_annotation=NULL, 
-breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, 
-scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, 
-clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", 
-clustering_method = "complete", treeheight_row = ifelse(cluster_rows, 50, 0), 
-treeheight_col = ifelse(cluster_cols, 50, 0), 
-legend = TRUE, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, 
-show_rownames = TRUE, show_colnames = TRUE, fontsize = 10, fontsize_row = fontsize, 
-fontsize_col = fontsize, filename = NA, width = NA, height = NA,order_sample=NULL, 
-...)
+                    color=colorRampPalette(rev(c("#D73027", 
+                    "#FC8D59", "#FEE090", "#FFFFBF",
+                    "#E0F3F8", "#91BFDB", "#4575B4")))(100),
+                    col_sample=NULL, 
+                    col_stimulation=NULL, 
+                    col_time=NULL,   
+                    label_color_stimulation=NULL,
+                    label_color_time=NULL, 
+                    label_annotation=NULL, 
+                    breaks = NA, 
+                    border_color = "grey60", 
+                    cellwidth = NA, 
+                    cellheight = NA, 
+                    scale = "none", 
+                    cluster_rows = TRUE, 
+                    cluster_cols = TRUE, 
+                    clustering_distance_rows = "euclidean", 
+                    clustering_distance_cols = "euclidean", 
+                    clustering_method = "complete", 
+                    treeheight_row = ifelse(cluster_rows, 50, 0), 
+                    treeheight_col = ifelse(cluster_cols, 50, 0), 
+                    legend = TRUE, 
+                    annotation = NA, 
+                    annotation_colors = NA, 
+                    annotation_legend = TRUE, 
+                    show_rownames = TRUE, 
+                    show_colnames = TRUE, 
+                    fontsize = 10, 
+                    fontsize_row = fontsize, 
+                    fontsize_col = fontsize, 
+                    filename = NA, 
+                    width = NA, 
+                    height = NA,
+                    order_sample=NULL, 
+                    ...)
 }	
 
 \arguments{
@@ -110,20 +150,22 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
 ## First example: one-factor analysis with sPLS-DA
 data(data.simu) # simulated data
 res.1level <- multilevel(data.simu$X, cond = data.simu$stimu, sample=data.simu$sample, ncomp=3,
-     keepX=c(200,200,200),tab.prob.gene=NULL, method = 'splsda')
+                         keepX=c(200,200,200),tab.prob.gene=NULL, method = 'splsda')
 
 #color for heatmap
 col.stimu = as.numeric(data.simu$stimu)
 col.stimu <- c("darkblue","purple","green4","red3")
-col.sample <- c("lightgreen", "red","lightblue","darkorange","purple",
-"maroon","blue","chocolate","turquoise","tomato1","pink2","aquamarine")
+col.sample <- c("lightgreen", "red","lightblue","darkorange",
+  "purple","maroon","blue","chocolate","turquoise","tomato1",
+  "pink2","aquamarine")
 
 pheatmap.multilevel(res.1level, col_sample=col.sample, col_stimulation=col.stimu, 
-    label_annotation=NULL,border=FALSE,clustering_method="ward",
-    show_colnames = FALSE,show_rownames = TRUE,fontsize_row=2)
+              label_annotation=NULL,border=FALSE,clustering_method="ward",
+              show_colnames = FALSE,show_rownames = TRUE,fontsize_row=2)
 
 
 ## Second example: two-factor analysis with sPLS-DA
+\dontrun{
 data(data.simu) # simulated data
 
 time = factor(rep(c(rep('t1', 6), rep('t2', 6)), 4))
@@ -131,7 +173,7 @@ stimu.time = data.frame(cbind(as.character(data.simu$stimu), as.character(time))
 repeat.simu2 = rep(c(1:6), 8)
 
 res.2level = multilevel(data.simu$X, cond = stimu.time,sample=repeat.simu2, 
-    ncomp=2,keepX=c(200, 200),tab.prob.gene=NULL, method = 'splsda')
+                        ncomp=2,keepX=c(200, 200),tab.prob.gene=NULL, method = 'splsda')
 
 # color for plotIndiv
 col.stimu = as.numeric(data.simu$stimu)
@@ -142,17 +184,17 @@ label.stimu = unique(data.simu$stimu)
 label.time = unique(time)
 
 pheatmap.multilevel(res.2level, 
-    col_sample=col.sample, 
-    col_stimulation=col.stimu, 
-    col_time=col.time,
-    label_color_stimulation=label.stimu,
-    label_color_time=label.time, 
-    label_annotation=NULL,border=FALSE,
-    clustering_method="ward",
-    show_colnames = FALSE,
-    show_rownames = TRUE,
-    fontsize_row=2)
-
+              col_sample=col.sample, 
+              col_stimulation=col.stimu, 
+              col_time=col.time,
+              label_color_stimulation=label.stimu,
+              label_color_time=label.time, 
+              label_annotation=NULL,border=FALSE,
+              clustering_method="ward",
+              show_colnames = FALSE,
+              show_rownames = TRUE,
+              fontsize_row=2)
+}
 }
 
 \keyword{regression}

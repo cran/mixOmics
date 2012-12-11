@@ -1,15 +1,12 @@
-import(rgl)
-import(lattice)
-import(igraph)
-importFrom(pheatmap, pheatmap)
+
+import(MASS, lattice, RGCCA, igraph, rgl, pheatmap)
 
 export(
 bin.color, 
 cim,   
-estim.regul,
 ica.par,
 ica.def,
-image.estim.regul, 
+image.tune.rcc, 
 imgCor,
 ipca,
 jet.colors,
@@ -24,7 +21,6 @@ nearZeroVar,
 network,
 nipals, 
 pca,
-pcatune,
 pcasvd,
 pheatmap.multilevel,
 plot3dIndiv, 
@@ -33,8 +29,6 @@ plotIndiv,
 plotVar, 
 pls,
 plsda, 
-q2.spls,
-q2.pls,
 rcc,
 scatterutil.base, 
 scatterutil.eti, 
@@ -53,9 +47,13 @@ tune.multilevel,
 tune.splsdalevel1,
 tune.splsdalevel2,
 tune.splslevel,
+tune.pca,
+tune.rcc,
 unmap,
 valid, 
-vip)
+vip,
+wrapper.rgcca,
+wrapper.sgcca)
 
 
 S3method(cim, default)
@@ -63,7 +61,7 @@ S3method(cim, rcc)
 S3method(cim, spls)
 S3method(cim, pls)
 
-S3method(image, estim.regul)
+S3method(image, tune.rcc)
 
 S3method(plot, rcc)
 S3method(plot, valid)
@@ -77,6 +75,8 @@ S3method(plotIndiv, rcc)
 S3method(plotIndiv, pca)
 S3method(plotIndiv, ipca)
 S3method(plotIndiv, sipca)
+S3method(plotIndiv, rgcca)
+S3method(plotIndiv, sgcca)
 
 S3method(plotVar, pls)
 S3method(plotVar, spls)
@@ -87,6 +87,8 @@ S3method(plotVar, pca)
 S3method(plotVar, spca)
 S3method(plotVar, ipca)
 S3method(plotVar, sipca)
+S3method(plotVar, sgcca)
+S3method(plotVar, rgcca)
 
 S3method(predict, pls)
 S3method(predict, spls)
@@ -107,6 +109,8 @@ S3method(print, pca)
 S3method(print, spca)
 S3method(print, ipca)
 S3method(print, sipca)
+S3method(print, sgcca)
+S3method(print, rgcca)
 
 S3method(plot3dIndiv, pls)
 S3method(plot3dIndiv, spls)
@@ -131,6 +135,7 @@ S3method(select.var, spls)
 S3method(select.var, splsda)
 S3method(select.var, spca)
 S3method(select.var, sipca)
+S3method(select.var, sgcca)
 
 S3method(network, default)
 S3method(network, rcc)

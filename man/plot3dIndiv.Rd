@@ -100,7 +100,7 @@ The pointing device of your graphics user-interface can also be used to set the 
 - right or wheel adjust zoom factor 
 }
 
-\author{Ignacio González}
+\author{Ignacio Gonzalez}
 
 \seealso{\code{\link{plotIndiv}}, \code{\link{plot3dVar}}, \code{\link[rgl]{text3d}}, 
 \code{\link[rgl]{title3d}} and \code{\link[rgl]{rgl.postscript}} to save the screen shot 

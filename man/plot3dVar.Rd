@@ -146,22 +146,23 @@ X <- nutrimouse$lipid
 Y <- nutrimouse$gene
 nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
+\dontrun{
 # default
 plot3dVar(nutri.res)
 
 # cutoff active, labeling the variables
 plot3dVar(nutri.res, cutoff = 0.7, X.label = TRUE, cex = c(0.8, 0.8))
-
+}
 ## 3D variable representation for objects of class 'pls' or 'spls'
 data(liver.toxicity)
 X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
 toxi.spls.1 <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50), 
                     keepY = c(10, 10, 10))
-        
+\dontrun{        
 plot3dVar(toxi.spls.1, rad.in = 0.5, keep.var = TRUE, cex = c(1, 0.8), 
           main = "Variables 3D representation") 
-
+}
 toxi.spls.2 <- spls(X, Y, ncomp = 3, keepX = c(10, 10, 10), 
                     keepY = c(10, 10, 10))
 					  
@@ -184,7 +185,9 @@ ncomp <- 3
 keepX <- rep(20, ncomp)
 
 splsda.liver <- splsda(X, Y, ncomp = ncomp, keepX = keepX)
+\dontrun{
 plot3dVar(splsda.liver, var.label = FALSE, Y.label = TRUE, keep.var = TRUE)
+}
 }
 }
 

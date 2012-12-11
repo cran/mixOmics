@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# S?bastien D?jean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonz?lez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh L? Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@ function(X,
          mode = c("regression", "canonical", "invariant", "classic"),
          max.iter = 500, 
          tol = 1e-06,
+         near.zero.var = TRUE,
          ...)
 {
 
@@ -48,12 +49,14 @@ function(X,
     if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0)
         stop("invalid number of variates, 'ncomp'.")
 		
+if(near.zero.var == TRUE){ 
     nzv = nearZeroVar(X, ...)
     if (length(nzv$Position > 0)) {
         warning("Zero- or near-zero variance predictors. 
   Reset predictors matrix to not near-zero variance predictors.
   See $nzv for problematic predictors.")
         X = X[, -nzv$Position]
+    }
     }
 	p = ncol(X)
 	
@@ -86,7 +89,7 @@ function(X,
         rownames(X) = rownames(Y) = ind.names
     }		
     	
-    #-- centrer et réduire les données --#
+    #-- centrer et r?duire les donn?es --#
     X = scale(X, center = TRUE, scale = TRUE)
     Y = scale(Y, center = TRUE, scale = TRUE) 
      
@@ -273,7 +276,7 @@ function(X,
 	              loadings = list(X = mat.a, Y = mat.b), 
 	              names = list(X = X.names, Y = Y.names, indiv = ind.names)
                 )
-    if (length(nzv$Position > 0)) result$nzv = nzv  
+    if (near.zero.var == T & length(nzv$Position > 0)) result$nzv = nzv  
 	
     class(result) = "pls"
     return(invisible(result))

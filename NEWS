@@ -1,3 +1,32 @@
+
+
+
+Changes in 5.0-1
+================
+
+New features:
+-------------
+
+New dependency to RGCCA package to enable integration of multiple matching data sets
+- wrapping method wrapper.sgcca() and wrapper.rgcca() created
+- S3 methods plotIndiv, plotVar, select.var, print for rgcca and sgcca added
+
+Multilevel analysis
+- cross validation enabled in function tune.multilevel for one factor (previously, only loocv was available)
+
+RCC
+-the function estim.regul has been renamed tune.rcc
+-the function pcatune has been renamed tune.pca
+
+Bug fixes:
+----------
+-in plotIndiv: horizontal and vertical abline set as a default argument
+-a new argument in splsda() function added: near.zero.var = TRUE or FALSE to speed up computations (near.zero.var = FALSE to gain speed)
+-the valid() function has been updated to speed up the computations. There is no 'criterion' argument to choose anymore (by default, all are included in the computation)
+-in plotVar: matching arguments user-function to avoid additions of unused arguments
+-in plotIndiv, arguments 'x.label' and 'y.label' were replaced by 'X.label' and 'Y.label'
+-in pca, argument 'scale.' was changed to 'scale'
+
 Changes in 4.1
 ================
 

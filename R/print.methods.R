@@ -330,4 +330,63 @@ function(x, ...)
 
 }
 
+# ------------------------ print for rgcca -------------------------
+print.rgcca<-
+  function(x, ...)
+  {
+    
+    cat("\nCall:\n", deparse(x$class, width.cutoff = 500), "\n\n")
+    # components
+    for(k in 1:length(x$data)){
+      cat(" rGCCA with", x$ncomp[[k]], "components on block", k, "\n") 
+    }
+    cat("\n")       
+    # dimension
+    for(k in 1:length(x$data)){
+      cat(" Dimension of block", k, 'is ', dim(x$data[[k]]), "\n")      
+    }
+    cat("\n")
+    cat(" Available components: \n", 
+        "-------------------- \n")
+    
+    cat(" loading vectors: see object$loadings \n")
+    cat(" variates: see object$variates \n")
+    cat(" variable names: see object$names \n")
+  }
+
+
+# ------------------------ print for sgcca -------------------------
+print.sgcca<-
+  function(x, ...)
+  {
+    
+    cat("\nCall:\n", deparse(x$class, width.cutoff = 500), "\n\n")  
+    # components
+    for(k in 1:length(x$data)){
+      cat(" sGCCA with", x$ncomp[[k]], "components on block", k, "\n") 
+    }
+    cat("\n")
+    
+    # dimension
+    for(k in 1:length(x$data)){
+      cat(" Dimension of block", k, 'is ', dim(x$data[[k]]), "\n")      
+    }
+    cat("\n")    
+    
+    
+    # selected variables
+    list.select = list()
+    for(k in 1:length(x$data)){
+      list.select[[k]] = apply(x$loadings[[k]], 2, function(x){sum(x!=0)})
+      cat(" Selection of", list.select[[k]], "variables on each of the sGCCA components on the block", k, "\n")
+    }
+    cat("\n")    
+    cat(" Available components: \n", 
+        "-------------------- \n")
+    
+    cat(" loading vectors: see object$loadings \n")
+    cat(" variates: see object$variates \n")
+    cat(" variable names: see object$names \n")
+  }
+
 

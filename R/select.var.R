@@ -25,7 +25,7 @@
 # names.X, names.Y: set to true means that the X and Y data frames have row names (see example below with srbct)
 
 select.var <-
-function(object, ...) UseMethod("select.var")
+function(...) UseMethod("select.var")
 
 
 
@@ -140,5 +140,63 @@ select.var.sipca = function(object, comp=1, ...){
   return(
     list(name = name.var, value = data.frame(value.var), comp = comp)
   )
+}
+
+
+
+# ------------------ for sgcca object --------------------
+
+select.var.sgcca = function(object, block = NULL, comp = 1, ...){ 
+  
+  # check arguments
+  # -----------------
+  if(length(comp) > 1)
+    stop("Expecting one single value for 'comp'")
+  if(is.null(block)){
+    if(any(comp > object$ncomp))
+      stop("'comp' is greater than the number of components in the fitted model,
+         you need to specify the variable 'block' ")
+  }else{
+    if(any(comp > object$ncomp[block]))
+      stop("'comp' is greater than the number of components in the fitted model for the block you specified")
+    
+  }
+  
+  
+  # extract selected variables
+  # --------------------------
+  keep = list()
+  name.var = value.var = list()
+  if(is.null(block)){
+    # identify the selected variables selected on a given component comp
+    for(k in 1:length(object$data)){
+      keep[[k]] = abs(object$loadings[[k]][,comp])> 0      
+    }   
+    #store name and value of the selected variables
+    for(k in 1:length(object$data)){
+      name.var[[k]] = object$names$var[keep[[k]]]
+      value.var[[k]] = object$loadings[[k]][keep[[k]], comp]
+    }
+  }else{ #end is.null(block)
+    j=1
+    # identify the selected variables selected on a given component ncomp.select
+    for(k in block){
+      keep[[j]] = abs(object$loadings[[k]][,comp])> 0
+      j=j+1        
+    }   
+    l=1
+    for(k in block){
+      name.var[[l]] = object$names$var[keep[[l]]]
+      value.var[[l]] = object$loadings[[k]][keep[[l]], comp]
+      l = l+1
+    }
+    
+    
+  } # end is.null (block)
+  
+  return(
+    list(name.var = name.var, value.var = value.var, comp = comp)
+  )
+  
 }
 

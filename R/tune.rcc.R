@@ -19,11 +19,11 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-estim.regul <-
-function(...) UseMethod("estim.regul")
+tune.rcc <-
+function(...) UseMethod("tune.rcc")
 
 
-estim.regul <-
+tune.rcc <-
 function(X, 
          Y, 
          grid1 = seq(0.001, 1, length = 5), 
@@ -66,7 +66,7 @@ function(X,
     mat = matrix(cv.score, nrow = length(grid1), ncol = length(grid2))
      
     if (isTRUE(plt)) {
-        image.estim.regul(list(grid1 = grid1, grid2 = grid2, mat = mat))
+        image.tune.rcc(list(grid1 = grid1, grid2 = grid2, mat = mat))
     }
      
     opt = cv.score.grid[cv.score.grid[, 3] == max(cv.score.grid[, 3]), ]
@@ -76,7 +76,7 @@ function(X,
     out = list(opt.lambda1 = opt[[1]], opt.lambda2 = opt[[2]], 
 	opt.score = opt[[3]], grid1 = grid1, grid2 = grid2, mat = mat)
      
-    class(out) = "estim.regul"	
+    class(out) = "tune.rcc"	
     return(invisible(out))
 }
 

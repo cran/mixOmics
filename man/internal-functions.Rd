@@ -10,8 +10,6 @@
 \alias{spls.model}
 \alias{splsda.model}
 
-\alias{q2.spls}
-\alias{q2.pls}
 
 \alias{ica.def}
 \alias{ica.par}

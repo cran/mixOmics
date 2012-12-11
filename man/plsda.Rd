@@ -9,7 +9,7 @@ to classify samples.
 }
 
 \usage{
-plsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06, ...)
+plsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06, near.zero.var = TRUE, ...)
 }	
 
 \arguments{
@@ -18,6 +18,8 @@ plsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06, ...)
   \item{ncomp}{the number of components to include in the model. Default to 2.}
   \item{max.iter}{integer, the maximum number of iterations.}  
   \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
+    \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations.}
+
   \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 
@@ -75,6 +77,7 @@ legend('bottomleft', c("After", "Before"), pch = c(16, 16),
        title = "Treatment")
 palette("default")
 
+\dontrun{
 ## Second example
 data(liver.toxicity)
 X <- liver.toxicity$gene
@@ -83,6 +86,7 @@ Y <- liver.toxicity$treatment[, 4]
 plsda.liver <- plsda(X, Y, ncomp = 2)
 col.rat <- as.numeric(as.factor(Y))
 plotIndiv(plsda.liver, col = col.rat, ind.names = Y)
+}
 }
 
 \keyword{regression}

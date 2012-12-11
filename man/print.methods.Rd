@@ -7,12 +7,14 @@
 \alias{print.summary}
 \alias{print.pca}
 \alias{print.spca}
+\alias{print.rgcca}
+\alias{print.sgcca}
 
-\title{Print Methods for CCA, (s)PLS and Summary objects}
+\title{Print Methods for CCA, (s)PLS, PCA and Summary objects}
 
 \description{
 Produce \code{print} methods for class \code{"rcc"}, 
-\code{"pls"}, \code{"spls"} and \code{"summary"}.
+\code{"pls"}, \code{"spls"}, \code{"pca"}, \code{"rgcca"}, \code{"sgcca"} and \code{"summary"}.
 }
 
 \usage{
@@ -26,17 +28,21 @@ Produce \code{print} methods for class \code{"rcc"},
 
 \method{print}{spca}(x, \ldots)
 
+\method{print}{rgcca}(x, \ldots)
+
+\method{print}{sgcca}(x, \ldots)
+
 \method{print}{summary}(x, \ldots)
 }
 
 \arguments{
   \item{x}{object of class inheriting from \code{"rcc"}, \code{"pls"}, 
-    \code{"spls"}, \code{"pca"}, \code{"spca"} or \code{"summary"}.}
+    \code{"spls"}, \code{"pca"}, \code{"spca"}, \code{"rgcca"}, \code{"sgcca"}or \code{"summary"}.}
   \item{\ldots}{not used currently.}
 }
 
 \details{
-\code{print} method for \code{"rcc"}, \code{"pls"} or \code{"spls"} class, 
+\code{print} method for \code{"rcc"}, \code{"pls"}, \code{"spls"} \code{"pca"}, \code{"rgcca"}, \code{"sgcca"} class, 
 returns a description of the \code{x} object including: the function used, the regularization 
 parameters (if \code{x} of class \code{"rcc"}), 
 the (s)PLS algorithm used (if \code{x} of class \code{"pls"} or \code{"spls"}),

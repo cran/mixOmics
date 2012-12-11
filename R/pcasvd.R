@@ -27,13 +27,13 @@ function(X,
          ncomp = 3,
          retx = TRUE, 
          center = TRUE, 
-         scale. = FALSE) 
+         scale = FALSE) 
         
 {
     X = as.matrix(X)
 	
 # Borrowed from PRCOMP	
-    result = svd(get("scale", envir = .GlobalEnv)(X, center = center, scale = scale.), nu = 0)
+    result = svd(get("scale", envir = .GlobalEnv)(X, center = center, scale = scale), nu = 0)
     cen = attr(X, "scaled:center")
     sc = attr(X, "scaled:scale")
     if (any(sc == 0)) 

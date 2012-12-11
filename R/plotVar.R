@@ -27,7 +27,7 @@ plotVar <-
 function(object, ...) UseMethod("plotVar")
 
 
-#--------------------- PLS, (plsada, sPLS, sPLSDA below)---------------------#
+#--------------------- PLS, (plsda, sPLS, sPLSDA below)---------------------#
 plotVar.pls <-  
 function(object, 
          comp = 1:2, 
@@ -38,7 +38,7 @@ function(object,
          cex = NULL, 
          col = NULL, 
          font = NULL,
-	 ...) 
+        ...) 
 {
 
     # validation des arguments #
@@ -46,14 +46,29 @@ function(object,
     if (length(comp) != 2)
         stop("'comp' must be a numeric vector of length 2.")
 
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
+
 		
     if (any(comp > object$ncomp)) 
         stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
 
     # calcul des coordonnées #
     #------------------------#
@@ -207,9 +222,13 @@ function(object,
     #--------------------------#
     if (length(comp) != 2)
         stop("'comp' must be a numeric vector of length 2.")
+    
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
 
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
 		
     if (any(comp > object$ncomp)) 
         stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
@@ -286,6 +305,9 @@ function(object,
                 col = list(rep(col[1], p))
 
             }
+            if (length(col) == p) {
+                col = list(col)
+              }
             else {
                 stop("'col' must be a vector of length 1 or a vector of length ", p)
             }
@@ -357,14 +379,29 @@ function(object,
     if (length(comp) != 2)
         stop("'comp' must be a numeric vector of length 2.")
 
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
+
 		
     if (any(comp > object$ncomp)) 
         stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+     # what the function is expecting
+    match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
 
     # calcul des coordonnées #
     #------------------------#
@@ -540,14 +577,29 @@ function(object,
     if (length(comp) != 2)
         stop("'comp' must be a numeric vector of length 2.")
 
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
+
 		
     if (any(comp > object$ncomp)) 
         stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
 
     # calcul des coordonnées #
     #------------------------#
@@ -617,6 +669,10 @@ function(object,
             if (length(col) == 1) { 
                 col = list(rep(col[1], p))
             }
+            
+              if (length(col) == p) {
+                col = list(col)
+              }
             else {
                 stop("'col' must be a vector of length 1 or a vector of length ", p)
             }
@@ -692,8 +748,12 @@ function(object,
     if (length(comp) != 2)
         stop("'comp' must be a numeric vector of length 2.")
 
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
+    
 
     p = ncol(object$X)
     q = ncol(object$Y)
@@ -704,6 +764,17 @@ function(object,
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
 
     # coordonnées des variables #
 	#---------------------------#
@@ -898,14 +969,29 @@ function(object,
     if (length(comp) != 2)
         stop("'comp' must be a numeric vector of length 2.")
 
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
+    
 		
     if (any(comp > object$ncomp)) 
         stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
 
 
     # calcul des coordonnées #
@@ -977,6 +1063,9 @@ function(object,
             if (length(col) == 1) { 
                 col = list(rep(col[1], p))
             }
+              if (length(col) == p) {
+                col = list(col)
+              }
             else {
                 stop("'col' must be a vector of length 1 or a vector of length ", p)
             }
@@ -1064,6 +1153,17 @@ function(object,
         if (length(var.label) != q)
             stop("'var.label' must be a character vector of length ", q, " or a boolean atomic vector.")
     }
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'rad.in', 'var.label')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
 	
     # calcul des coordonnées #
     #------------------------#
@@ -1104,8 +1204,12 @@ function(object,
     if (length(comp) != 2)
         stop("'comp' must be a numeric vector of length 2.")
 
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
+    
 
 	q = nrow(object$loadings)
 	
@@ -1123,6 +1227,17 @@ function(object,
         if (length(var.label) != q)
             stop("'var.label' must be a character vector of length ", q, " or a boolean atomic vector.")
     }
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'rad.in', 'var.label')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
 	
     # calcul des coordonnées #
     #------------------------#
@@ -1168,14 +1283,29 @@ function(object,
     if (length(comp) != 2)
         stop("'comp' must be a numeric vector of length 2.")
 
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
+    
 		
     if (any(comp > object$ncomp)) 
         stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
 
     comp1 = round(comp[1])
     comp2 = round(comp[2])
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
 
 
     # calcul des coordonnées #
@@ -1247,6 +1377,9 @@ function(object,
             if (length(col) == 1) { 
                 col = list(rep(col[1], p))
             }
+              if (length(col) == p) {
+                col = list(col)
+              }
             else {
                 stop("'col' must be a vector of length 1 or a vector of length ", p)
             }
@@ -1300,3 +1433,354 @@ function(object,
     return(invisible(list(coord.X = cord.X)))
 }
 
+
+# ---------------------- RGCCA/SGCCA -------------------------#
+
+plotVar.sgcca <- 
+  function(object, 
+           comp = c(1,2), 
+           #sgcca specific
+           block = c(1,2),
+           # the comp where the variables are selected
+           ncomp.select = c(1,2),
+           labels = FALSE,
+           pch = c(16,17), 
+           cex =  c(0.5, 0.5), 
+           col = c('green', 'blue'),
+           font = c(2,3),
+           rad.in = 0.5, 
+           ...) 
+{
+    
+    ## validation des arguments
+    if (length(comp) != 2)
+      stop("'comp' must be a numeric vector of length 2.")
+    
+    if (!is.numeric(comp) || any(comp < 1))
+      stop("invalid vector for 'comp'.")
+    
+    if (any(comp > object$ncomp[block])) 
+      stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+    
+    if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
+      warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
+    
+    if(all(ncomp.select != comp))
+      stop("All argument from 'ncomp.select' differ from 'comp'")
+    
+    if(any(ncomp.select > comp))
+      stop("At least one argument from 'ncomp.select' is greater than 'comp'")
+    
+    cat('PlotVar only display variables selected on components', ncomp.select, '\n')
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
+    
+    
+    # define if single block is true or false
+    single.block = ifelse(length(block) == 1, TRUE, FALSE)
+    
+    #extract data
+    data = object$data
+    
+    # extraire la matrice de design
+    design = object$design
+    
+    # choose the mode (canonical or regression) and if regression, decide which component to compute
+    # the correlation on
+    reg = NULL
+    if(length(block) >1){
+      if(design[block[1], block[2]] + design[block[1], block[2]] == 0) warning("There is no relationship designed between these two blocks")
+      
+      if(design[block[1], block[2]] == design[block[2], block[1]]){ 
+        mode = 'canonical'
+      } else {
+        mode = 'regression'
+        #define where to regress on:
+        # data 1 on data 2 -> reg = 1
+        # data 2 on data 1 -> reg = 0  # double check with Artur
+        reg = ifelse(design[block[1], block[2]] == 1, 1, 0)
+      }
+    } else{ # single block case
+      #check that there is a relationship between this block??
+      mode = 'regression'
+    }
+    
+    
+    keep = list()
+    j=1
+    # identify the selected variables selected on a given component ncomp.select
+    if(length(ncomp.select) > 1){
+      for(k in block){
+        keep[[j]] = apply(abs(object$loadings[[k]][,ncomp.select]), 1, sum) > 0
+        j=j+1
+      }
+    }else{
+      for(k in block){
+        keep[[j]] = abs(object$loadings[[k]][,ncomp.select])> 0
+        j=j+1        
+      }   
+    }
+    
+    # -------------------------
+    # compute coordinates
+    # -------------------------
+    # ----- canonical mode type
+    # correlation between original variables and latent variables
+
+    coord = list()
+    j=1
+    # canonical mode or when representing only one block
+    if((mode == 'canonical') | is.null(reg)){
+      for(k in block){
+        coord[[j]] = cor(data[[k]][, keep[[j]]], object$variates[[k]][,comp], use = "pairwise")
+        j=j+1
+      }
+    }else{
+      # ----- regression mode type
+      # correlation between original variables and frst latent variables (because of the deflation
+      # made for regression mode)
+      # !!!! remove??!
+      if(reg == 1){  #data 1 on data 2 
+        for(j in 1:length(block)){
+          coord[[j]] = cor(data[[block[2]]][, keep[[j]]], object$variates[[block[1]]][,comp], use = "pairwise")
+        }
+      }
+      if(reg == 0){        #data 2 on data 1 
+        for(j in 1:length(block)){
+          coord[[j]] = cor(data[[block[1]]][, keep[[j]]], object$variates[[block[2]]][,comp], use = "pairwise")
+        }
+      }
+    }
+    
+    
+    # -------------------
+    # input parameters
+    # -------------------
+    # labels
+    name.labels = list()
+    #if(IS.TRUE(labels)){
+    for(j in 1:length(block)){
+      name.labels[[j]] = colnames(data[[j]][, keep[[j]]])
+    }
+    
+    #determine number of variables in each block
+    num.var = unlist(lapply(data, ncol))
+    
+    pch.plot = col.plot = cex.plot = font.plot = list()
+    # set arguments for plot
+    for(j in 1:length(block)){
+      pch.plot[[j]] = rep(pch[j], num.var[j])
+      col.plot[[j]] = rep(col[j], num.var[j])
+      cex.plot[[j]] = rep(cex[j], num.var[j])
+      font.plot[[j]] = rep(font[j], num.var[j])
+    }
+
+    # this is to display only the selected variables
+    for(j in 1:length(block)){
+      pch.plot[[j]] = pch.plot[[j]][keep[[j]]]
+      col.plot[[j]] = col.plot[[j]][keep[[j]]]
+      cex.plot[[j]] = cex.plot[[j]][keep[[j]]]
+      font.plot[[j]] = font.plot[[j]][keep[[j]]]
+    }
+    
+    
+    # ---------------------------
+    # plot the correlation circles
+    # --------------------------
+    
+    
+    par(pty = "s")
+    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
+         xlab = paste('sGCCA, component 1'), ylab = paste('sGCCA, component 2'))
+    
+    for(j in 1:length(block)){
+      if(labels){
+        text(coord[[j]][, 1], coord[[j]][, 2], name.labels[[j]], col = col.plot[[j]], 
+             font = font.plot[[j]], cex = cex.plot[[j]])
+      }else{
+        points(coord[[j]][, 1], coord[[j]][, 2], pch = pch.plot[[j]], 
+               cex = cex.plot[[j]], col = col.plot[[j]])
+      }
+    }
+    
+    
+    abline(v = 0, h = 0)
+    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
+    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
+          rad.in * sin(seq(0, 2 * pi, l = 100)))
+    
+    # output coordinates
+    return(invisible(list(coord = coord)))
+    
+  }
+
+
+# --------------
+# RGCCA
+# -------------
+
+
+
+plotVar.rgcca <- 
+  function(object, 
+           comp = c(1,2), 
+           #sgcca specific
+           block = c(1,2),
+           labels = FALSE,
+           pch = c(16,17), 
+           cex =  c(0.5, 0.5), 
+           col = c('green', 'blue'),
+           font = c(2,3),
+           rad.in = 0.5, 
+           ...) 
+{
+    
+    ## validation des arguments
+    if (length(comp) != 2)
+      stop("'comp' must be a numeric vector of length 2.")
+    
+    if (!is.numeric(comp))
+    stop("invalid vector for 'comp'.")
+    
+    if (length(comp) == 1)
+    stop("Need at least 2 components to plot the graph")
+    
+    
+    if (any(comp > object$ncomp[block])) 
+      stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+    
+    if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
+      warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
+    
+    
+    # define if single block is true or false
+    single.block = ifelse(length(block) == 1, TRUE, FALSE)
+    
+    #extract data
+    data = object$data
+    
+    # extraire la matrice de design
+    design = object$design
+    
+    # choose the mode (canonical or regression) and if regression, decide which component to compute
+    # the correlation on
+    reg = NULL
+    if(single.block == FALSE){
+      if(design[block[1], block[2]] + design[block[1], block[2]] == 0) stop("There is no relationship designed between these two blocks")
+      
+      if(design[block[1], block[2]] == design[block[2], block[1]]){ 
+        mode = 'canonical'
+      } else {
+        mode = 'regression'
+        #define where to regress on:
+        # data 1 on data 2 -> reg = 1
+        # data 2 on data 1 -> reg = 0  # double check with Artur
+        reg = ifelse(design[block[1], block[2]] == 1, 1, 0)
+      }
+    } else{ # single block case
+      #check that there is a relationship between this block??
+      mode = 'regression'
+    }
+    
+    
+    # -------------------------
+    # compute coordinates
+    # -------------------------
+    # ----- canonical mode type
+    # correlation between original variables and latent variables
+    
+    coord = list()
+    j=1
+    # canonical mode or when representing only one block
+    if((mode == 'canonical') | is.null(reg)){
+      for(k in block){
+        coord[[j]] = cor(data[[k]], object$variates[[k]][,comp], use = "pairwise")
+        j=j+1
+      }
+    }else{
+      # ----- regression mode type
+      # correlation between original variables and frst latent variables (because of the deflation
+      # made for regression mode)
+      # !!!! remove??!
+      if(reg == 1){  #data 1 on data 2 
+        for(j in 1:length(block)){
+          coord[[j]] = cor(data[[block[2]]], object$variates[[block[1]]][,comp], use = "pairwise")
+        }
+      }
+      if(reg == 0){        #data 2 on data 1 
+        for(j in 1:length(block)){
+          coord[[j]] = cor(data[[block[1]]], object$variates[[block[2]]][,comp], use = "pairwise")
+        }
+      }
+    }
+    
+    
+    # -------------------
+    # input parameters
+    # -------------------
+    # labels
+    name.labels = list()
+    #if(IS.TRUE(labels)){
+    for(j in 1:length(block)){
+      name.labels[[j]] = colnames(data[[j]])
+    }
+    
+    
+    #determine number of variables in each block
+    num.var = unlist(lapply(data, ncol))    
+    pch.plot = col.plot = cex.plot = font.plot = list()
+    # set arguments for plot
+    for(j in 1:length(block)){
+      pch.plot[[j]] = rep(pch[j], num.var[j])
+      col.plot[[j]] = rep(col[j], num.var[j])
+      cex.plot[[j]] = rep(cex[j], num.var[j])
+      font.plot[[j]] = rep(font[j], num.var[j])
+    }
+    
+    # ---------------------------
+    # plot the correlation circles
+    # --------------------------
+    
+    
+    par(pty = "s")
+    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
+         xlab = paste('sGCCA, component 1'), ylab = paste('sGCCA, component 2'))
+    
+    for(j in 1:length(block)){
+      if(labels){
+        text(coord[[j]][, 1], coord[[j]][, 2], name.labels[[j]], col = col.plot[[j]], 
+             font = font.plot[[j]], cex = cex.plot[[j]])
+      }else{
+        points(coord[[j]][, 1], coord[[j]][, 2], pch = pch.plot[[j]], 
+               cex = cex.plot[[j]], col = col.plot[[j]])
+      }
+    }
+    
+    
+    abline(v = 0, h = 0)
+    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
+    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
+          rad.in * sin(seq(0, 2 * pi, l = 100)))
+    
+    # output coordinates
+    return(invisible(list(coord = coord)))
+    
+  }

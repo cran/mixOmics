@@ -25,7 +25,7 @@ pca <-
 function(X, 
          ncomp = 3,
          center = TRUE, 
-         scale. = FALSE, 
+         scale = FALSE, 
          comp.tol = NULL,
          max.iter = 500, 
          tol = 1e-09) 
@@ -40,7 +40,7 @@ function(X,
     ind.names = dimnames(X)[[1]]
     if (is.null(ind.names)) ind.names = 1:nrow(X)
 	
-    X = scale(X, center = center, scale = scale.)
+    X = scale(X, center = center, scale = scale)
     cen = attr(X, "scaled:center")
     sc = attr(X, "scaled:scale")
     if (any(sc == 0)) 
@@ -50,6 +50,18 @@ function(X,
     if (ncomp > min(ncol(X),nrow(X))) {
         stop("Use smaller 'ncomp'")
     }
+    
+    # check that the user did not enter extra arguments #
+    # --------------------------------------------------#
+    # what the user has entered
+    match.user =names(match.call())
+    # what the function is expecting
+    match.function = c('X', 'ncomp', 'center', 'scale', 'comp.tol', 'max.iter', 'tol')
+    
+    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
+    
+    
 
     is.na.X = is.na(X)
     na.X = FALSE
@@ -59,6 +71,9 @@ function(X,
     if (is.null(ncomp)) {
         ncomp = min(nrow(X),ncol(X))
     }
+    
+    cl = match.call()
+		cl[[1]] = as.name('pca')
 
 # If there are missing values use NIPALS agorithm
     if(na.X){
@@ -67,7 +82,7 @@ function(X,
         result$rotation = result$p
         dimnames(result$rotation) = list(X.names, paste("PC", 1:ncol(result$rotation), sep = ""))
         dimnames(result$p) = list(X.names, paste("PC", 1:ncol(result$p), sep = ""))
-        r = list(X = X, ncomp = ncomp, NA.X = NA.X, sdev = result$eig, rotation = result$rotation, 
+        r = list(call = cl, X = X, ncomp = ncomp, NA.X = NA.X, sdev = result$eig, rotation = result$rotation, 
 		         center = if (is.null(cen)) FALSE else cen, scale = if (is.null(sc)) FALSE else sc)
 
         if (retx) {
@@ -78,10 +93,10 @@ function(X,
 	
 # If data is complete use PCASVD, singular value decomposition
     if(!na.X){
-        result = pcasvd(X, ncomp = ncomp, center = center, scale. = scale.)
+        result = pcasvd(X, ncomp = ncomp, center = center, scale = scale)
         result$eig = (result$sdev^2)
         dimnames(result$rotation) = list(X.names, paste("PC", 1:ncol(result$rotation), sep = ""))
-        r = list(X = X, ncomp = ncomp, NA.X = NA.X, sdev = (result$eig), 
+        r = list(call = cl, X = X, ncomp = ncomp, NA.X = NA.X, sdev = (result$eig), 
                  rotation = (result$rotation), center = if (is.null(cen)) FALSE else cen, 
                  scale = if (is.null(sc)) FALSE else sc)
 				 

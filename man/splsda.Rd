@@ -10,7 +10,7 @@ embeds variable selection for this purpose.
 
 \usage{
 splsda(X, Y, ncomp = 2, keepX = rep(ncol(X), ncomp),
-       max.iter = 500, tol = 1e-06, ...)
+       max.iter = 500, tol = 1e-06, near.zero.var = TRUE, ...)
 }	
 
 \arguments{
@@ -21,6 +21,7 @@ splsda(X, Y, ncomp = 2, keepX = rep(ncol(X), ncomp),
     to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
   \item{max.iter}{integer, the maximum number of iterations.}   
   \item{tol}{a positive real, the tolerance used in the iterative algorithm.} 
+      \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations.}
   \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 

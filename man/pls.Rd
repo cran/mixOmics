@@ -11,7 +11,7 @@
 \usage{
 pls(X, Y, ncomp = 2, 
     mode = c("regression", "canonical", "invariant", "classic"), 
-    max.iter = 500, tol = 1e-06, ...)
+    max.iter = 500, tol = 1e-06, near.zero.var = TRUE, ...)
 }	
 
 \arguments{
@@ -24,6 +24,7 @@ pls(X, Y, ncomp = 2,
 	See Details.}
   \item{max.iter}{integer, the maximum number of iterations.}
   \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
+  \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations.}
   \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 

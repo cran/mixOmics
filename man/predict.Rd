@@ -101,11 +101,13 @@ test.predict <- predict(plsda.train, X[test, ], method = "max.dist")
 Prediction <- levels(Y)[test.predict$class$max.dist[, 2]]
 cbind(Y = as.character(Y[test]), Prediction)
 
+\dontrun{
 ## Second example with splsda
 splsda.train <- splsda(X[train, ], Y[train], ncomp = 2, keepX = c(30, 30))
 test.predict <- predict(splsda.train, X[test, ], method = "max.dist")
 Prediction <- levels(Y)[test.predict$class$max.dist[, 2]]
 cbind(Y = as.character(Y[test]), Prediction)
+}
 }
 
 \keyword{regression}

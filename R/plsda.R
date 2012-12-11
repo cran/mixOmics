@@ -26,6 +26,7 @@ function(X,
          ncomp = 2,
          max.iter = 500,		 
          tol = 1e-06,
+         near.zero.var = TRUE,
          ...)
 {
     X = as.matrix(X)
@@ -61,6 +62,7 @@ function(X,
     	
     result$ind.mat = ind.mat
     result$names$Y = levels(Y)
+    result$near.zero.var = near.zero.var
     class(result) = "plsda"
     return(invisible(result))	
 }

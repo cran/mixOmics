@@ -1,14 +1,14 @@
 Package: mixOmics
 Type: Package
 Title: Omics Data Integration Project
-Version: 4.1-5
+Version: 5.0-1
 Date: 2012-12-11
-Depends: R (>= 2.10), rgl
-Imports: igraph, lattice, pheatmap
+Depends: R (>= 2.10), MASS, lattice
+Imports: RGCCA, igraph, rgl, pheatmap
 Author: Sebastien Dejean, Ignacio Gonzalez, Kim-Anh Le Cao with
         contributions from Pierre Monget, Jeff Coquery, FangZou Yao,
-        Benoit Liquet
-Maintainer: ORPHANED
+        Benoit Liquet, Florian Rohart
+Maintainer: Kim-Anh Le Cao <k.lecao@uq.edu.au>
 Description: The package provide statistical integrative techniques and
         variants to analyse highly dimensional data sets: regularized
         CCA and sparse PLS to unravel relationships between two
@@ -28,9 +28,6 @@ Description: The package provide statistical integrative techniques and
         multilevel analysis using variance decomposition of the data.
 License: GPL (>= 2)
 Repository: CRAN
-Date/Publication: 2013-09-03 12:09:03
-Packaged: 2013-09-02 14:34:58 UTC; ripley
+Date/Publication: 2013-11-10 08:46:32
+Packaged: 2013-11-08 06:25:54 UTC; k.lecao
 NeedsCompilation: no
-X-CRAN-Original-Maintainer: Kim-Anh Le Cao <k.lecao@uq.edu.au>
-X-CRAN-Comment: Orphaned on 2013-09-03 as it had not been converted to
-        igraph in over a year

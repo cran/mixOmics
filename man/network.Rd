@@ -132,7 +132,7 @@ network can take some seconds.
 \value{
 \code{network} return a list containing the following components:
   \item{simMat}{the similarity (adjacent) matrix used by \code{network}.}
-  \item{gR}{a \code{graph} object (see the \pkg{igraph} \R package).}
+  \item{gR}{a \code{graph} object (see the \pkg{igraph} package).}
 }
 
 \references{
@@ -147,13 +147,12 @@ and Transcriptome in Human Hepatoma Cells. \emph{Molecular Cancer Therapeutics} 
 199-205.
 }
 
-\author{Sébastien Déjean, Ignacio González and Kim-Anh Lê Cao.}
+\author{S?bastien D?jean, Ignacio Gonz?lez and Kim-Anh L? Cao.}
 
 \seealso{\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}
  and http: //www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
 
 \examples{
-require(igraph)
 
 ## network representation for objects of class 'rcc'
 data(nutrimouse)

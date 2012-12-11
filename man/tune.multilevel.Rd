@@ -21,7 +21,9 @@ tune.multilevel(X, Y = NULL,
                     already.tested.X = NULL, 
                     already.tested.Y = NULL, 
                     method = NULL, 
-                    dist)  
+                    dist,
+                    validation = c("Mfold", "loo"),
+                    folds = 10)  
 }	
 
 \arguments{
@@ -37,6 +39,9 @@ tune.multilevel(X, Y = NULL,
   \item{method}{character string. Which multivariate method and type of analysis to choose, matching one of 'splsda' (Discriminant Analysis) or 'spls' (unsupervised integrative analysis). See Details.}
   \item{dist}{distance metric to use for \code{splsda} to estimate the classification error rate, 
     should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \code{"max.dist"} (see Details).}
+      \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or 
+    \code{"loo"} (see below). Default is \code{"Mfold"}.}
+  \item{folds}{the folds in the Mfold cross-validation. See Details.}
 }
 
 \details{
@@ -50,6 +55,15 @@ For a sPLS-DA two-factor analysis, the correlation between components from the w
 
 
 For a sPLS-DA two-factor analysis, the correlation between components from the within-subject variation of X and Y is computed on the whole data set.
+
+
+If \code{validation = "Mfold"}, M-fold cross-validation is performed. 
+How many folds to generate is selected by specifying the number of folds in \code{folds}.
+The folds also can be supplied as a list of vectors containing the indexes defining each 
+fold as produced by \code{split}.
+
+If \code{validation = "loo"}, leave-one-out cross-validation is performed. By default \code{folds} is set to the number of unique individuals.
+
 
 }
 
@@ -84,7 +98,8 @@ result.ex1 = tune.multilevel(data.simu$X,
                                test.keepX=c(5, 10, 15), 
                                already.tested.X = c(50),
                                method = 'splsda',
-                               dist = 'mahalanobis.dist') 
+                               dist = 'mahalanobis.dist',
+                               validation = 'loo') 
 
 result.ex1
 }
@@ -95,10 +110,11 @@ data(liver.toxicity)
 dose = liver.toxicity$treatment$Dose.Group
 time = liver.toxicity$treatment$Time.Group
 dose.time = cbind(dose, time)
-repeat.indiv = c(1, 2, 1, 2, 1, 2, 1, 2, 3, 3, 4, 3, 4, 3, 4, 4, 5, 6, 5, 5,
-6, 5, 6, 7, 7, 8, 6, 7, 8, 7, 8, 8, 9, 10, 9, 10, 11, 9, 9, 10, 11, 12,
-12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 14, 13, 14, 15, 16, 15, 16,
-15, 16, 15, 16)
+repeat.indiv = c(1,2, 1,  2,  1,  2,  1,  2,  3,  3,  4,  
+  3,  4,  3,  4,  4,  5,  6,  5,  5,  6,  5,  6,  7,  7,  
+  8,  6,  7,  8,  7,  8,  8,  9, 10,  9, 10, 11, 9,  9, 
+  10, 11, 12, 12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 
+  14, 13, 14, 15, 16, 15, 16, 15, 16, 15, 16)
 
 
 result.ex2 = tune.multilevel (liver.toxicity$gene,

@@ -119,10 +119,11 @@ X <- vac18$genes
 Y <- vac18$stimulation
 
 res <- multilevel(X, cond = Y, ncomp = 3,
-tab.prob.gene = vac18$tab.prob.gene,
-sample = vac18$sample, method = "splsda",
-keepX = c(30, 137, 123))
+  tab.prob.gene = vac18$tab.prob.gene,
+  sample = vac18$sample, method = "splsda",
+  keepX = c(30, 137, 123))
 
+\dontrun{
 # color for plot3dIndiv
 col_stim <- c("darkblue", "purple", "green4","red3")
 cols <- Y
@@ -131,7 +132,7 @@ cols <- as.character(cols)
 
 plot3dIndiv(res, ind.names = Y, col = cols,
 cex = 0.3, axes.box = "both")
-
+}
 
 ## Second example: two-factor analysis with sPLS-DA
 data(data.simu) # simulated data

@@ -74,12 +74,15 @@ sipca.res
 # samples representation
 plotIndiv(sipca.res, ind.names = liver.toxicity$treatment[, 4], cex = 0.5, 
           col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
+\dontrun{
 plot3dIndiv(sipca.res, cex = 0.01,
             col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
-
+}
 # variables representation
 plotVar(sipca.res, var.label = TRUE, cex = 0.5)
+\dontrun{
 plot3dVar(sipca.res, rad.in = 0.5, var.label = TRUE, cex = 0.5)
+}
 }
 
 \keyword{algebra}

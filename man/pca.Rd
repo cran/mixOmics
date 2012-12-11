@@ -11,7 +11,7 @@ Decomposition, if there are some missing values, it uses the NIPALS algorithm.
 }
 
 \usage{
-pca(X, ncomp = 3, center = TRUE, scale. = FALSE, 
+pca(X, ncomp = 3, center = TRUE, scale = FALSE, 
     comp.tol = NULL, max.iter = 500, tol = 1e-09)
 }
 
@@ -25,7 +25,7 @@ pca(X, ncomp = 3, center = TRUE, scale. = FALSE,
   \item{center}{a logical value indicating whether the variables should be shifted to be zero centered. 
     Alternately, a vector of length equal the number of columns of \code{X} can be supplied. 
     The value is passed to \code{\link{scale}}.} 
-  \item{scale.}{a logical value indicating whether the variables should be scaled to have 
+  \item{scale}{a logical value indicating whether the variables should be scaled to have 
     unit variance before the analysis takes place. The default is \code{FALSE} for consistency with \code{prcomp} 
     function, but in general scaling is advisable. Alternatively, a vector of length equal the number of 
     columns of \code{X} can be supplied. The value is passed to \code{\link{scale}}.} 
@@ -41,7 +41,7 @@ data matrix, if the data is complete or by using the NIPALS algorithm if there i
 \code{plot} method produces a bar plot of the percentage of variance explaned by the principal 
 components (PCs).
 
-Note that \code{scale.= TRUE} cannot be used if there are zero or constant (for \code{center = TRUE}) variables. 
+Note that \code{scale= TRUE} cannot be used if there are zero or constant (for \code{center = TRUE}) variables. 
  
 Components are omitted if their standard deviations are less than or equal to \code{comp.tol} times 
 the standard deviation of the first component. With the default null setting, no components are omitted. 
@@ -62,7 +62,7 @@ which would omit essentially constant components, or \code{comp.tol = 0}.
 
 
 
-\author{Ignacio González.}
+\author{Ignacio Gonz?lez.}
 
 \seealso{\code{\link{nipals}}, \code{\link{prcomp}}, \code{\link{biplot}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}},
@@ -81,12 +81,15 @@ biplot(pca.res, xlabs = multidrug$cell.line$Class, cex = 0.7)
 # samples representation
 plotIndiv(pca.res, ind.names = multidrug$cell.line$Class, cex = 0.5, 
           col = as.numeric(as.factor(multidrug$cell.line$Class)))
+\dontrun{
 plot3dIndiv(pca.res, cex = 0.2,
             col = as.numeric(as.factor(multidrug$cell.line$Class)))
-
+}
 # variables representation
 plotVar(pca.res, var.label = TRUE)
+\dontrun{
 plot3dVar(pca.res, rad.in = 0.5, var.label = TRUE, cex = 0.5)
+}
 }
 
 \keyword{algebra}

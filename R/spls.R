@@ -28,6 +28,7 @@ function(X,
          tol = 1e-06,
          keepX = rep(ncol(X), ncomp), 
          keepY = rep(ncol(Y), ncomp),
+         near.zero.var = TRUE,
          ...)
 {
 
@@ -49,13 +50,15 @@ function(X,
      
     if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0)
         stop("invalid number of variates, 'ncomp'.")
-     
+    
+     if(near.zero.var == TRUE){ 
     nzv = nearZeroVar(X, ...)
     if (length(nzv$Position > 0)) {
         warning("Zero- or near-zero variance predictors. 
   Reset predictors matrix to not near-zero variance predictors.
   See $nzv for problematic predictors.")
         X = X[, -nzv$Position]
+    }
     }
 	p = ncol(X)
 	
@@ -150,7 +153,7 @@ function(X,
             t = t / drop(sqrt(crossprod(t)))			
         }
         else {
-            t = X.temp %*% a.old / drop(crossprod(a.old))
+            t = X.temp %*% a.old ##/ drop(crossprod(a.old))
             t = t / drop(sqrt(crossprod(t)))
         }
          
@@ -163,7 +166,7 @@ function(X,
             u = u / drop(sqrt(crossprod(u)))			
         }
         else {
-            u = Y.temp %*% b.old / drop(crossprod(b.old))
+            u = Y.temp %*% b.old ##/ drop(crossprod(b.old))
             u = u / drop(sqrt(crossprod(u)))
         }
          
@@ -181,7 +184,7 @@ function(X,
                 a = ifelse(abs(a) > abs(a[order(abs(a))][nx]), 
                     (abs(a) - abs(a[order(abs(a))][nx])) * sign(a), 0)
             }
-            a = a / drop(crossprod(u))
+            ##a = a / drop(crossprod(u))
             a = a / drop(sqrt(crossprod(a)))
 		     
             if (ny != 0) {
@@ -199,7 +202,7 @@ function(X,
                 t = t / drop(sqrt(crossprod(t)))			
             }
             else {
-                t = X.temp %*% a / drop(crossprod(a))
+                t = X.temp %*% a ##/ drop(crossprod(a))
                 t = t / drop(sqrt(crossprod(t)))
             }
              
@@ -212,7 +215,7 @@ function(X,
                 u = u / drop(sqrt(crossprod(u)))			
             }
             else {
-                u = Y.temp %*% b / drop(crossprod(b))
+                u = Y.temp %*% b ##/ drop(crossprod(b))
                 u = u / drop(sqrt(crossprod(u)))
             }
            
@@ -315,6 +318,7 @@ function(X,
                   variates = list(X = mat.t, Y = mat.u),
                   loadings = list(X = mat.a, Y = mat.b),
                   names = list(X = X.names, Y = Y.names, indiv = ind.names))
+                  
     if (length(nzv$Position > 0)) result$nzv = nzv
 
     class(result) = c("spls", "pls") 
