@@ -69,7 +69,8 @@ representation in (regularized) CCA, (sparse) PLS regression, (sparse)RGCCA and 
     \code{"Y-variate"} or \code{"XY-variate"}, determining the subspace to project the 
 	  individuals. Defaults to \code{"XY-variate"} \code{"rcc"} object for  and \code{"X-variate"} \code{"pls"} and \code{"spls"} objects.
 For objects of class \code{"rgcca"} and \code{"sgcca"}, numerical value indicating the block data set form which to represent the individuals.}
-  \item{X.label, Y.label}{\eqn{x}- and \eqn{y}-axis titles.}
+  \item{X.label}{x axis titles.}
+  \item{Y.label}{y axis titles}
   \item{col}{character (or symbol) color to be used, possibly vector.}
   \item{cex}{numeric character (or symbol) expansion, possibly vector.}
   \item{pch}{plot character. A character string or a vector of single characters 
@@ -92,9 +93,9 @@ In the last case, multiple arguments values can be specified so that each point 
 can be given its own graphic attributes (see \code{\link{par}}). Default values exist for this arguments. 
 }
 
-\author{S?bastien D?jean and Ignacio Gonz?lez.}
+\author{Sebastien Dejean and Ignacio Gonzalez.}
 
-\seealso{\code{\link{plot3dIndiv}}, \code{\link{text}}, \code{\link{points}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\seealso{\code{\link{plot3dIndiv}}, \code{\link{text}}, \code{\link{points}} and http://mixOmics.org for more details.}
 
 
 \examples{

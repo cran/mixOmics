@@ -43,7 +43,7 @@ The returned value is a list with components:
 }
 
 \references{
-Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 
 Wold H. (1966). Estimation of principal components and related models by iterative least squares. 
 In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
@@ -53,9 +53,9 @@ In: Blalock H. M. et al. (editors). \emph{Quantitative Sociology: International 
 on mathematical and statistical model building}. Academic Press, N.Y., 307-357.
 }
 
-\author{Sébastien Déjean and Ignacio González.}
+\author{Sebastien Dejean and Ignacio Gonzalez.}
 
-\seealso{\code{\link{svd}}, \code{\link{princomp}}, \code{\link{prcomp}}, \code{\link{eigen}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\seealso{\code{\link{svd}}, \code{\link{princomp}}, \code{\link{prcomp}}, \code{\link{eigen}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## Hilbert matrix

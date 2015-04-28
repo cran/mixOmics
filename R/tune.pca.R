@@ -1,5 +1,5 @@
 # Copyright (C) 2011
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence in Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 # Leigh Coonan, Student, University of Quuensland, Australia
 # Fangzhou Yao, Student, University of Queensland, Australia

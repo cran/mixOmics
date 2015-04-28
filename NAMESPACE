@@ -3,21 +3,21 @@ import(MASS, lattice, RGCCA, igraph, rgl, pheatmap)
 
 export(
 bin.color, 
+color.jet,
+color.GreenRed,
+color.spectral,
+color.mixo,
 cim,  
-check.one.level,
 ica.par,
 ica.def,
 image.tune.rcc, 
 imgCor,
 ipca,
-jet.colors,
 loo,
 mat.rank, 
 map,
 Mfold,
 multilevel,
-multilevel.splsda,
-multilevel.spls,
 nearZeroVar,
 network,
 nipals, 
@@ -35,14 +35,13 @@ rcc,
 scatterutil.base, 
 scatterutil.eti, 
 scatterutil.grid, 
-select.var,
+selectVar,
 sipca,
 s.match,
 spca,
-Split.variation.one.level,
-Split.variation.two.level,
 spls,
 splsda,
+tau.estim,
 tune.multilevel,
 tune.splsdalevel1,
 tune.splsdalevel2,
@@ -52,6 +51,7 @@ tune.rcc,
 unmap,
 valid,
 vip,
+withinVariation,
 wrapper.rgcca,
 wrapper.sgcca)
 
@@ -137,11 +137,11 @@ S3method(plot3dVar, spca)
 S3method(plot3dVar, ipca)
 S3method(plot3dVar, sipca)
 
-S3method(select.var, spls)
-S3method(select.var, splsda)
-S3method(select.var, spca)
-S3method(select.var, sipca)
-S3method(select.var, sgcca)
+S3method(selectVar, spls)
+S3method(selectVar, splsda)
+S3method(selectVar, spca)
+S3method(selectVar, sipca)
+S3method(selectVar, sgcca)
 
 S3method(network, default)
 S3method(network, rcc)

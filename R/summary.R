@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
@@ -48,9 +48,9 @@ function(object,
         gp.Y = 1:q
     }
      
-    #-- communauté --#
+    #-- communaut? --#
     if (any(what == "all") || any(what == "communalities")) {
-        # communauté inter-groupe #
+        # communaut? inter-groupe #
         #-------------------------#
         Cm.XvsV = cor(object$X[, gp.X], object$variate$Y[, 1:ncomp], use = "pairwise")
         Cm.XvsV = t(apply(Cm.XvsV^2, 1, cumsum))
@@ -60,7 +60,7 @@ function(object,
         Cm.YvsU = t(apply(Cm.YvsU^2, 1, cumsum))
         colnames(Cm.YvsU) = paste("comp", 1:ncomp)
          
-        # communauté intra-groupe #
+        # communaut? intra-groupe #
         #-------------------------#
         Cm.XvsU = cor(object$X[, gp.X], object$variates$X[, 1:ncomp], use = "pairwise")
         Cm.XvsU = t(apply(Cm.XvsU^2, 1, cumsum))
@@ -152,8 +152,8 @@ function(object,
     gp.Y = 1:q
      
     if (!is.null(cutoff)) {
-        # choix des variables avec au moins une coordonnée # 
-        # supérieur au cutoff                              #
+        # choix des variables avec au moins une coordonn?e # 
+        # sup?rieur au cutoff                              #
         #--------------------------------------------------#
         gp.X = vector(mode = "numeric")
         gp.Y = vector(mode = "numeric")
@@ -181,9 +181,9 @@ function(object,
      
     result = list( )
      
-    #-- communauté --#
+    #-- communaut? --#
     if (any(what == "all") || any(what == "communalities")) {
-        # communauté inter-groupe #
+        # communaut? inter-groupe #
         #-------------------------#
         Cm.XvsV = cor(object$X[, gp.X], object$variate$Y[, 1:ncomp], use = "pairwise")
         Cm.XvsV = t(apply(Cm.XvsV^2, 1, cumsum))
@@ -193,7 +193,7 @@ function(object,
         Cm.YvsU = t(apply(Cm.YvsU^2, 1, cumsum))
         colnames(Cm.YvsU) = paste("comp", 1:ncomp)
          
-        # communauté intra-groupe #
+        # communaut? intra-groupe #
         #-------------------------#
         Cm.XvsU = cor(object$X[, gp.X], object$variates$X[, 1:ncomp], use = "pairwise")
         Cm.XvsU = scale(Cm.XvsU^2, center = FALSE, scale = (object$cor[1:ncomp])^2)
@@ -238,7 +238,7 @@ function(object,
         result$Rd.Y = list(own = own, opp = opp)
     }
      
-    #-- corrélations canoniques --#
+    #-- corr?lations canoniques --#
     can.cor = object$cor[1:ncomp]
     names(can.cor) = paste(1:ncomp, "th", sep = "")
      

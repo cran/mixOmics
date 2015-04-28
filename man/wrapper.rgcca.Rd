@@ -8,9 +8,16 @@
 }
 
 \usage{	
-wrapper.rgcca(data, design = 1 - diag(length(data)), tau = rep(1, length(data)),
-  ncomp = rep(1, length(data)), scheme = "centroid", scale = TRUE, init = "svd", 
-  bias = TRUE, tol = .Machine$double.eps, verbose = FALSE)
+wrapper.rgcca(data, 
+design = 1 - diag(length(data)), 
+tau = rep(1, length(data)),
+  ncomp = rep(1, length(data)), 
+  scheme = "centroid", 
+  scale = TRUE, 
+  init = "svd", 
+  bias = TRUE, 
+  tol = .Machine$double.eps, 
+  verbose = FALSE)
 }	
 
 \arguments{
@@ -71,9 +78,9 @@ that contains the following components:
   Genet. Mol. Biol. 4:32.
 }
 
-\author{Arthur Tenenhaus, Vincent Guillemot and Kim-Anh Lê Cao.}
+\author{Arthur Tenenhaus, Vincent Guillemot and Kim-Anh Le Cao.}
 
-\seealso{\code{\link{rgcca}}, \code{\link{plotIndiv}}, \code{\link{plotVar}}, \code{\link{wrapper.sgcca}}. \code{\link{sgcca}} and \url{http://www.math.univ-toulouse.fr/~biostat/mixOmics/} for more details.}
+\seealso{\code{\link{rgcca}}, \code{\link{plotIndiv}}, \code{\link{plotVar}}, \code{\link{wrapper.sgcca}}. \code{\link{sgcca}} and \url{http://www.mixOmics.org} for more details.}
 
 \examples{
 data(nutrimouse)
@@ -99,3 +106,4 @@ wrap.result.rgcca = wrapper.rgcca(data = data, design = design, tau = c(1, 1, 0)
 
 
 \keyword{multivariate}
+

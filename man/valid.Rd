@@ -6,7 +6,7 @@
 
 \description{
 The valid function has been supersided by the perf function to evaluate the performance of the PLS, sPLS, PLS-DA and sPLS-DA methods. 
-     See ?perf for more details}
+     See \code{help(perf)} for more details}
 
 \usage{
 valid(object, \ldots)	
@@ -20,9 +20,9 @@ valid(object, \ldots)
 
 
 \references{
-Tenenhaus, M. (1998). \emph{La r?gression PLS: th?orie et pratique}. Paris: Editions Technic.  
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.  
 
-L? Cao, K. A., Rossouw D., Robert-Grani?, C. and Besse, P. (2008). A sparse PLS for variable 
+Le Cao, K. A., Rossouw D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable 
 selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular 
 Biology} \bold{7}, article 35.
 
@@ -32,7 +32,7 @@ Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of C
 
 \author{Sebastien Dejean, Ignacio Gonzalez and Kim-Anh Le Cao.}
 
-\seealso{\code{\link{perf}}, \code{\link{predict}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\seealso{\code{\link{perf}}, \code{\link{predict}} and http://www.mixOmics.org for more details.}
 
 \keyword{regression}
 \keyword{multivariate}

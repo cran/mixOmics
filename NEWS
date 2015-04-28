@@ -1,4 +1,25 @@
+Changes in 5.0-4
+================
 
+New features:
+-------------
+1- new set of palettes have been added: color.jet, color.spectral, color.GreenRed and color.mixo
+2- the multilevel module has been updated. A new function called withinVariation() calculates the within matrix. Our new website www.mixOmics.org will be updated shortly
+3- the function tau.estim was borrowed from the RGCCA package and included in mixOmics in order to estimate the regularisation parameters from rcc more efficiently than tune.rcc(). We noted differences in those parameters estimates between tune.rcc() and tau.estim() as the methods use either cross-validation or the formula from SHaefer and Strimmer (2005). When using tau.estim() we also advise to center and scale the input data in rcc(). See helptau.estim().  
+4- because of a S3 method clash with the MASS package with the current R version we had to rename select.var to selectVar
+
+Bug fixes:
+----------
+1- select.var.sgcca has been fixed (the outputs were messy)
+2- minor bug in plotVar.sgcca and plotVar.rgcca fixed
+3- the algorithm in perf.pls and perf.spls has been almost entirely changed. We are now using a different algorithm to estimate the Q2, as presented in the help Rd file (unfortunately the reference is French so contact us for more details if needed). plot.perf() has been updated
+
+Enhancements:
+----------
+1- network default color set to color.GreenRed
+2- output feature.final in perf S3 function has been removed. Better to use select.var() to obtain the list of selected variables
+3- the multilevel module has been updated. The argument names were changed to 'design' instead of 'cond'. The pheatmap.multilevel() function has been improved.
+4- the nearZeroVar function that was borrowed from the caret package has been enhanced to improve computational time as this is costly in the pls/spls functions
 
 Changes in 5.0-3
 ================

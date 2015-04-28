@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
@@ -59,7 +59,7 @@ function(object,
             stop("'ind.names' must be a character vector of length ", nrow(object$X), " or a boolean atomic vector.")
     }
 
-    # l'espace de représentation #
+    # l'espace de representation #
     #----------------------------#
     rep.space = match.arg(rep.space, c("XY-variate", "X-variate", "Y-variate"))
 		
@@ -193,7 +193,7 @@ function (object,
             stop("'ind.names' must be a character vector of length ", nrow(object$X), " or a boolean atomic vector.")
     }		
 
-    # l'espace de représentation #
+    # l'espace de representation #
     #----------------------------#
     rep.space = match.arg(rep.space, c("XY-variate", "X-variate", "Y-variate"))
 		
@@ -326,7 +326,7 @@ function (object,
             stop("'ind.names' must be a character vector of length ", nrow(object$x), " or a boolean atomic vector.")
     }
 
-    # l'espace de représentation #
+    # l'espace de representation #
     #----------------------------#
     x = object$x[, comp[1]]
     y = object$x[, comp[2]]

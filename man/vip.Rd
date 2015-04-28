@@ -35,10 +35,10 @@ Predictors with large VIP, larger than 1, are the most relevant for explaining \
 }
 
 \references{
-Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 }
 
-\author{Sébastien Déjean and Ignacio González.}
+\author{Sebastien Dejean and Ignacio Gonz\`alez.}
 
 \seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{summary}}.}
 
@@ -58,3 +58,4 @@ barplot(linn.vip,
 
 \keyword{regression}
 \keyword{multivariate}
+

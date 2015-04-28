@@ -62,7 +62,7 @@ in three dimensions for (r)CCA, (s)PLS regression and PCA.
   \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"}, 
     \code{"spls"}, \code{"plsda"} or \code{"pca"}.}
   \item{comp}{an integer vector of length 3, the components that will be used on the \eqn{x}-axis,  
-	the \eqn{y}-axis and \eqn{z}-axis respectively to project the individuals.}
+	the y-axis and z-axis respectively to project the individuals.}
   \item{ind.names}{either a character vector of names for the individuals to be plotted, 
     or \code{FALSE} for no names. If \code{TRUE}, the row names of the first (or second) 
 	data matrix is used as names (see Details).}	
@@ -70,7 +70,7 @@ in three dimensions for (r)CCA, (s)PLS regression and PCA.
     \code{"Y-variate"} or \code{"XY-variate"}, determining the subspace to project the 
 	  individuals. Defaults to \code{"XY-variate"} and \code{"X-variate"} for (r)CCA and (s)PLS 
       respectively.}
-  \item{xlab, ylab, zlab}{\eqn{x}-, \eqn{y}- and \eqn{z}-axis titles.}
+  \item{xlab, ylab, zlab}{x, y and z axis titles.}
   \item{col}{character (or item) color to be used, possibly vector (see Details).}
   \item{cex}{numeric character (or item) expansion, possibly vector (see Details).}
   \item{pch}{character indicating the type of item to plot, possibly vector (see Details).}
@@ -104,7 +104,7 @@ The pointing device of your graphics user-interface can also be used to set the 
 
 \seealso{\code{\link{plotIndiv}}, \code{\link{plot3dVar}}, \code{\link[rgl]{text3d}}, 
 \code{\link[rgl]{title3d}} and \code{\link[rgl]{rgl.postscript}} to save the screen shot 
-to a file in PostScript or other vector graphics format.}
+to a file in PostScript or other vector graphics format (provided you load the \code{\link[rgl]{rgl}} library.}
 
 \examples{
 require(rgl)

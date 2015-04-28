@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Seébastien Deéjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonzàlez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research, Toulouse France and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research, Toulouse France and 
 # The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 # Florian Rohart,  Australian Institute for Bioengineering and Nanotechnology, The University of Queensland, Brisbane, QLD 
 #
@@ -27,68 +27,95 @@ function(X,
          mode = c("regression", "canonical", "invariant", "classic"),
          max.iter = 500, 
          tol = 1e-06,
-         near.zero.var = TRUE,
-         ...)
+         near.zero.var = TRUE)
 {
 
     #-- validation des arguments --#
-    if (length(dim(X)) != 2) 
+    if (length(dim(X)) != 2)
+    {
         stop("'X' must be a numeric matrix.")
-     
+    }
+    
     X = as.matrix(X)
     Y = as.matrix(Y)
      
     if (!is.numeric(X) || !is.numeric(Y)) 
+    {
         stop("'X' and/or 'Y' must be a numeric matrix.")
-     
+    }
+    
     n = nrow(X)
     q = ncol(Y)
      
     if ((n != nrow(Y))) 
+    {
         stop("unequal number of rows in 'X' and 'Y'.")
-     
+    }
     if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0)
+    {
         stop("invalid number of variates, 'ncomp'.")
-		
-if(near.zero.var == TRUE){ 
-    nzv = nearZeroVar(X, ...)
-    if (length(nzv$Position > 0)) {
-        warning("Zero- or near-zero variance predictors. 
-  Reset predictors matrix to not near-zero variance predictors.
-  See $nzv for problematic predictors.")
-        X = X[, -nzv$Position]
     }
+    
+    if(near.zero.var == TRUE)
+    {
+        nzv = nearZeroVar(X)
+        if (length(nzv$Position > 0))
+        {
+            warning("Zero- or near-zero variance predictors.\nReset predictors matrix to not near-zero variance predictors.\nSee $nzv for problematic predictors.")
+            X = X[, -nzv$Position,drop=FALSE]
+
+            if(ncol(X)==0)
+            {
+                stop("No more predictors after Near Zero Var has been applied!")
+            }
+            
+        }
     }
+    
 	p = ncol(X)
 	
     ncomp = round(ncomp)
-    if(ncomp > p) {
+    if(ncomp > p)
+    {
         warning("Reset maximum number of variates 'ncomp' to ncol(X) = ", p, ".")
         ncomp = p
     }
      
     mode = match.arg(mode)
      
-    #-- initialisation des matrices --#
-    X.names = dimnames(X)[[2]]
-    if (is.null(X.names)) X.names = paste("X", 1:p, sep = "")
+     #-- initialisation des matrices --#
+     X.names = dimnames(X)[[2]]
+     if (is.null(X.names))
+     {
+         X.names = paste("X", 1:p, sep = "")
+         dimnames(X)[[2]]=X.names
+         
+     }
      
-    if (dim(Y)[2] == 1) Y.names = "Y"
-    else {
-        Y.names = dimnames(Y)[[2]]
-        if (is.null(Y.names)) Y.names = paste("Y", 1:q, sep = "")
-    }
+     if (dim(Y)[2] == 1)
+     {
+         Y.names = "Y"
+     }else{
+         Y.names = dimnames(Y)[[2]]
+         if (is.null(Y.names))
+         {
+             Y.names = paste("Y", 1:q, sep = "")
+             dimnames(Y)[[2]]=Y.names
+         }
+     }
      
-    ind.names = dimnames(X)[[1]]
-    if (is.null(ind.names)) {
-        ind.names = dimnames(Y)[[1]]
-        rownames(X) = ind.names
-    }
-     	
-    if (is.null(ind.names)) {
-        ind.names = 1:n
-        rownames(X) = rownames(Y) = ind.names
-    }		
+     ind.names = dimnames(X)[[1]]
+     if (is.null(ind.names))
+     {
+         ind.names = dimnames(Y)[[1]]
+         rownames(X) = ind.names
+     }
+     
+     if (is.null(ind.names))
+     {
+         ind.names = 1:n
+         rownames(X) = rownames(Y) = ind.names
+     }		
     	
     #-- centrer et r?duire les donn?es --#
     X = scale(X, center = TRUE, scale = TRUE)
@@ -112,7 +139,8 @@ if(near.zero.var == TRUE){
     is.na.Y = is.na(Y)
 	if (any(is.na.X)) na.X = TRUE
     if (any(is.na.Y)) na.Y = TRUE
-     
+    
+    iter=NULL
     #-- boucle sur h --#
     for (h in 1:ncomp) {
         
@@ -121,22 +149,25 @@ if(near.zero.var == TRUE){
 		if (any(is.na(u))) u[is.na(u)] = 0
         a.old = 0
         b.old = 0
-        iter = 1
+        iterh = 1
          	
-        if (na.X) {
+        if (na.X)
+        {
             X.aux = X.temp
             X.aux[is.na.X] = 0
         }
          
-        if (na.Y) {
+        if (na.Y)
+        {
             Y.aux = Y.temp
             Y.aux[is.na.Y] = 0
         }
          
-        repeat {
+        repeat{
             #--compute loading vectors and variates associated to X
-            if (na.X) {
-                a = crossprod(X.aux, u)				
+            if (na.X)
+            {
+                a = crossprod(X.aux, u)
                 U = drop(u) %o% p.ones
                 U[is.na.X] = 0
                 u.norm = crossprod(U)				
@@ -147,15 +178,14 @@ if(near.zero.var == TRUE){
                 A[t(is.na.X)] = 0
                 a.norm = crossprod(A)
                 t = t / diag(a.norm)				
-            }
-            else {			
-                a = crossprod(X.temp, u) #/ drop(crossprod(u)), not useful as a is scaled below
+            }else{
+                a = crossprod(X.temp, u)#/ drop(crossprod(u)), not useful as a is scaled below
                 a = a / drop(sqrt(crossprod(a)))
                 t = X.temp %*% a / drop(crossprod(a))
             }
              
             #--compute loading vectors and variates associated to Y
-            if (na.Y) {
+            if (na.Y){
                 b = crossprod(Y.aux, t)
                 T = drop(t) %o% q.ones
                 T[is.na.Y] = 0
@@ -166,28 +196,28 @@ if(near.zero.var == TRUE){
                 B[t(is.na.Y)] = 0
                 b.norm = crossprod(B)
                 u = u / diag(b.norm)					
-            }
-            else {			
+            }else{
                 b = crossprod(Y.temp, t) #/ drop(crossprod(t)), not useful as b is scaled below
                 b=b / drop(sqrt(crossprod(b)))
                 u = Y.temp %*% b / drop(crossprod(b))
             }
 				
-            if (crossprod(a - a.old) < tol) break
+            if (crossprod(a - a.old) < tol) {break}
              
-            if (iter == max.iter) {
-                warning(paste("Maximum number of iterations reached for dimension", h),
-                        call. = FALSE)
+            if (iterh == max.iter)
+            {
+                warning(paste("Maximum number of iterations reached for dimension", h),call. = FALSE)
                 break
             }
              
             a.old = a
             b.old = b
-            iter = iter + 1
+            iterh = iterh + 1
         }
-         
+        
         #-- deflation des matrices --#
-        if (na.X) {
+        if (na.X)
+        {
             X.aux = X.temp
             X.aux[is.na.X] = 0
             c = crossprod(X.aux, t)				
@@ -195,16 +225,17 @@ if(near.zero.var == TRUE){
             T[is.na.X] = 0
             t.norm = crossprod(T)				
             c = c / diag(t.norm)
-        }
-        else {
+        }else{
             c = crossprod(X.temp, t) / drop(crossprod(t))
         }	
 		
         X.temp = X.temp - t %*% t(c)   
          
         #-- mode canonique --#
-        if (mode == "canonical") {
-            if (na.Y) {
+        if (mode == "canonical")
+        {
+            if (na.Y)
+            {
                 Y.aux = Y.temp
                 Y.aux[is.na.Y] = 0
                 e = crossprod(Y.aux, u)
@@ -212,8 +243,7 @@ if(near.zero.var == TRUE){
                 U[is.na.Y] = 0
                 u.norm = crossprod(U)				
                 e = e / diag(u.norm)					
-            }
-            else {
+            }else{
                 e = crossprod(Y.temp, u) / drop(crossprod(u))
             }
 			
@@ -221,11 +251,15 @@ if(near.zero.var == TRUE){
         }
          
         #-- mode classic --#
-        if(mode == "classic") Y.temp = Y.temp - t %*% t(b)                 
-         
+        if(mode == "classic")
+        {
+            Y.temp = Y.temp - t %*% t(b)
+        }
         #-- mode regression --#
-        if(mode == "regression") {
-            if (na.Y) {
+        if(mode == "regression")
+        {
+            if (na.Y)
+            {
                 Y.aux = Y.temp
                 Y.aux[is.na.Y] = 0
                 d = crossprod(Y.aux, t)
@@ -233,8 +267,7 @@ if(near.zero.var == TRUE){
                 T[is.na.Y] = 0
                 t.norm = crossprod(T)				
                 d = d / diag(t.norm)
-            }
-            else {				
+            }else{
                 d = crossprod(Y.temp, t) / drop(crossprod(t))
             }
              
@@ -242,16 +275,18 @@ if(near.zero.var == TRUE){
         }
 		
         #-- mode invariant --#
-        if (mode == "invariant") Y.temp = Y 
-         
+        if (mode == "invariant") {Y.temp = Y}
+        
         mat.t[, h] = t
         mat.u[, h] = u
         mat.a[, h] = a
         mat.b[, h] = b
         mat.c[, h] = c
-        if (mode == "regression") mat.d[, h] = d
-	if (mode == "canonical") mat.e[, h] = e
-     
+        if (mode == "regression") {mat.d[, h] = d}
+	
+        if (mode == "canonical") {mat.e[, h] = e}
+        
+        iter=c(iter,iterh) #save the number of iteration per component
     } #-- fin boucle sur h --#
 
     #-- valeurs sortantes --#
@@ -272,16 +307,16 @@ if(near.zero.var == TRUE){
 	              ncomp = ncomp, 
 	              mode = mode, 
 	              mat.c = mat.c,
-		      mat.d = mat.d,
-		      mat.e = mat.e, 
+                  mat.d = mat.d,
+                  mat.e = mat.e,
 	              variates = list(X = mat.t, Y = mat.u),
 	              loadings = list(X = mat.a, Y = mat.b), 
-	              names = list(X = X.names, Y = Y.names, indiv = ind.names),
-          tol = tol,
-          max.iter = max.iter,
-          iter=iter
+                  names = list(X = X.names, Y = Y.names, indiv = ind.names),
+                  tol = tol,
+                  max.iter = max.iter,
+                  iter=iter
                 )
-    if (near.zero.var == TRUE & length(nzv$Position > 0)) result$nzv = nzv  
+    if (near.zero.var == TRUE) result$nzv = nzv
 	
     class(result) = "pls"
     return(invisible(result))

@@ -28,7 +28,7 @@ A list containing the following components:
 
 \details{
 This data consists of 47 breast cancer samples and 1753 cDNA clones
-pre-selected by Pérez-Enciso \emph{et al.} (2003) to draw their Fig. 1.
+pre-selected by P?rez-Enciso \emph{et al.} (2003) to draw their Fig. 1.
 The authors selected 47 samples for which there was information
 at least before or before and after chemotherapy treatment.
 There were 20 tumours that were microarrayed both before
@@ -43,7 +43,7 @@ Cancer Consortium Portal
 }
 
 \references{
-Pérez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
+Perez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
 a partial least squares discriminant analysis (PLS-DA) approach. \emph{Human Genetics} 
 \bold{112}, 581-592.
 

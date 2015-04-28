@@ -8,9 +8,15 @@
 }
 
 \usage{	
-wrapper.sgcca(data, design = 1 - diag(length(data)), penalty = rep(1, length(data)),
-  ncomp = rep(1, length(data)), scheme = "centroid", scale = TRUE, init = "svd", 
-  bias = TRUE, tol = .Machine$double.eps, verbose = FALSE)
+wrapper.sgcca(data, design = 1 - diag(length(data)), 
+penalty = rep(1, length(data)),
+  ncomp = rep(1, length(data)), 
+  scheme = "centroid", 
+  scale = TRUE, 
+  init = "svd", 
+  bias = TRUE, 
+  tol = .Machine$double.eps, 
+  verbose = FALSE)
 }	
 
 \arguments{
@@ -66,9 +72,9 @@ that contains the following components:
   Tenenhaus A., Phillipe C., Guillemot, V., Le Cao K-A., Grill J., Frouin, V. Variable Selection For Generalized Canonical Correlation Analysis. 2013. (in revision)
 }
 
-\author{Arthur Tenenhaus, Vincent Guillemot and Kim-Anh Lê Cao.}
+\author{Arthur Tenenhaus, Vincent Guillemot and Kim-Anh Le Cao.}
 
-\seealso{\code{\link{sgcca}}, \code{\link{plotIndiv}}, \code{\link{plotVar}}, \code{\link{wrapper.rgcca}}, \code{\link{rgcca}} and \url{http://www.math.univ-toulouse.fr/~biostat/mixOmics/} for more details.}
+\seealso{\code{\link{sgcca}}, \code{\link{plotIndiv}}, \code{\link{plotVar}}, \code{\link{wrapper.rgcca}}, \code{\link{rgcca}} and \url{http://www.mixOmics.org} for more details.}
 
 \examples{
 data(nutrimouse)

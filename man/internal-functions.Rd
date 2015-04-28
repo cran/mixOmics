@@ -6,15 +6,8 @@
 \alias{map}
 \alias{unmap}
 \alias{pcasvd}
-
-
-
 \alias{ica.def}
 \alias{ica.par}
-
-\alias{check.one.level}
-\alias{Split.variation.one.level}
-\alias{Split.variation.two.level}
 
 
 \title{Internal Functions}

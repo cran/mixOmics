@@ -17,7 +17,7 @@ and (sparse) PLS regression.
 \method{network}{default}(mat, threshold = 0.5, X.names = NULL, Y.names = NULL,
         color.node = c("white", "white"), 
         shape.node = c("circle", "rectangle"), 
-        color.edge = c("blue", "red"), 
+        color.edge = color.GreenRed(100), 
         lty.edge = c("solid", "solid"), 
         lwd.edge = c(1, 1), show.edge.labels = FALSE, 
         show.color.key = TRUE, symkey = TRUE, keysize = 1, 
@@ -48,7 +48,7 @@ and (sparse) PLS regression.
   \item{shape.node}{character vector of length two, the shape of the \eqn{X} and  
     \eqn{Y} nodes (see Details).}
   \item{color.edge}{vector of colors or character string specifying the colors function to using
-     to color the edges (see Details).}
+     to color the edges, set to default to \code{color.GreenRed(100)} but other palettes can be chosen (see Details and Examples).}
   \item{lty.edge}{character vector of length two, the line type for the edges (see Details).}
   \item{lwd.edge}{vector of length two, the line width of the edges (see Details).}
   \item{show.edge.labels}{logical. If \code{TRUE}, plot association values as edge 
@@ -108,7 +108,7 @@ or an integer \code{i} meaning \code{palette()[i]}. \code{color.node[1]} and
 respectively. Defaults to \code{c("white", "white")}.
  
 \code{color.edge} give the color to edges with colors corresponding to the values in 
-\code{mat}. Defaults to \code{c("blue", "red")} for low and high weight respectively.
+\code{mat}. Defaults to \code{color.GreenRed(100)} for negative (green) and positive (red) correlations. We also propose other palettes of colors, such as \code{color.jet} and \code{color.spectral}, see help on those functions, and examples below. Other palette of colors from the stats package can be used too.
 
 \code{shape.node[1]} and \code{shape.node[2]} provide the shape of the nodes associate
 to \eqn{X}- and \eqn{Y}-variables respectively. Current acceptable values are 
@@ -136,6 +136,8 @@ network can take some seconds.
 }
 
 \references{
+Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired ?omics? data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}
+
 Butte, A. J., Tamayo, P., Slonim, D., Golub, T. R. and Kohane, I. S. (2000). 
 Discovering functional relationships between RNA expression and chemotherapeutic 
 susceptibility using relevance networks. \emph{Proceedings of the National Academy 
@@ -147,10 +149,10 @@ and Transcriptome in Human Hepatoma Cells. \emph{Molecular Cancer Therapeutics} 
 199-205.
 }
 
-\author{S?bastien D?jean, Ignacio Gonz?lez and Kim-Anh L? Cao.}
+\author{Sebastien Dejean, Ignacio Gonzalez and Kim-Anh Le Cao.}
 
-\seealso{\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}
- and http: //www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\seealso{\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{color.GreenRed}}, \code{\link{color.jet}}, \code{\link{color.spectral}}
+ and http: //www.mixOmics.org for more details.}
 
 \examples{
 
@@ -160,18 +162,27 @@ X <- nutrimouse$lipid
 Y <- nutrimouse$gene
 nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
-\dontrun{   # may not work on the Linux version, use Windows instead
+\dontrun{   
+# may not work on the Linux version, use Windows instead
+# sometimes with Rstudio might not work because of margin issues, 
+# in that case save it as an image
+jpeg('example1-network.jpeg')
 network(nutri.res, comp = 1:3, threshold = 0.6)
+dev.off()
 }
 
 ## Changing the attributes of the network
 \dontrun{
+# sometimes with Rstudio might not work because of margin issues, 
+# in that case save it as an image
+jpeg('example2-network.jpeg')
 network(nutri.res, comp = 1:3, threshold = 0.45,
-        color.node = c("mistyrose", "lightcyan"),,
+        color.node = c("mistyrose", "lightcyan"),
         shape.node = c("circle", "rectangle"), 
-        color.edge = jet.colors(8),
+        color.edge = color.jet(100),
         lty.edge = c("solid", "solid"), lwd.edge = c(2, 2), 
         show.edge.labels = FALSE)
+dev.off()
 }
 
 ## interactive 'threshold' 
@@ -187,13 +198,17 @@ Y <- liver.toxicity$clinic
 toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50), 
                       keepY = c(10, 10, 10))
 \dontrun{
+# sometimes with Rstudio might not work because of margin issues, 
+# in that case save it as an image
+jpeg('example3-network.jpeg')
 network(toxicity.spls, comp = 1:3, threshold = 0.8, 
         X.names = NULL, Y.names = NULL, keep.var = TRUE,
         color.node = c("mistyrose", "lightcyan"),
         shape.node = c("rectangle", "circle"),
-        color.edge = c("red", "blue"),
+        color.edge = color.spectral(100),
         lty.edge = c("solid", "solid"), lwd.edge = c(1, 1), 
         show.edge.labels = FALSE, interactive = FALSE)
+dev.off()
 }
 }
 

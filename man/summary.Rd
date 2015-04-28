@@ -73,7 +73,7 @@ The function \code{summary} returns a list with components:
 
 }
 
-\author{Sébastien Déjean Ignacio González and Kim-Anh Lê Cao.}
+\author{Sebastien Dejean, Ignacio Gonzalez and Kim-Anh Le Cao.}
 
 \seealso{\code{\link{rcc}}, \code{\link{pls}}, \code{\link{spls}}, \code{\link{vip}}.}
 

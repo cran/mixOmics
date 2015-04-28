@@ -44,7 +44,7 @@ model, laid out in a multi panel display.  It uses \code{\link{xyplot}} for
 performing the actual plotting.
 }
 
-\author{Ignacio Gonz?lez.}
+\author{Ignacio Gonzalez, Florian Rohart.}
 
 \seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}}, 
 \code{\link{perf}}.}

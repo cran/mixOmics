@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
@@ -63,7 +63,7 @@ function(X,
     Cyy = var(Y, na.rm = TRUE, use = "pairwise") + diag(lambda2, ncol(Y))
     Cxy = cov(X, Y, use = "pairwise")
      
-    # calcul des corrélations canoniques, des variables #
+    # calcul des correlations canoniques, des variables #
     # canoniques et des vecteurs bisecteurs             #
     #---------------------------------------------------#
     Cxx.fac = chol(Cxx)

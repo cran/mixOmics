@@ -44,8 +44,8 @@ It consists in the regularization of the empirical covariances matrices of
 \eqn{X} and \eqn{Y} by adding a multiple of the matrix identity, that is,
 Cov\eqn{(X)+ \lambda_1 I} and Cov\eqn{(Y)+ \lambda_2 I}.
 
-When \code{lambda1=0} and \code{lambda2=0}, \code{rcc} perform classic
-CCA, if posible.
+When \code{lambda1=0} and \code{lambda2=0}, \code{rcc} performs a classical
+CCA, if possible (i.e. when \eqn{n > p+q}.
 
 The estimation of the missing values can be performed 
 by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
@@ -66,6 +66,10 @@ contains the following components:
 }
 
 \references{
+Gonzalez, I., Dejean, S., Martin, P. G., and Baccini, A. (2008). CCA: An R package to extend canonical correlation analysis. Journal of Statistical Software, 23(12), 1-14.
+
+Gonzalez, I., Dejean, S., Martin, P., Goncalves, O., Besse, P., and Baccini, A. (2009). Highlighting relationships between heterogeneous biological data through graphical displays based on regularized canonical correlation analysis. Journal of Biological Systems, 17(02), 173-199.
+
 Leurgans, S. E., Moyeed, R. A. and Silverman, B. W. (1993). 
 Canonical correlation analysis when the data are curves. 
 \emph{Journal of the Royal Statistical Society. Series B} \bold{55}, 725-740.
@@ -74,11 +78,11 @@ Vinod, H. D. (1976). Canonical ridge and econometrics of joint production.
 \emph{Journal of Econometrics} \bold{6}, 129-137.
 }
 
-\author{Sébastien Déjean and Ignacio González.}
+\author{Sebastien Dejean and Ignacio Gonzalez.}
 
 \seealso{\code{\link{summary}}, \code{\link{tune.rcc}}, 
 \code{\link{plot.rcc}}, \code{\link{plotIndiv}}, \code{\link{plot3dIndiv}},
-\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## Classic CCA

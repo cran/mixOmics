@@ -12,7 +12,7 @@ in a one-step strategy.
 \usage{
 spls(X, Y, ncomp = 2, mode = c("regression", "canonical"),
      max.iter = 500, tol = 1e-06, keepX = rep(ncol(X), ncomp), 
-     keepY = rep(ncol(Y), ncomp), near.zero.var = TRUE,...)
+     keepY = rep(ncol(Y), ncomp), near.zero.var = TRUE)
 }	
 
 \arguments{
@@ -30,8 +30,6 @@ spls(X, Y, ncomp = 2, mode = c("regression", "canonical"),
   \item{keepY}{numeric vector of length \code{ncomp}, the number of variables
     to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
       \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations.}
-
-  \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 
 \details{
@@ -67,32 +65,33 @@ that contains the following components:
   \item{nzv}{list containing the zero- or near-zero predictors information.}
   \item{tol}{the tolerance used in the iterative algorithm, used for subsequent S3 methods}
   \item{max.iter}{the maximum number of iterations, used for subsequent S3 methods}
+\item{iter}{Number of iterations of the algorthm for each component}
 
 }
 
 \references{
 
-Lê Cao, K.-A., Martin, P.G.P., Robert-Granié, C. and Besse, P. (2009). Sparse canonical methods for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
+Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 
-Lê Cao, K.-A., Rossouw, D., Robert-Granié, C. and Besse, P. (2008). A sparse PLS for variable 
+Le Cao, K.-A., Rossouw, D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable 
 selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular 
 Biology} \bold{7}, article 35.
 
 Shen, H. and Huang, J. Z. (2008). Sparse principal component analysis via regularized 
 low rank matrix approximation. \emph{Journal of Multivariate Analysis} \bold{99}, 1015-1034.    
 
-Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 
 Wold H. (1966). Estimation of principal components and related models by iterative least squares. 
 In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
 }
 
-\author{Sébastien Déjean, Ignacio González and Kim-Anh Lê Cao.}
+\author{Sebastien Dejean, Ignacio Gonzalez and Kim-Anh Le Cao.}
 
 \seealso{\code{\link{pls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
-\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{perf}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{perf}} and http://www.mixOmics.org for more details.}
 
 \examples{
 data(liver.toxicity)

@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
@@ -59,18 +59,18 @@ function(object,
     comp1 = round(comp[1])
     comp2 = round(comp[2])
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-    
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
+#     
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     
 
-    # calcul des coordonnées #
+    # calcul des coordonnees #
     #------------------------#
       if (object$mode == "canonical") {
           cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
@@ -236,7 +236,7 @@ function(object,
     comp1 = round(comp[1])
     comp2 = round(comp[2])
 
-    # calcul des coordonnées #
+    # calcul des coordonnees #
     #------------------------#
     cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
 
@@ -392,18 +392,18 @@ function(object,
     comp1 = round(comp[1])
     comp2 = round(comp[2])
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-     # what the function is expecting
-    match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-    
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#      # what the function is expecting
+#     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
+#     
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     
 
-    # calcul des coordonnées #
+    # calcul des coordonnees #
     #------------------------#
         keep.X = apply(abs(object$loadings$X), 1, sum) > 0
         keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
@@ -590,18 +590,18 @@ function(object,
     comp1 = round(comp[1])
     comp2 = round(comp[2])
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-    
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
+#     
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     
 
-    # calcul des coordonnées #
+    # calcul des coordonnees #
     #------------------------#
     keep.X = apply(abs(object$loadings$X), 1, sum) > 0
     cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
@@ -765,24 +765,24 @@ function(object,
     comp1 = round(comp[1])
     comp2 = round(comp[2])
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-    
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
+#     
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     
 
-    # coordonnées des variables #
+    # coordonnees des variables #
 	#---------------------------#
     bisect = object$variates$X[, c(comp1, comp2)] + object$variates$Y[, c(comp1, comp2)]
     cord.X = cor(object$X, bisect, use = "pairwise")
     cord.Y = cor(object$Y, bisect, use = "pairwise")
 
-    # choix des variables avec au moins une coordonnée supérieur au cutoff #
+    # choix des variables avec au moins une coordonnee superieur au cutoff #
     #----------------------------------------------------------------------#
     if (!is.null(cutoff)) {
         gp.X = vector(mode = "numeric")
@@ -982,19 +982,19 @@ function(object,
     comp1 = round(comp[1])
     comp2 = round(comp[2])
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-    
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
+#     
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     
 
 
-    # calcul des coordonnées #
+    # calcul des coordonnees #
     #------------------------#
     keep.X = apply(abs(object$rotation), 1, sum) > 0
     cord.X = cor(object$X[, keep.X], object$x[, c(comp1, comp2)], 
@@ -1154,18 +1154,18 @@ function(object,
             stop("'var.label' must be a character vector of length ", q, " or a boolean atomic vector.")
     }
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'rad.in', 'var.label')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-	if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'rad.in', 'var.label')
+#     
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+# 	if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+# 	
 	
-	
-    # calcul des coordonnées #
+    # calcul des coordonnees #
     #------------------------#
     cord.X = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
 
@@ -1228,18 +1228,18 @@ function(object,
             stop("'var.label' must be a character vector of length ", q, " or a boolean atomic vector.")
     }
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'rad.in', 'var.label')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-	if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'rad.in', 'var.label')
+#     
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+# 	if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+# 	
 	
-	
-    # calcul des coordonnées #
+    # calcul des coordonnees #
     #------------------------#
     cord.X = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
 
@@ -1296,19 +1296,19 @@ function(object,
     comp1 = round(comp[1])
     comp2 = round(comp[2])
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-    
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
+#     
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     
 
 
-    # calcul des coordonnées #
+    # calcul des coordonnees #
     #------------------------#
     keep.X = apply(abs(object$loadings), 1, sum) > 0
     cord.X = cor(object$X[, keep.X], object$x[, c(comp1, comp2)], 
@@ -1446,7 +1446,7 @@ plotVar.sgcca <-
            labels = FALSE,
            pch = c(16,17), 
            cex =  c(0.5, 0.5), 
-           col = c('green', 'blue'),
+           col =  color.mixo(2),   #c('green', 'blue'),
            font = c(2,3),
            rad.in = 0.5, 
            ...) 
@@ -1468,20 +1468,22 @@ plotVar.sgcca <-
     if(all(ncomp.select != comp))
       stop("All argument from 'ncomp.select' differ from 'comp'")
     
-    if(any(ncomp.select > comp))
-      stop("At least one argument from 'ncomp.select' is greater than 'comp'")
+    #KA changed condition
+    #if(any(ncomp.select > comp))
+    if(any(ncomp.select > object$ncomp[comp]))
+      stop("At least one argument from 'ncomp.select' is greater than the actual number of components in the sgcca model")
     
-    cat('PlotVar only display variables selected on components', ncomp.select, '\n')
+    cat('PlotVar will only display variables selected on components', ncomp.select[1], 'and', ncomp.select[2], '\n')
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-    
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     
     
     
     # define if single block is true or false
@@ -1637,7 +1639,7 @@ plotVar.rgcca <-
            labels = FALSE,
            pch = c(16,17), 
            cex =  c(0.5, 0.5), 
-           col = c('green', 'blue'),
+           col =  color.mixo(2),       #c('green', 'blue'),
            font = c(2,3),
            rad.in = 0.5, 
            ...) 
@@ -1660,15 +1662,15 @@ plotVar.rgcca <-
     if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
       warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
     
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-    
+#     # check that the user did not enter extra arguments #
+#     # --------------------------------------------------#
+#     # what the user has entered
+#     match.user =names(match.call())
+#     # what the function is expecting
+#     match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
+#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
+#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
+#     
     
     
     # define if single block is true or false

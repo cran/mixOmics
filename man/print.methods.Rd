@@ -59,7 +59,7 @@ and the available components for Communalities Analysis,
 Redundancy Analysis and Variable Importance in the Projection (VIP).
 }
 
-\author{Sébastien Déjean, Ignacio González and Kim-Anh Lê Cao.}
+\author{Sebastien Dejean, Ignacio Gonzalez and Kim-Anh Le Cao.}
 
 \seealso{\code{\link{rcc}}, \code{\link{pls}}, \code{\link{spls}}, \code{\link{vip}}.}
 

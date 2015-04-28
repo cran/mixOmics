@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 # Leigh Coonan, Student, University of Queensland, Australia
 # Fangzhou Yao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia and
@@ -166,7 +166,7 @@ function(x, ...)
 			cat("\n Number of Y-variables selected on each of the sPLS components:", x$keepY, "\n")
         }			
 
-        #---------- affichage communauté ----------#
+        #---------- affichage communaute ----------#
         if (any(what == "all") || any(what == "communalities")) { 
             cat("\n\n Communalities Analysis:\n",
                 "----------------------")
@@ -206,7 +206,7 @@ function(x, ...)
             print(round(x$can.cor, digits = digits), print.gap = print.gap)
         }
 
-        #-- affichage communauté --#
+        #-- affichage communaute --#
         if (any(what == "all") || any(what == "communalities")) { 
             cat("\n\n Canonical Communalities Analysis:\n",
                 "--------------------------------")

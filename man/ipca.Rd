@@ -62,7 +62,7 @@ components.
 \author{Fangzhou Yao and Jeff Coquery.}
 
 \references{
-Yao, F., Coquery, J. and L\^e Cao, K.-A.(2011) Principal component analysis with independent loadings: a combination of PCA and ICA. (in preparation)
+Yao, F., Coquery, J. and Le Cao, K.-A. (2011) Principal component analysis with independent loadings: a combination of PCA and ICA. (in preparation)
 
 A. Hyvarinen and E. Oja (2000) Independent Component Analysis: Algorithms and Applications, \emph{Neural Networks}, \bold{13(4-5)}:411-430
 
@@ -72,7 +72,7 @@ J L Marchini, C Heaton and B D Ripley (2010). fastICA: FastICA Algorithms to per
 \seealso{\code{\link{sipca}}, \code{\link{pca}},
 \code{\link{plotIndiv}}, \code{\link{plotVar}},
 \code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}
-and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details..}
+and http://www.mixOmics.org for more details.}
 
 \examples{
 data(liver.toxicity)

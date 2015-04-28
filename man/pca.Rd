@@ -62,11 +62,11 @@ which would omit essentially constant components, or \code{comp.tol = 0}.
 
 
 
-\author{Ignacio Gonz?lez.}
+\author{Ignacio Gonzalez.}
 
 \seealso{\code{\link{nipals}}, \code{\link{prcomp}}, \code{\link{biplot}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}},
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details..}
+\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}} and http://www.mixOmics.org for more details.}
 
 \examples{
 data(multidrug)

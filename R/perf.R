@@ -1,7 +1,8 @@
-# Copyright (C) 2014 
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+# Copyright (C) 2015
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 # Amrit Singh, University of British Columbia, Vancouver.
+# Benoit Gautier, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 # Florian Rohart, Australian Institute for Bioengineering and Nanotechnology, University of Queensland, Brisbane, QLD.
 #
 # This program is free software; you can redistribute it and/or
@@ -28,62 +29,290 @@ perf <- function(object, ...) UseMethod("perf")
 #------------------------------------------------------#
 #-- Includes perf for PLS, sPLS, PLS-DA and sPLS-DA --#
 #------------------------------------------------------#
-
 # ---------------------------------------------------
 # perf for pls object
 # ---------------------------------------------------
-perf.pls <-
-  function(object,
-           criterion = c("all", "MSEP", "R2", "Q2"), 
-           validation = c("Mfold", "loo"),
-           folds = 10,
-           progressBar = TRUE,
-           ...)
-  {
+perf.pls <-function(object,
+                    validation = c("Mfold", "loo"),
+                    folds = 10,
+                    progressBar = TRUE,
+                    ...)
+{    #-- checking general input parameters --------------------------------------#
+    #---------------------------------------------------------------------------#
     
-    #-- validation des arguments --#
-    # these are the centered and scaled matrices output from pls 
+    #------------------#
+    #-- check entries --#
+    
+    #-- check pls mode
+    if(object$mode == 'canonical')
+    stop("PLS 'mode' should be set to 'regression', 'invariant' or 'classic'.", call. = FALSE)
+    
+    #-- validation
+    choices = c("Mfold", "loo")
+    validation = choices[pmatch(validation, choices)]
+    
+    if (any(is.na(validation)) || length(validation) > 1)
+    stop("'validation' should be one of 'Mfold' or 'loo'.", call. = FALSE)
+    
+    #-- progressBar
+    if (!is.logical(progressBar))
+    stop("'progressBar' must be a logical constant (TRUE or FALSE).", call. = FALSE)
+    
+    #-- end checking --#
+    #------------------#
+
+
+    #-- cross-validation approach  ---------------------------------------------#
+    #---------------------------------------------------------------------------#
+    
+    #-- initialising arguments --#
+    # these are the centered and scaled matrices output from pls
     X = object$X
     Y = object$Y
     
     tol = object$tol
     max.iter = object$max.iter
+    mode = object$mode
+    ncomp = object$ncomp
+    n = nrow(X)
+    p = ncol(X)
+    q = ncol(Y)    
+    res = list()
+
+    if (any(is.na(X)) || any(is.na(Y)))
+      stop("missing data in 'X' and/or 'Y'. Use 'nipals' for dealing with NAs.", call. = FALSE)
+        
+    #-- define the folds --#
+    if (validation == "Mfold") {
+        if (is.list(folds)) {
+            
+            if (length(folds) < 2 || length(folds) > n)
+              stop("Invalid number of folds.", call. = FALSE)
+            
+            if (length(unlist(folds)) != n)
+              stop("Invalid folds. The total number of samples in folds must be equal to ", n, ".", call. = FALSE)
+            
+            if (length(unique(unlist(folds))) != n)
+              stop("Invalid folds. Repeated samples in folds.", call. = FALSE)
+            
+            M = length(folds)
+        } else {
+            if (is.null(folds) || !is.finite(folds) || folds < 2 || folds > n) {
+                stop("Invalid number of folds.", call. = FALSE)
+            } else {
+                M = round(folds)
+                folds = split(sample(1:n), rep(1:M, length = n))
+            }
+        }
+    } else {
+        folds = split(1:n, rep(1:n, length = n))
+        M = n
+    }
     
-    if (length(dim(X)) != 2) 
-      stop("'X' must be a numeric matrix for validation.")
+    #-- set up a progress bar --#
+    if (progressBar == TRUE) {
+        pb = txtProgressBar(style = 3)
+        nBar = 1
+    }
+      
+    RSS = rbind(rep(n - 1, q), matrix(nrow = ncomp, ncol = q))
+    PRESS.inside = Q2 = MSEP = R2 = matrix(nrow = ncomp, ncol = q)
+    MSEP.mat = Ypred = array(0, c(n, q, ncomp))
     
-    if(object$mode == 'canonical') stop('PLS mode should be set to regression, invariant or classic')
+    press.mat = lapply(1 : ncomp, function(x){matrix(NA, nrow = n, ncol = q)})
+    RSS.indiv = lapply(1 : (ncomp + 1), function(x){matrix(NA, nrow = n, ncol = q)})
+    RSS.indiv[[1]] = X
     
-    validation = match.arg(validation)
+    #-- loop on h = ncomp --#
+    for (h in 1:ncomp) {
+        
+        #-- initialising arguments --#
+        tt = object$variates$X[, h]
+        u = object$variates$Y[, h]
+        b = object$loadings$Y[, h]
+        c = object$mat.c[, h]
+        d = object$mat.d[, h]
+        e = object$mat.e[, h]
+        
+        RSS.indiv[[h + 1]] = Y - tt %*% t(d)
+        RSS[h + 1, ] = colSums((Y - tt %*% t(d))^2)
+        
+        #-- loop on i (cross validation) --#
+        for (i in 1:M) {
+            if (progressBar == TRUE) {
+                setTxtProgressBar(pb, nBar/(ncomp * M))
+                nBar = nBar + 1
+            }
+            
+            omit = folds[[i]]
+            X.train = as.matrix(X[-omit, ])
+            Y.train = as.matrix(Y[-omit, ])
+            X.test = matrix(X[omit, ], nrow = length(omit))
+            Y.test = matrix(Y[omit, ], nrow = length(omit))
+            u.cv = u[-omit]
+            
+            #-- Q2 criterion
+            a.old.cv = 0
+            iter.cv = 1
+            
+            repeat {
+                a.cv = crossprod(X.train, u.cv)
+                a.cv = a.cv / drop(sqrt(crossprod(a.cv)))
+                t.cv = X.train %*% a.cv
+                
+                b.cv = crossprod(Y.train, t.cv)
+                b.cv = b.cv / drop(sqrt(crossprod(b.cv)))
+                u.cv = Y.train %*% b.cv / drop(crossprod(b.cv))
+                
+                if ((crossprod(a.cv - a.old.cv) < tol) || (iter.cv == max.iter)) break
+                
+                a.old.cv = a.cv
+                iter.cv = iter.cv + 1
+            }
+            
+            d.cv = t(Y.train) %*% (X.train %*% a.cv) / norm((X.train %*% a.cv), type = "2")^2
+            Y.hat.cv = (X.test %*% a.cv) %*% t(d.cv)
+            press.mat[[h]][omit, ] = Y.test - Y.hat.cv
+            
+            #-- for MSEP and R2 criteria, only calculated once, for all component at the same time
+            if (h == 1) {
+                nzv = (apply(X.train, 2, var) > .Machine$double.eps)
+                pls.res = pls(X = X.train[, nzv], Y = Y.train, ncomp = ncomp, mode = mode, max.iter = max.iter, tol = tol, near.zero.var = FALSE)
+                X.test = X.test[, nzv, drop = FALSE]
+                Y.hat = predict(pls.res, X.test)$predict
+                
+                for (k in 1:ncomp) {
+                    Ypred[omit, , k] = Y.hat[, , k]
+                    MSEP.mat[omit, , k] = (Y.test - Y.hat[, , k])^2
+                } # end loop on k
+            }
+        } # end i (cross validation)
+        
+        #-- compute the Q2 creterion --#
+        PRESS.inside[h, ] = apply(press.mat[[h]], 2, function(x){norm(x, type = "2")^2})
+        Q2[h, ] = 1 - PRESS.inside[h, ] / RSS[h, ]
+        
+        #-- deflation des matrices (for Q2 criterion)
+        X = X - tt %*% t(c)
+        
+        #-- mode classic
+        if(mode == "classic")
+          Y = Y - tt %*% t(b)
+        
+        #-- mode regression
+        if(mode == "regression") {
+            Y = Y - tt %*% t(d)
+        }
+        
+        #-- compute the MSEP creterion --#
+        MSEP[h, ] = apply(as.matrix(MSEP.mat[, , h]), 2, mean)
+        
+        #-- compute the R2 creterion --#
+        R2[h, ] = (diag(cor(object$Y, Ypred[, , h])))^2
+        
+    } #-- end loop on h --#
     
+    if (progressBar == TRUE) cat('\n')
+    
+    
+    #-- output -----------------------------------------------------------------#
+    #---------------------------------------------------------------------------#
+  	Q2.total = matrix(1 - rowSums(PRESS.inside) / rowSums(RSS[-(ncomp+1), , drop = FALSE]), nrow = 1, ncol = ncomp, 
+   					dimnames = list("Q2.total", paste0(1:ncomp, " comp")))
+    
+    # set up dimnames
+    rownames(MSEP) = rownames(R2) = rownames(Q2) = paste0(1:ncomp, " comp")
+    colnames(MSEP) = colnames(R2) = colnames(Q2) = object$names$Y
+    
+    res$MSEP = t(MSEP)
+    res$R2 = t(R2)
+    res$Q2 = t(Q2)
+   	res$Q2.total =  t(Q2.total)
+    res$RSS = RSS
+    res$PRESS = PRESS.inside
+    res$press.mat = press.mat
+    res$RSS.indiv = RSS.indiv
+    
+    class(res) = c("perf", "pls.mthd")
+    return(invisible(res))
+}
+
+
+# ===========================================================================================
+#---------------------------------------------------
+# perf for spls object
+#---------------------------------------------------
+perf.spls <-function(object,
+                    validation = c("Mfold", "loo"),
+                    folds = 10,
+                    progressBar = TRUE,
+                    ...)
+{
+    #------------------#
+    #-- check entries --#
+    
+    #-- check spls mode
+    if(object$mode == 'canonical')
+    stop("SPLS 'mode' should be set to 'regression'.", call. = FALSE)
+    
+    #-- validation
+    choices = c("Mfold", "loo")
+    validation = choices[pmatch(validation, choices)]
+    
+    if (any(is.na(validation)) || length(validation) > 1)
+    stop("'validation' should be one of 'Mfold' or 'loo'.", call. = FALSE)
+    
+    #-- progressBar
+    if (!is.logical(progressBar))
+    stop("'progressBar' must be a logical constant (TRUE or FALSE).", call. = FALSE)
+    
+    #-- end checking --#
+    #------------------#
+
+    
+    #-- cross-validation approach  ---------------------------------------------#
+    #---------------------------------------------------------------------------#
+    
+    #-- initialising arguments --#
+    # these are the centered and scaled matrices output from pls
+    X = object$X
+    Y = object$Y
+    
+    tol = object$tol
+    max.iter = object$max.iter
     mode = object$mode
     ncomp = object$ncomp
     n = nrow(X)
     p = ncol(X)
     q = ncol(Y)
     res = list()
-    
-    if (any(criterion == "all" | criterion == "Q2") & ncomp == 1)
-      stop("'ncomp' must be > 1 for Q2 criterion.")
-    
-    if (any(is.na(X)) || any(is.na(Y))) 
-      stop("Missing data in 'X' and/or 'Y'. Use 'nipals' for dealing with NAs.")
+
+    if (any(is.na(X)) || any(is.na(Y)))
+    stop("missing data in 'X' and/or 'Y'. Use 'nipals' for dealing with NAs.", call. = FALSE)
     
     
-    #-- define  M fold or loo cross validation --------------------#
-    #- define the folds
+    #-- tells which variables are selected in X and in Y --#
+    keepX = object$keepX   
+    keepY = object$keepY
+        
+    #-- define the folds --#
     if (validation == "Mfold") {
       if (is.list(folds)) {
-        if (length(folds) < 2 | length(folds) > n)
-          stop("Invalid number of folds.")
+        
+        if (length(folds) < 2 || length(folds) > n)
+          stop("Invalid number of folds.", call. = FALSE)
+        
+        if (length(unlist(folds)) != n)
+          stop("Invalid folds. The total number of samples in folds must be equal to ", 
+               n, ".", call. = FALSE)
+        
         if (length(unique(unlist(folds))) != n)
-          stop("Invalid folds.")
+          stop("Invalid folds. Repeated samples in folds.", call. = FALSE)
         
         M = length(folds)
-      }
-      else {
-        if (is.null(folds) || !is.numeric(folds) || folds < 2 || folds > n)
-          stop("Invalid number of folds.")
+      } else {
+        if (is.null(folds) || !is.finite(folds) || folds < 2 || folds > n)
+          stop("Invalid number of folds.", call. = FALSE)
         else {
           M = round(folds)
           folds = split(sample(1:n), rep(1:M, length = n)) 
@@ -94,348 +323,172 @@ perf.pls <-
       M = n
     }
     
-    #-- compute MSEP and/or R2 --#
+    #-- set up a progress bar --#
+    if (progressBar == TRUE) {
+      pb = txtProgressBar(style = 3)
+      nBar = 1
+    }
     
-    ## add Q2
+    #-- initialize new objects --#
     RSS = rbind(rep(n - 1, q), matrix(nrow = ncomp, ncol = q))
-    RSS.indiv = array(0, c(n, q, ncomp+1))
-    PRESS.inside = Q2.inside = matrix(nrow = ncomp, ncol = q)
+    PRESS.inside = Q2 = MSEP = R2 = matrix(nrow = ncomp, ncol = q)
+    MSEP.mat = Ypred = array(0, c(n, q, ncomp))
     
-    #KA: all criteria included in the computation
-    if (any(criterion %in% c("all", "MSEP", "R2", "Q2"))){
-      press.mat = Ypred = array(0, c(n, q, ncomp))
-      MSEP = R2 = matrix(0, nrow = q, ncol = ncomp)
-      
-      # set up dimnames
-      rownames(MSEP) = rownames(R2) = colnames(Q2.inside) = colnames(Y)
-      dimnames(press.mat)[[2]] = colnames(Y)
-      
-      # in case the test set only includes one sample, it is better to advise the user to perform loocv
-      stop.user = FALSE
-      if (progressBar == TRUE) pb <- txtProgressBar(style = 3)
-      
-      for (i in 1:M) {
-        if (progressBar == TRUE) setTxtProgressBar(pb, i/M)
-        
-        omit = folds[[i]]
-        # see below, we stop the user if there is only one sample drawn on the test set using MFold
-        if(length(omit) == 1) stop.user = TRUE
-        
-        # the training set is NOT scaled
-        X.train = X[-omit, ]
-        Y.train = Y[-omit, ]
-        # the test set is scaled either in the predict function directly (for X.test)
-        # or below for Y.test
-        X.test = matrix(X[omit, ], nrow = length(omit))
-        Y.test = matrix(Y[omit, ], nrow = length(omit))
-        
-        
-        #-- pls --#
-        pls.res = pls(X = X.train, Y = Y.train, ncomp = ncomp, 
-                      mode = mode, max.iter = max.iter, tol = tol)
-        
-        if (!is.null( pls.res$nzv$Position)) X.test = X.test[, - pls.res$nzv$Position]
-        # in the predict function, X.test is already normalised w.r.t to training set X.train, so no need to do it here
-        Y.hat = predict( pls.res, X.test)$predict
-        
-        for (h in 1:ncomp) {
-          Ypred[omit, , h] = Y.hat[, , h]
-          
-          # compute the press and the RSS
-          # by definition (tenenhaus), RSS[h+1,] = (y_i - y.hat_(h-1)_i)^2
-          press.mat[omit, , h] = (Y.test - Y.hat[, , h])^2
-          RSS.indiv[omit, ,h+1] = (Y.test - Y.hat[, , h])^2
-          
-        } # end h
-      } #end i (cross validation)
-      
-      # warn the user that at least test set had a length of 1
-      if(stop.user == TRUE & validation == 'Mfold') stop('The folds value was set too high to perform cross validation. Choose validation = "loo" or set folds to a lower value')
-      
-      # these criteria are computed across all folds.
-      for (h in 1:ncomp) { 
-        MSEP[, h] = apply(as.matrix(press.mat[, , h]), 2, mean, na.rm = TRUE)
-        R2[, h] = (diag(cor(Y, Ypred[, , h], use = "pairwise")))^2
-        
-        # on en profite pour calculer le PRESS par composante et le Q2
-        if(q>1){
-          RSS[h+1,] = t(apply(RSS.indiv[,,h+1], 2, sum))
-          PRESS.inside[h, ] = colSums(press.mat[, , h], na.rm = TRUE)
-        }else{
-          RSS[h+1,q] = sum(RSS.indiv[,q,h+1])
-          PRESS.inside[h, q] = sum(press.mat[,q, h], na.rm = TRUE)
-        }
-        
-        Q2.inside[h, ] = 1 - PRESS.inside[h, ]/RSS[h, ]
-        
-      }
-      
-      colnames(MSEP) = colnames(R2) = rownames(Q2.inside) = paste('ncomp', c(1:ncomp), sep = " ")
-      
-      if (q == 1){
-        rownames(MSEP) = rownames(R2) = ""
-      }
-      
-      if(ncomp>1){
-        # compute Q2 total
-        if(q>1){
-          Q2.total = 1 - rowSums(PRESS.inside, na.rm = TRUE)/rowSums(RSS[-(ncomp+1), ], na.rm = TRUE)
-        }else{ # for q == 1
-          Q2.total = t(1 - PRESS.inside/RSS[-(ncomp+1), ])
-        }
-      }else{
-        Q2.total = NA
-      }
-      
-      names(Q2.total) = paste('comp', 1:ncomp, sep = " ")
-      
-    } # end all, MSEP, R2, Q2
+    press.mat = lapply(1 : ncomp, function(x){matrix(NA, nrow = n, ncol = q)})
+    RSS.indiv = lapply(1 : (ncomp + 1), function(x){matrix(NA, nrow = n, ncol = q)})
+    RSS.indiv[[1]] = X
     
-    
-    if (progressBar == TRUE) cat('\n')
-    
-    # ----------  final outputs:
-    if (any(criterion %in% c("all", "MSEP"))) res$MSEP = MSEP
-    if (any(criterion %in% c("all", "R2"))) res$R2 = R2
-    if (any(criterion %in% c("all", "Q2"))) res$Q2 = t(Q2.inside)
-    if (any(criterion %in% c("all", "Q2"))) res$Q2.total = Q2.total
-    
-    res$press.mat=press.mat
-    res$RSS.indiv=RSS.indiv
-    res$PRESS.inside=PRESS.inside
-    res$RSS=RSS
-    
-    method = "pls.mthd"
-    class(res) = c("perf", method)
-    return(invisible(res))
-  }
-
-
-# ===========================================================================================
-# ---------------------------------------------------
-# perf for spls object
-# ---------------------------------------------------
-perf.spls <-
-  function(object,
-           criterion = c("all","MSEP", "R2", "Q2"), 
-           validation = c("Mfold", "loo"),
-           folds = 10,
-           progressBar = TRUE,
-           ...)
-  {
-    
-    #-- validation des arguments --#
-    # these are the centered and scaled matrices output from spls 
-    X = object$X
-    Y = object$Y
-    
-    tol = object$tol
-    max.iter = object$max.iter
-    
-    # tells which variables are selected in X and in Y:
-    keepX = object$keepX   
-    keepY = object$keepY   
-    
-    mode = object$mode
-    ncomp = object$ncomp
-    n = nrow(X)
-    p = ncol(X)
-    q = ncol(Y)
-    res = list()
-    
-    validation = match.arg(validation)
-    
+    #-- record feature stability --#
     # initialize new objects:= to record feature stability
     featuresX  = featuresY =  list()
     for(k in 1:ncomp){
-      featuresX[[k]] = featuresY[[k]] = NA
+        featuresX[[k]] = featuresY[[k]] = NA
     }
     
-    
-    if (length(dim(X)) != 2) 
-      stop("'X' must be a numeric matrix for validation.")
-    
-    if(object$mode == 'canonical') stop('sPLS mode should be set to regression, invariant or classic')
-    
-    if (any(criterion == "Q2") & ncomp == 1)
-      stop("'ncomp' must be > 1 for Q2 criterion.")
-    
-    if (any(is.na(X)) || any(is.na(Y))) 
-      stop("Missing data in 'X' and/or 'Y'. Use 'nipals' for dealing with NAs.")
-    
-    
-    #-- M fold or loo cross validation --#
-    #- define the folds
-    if (validation == "Mfold") {
-      if (is.list(folds)) {
-        if (length(folds) < 2 | length(folds) > n)
-          stop("Invalid number of folds.")
-        if (length(unique(unlist(folds))) != n)
-          stop("Invalid folds.")
-        
-        M = length(folds)
-      }
-      else {
-        if (is.null(folds) || !is.numeric(folds) || folds < 2 || folds > n)
-          stop("Invalid number of folds.")
-        else {
-          M = round(folds)
-          folds = split(sample(1:n), rep(1:M, length = n)) 
+    #-- loop on h = ncomp --#
+    for (h in 1:ncomp) {
+      
+      #-- initialising arguments --#
+      tt = object$variates$X[, h]
+      u = object$variates$Y[, h]
+      b = object$loadings$Y[, h]
+      c = object$mat.c[, h]
+      d = object$mat.d[, h]
+      nx = p - keepX[h]
+      ny = q - keepY[h]
+      
+      RSS.indiv[[h + 1]] = Y - tt %*% t(d)
+      RSS[h + 1, ] = colSums((Y - tt %*% t(d))^2)
+      
+      #-- loop on i (cross validation) --#
+      for (i in 1:M)
+      {
+        if (progressBar == TRUE)
+        {
+          setTxtProgressBar(pb, nBar/(ncomp * M))
+          nBar = nBar + 1
         }
-      }
-    } 
-    else { 
-      folds = split(1:n, rep(1:n, length = n)) 
-      M = n
-    }
-    
-    
-    #-- compute criteria ------------ --#
-    RSS = rbind(rep(n - 1, q), matrix(nrow = ncomp, ncol = q))
-    RSS.indiv = array(NA, c(n, q, ncomp+1))
-    PRESS.inside = Q2.inside = matrix(nrow = ncomp, ncol = q)
-    
-    #KA: all criteria were included.
-    if (any(criterion %in% c("all", "MSEP", "R2", "Q2"))) {
-      press.mat = Ypred = array(NA, c(n, q, ncomp))
-      MSEP = R2 = matrix(NA, nrow = q, ncol = ncomp)
-      
-      # set up dimnames
-      rownames(MSEP) = rownames(R2) = colnames(Q2.inside) = colnames(Y)
-      dimnames(press.mat)[[2]] = colnames(Y)
-      
-      # in case the test set only includes one sample, it is better to advise the user to
-      # perform loocv
-      stop.user = FALSE
-      if (progressBar == TRUE) pb <- txtProgressBar(style = 3)
-      
-      for (i in 1:M) {
-        if (progressBar == TRUE) setTxtProgressBar(pb, i/M)
         
         omit = folds[[i]]
-        # see below, we stop the user if there is only one sample drawn on the test set using MFold
-        if(length(omit) == 1) stop.user = TRUE
+        X.train = X[-omit, , drop = FALSE]
+        Y.train = Y[-omit, , drop = FALSE]
+        X.test = X[omit, , drop = FALSE]
+        Y.test = Y[omit, , drop = FALSE]
+        u.cv = u[-omit] 
         
-        # the training set is NOT scaled
-        X.train = X[-omit, ]
-        Y.train = Y[-omit, ]
-        X.test = matrix(X[omit, ], nrow = length(omit))
-        Y.test = matrix(Y[omit, ], nrow = length(omit))
+        #-- Q2 criterion
+        a.old.cv = 0
+        iter.cv = 1
         
-        
-        #-- spls --#
-        spls.res = spls(X.train, Y.train, ncomp, mode, max.iter, tol, keepX=keepX, keepY=keepY)     ## change
-        
-        # added: record selected features in each set
-        for(k in 1:ncomp){
-          featuresX[[k]] = c(unlist(featuresX[[k]]), select.var(spls.res, comp = k)$name.X)
-          featuresY[[k]] = c(unlist(featuresY[[k]]), select.var(spls.res, comp = k)$name.Y)
-        }
-        
-        
-        if (!is.null(spls.res$nzv$Position)) X.test = X.test[, -spls.res$nzv$Position]
-        Y.hat = predict(spls.res, X.test)$predict
-        
-        #compute prediction of Y
-        for (h in 1:ncomp) {
-          Ypred[omit, , h] = Y.hat[, , h]
+        repeat{
+          a.cv = crossprod(X.train, u.cv)
+          if (nx != 0) { 
+            a.cv = ifelse(abs(a.cv) > abs(a.cv[order(abs(a.cv))][nx]),
+                          (abs(a.cv) - abs(a.cv[order(abs(a.cv))][nx])) * sign(a.cv), 0)
+          }
+          a.cv = a.cv / drop(sqrt(crossprod(a.cv)))
+          t.cv = X.train %*% a.cv
           
-          # KA: this bunch was added:
-          # compute the press and the RSS
-          # by definition (tenenhaus), RSS[h+1,] = (y_i - y.hat_(h-1)_i)^2
-          press.mat[omit, , h] = (Y.test - Y.hat[, , h])^2
-          RSS.indiv[omit, ,h+1] = (Y.test - Y.hat[, , h])^2
-        } # end h
-      } #end i (cross validation)
-      
-      # KA added
-      # warn the user that at least test set had a length of 1
-      if(stop.user == TRUE & validation == 'Mfold') stop('The folds value was set too high to perform cross validation. Choose validation = "loo" or set folds to a lower value')
-      
-      # these criteria are computed across all folds.
-      for (h in 1:ncomp) { 
-        MSEP[, h] = apply(as.matrix(press.mat[, , h]), 2, mean, na.rm = TRUE)
-        R2[, h] = (diag(cor(Y, Ypred[,,h], use = "pairwise")))^2
-        #KA:  PRESS is also computed as well as Q2 inside this procedure 
-        if(q>1){
-          RSS[h+1,] = t(apply(RSS.indiv[,,h+1], 2, sum))
-          PRESS.inside[h, ] = colSums(press.mat[, , h], na.rm = TRUE)
-        }else{
-          RSS[h+1,q] = sum(RSS.indiv[,q,h+1])
-          PRESS.inside[h, q] = sum(press.mat[,q, h], na.rm = TRUE)
+          b.cv = crossprod(Y.train, t.cv)
+          if (ny != 0) {
+            b.cv = ifelse(abs(b.cv) > abs(b.cv[order(abs(b.cv))][ny]),
+                          (abs(b.cv) - abs(b.cv[order(abs(b.cv))][ny])) * sign(b.cv), 0)
+          }
+          b.cv = b.cv / drop(sqrt(crossprod(b.cv)))
+          u.cv = Y.train %*% b.cv 
+                    
+          if ((crossprod(a.cv - a.old.cv) < tol) || (iter.cv == max.iter))
+            break
+          
+          a.old.cv = a.cv
+          iter.cv = iter.cv + 1
         }
         
-        Q2.inside[h, ] = 1 - PRESS.inside[h, ]/RSS[h, ]
+        d.cv = t(Y.train) %*% (X.train %*% a.cv) / norm((X.train %*% a.cv), type = "2")^2
+        Y.hat.cv = (X.test %*% a.cv) %*% t(d.cv)
+        press.mat[[h]][omit, ] = Y.test - Y.hat.cv
         
-      }
+        #-- for MSEP and R2 criteria
+        if (h == 1)
+        {
+          nzv = (apply(X.train, 2, var) > .Machine$double.eps)
+          spls.res = spls(X.train[, nzv],Y.train, ncomp = ncomp, mode = mode, max.iter = max.iter, tol = tol, keepX = keepX, keepY = keepY, near.zero.var = FALSE)
+                    
+          X.test = X.test[, nzv, drop = FALSE]
+          Y.hat = predict(spls.res, X.test)$predict
+          
+          for (k in 1:ncomp)
+          {
+            Ypred[omit, , k] = Y.hat[, , k]
+            MSEP.mat[omit, , k] = (Y.test - Y.hat[, , k])^2
+            
+            # added: record selected features in each set
+            featuresX[[k]] = c(unlist(featuresX[[k]]), selectVar(spls.res, comp = k)$name.X)
+            featuresY[[k]] = c(unlist(featuresY[[k]]), selectVar(spls.res, comp = k)$name.Y)
+
+          } # end loop on k
+        }        
+      } # end i (cross validation)
       
-      colnames(MSEP) = colnames(R2) = rownames(Q2.inside) = paste('ncomp', c(1:ncomp), sep = " ")
-      rownames(MSEP) = rownames(R2) = colnames(Q2.inside)  = colnames(Y)
+      #-- compute the Q2 creterion --#
+      PRESS.inside[h, ] = apply(press.mat[[h]], 2, function(x){norm(x, type = "2")^2})
+      Q2[h, ] = 1 - PRESS.inside[h, ] / RSS[h, ]
       
-      if (q == 1) rownames(MSEP) = rownames(R2) = ""
+      #-- deflation des matrices (for Q2 criterion)
+      X = X - tt %*% t(c)
+      Y = Y - tt %*% t(d)
       
-      if(ncomp>1){
-        # compute Q2 total
-        if(q>1){
-          Q2.total = 1 - rowSums(PRESS.inside, na.rm = TRUE)/rowSums(RSS[-(ncomp+1), ], na.rm = TRUE)
-        }else{ # for q == 1
-          Q2.total = t(1 - PRESS.inside/RSS[-(ncomp+1), ])
-        }
-      }else{
-        Q2.total = NA
-      }
+      #-- compute the MSEP creterion --#
+      MSEP[h, ] = apply(as.matrix(MSEP.mat[, , h]), 2, mean)
       
-      names(Q2.total) = paste('comp', 1:ncomp, sep = " ")
+      #-- compute the R2 creterion --#
+      R2[h, ] = (diag(cor(object$Y, Ypred[, , h])))^2
       
-    } # end all, MSEP, R2
+    } #-- end loop on h --#
     
     if (progressBar == TRUE) cat('\n')
     
+    #---- extract stability of features -----#
+    list.features.X = list()
+    list.features.Y = list()
     
-    # ---- extract stability of features ----- # NEW
-    list.featuresX = list.featuresY =list()
     for(k in 1:ncomp){
-      #remove the NA value that was added for initialisation
-      remove.naX = which(is.na(featuresX[[k]]))
-      remove.naY = which(is.na(featuresY[[k]]))
-      # then summarise as a factor and output the percentage of appearance
-      list.featuresX[[k]] = sort(summary(as.factor(featuresX[[k]][-remove.naX]))/M, decreasing = TRUE)
-      list.featuresY[[k]] = sort(summary(as.factor(featuresY[[k]][-remove.naY]))/M, decreasing = TRUE)
+        #remove the NA value that was added for initialisation
+        remove.naX = which(is.na(featuresX[[k]]))
+        remove.naY = which(is.na(featuresY[[k]]))
+        # then summarise as a factor and output the percentage of appearance
+        list.features.X[[k]] = sort(summary(as.factor(featuresX[[k]][-remove.naX]))/M, decreasing = TRUE)
+        list.features.Y[[k]] = sort(summary(as.factor(featuresY[[k]][-remove.naY]))/M, decreasing = TRUE)
+        
     }
+    names(list.features.X)  = names(list.features.Y) = paste('comp', 1:ncomp)
     
-    # extract features selected from the full model ---------
-    features.finalX = features.finalY =list()
-    for(k in 1:ncomp){
-      features.finalX[[k]] = select.var(object, comp = k)$value.X
-      features.finalY[[k]] = select.var(object, comp = k)$value.Y
-    }
+    #-- output -----------------------------------------------------------------#
+    #---------------------------------------------------------------------------#
+    Q2.total = matrix(1 - rowSums(PRESS.inside) / rowSums(RSS[-(ncomp+1), , drop = FALSE]), nrow = 1, ncol = ncomp, 
+   					dimnames = list("Q2.total", paste0(1:ncomp, " comp")))
     
-    names(features.finalX)  = names(features.finalY) = names(list.featuresX) = names(list.featuresX) = paste('comp', 1:ncomp)
+    # set up dimnames
+    rownames(MSEP) = rownames(R2) = rownames(Q2) = paste0(1:ncomp, " comp")
+    colnames(MSEP) = colnames(R2) = colnames(Q2) = object$names$Y
     
+    res = list()
+    res$MSEP = t(MSEP)
+    res$R2 = t(R2)
+    res$Q2 = t(Q2)
+   	res$Q2.total =  t(Q2.total)
+    res$RSS = RSS
+    res$PRESS = PRESS.inside
+    res$press.mat = press.mat
+    res$RSS.indiv = RSS.indiv
     
-    # ----------  final outputs:
-    if (any(criterion %in% c("all", "MSEP"))) res$MSEP = MSEP
-    if (any(criterion %in% c("all", "R2"))) res$R2 = R2
-    if (any(criterion %in% c("all", "Q2"))) res$Q2 = t(Q2.inside)
-    if (any(criterion %in% c("all", "Q2"))) res$Q2.total = Q2.total
+    # features
+    res$features$stable.X = list.features.X
+    res$features$stable.Y = list.features.Y
     
-    
-    #features
-    res$features$stable.X = list.featuresX
-    res$features$stable.Y = list.featuresY
-    res$features$final.X = features.finalX
-    res$features$final.Y = features.finalY
-    
-    res$press.mat=press.mat
-    res$RSS.indiv=RSS.indiv
-    res$PRESS.inside=PRESS.inside
-    res$RSS=RSS
-    
-    method = "pls.mthd"
-    class(res) = c("perf", method)
+    class(res) = c("perf", "spls.mthd")
     return(invisible(res))
-  }
-
+}
 
 # ---------------------------------------------------
 # perf for plsda object
@@ -445,7 +498,8 @@ perf.plsda <-
            method.predict = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
            validation = c("Mfold", "loo"),
            folds = 10,
-           progressBar = TRUE, ...) 
+           progressBar = TRUE, 
+           near.zero.var = FALSE,...) 
   {
     
     #-- validation des arguments --#
@@ -467,6 +521,24 @@ perf.plsda <-
     }else{
       nmthdd = length(method.predict)
     }
+    
+    
+    # -------------------------------------
+    # added: first check for near zero var on the whole data set
+    nzv = nearZeroVar(X)
+    if (length(nzv$Position > 0))
+    {
+      warning("Zero- or near-zero variance predictors.\nReset predictors matrix to not near-zero variance predictors.\nSee $nzv for problematic predictors.")
+      X = X[, -nzv$Position, drop=TRUE]
+      
+      if(ncol(X)==0)
+      {
+        stop("No more predictors after Near Zero Var has been applied!")
+      }
+      
+    }
+    # and then we start from the X data set with the nzv removed
+    
     
     
     error.fun = function(x, y) {
@@ -522,7 +594,7 @@ perf.plsda <-
       
       
       plsda.res = plsda(X = X.train, Y = Y.train, ncomp = ncomp, 
-                        max.iter = max.iter, tol = tol)
+                        max.iter = max.iter, tol = tol, near.zero.var = near.zero.var)
       
       if (!is.null(plsda.res$nzv$Position)) X.test = X.test[, -plsda.res$nzv$Position]
       Y.predict = predict(plsda.res, X.test, method = method.predict)$class
@@ -541,6 +613,9 @@ perf.plsda <-
     
     result = list()
     result$error.rate = error.rate
+    # added
+    result$nzvX = nzv$Position
+    
     
     method = "plsda.mthd"
     class(result) = c("perf", method)
@@ -555,7 +630,8 @@ perf.splsda <- function(object,
                         method.predict = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),     
                         validation = c("Mfold", "loo"),                                          
                         folds = 10,                                                              
-                        progressBar = TRUE, ...)                                                        
+                        progressBar = TRUE, 
+                        near.zero.var = FALSE,...)                                                        
 {
   
   #-- initialising arguments --#
@@ -581,6 +657,25 @@ perf.splsda <- function(object,
   method.predict = match.arg(method.predict, choices = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"), several.ok = TRUE)
   if (any(method.predict == "all")) nmthdd = 3 
   else nmthdd = length(method.predict)  
+  
+  
+  # -------------------------------------
+  # added: first check for near zero var on the whole data set
+  nzv = nearZeroVar(X)
+  if (length(nzv$Position > 0))
+  {
+    warning("Zero- or near-zero variance predictors.\nReset predictors matrix to not near-zero variance predictors.\nSee $nzv for problematic predictors.")
+    X = X[, -nzv$Position, drop=TRUE]
+    
+    if(ncol(X)==0)
+    {
+      stop("No more predictors after Near Zero Var has been applied!")
+    }
+    
+  }
+  # and then we start from the X data set with the nzv removed
+  
+  
   
   error.fun = function(x, y) {
     error.vec = sweep(x, 1, y, FUN = "-")
@@ -635,10 +730,10 @@ perf.splsda <- function(object,
     Y.train = Y[-omit]
     X.test = matrix(X[omit, ], nrow = length(omit))
     
-    spls.res = splsda(X.train, Y.train, ncomp, max.iter, tol, keepX=keepX)     ## change
+    spls.res = splsda(X.train, Y.train, ncomp, max.iter, tol, keepX=keepX, near.zero.var = near.zero.var)  
     # added: record selected features
     for(k in 1:ncomp){
-      features[[k]] = c(unlist(features[[k]]), select.var(spls.res, comp = k)$name)
+      features[[k]] = c(unlist(features[[k]]), selectVar(spls.res, comp = k)$name)
     }
     
     if (!is.null(spls.res$nzv$Position)) X.test = X.test[, -spls.res$nzv$Position]
@@ -668,18 +763,16 @@ perf.splsda <- function(object,
     list.features[[k]] = sort(summary(as.factor(features[[k]][-remove.na]))/M, decreasing = TRUE)
   }
   
-  # extract features selected from the full model ---------
-  features.final = list()
-  for(k in 1:ncomp){
-    features.final[[k]] = select.var(object, comp = k)$value
-  }
+
   
-  names(features.final)  = names(list.features) = paste('comp', 1:ncomp)
+  names(list.features) = paste('comp', 1:ncomp)
   
   result = list()
   result$error.rate = res
   result$features$stable = list.features
-  result$features$final = features.final
+  
+  # added
+  result$nzvX = nzv$Position
   
   
   method = "plsda.mthd"
@@ -688,5 +781,3 @@ perf.splsda <- function(object,
   #updated outputs
   return(invisible(result))
 }
-
-

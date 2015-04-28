@@ -82,7 +82,7 @@ This function provides variables representation in three dimensions for
     of \code{c("axes", "box", "bbox", "all")}.}
   \item{label.axes.box}{character string indicating whether to label the axes and/or boxes.
     Should be a of \code{c("axes", "box", "both")}}	
-  \item{xlab, ylab, zlab}{\eqn{x}-, \eqn{y}- and \eqn{z}-axis titles.}	
+  \item{xlab, ylab, zlab}{x, y and  z axis titles.}	
   \item{\ldots}{further title parameters are passed to \code{\link[rgl]{title3d}}.}
 }
 
@@ -130,7 +130,7 @@ A list containing the following components:
   \item{coord.Y}{matrix of \eqn{Y}-variables coordinates.}
 }
 
-\author{Ignacio González.}
+\author{Ignacio Gonzalez.}
 
 \seealso{\code{\link{plotVar}}, \code{\link{plot3dIndiv}}, \code{\link[rgl]{text3d}}, 
 \code{\link[rgl]{title3d}} and \code{\link[rgl]{rgl.postscript}} to save the screen shot to a file in PostScript 

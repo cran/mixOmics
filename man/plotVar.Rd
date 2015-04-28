@@ -47,7 +47,7 @@ This function provides variables representation for (regularized) CCA, (sparse) 
 
 \method{plotVar}{rgcca}(object, comp = c(1,2), block = c(1,2),
            labels = FALSE, pch = c(16,17), cex =  c(0.5, 0.5), 
-           col = c('green', 'blue'), font = c(2,3), rad.in = 0.5, 
+           col = color.mixo(2), font = c(2,3), rad.in = 0.5, 
            \ldots) 
         
 \method{plotVar}{sgcca}(object, 
@@ -55,7 +55,7 @@ comp = c(1,2),
 block = c(1,2), ncomp.select = c(1,2), 
 labels = FALSE, pch = c(16,17), 
 cex =  c(0.5, 0.5), 
-col = c('green', 'blue'), 
+col = color.mixo(2), 
 font = c(2,3), 
 rad.in = 0.5,\ldots)	
          
@@ -115,12 +115,12 @@ A list containing the following components:
   \item{coord.Y}{matrix of \eqn{Y}-variables coordinates.}
 }
 
-\author{S\'ebastien D\'ejean, Ignacio Gonz\'alez, Kim-Anh L\^e Cao.}
+\author{Sebastien Dejean, Ignacio Gonzalez, Kim-Anh Le Cao.}
 
-\references{Gonz\'alez I., L\^e Cao K-A., Davis, M.J. and D\'ejean, S. (2012). Visualising associations between paired ?omics? data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}}
+\references{Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired 'omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}}
 
 
-\seealso{\code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}}, \code{\link{par}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\seealso{\code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}}, \code{\link{par}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## variable representation for objects of class 'rcc'
@@ -162,26 +162,70 @@ plotVar(splsda.liver, var.label = FALSE)
 ## variable representation for objects of class 'sgcca' (or 'rgcca')
 # ----------------------------------------------------
 data(nutrimouse)
-
 # need to unmap the Y factor diet
 Y = unmap(nutrimouse$diet)
+# set up the data as list
 data = list(nutrimouse$gene, nutrimouse$lipid,Y)
+
+# set up the design matrix:
+# with this design, gene expression and lipids are connected to the diet factor
+# design = matrix(c(0,0,1,
+#                   0,0,1,
+#                   1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
+
 # with this design, gene expression and lipids are connected to the diet factor
 # and gene expression and lipids are also connected
 design = matrix(c(0,1,1,
                   1,0,1,
                   1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
 
+
+
 #note: the penalty parameters will need to be tuned
-wrap.result.sgcca = wrapper.sgcca(data = data, design = design, penalty = c(.3,.5, 1), 
+wrap.result.sgcca = wrapper.sgcca(data = data, design = design, penalty = c(.3,.3, 1), 
                                   ncomp = c(2, 2, 1),
                                   scheme = "centroid", verbose = FALSE)
-par(mfrow=c(2,2))
-plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = c(1,2))
-plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = c(1,2), labels = TRUE)
-plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = 1, labels = TRUE)
-plotVar(wrap.result.sgcca, comp = c(1,2), block = 1, ncomp.select = 1, labels = TRUE)
-par(mfrow=c(1,1))
+wrap.result.sgcca
+
+#variables selected on component 1 for the two blocks:
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$name.var
+
+#variables selected on component 2 for each block: 
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$name.var
+
+
+plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = c(1,1), labels = TRUE)
+title(main = c('Variables selected on component 1 only'))
+plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = c(2,2), labels = TRUE)
+title(main = c('Variables selected on component 2 only'))
+# -> this one shows the variables selected on both components
+plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), labels = TRUE)
+title(main = c('Variables selected on components 1 and 2'))
+
+## variable representation for objects of class 'rgcca'
+# ----------------------------------------------------
+data(nutrimouse)
+# need to unmap the Y factor diet
+Y = unmap(nutrimouse$diet)
+# set up the data as list
+data = list(nutrimouse$gene, nutrimouse$lipid,Y)
+# with this design, gene expression and lipids are connected to the diet factor
+# design = matrix(c(0,0,1,
+#                   0,0,1,
+#                   1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
+
+# with this design, gene expression and lipids are connected to the diet factor
+# and gene expression and lipids are also connected
+design = matrix(c(0,1,1,
+                  1,0,1,
+                  1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
+#note: the tau parameter is the regularization parameter
+wrap.result.rgcca = wrapper.rgcca(data = data, design = design, tau = c(1, 1, 0), 
+                                  ncomp = c(2, 2, 1),
+                                  scheme = "centroid", verbose = FALSE)
+#wrap.result.rgcca
+plotVar(wrap.result.rgcca, comp = c(1,2), block = c(1,2))
+plotVar(wrap.result.rgcca, comp = c(1,2), block = c(1,2), labels = TRUE)
 }
 
 \keyword{multivariate}

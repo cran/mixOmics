@@ -59,10 +59,10 @@ strongly agree and long arrows a disagreement between the two data sets.
 The matched call.
 }
 
-\author{Daniel Chessel from \pkg{ade4 R} package, modified by Kim-Anh Lê Cao.}
+\author{Daniel Chessel from \pkg{ade4 R} package, modified by Kim-Anh Le Cao.}
 
 \references{
-Lê Cao, K.-A., Martin, P.G.P., Robert-Granié, C. and Besse, P. (2009). Sparse canonical methods 
+Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods 
 for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 }
 

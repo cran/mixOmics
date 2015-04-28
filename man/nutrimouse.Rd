@@ -55,7 +55,7 @@ Agronomic Research, French.
 }
 
 \references{
-Martin, P. G. P., Guillou, H., Lasserre, F., Déjean, S., Lan, A., 
+Martin, P. G. P., Guillou, H., Lasserre, F., Dejean, S., Lan, A., 
 Pascussi, J.-M., San Cristobal, M., Legrand, P., Besse, P. and Pineau, T. (2007). 
 Novel aspects of PPAR\eqn{\alpha}-mediated regulation of lipid and xenobiotic 
 metabolism revealed through a multrigenomic study. \emph{Hepatology} \bold{54}, 767-777.

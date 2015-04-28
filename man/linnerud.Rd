@@ -26,7 +26,7 @@ Tenenhaus, M. (1998), Table 1, page 15.
 }
 
 \references{
-Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 }
 
 \keyword{datasets}

@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
 # Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
 #
@@ -24,7 +24,7 @@ imgCor <-
 function(X, 
          Y,  
          type = c("combine", "separate"), 
-         col = jet.colors, 
+         col = color.jet, 
          X.names = TRUE, 
          Y.names = TRUE,		 
          XsideColor = "blue",
@@ -75,7 +75,7 @@ function(X,
     if (!is.null(Y.names)) colnames(Y) = Y.names
     type = match.arg(type)
      
-    # représentation de la matrice de corrélation de #
+    # representation de la matrice de correlation de #
     # la concatenationdes variables X et Y, [X Y]    #
     #------------------------------------------------#
 
@@ -98,7 +98,7 @@ function(X,
             breaks = breaks)
     }
      
-    # représentation des matrices de corrélation de #
+    # representation des matrices de correlation de #
     # X, Y et entre X et Y                          #
     #-----------------------------------------------#
     if (type == "separate") {

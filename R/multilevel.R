@@ -1,6 +1,7 @@
-# Copyright (C) 2012 
-# Benoit Liquet, Université de Bordeaux, France
-# Kim-Anh Lê Cao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Brisbane, Australia
+# Copyright (C) 2015 
+# Benoit Liquet, Universite de Bordeaux, France
+# Kim-Anh Le Cao, University of Queensland, Brisbane, Australia
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -15,330 +16,194 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-# ----------------------------------------
-# generic function for multilevel analysis 
-# ----------------------------------------
 
-multilevel <-  function (X, Y = NULL, 
-                         cond = NULL,                  
-                         sample = NULL,
-                         ncomp = 1,
-                         keepX = rep(ncol(X), ncomp),
-                         keepY = NULL,  # for spls
-                         method = NULL,
-                         tab.prob.gene=NULL, # remove?
-                         max.iter = 500, 
-                         tol = 1e-06,...) {
-  
-  # check parameter input
-  check.one.level(X, Y, 
-                  cond ,                  
-                  sample,
-                  ncomp,
-                  keepX,
-                  keepY,  # for spls
-                  method ,
-                  tab.prob.gene, # remove?
-                  max.iter, 
-                  tol,...)
-  
-  #   # checking general input parameters
-  #   X = as.matrix(X)
-  #   # X input
-  #   if (length(dim(X)) != 2 || !is.numeric(X)) 
-  #     stop("'X' must be a numeric matrix.")
-  #   
-  #   # Testing the cond vector
-  #   if(is.null(cond)) stop('Vector cond is missing', call. = FALSE)
-  #     
-  #   # ncomp
-  #   if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0) stop("invalid number of components, 'ncomp'.")
-  #   
-  #   #checking sample
-  #   if(is.null(sample)) stop('Vector sample is missing', call. = FALSE)
-  #   if(!is.null(dim(sample))) stop('sample should be a vector indicating the repeated measurements')
-  #   if(length(sample) != nrow(X)) stop('X and the vector sample should have the same number of subjects')
-  #   # check that the sample numbers are repeated
-  #   if(length(summary(as.factor(sample))) == nrow(X)) stop('Check that the vector sample reflects the repeated measurements')
-  
-  if(is.factor(sample)){
-    sample = as.numeric(sample)
-    warning('the vector sample was converted into a numeric vector', call. = FALSE)
-  }
-  
-  #   #check that the sample are numbered from 1
-  #   if(!any(names(summary(as.factor(sample))) == '1')) {
-  #     cat('The vector sample includes the values: ', as.vector(names(summary(as.factor(sample)))), '\n')
-  #     stop('sample vector', call. =FALSE)
-  #   }
-  #   
-  #   # method
-  #   if(is.null(method)) stop('Input method missing, should be set to splsda or spls', call. = FALSE)
-  
-  
-  # call the multilevel approach
-  if(method == 'splsda'){
-    # apply one or two-factor analysis with splsda
-    result = multilevel.splsda(X = X, cond = cond, sample = sample, ncomp=ncomp, keepX = keepX, tab.prob.gene = tab.prob.gene)
-  }else{
-    # spls
-    result = multilevel.spls(X = X, Y=Y, cond = cond, sample = sample, ncomp = ncomp, keepX=keepX, keepY = keepY, tab.prob.gene = tab.prob.gene)
-  }
-  
-  return(result)
-}
+# ---------------------------------------------
+# Generic function for multilevel analysis 
+# ---------------------------------------------
 
-
-# ----------------------------------------
-# multilevel analysis with sPLS-DA (1 data set X)
-# ----------------------------------------
-multilevel.splsda <-  function (X, 
-                                cond = NULL,
-                                sample = NULL,
-                                ncomp = 2,
-                                keepX = rep(ncol(X), ncomp),
-                                tab.prob.gene=NULL, # remove?
-                                max.iter = 500, 
-                                tol = 1e-06,...) {
-  
-  #internal booleans to choose between 1 or 2 factors analysis
-  factor1 = FALSE
-  factor2 = FALSE
-  
-  #-- check input parameters --#
-  
-  # Testing the input cond and setting the 1 or 2 factor analysis   
-  if (is.null(dim(cond))) {  # if cond is a vector: 1 factor analysis
-    factor1 = TRUE
-    if(!is.factor(cond)){
-      cond = as.factor(cond)
-      warning('cond was set as a factor', call. = FALSE)
+multilevel <- 
+  function(X, 
+           Y = NULL,
+           design,  
+           ncomp = 2,
+           keepX = NULL,
+           keepY = NULL,  
+           method = c("spls", "splsda"),  
+           mode = c("regression", "canonical"), 
+           max.iter = 500, 
+           tol = 1e-06, 
+           near.zero.var = TRUE)
+  {
+    #-- checking general input arguments ---------------------------------------#
+    #---------------------------------------------------------------------------#
+    
+    #-- check that the user did not enter extra arguments
+    user.arg = names(match.call())[-1]
+    function.arg = c("X", "Y", "design", "ncomp",
+                     "keepX", "keepY", "method", "mode",
+                     "max.iter", "tol", "near.zero.var",
+                     "freqCut", "uniqueCut")
+    
+    in.arg = !(user.arg %in% function.arg)
+    
+    if (any(in.arg)) {
+      unused.arg = user.arg[in.arg]
+      unused.arg = paste(unused.arg, collapse = ", ")
+      unused.arg = paste0("(", unused.arg, ").")
+      stop("unused argument(s) ", unused.arg, call. = FALSE)
     }
-  }else{              #else if cond is a matrix: 2 factor analysis
-    if(ncol(cond) == 2){
-      factor2 = TRUE
-      if(!is.factor(cond[,1])){ 
-        warning('First cond response was set as a factor', call. = FALSE)
+    
+    #-- method
+    choices = c("spls", "splsda")
+    method = choices[pmatch(method, choices)]
+    
+    if (is.na(method) || length(method) != 1) 
+      stop("'method' should be one of 'spls' or 'splsda'.", call. = FALSE)
+    
+    #-- mode
+    if (method == "spls") {
+      choices = c("regression", "canonical")
+      mode = choices[pmatch(mode, choices)]
+      
+      if (is.na(mode) || length(mode) != 1) 
+        stop("'mode' should be one of 'regression' or 'canonical'.", call. = FALSE)
+    }
+    
+    #-- design
+    if(missing(design)) stop('You forgot to input the design matrix.', call. = FALSE) 
+    
+    if(is.null(design)) 
+      stop("the 'design' matrix is missing.", call. = FALSE)
+    design = as.data.frame(design)
+    
+    # --- X matrix    
+    if (is.data.frame(X) || !is.vector(X)) {
+      X = as.matrix(X)
+    } else {
+      stop("'X' must be a numeric matrix.", call. = FALSE)
+    }
+    
+    if (is.character(X))
+      stop("'X' must be a numeric matrix.", call. = FALSE)
+    
+    if (any(apply(X, 1, is.infinite))) 
+      stop("infinite values in 'X'.", call. = FALSE)
+    
+    #-- equal number of rows in X and design
+    if ((nrow(design) != nrow(X))) 
+      stop("unequal number of rows in 'X' and 'design'.", call. = FALSE)
+    
+    # added: when spls, no need for two columns
+    if ((ncol(design) < 2) & (method == 'splsda'))
+      stop("'design' must be a matrix or data frame with at least 2 columns for method = splsda.",
+           call. = FALSE)
+    
+    design = as.data.frame(design)
+    
+    #-- ncomp
+    if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0)
+      stop("invalid number of variates, 'ncomp'.", call. = FALSE)
+    
+    p = ncol(X)
+    ncomp = round(ncomp)
+    
+    if(ncomp > p) {
+      warning("reset maximum number of variates 'ncomp' to ncol(X) = ", p, ".", 
+              call. = FALSE)
+      ncomp = p
+    }
+    
+    #-- keepX
+    # if keepX is missing, we assume it is a non sparse model
+    if (is.null(keepX)) {
+      keepX = rep(p, ncomp)
+    } else {
+      if (!is.numeric(keepX) || !is.vector(keepX))
+        stop("'keepX' must be a numeric vector of length equal to ", ncomp, ".",
+             call. = FALSE)
+      
+      if(any(keepX <= 0) || any(!is.finite(keepX)))
+        stop("'keepX' must be positive integer vector.", call. = FALSE)
+    }
+    
+    #-- Y matrix and keepY
+    if (method == "spls") {      
+      if (is.data.frame(Y) || is.vector(Y)){ 
+        Y = as.matrix(Y)
+      } else {
+        stop("'Y' must be a numeric matrix.", call. = FALSE)
       }
-      if(!is.factor(cond[,2])){ 
-        warning('Second cond response was set as a factor', call. = FALSE)
+      # *BG* End simplify check Y matrix
+      
+      if (is.character(Y))
+        stop("'Y' must be a numeric matrix.", call. = FALSE)
+      
+      if (any(apply(Y, 1, is.infinite))) 
+        stop("infinite values in 'Y'.", call. = FALSE)
+      
+      q = ncol(Y)
+      
+      # if keepY is missing, we assume it is a non sparse model
+      if (is.null(keepY)) {
+        keepY = rep(q, ncomp) 
+      } else {
+        if (!is.numeric(keepY) || !is.vector(keepY))
+          stop("'keepY' must be a numeric vector of length equal to ", ncomp, ".",
+               call. = FALSE)
+        
+        if(any(keepY <= 0) || any(!is.finite(keepY)))
+          stop("'keepY' must be positive integer vector.", call. = FALSE)
       }
-      cond1 = as.factor(cond[,1])
-      cond2 = as.factor(cond[,2])
-    }else {
-      stop("'cond' must be a matrix with max. 2 columns for the 2 factor analysis.")
-    } # end if ncol(cond)
+    }
+    
+    #-- end check input --#
+    #------------------#
+    
+    
+    #-- multilevel approach ----------------------------------------------------#
+    #---------------------------------------------------------------------------#
+    
+    if (method == 'splsda') { 
+      #-- apply multi-factor analysis with splsda --#
+      #---------------------------------------------#
+      
+      #-- within-subject deviation matrix for 1 or 2 factors
+      # let the user know which design is analysed
+      Xw = withinVariation(X, design  = design)
+      
+      #-- Need to set Y variable for 1 or 2 factors
+      Y = design[, -1]
+      if (!is.null(dim(Y))) {
+        Y = apply(Y, 1, paste, collapse = ".")  #  paste is to combine in the case we have 2 levels
+      }
+      Y = as.factor(Y) 
+      
+      res = splsda(Xw, Y, ncomp = ncomp, keepX = keepX, max.iter = max.iter, tol = tol, near.zero.var = near.zero.var) 
+      
+      result = c(res, list(Xw = Xw, design = design))
+      
+      # Different classes depending on the number of factors. Added to fit pheatmap (not the best patching)
+      if(ncol(design) == 2){ 
+        class(result) = c("mlsplsda", "splsda", "plsda", "splsda1fact") 
+      }else{  # if more than 2 columns (i.e. 2 factors)
+        class(result) = c("mlsplsda", "splsda", "plsda", "splsda2fact")
+      }
+    } else {
+      #-- apply multilevel analysis with spls --#
+      #-----------------------------------------#
+      
+      #-- within-subject deviation matrices --#
+      Xw = withinVariation(X, design = design) 
+      Yw = withinVariation(Y, design = design) 
+      
+      #-- apply sPLS on the within deviation matrices --#
+      res = spls(Xw, Yw, ncomp = ncomp, mode = mode, 
+                 keepY = keepY, keepX = keepX, max.iter = max.iter, tol = tol, near.zero.var = near.zero.var) 
+      
+      result = c(res, list(Xw = Xw, Yw = Yw, design = design))
+      class(result) = c("mlspls", "spls", "pls")
+    } # end if spls / splsda
+    
+    return(invisible(result))
   }
-  
-  
-  if(factor1 == TRUE){
-    if(nrow(X) != length(cond)) stop('X and cond should have the same number of subjects')
-  }
-  if(factor2 == TRUE){
-    if(nrow(X) != nrow(cond)) stop('X and cond should have the same number of subjects')
-  }
-  
-  
-  
-  # --multilevel analysis  
-  # Variance decomposition for 1 or 2 factors
-  if(factor1 == TRUE){
-    Xw <- Split.variation.one.level(X, cond, sample)$Xw
-  }else{ #if factor2 = TRUE 
-    Xw <- Split.variation.two.level(X, cond1, cond2, sample)$Xw
-    cond <- as.factor(paste(cond1, cond2, sep="."))
-  }
-  
-  #Apply sPLS-DA on the within matrix
-  res <- splsda(Xw, cond, ncomp = ncomp, keepX, max.iter, tol, ...)
-  class(res) <- "list"
-  if(factor1){
-    result <- c(res,list(Xw=Xw,sample=sample,name.condition=factor(cond),tab.prob.gene=tab.prob.gene))
-    class(result) <- c("splsda1fact","splsda")
-  }else{ #if factor2 = TRUE
-    result <- c(res,list(Xw=Xw,sample=sample, name.condition=cond1,tab.prob.gene=tab.prob.gene, name.time=cond2))
-    class(result) <- c("splsda2fact","splsda")}
-  return(invisible(result))
-}
-
-
-# ----------------------------------------
-# multilevel analysis with sPLS (2 data sets X and Y)
-# ----------------------------------------
-multilevel.spls <-  function (X, Y, 
-                              cond, 
-                              sample,
-                              ncomp = 2,
-                              keepX = rep(ncol(X), ncomp),
-                              keepY = rep(ncol(Y), ncomp),
-                              tab.prob.gene=NULL,
-                              max.iter = 500, tol = 1e-06,...) {
-  
-  #-- check input parameters --#
-  
-  # Y input
-  Y = as.matrix(Y)
-  if (length(dim(Y)) != 2 || !is.numeric(Y)) 
-    stop("'Y' must be a numeric matrix.")
-  
-  
-  # set the mode 
-  mode="canonical"
-  
-  # Decomposition of the variance
-  Xw <- Split.variation.one.level(X,Y=cond,sample)$Xw
-  Yw <- Split.variation.one.level(X=Y,Y=cond,sample)$Xw
-  
-  # call sPLS
-  res <- spls(Xw,Yw, mode=mode, ncomp = ncomp, keepY = keepY, keepX= keepX) 
-  result <- c(res,list(Xw=Xw,Yw=Yw,sample=sample,name.condition=factor(cond),tab.prob.gene=tab.prob.gene))
-  
-  if(!is.null(tab.prob.gene)){ 
-    #############match probes and gene for the graph #######
-    probeX <- result$names$X
-    geneX <- result$tab.prob.gene[match(probeX,result$tab.prob.gene[,1]),2]
-    result$names$X <- as.character(geneX)
-    ###for the network and CIM representation
-    colnames(result$X) <- as.character(geneX)}
-  class(result) <- c("splslevel","spls") #,"pls")
-  return(invisible(result))
-}
-
-
-
-# -----------------------------------------------------------------------------------------
-#                               internal functions
-# ----------------------------------------------------------------------------------------
-
-# ----------------
-# check.one.level
-# -----------------
-check.one.level = function(X, Y, 
-                           cond ,                  
-                           sample,
-                           ncomp,
-                           keepX,
-                           keepY,  # for spls
-                           method ,
-                           tab.prob.gene, # remove?
-                           max.iter, 
-                           tol,...){
-  
-  # checking general input parameters
-  X = as.matrix(X)
-  # X input
-  if (length(dim(X)) != 2 || !is.numeric(X)) 
-    stop("'X' must be a numeric matrix.")
-  
-  # Testing the cond vector
-  if(is.null(cond)) stop('Vector cond is missing', call. = FALSE)
-  
-  # ncomp
-  if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0) stop("invalid number of components, 'ncomp'.")
-  
-  #checking sample
-  if(is.null(sample)) stop('Vector sample is missing', call. = FALSE)
-  if(!is.null(dim(sample))) stop('sample should be a vector indicating the repeated measurements')
-  if(length(sample) != nrow(X)) stop('X and the vector sample should have the same number of subjects')
-  # check that the sample numbers are repeated
-  if(length(summary(as.factor(sample))) == nrow(X)) stop('Check that the vector sample reflects the repeated measurements')
-  
-  
-  #check that the sample are numbered from 1
-  if(!any(names(summary(as.factor(sample))) == '1')) {
-    cat('The vector sample includes the values: ', as.vector(names(summary(as.factor(sample)))), '\n')
-    stop('sample vector', call. =FALSE)
-  }
-  
-  # method
-  if(is.null(method)) stop('Input method missing, should be set to splsda or spls', call. = FALSE)
-  
-}
-
-# --------------------------------------
-### Split.variation.one.level: decomposition of the variance (within matrix and between matrix) for one level
-# --------------------------------------
-
-Split.variation.one.level <- function(X,Y,sample){
-  
-  X = as.matrix(X)
-  
-  # check sample is numeric
-  if(is.factor(sample)){
-    sample = as.numeric(sample)
-    warning('the vector sample was converted into a numeric vector', call. = FALSE)
-  }
-  
-  Xmi <- colMeans(X)
-  Xm <- matrix(Xmi,nrow=nrow(X),ncol=ncol(X),byrow=T)
-  indX <- cbind(sample,X)
-  
-  indsample <- unique(sample)
-  n.sample <- length(indsample)
-  Xbi <- t(apply(matrix(indsample,ncol=1,nrow=n.sample),MARGIN=1,FUN=function(x,indX){indice<-which(indX[,1]==x[1]);res <- colMeans(indX[indice,])[-1];return(c(x,res))},indX=indX))
-  
-  Xb <- apply(matrix(sample,ncol=1,nrow=length(sample)),MARGIN=1,FUN=function(x,Xbi){Xbi[which(Xbi[,1]==x),-1]},Xbi=Xbi)
-  Xb <- t(Xb)-Xm
-  
-  Xw <- X-Xm-Xb
-  res <- list(Xw=Xw,Xb=Xb,Xm=Xm)
-}
-
-
-###--------------------------------------
-### Split.variation.two.level: decomposition of the variance (within matrix and between matrix) for two level
-###--------------------------------------
-
-
-Split.variation.two.level <- function(X, factor1, factor2, sample){
-  
-  if(is.factor(sample)){
-    sample = as.numeric(sample)
-    warning('the vector sample was converted into a numeric vector', call. = FALSE)
-  }
-  
-  ######## off set term
-  Xmi <- colMeans(X)
-  Xm <- matrix(Xmi,nrow=nrow(X),ncol=ncol(X),byrow=T)
-  #######
-  
-  ###### compute Xb and Xs ######## Compute the between subject variation 
-  indX <- cbind(sample,X)
-  Xb <- apply(indX,MARGIN=1,FUN=function(x,indX){indice<-which(indX[,1]==x[1]);res <- colMeans(indX[indice,]);return(res[-1])},indX=indX)
-  Xs <- t(Xb)
-  Xb <- t(Xb)-Xm
-  #################################
-  
-  
-  xbfactor1 <- X
-  for (i in levels(factor(factor1))){
-    indice <- which(factor1==i)
-    indXX <- indX[indice,] 
-    res1 <- apply(indXX,MARGIN=1,FUN=function(x,indXX){indice<-which(indXX[,1]==x[1]);if(length(indice)==1){res <- colMeans(matrix(indXX[indice,],nrow=1,ncol=dim(indXX)[2]))}else{res <- colMeans(indXX[indice,])};return(res[-1])},indXX=indXX)
-    xbfactor1[indice,] <- t(res1)
-  }
-  
-  xbfactor2 <- X
-  for (i in levels(factor(factor2))){
-    indice <- which(factor2==i)
-    indXX <- indX[indice,] 
-    res1 <- apply(indXX,MARGIN=1,FUN=function(x,indXX){indice<-which(indXX[,1]==x[1]);if(length(indice)==1){res <- colMeans(matrix(indXX[indice,],nrow=1,ncol=dim(indXX)[2]))}else{res <- colMeans(indXX[indice,])};return(res[-1])},indXX=indXX)
-    xbfactor2[indice,] <- t(res1)
-  }
-  
-  ###fixed effect###
-  matfactor1 <- matrix(factor1,nrow=1,ncol=length(factor1))
-  XFACTOR1 <- apply(matfactor1,MARGIN=2,FUN=function(x,matfactor1){indice<-which(matfactor1==x[1]);res <- colMeans(X[indice,]);return(res)},matfactor1=matfactor1)
-  
-  matfactor2 <- matrix(factor2,nrow=1,ncol=length(factor2))
-  XFACTOR2 <- apply(matfactor2,MARGIN=2,FUN=function(x,matfactor2){indice<-which(matfactor2==x[1]);res <- colMeans(X[indice,]);return(res)},matfactor2=matfactor2)
-  #########
-  
-  XCS <- xbfactor1-Xs+Xm-t(XFACTOR1)
-  XTS <- xbfactor2-Xs+Xm-t(XFACTOR2)
-  Xw <- X-Xb-Xm-XCS-XTS
-  
-  res <- list(Xw=Xw,Xb=Xb,Xm=Xm,XCS=XCS,XTS=XTS)
-}
-
 

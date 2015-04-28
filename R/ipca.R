@@ -1,5 +1,5 @@
 # Copyright (C) 2009 
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # Queensland Facility for Bioinformatics, University of Queensland, Australia
 # Fangzhou Yao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia and
 # Shangai University of Finance and Economics, Shanghai, P.R. China

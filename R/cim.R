@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# S?bastien D?jean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonz?lez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh L? Cao, French National Institute for Agricultural Research and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
 # Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
 #
@@ -30,7 +30,7 @@ cim <-
 cim.default <-function(
   mat, 
   breaks, 
-  col = jet.colors, 
+  col = color.jet, 
   distfun = dist, 
   hclustfun = hclust,
   dendrogram = c("both", "row", "column", "none"),
@@ -125,7 +125,7 @@ cim.default <-function(
   
   if (length(breaks) == 1) {
     breaks = seq(min.mat, max.mat, length = breaks)
-    if (missing(col)) col = jet.colors
+    if (missing(col)) col = color.jet
   }
   
   nbr = length(breaks)

@@ -55,9 +55,9 @@ Shen, H. and Huang, J. Z. (2008). Sparse principal component analysis via regula
 low rank matrix approximation. \emph{Journal of Multivariate Analysis} \bold{99}, 1015-1034. 
 }
 
-\author{Kim-Anh L? Cao, Fangzhou Yao, Leigh Coonan}
+\author{Kim-Anh Le Cao, Fangzhou Yao, Leigh Coonan}
 
-\seealso{\code{\link{pca}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.} 
+\seealso{\code{\link{pca}} and http://www.mixOmics.org for more details.} 
 
 \examples{
 data(liver.toxicity)

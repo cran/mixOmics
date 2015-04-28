@@ -14,7 +14,7 @@ represent "high-dimensional" data sets.
 }
 
 \usage{
-\method{cim}{default}(mat, breaks, col = jet.colors, 
+\method{cim}{default}(mat, breaks, col = color.jet, 
     distfun = dist, hclustfun = hclust,
     dendrogram = c("both", "row", "column", "none"),
     labRow = NULL, labCol = NULL,
@@ -51,7 +51,7 @@ represent "high-dimensional" data sets.
 	and \code{max(mat)}.}	
   \item{col}{a character string specifying the colors function to use: 
     \code{\link{terrain.colors}}, \code{\link{topo.colors}}, 
-	\code{\link{rainbow}} or similar functions. Defaults to \code{\link{jet.colors}}.}
+	\code{\link{rainbow}} or similar functions. Defaults to \code{\link{color.jet}}.}
   \item{hclustfun}{function used to compute the hierarchical clustering for both rows and columns. 
     Defaults to \code{\link[stats]{hclust}}. Should take as argument a result of \code{distfun} and return 
     an object to which \code{as.dendrogram} can be applied.}
@@ -134,10 +134,10 @@ and Paull, K. D. (1997). An information-intensive approach to the molecular
 pharmacology of cancer. \emph{Science} \bold{275}, 343-349.
 }
 
-\author{Ignacio González.}
+\author{Ignacio Gonzalez.}
 
 \seealso{\code{\link{image}}, \code{\link{heatmap}}, \code{\link{hclust}}, \code{\link{plotVar}}, 
-\code{\link{plot3dVar}}, \code{\link{network}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\code{\link{plot3dVar}}, \code{\link{network}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## default method

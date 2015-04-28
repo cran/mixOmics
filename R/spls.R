@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Seébastien Deéjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonzàlez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research, Toulouse France and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research, Toulouse France and 
 # The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 # Florian Rohart,  Australian Institute for Bioengineering and Nanotechnology, The University of Queensland, Brisbane, QLD 
 #
@@ -29,84 +29,91 @@ function(X,
          tol = 1e-06,
          keepX = rep(ncol(X), ncomp), 
          keepY = rep(ncol(Y), ncomp),
-         near.zero.var = TRUE,
-         ...)
+         near.zero.var = TRUE)
 {
 
     #-- validation des arguments --#
-    if (length(dim(X)) != 2) 
-        stop("'X' must be a numeric matrix.")
-     
+    if (length(dim(X)) != 2) {stop("'X' must be a numeric matrix.")}
+    
     X = as.matrix(X)
     Y = as.matrix(Y)
-     
-    if (!is.numeric(X) || !is.numeric(Y)) 
-        stop("'X' and/or 'Y' must be a numeric matrix.")
-     
+    
+    if (!is.numeric(X) || !is.numeric(Y)) {stop("'X' and/or 'Y' must be a numeric matrix.")}
+    
     n = nrow(X)
     q = ncol(Y)
-     
-    if ((n != nrow(Y))) 
-        stop("unequal number of rows in 'X' and 'Y'.")
-     
-    if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0)
-        stop("invalid number of variates, 'ncomp'.")
     
-     if(near.zero.var == TRUE){ 
-    nzv = nearZeroVar(X, ...)
-    if (length(nzv$Position > 0)) {
-        warning("Zero- or near-zero variance predictors. 
-  Reset predictors matrix to not near-zero variance predictors.
-  See $nzv for problematic predictors.")
-        X = X[, -nzv$Position]
+    if ((n != nrow(Y))) {stop("unequal number of rows in 'X' and 'Y'.")}
+    
+    if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0) {stop("invalid number of variates, 'ncomp'.")}
+    
+    if(near.zero.var == TRUE)
+    {
+        nzv = nearZeroVar(X)
+        if (length(nzv$Position > 0))
+        {
+            warning("Zero- or near-zero variance predictors.\nReset predictors matrix to not near-zero variance predictors.\nSee $nzv for problematic predictors.")
+            X = X[, -nzv$Position,drop=FALSE]
+            
+            if(ncol(X)==0) {stop("No more predictors")}
+            
+        }
     }
-    }
+    
 	p = ncol(X)
 	
     ncomp = round(ncomp)
-    if(ncomp > p) {
+    if(ncomp > p)
+    {
         warning("Reset maximum number of variates 'ncomp' to ncol(X) = ", p, ".")
         ncomp = p
     }
+    
 	
-    if (length(keepX) != ncomp) 
-        stop("length of 'keepX' must be equal to ", ncomp, ".")
-     
-    if (length(keepY) != ncomp) 
-        stop("length of 'keepY' must be equal to ", ncomp, ".")
-     
-    if (any(keepX > p)) 
-        stop("each component of 'keepX' must be lower or equal than ", p, ".")
-     
-    if (any(keepY > q)) 
-        stop("each component of 'keepY' must be lower or equal than ", q, ".")
-     
+    if (length(keepX) != ncomp) {stop("length of 'keepX' must be equal to ", ncomp, ".")}
+    
+    if (length(keepY) != ncomp) {stop("length of 'keepY' must be equal to ", ncomp, ".")}
+    if (any(keepX > p)) {stop("each component of 'keepX' must be lower or equal than ", p, ".")}
+    if (any(keepY > q)) {stop("each component of 'keepY' must be lower or equal than ", q, ".")}
     mode = match.arg(mode)
-     
+    
     #-- initialisation des matrices --#
     X.names = dimnames(X)[[2]]
-    if (is.null(X.names)) X.names = paste("X", 1:p, sep = "")
-     
-    if (dim(Y)[2] == 1) Y.names = "Y"
-    else {
-        Y.names = dimnames(Y)[[2]]
-        if (is.null(Y.names)) Y.names = paste("Y", 1:q, sep = "")
+    if (is.null(X.names))
+    {
+        X.names = paste("X", 1:p, sep = "")
+        dimnames(X)[[2]]=X.names
+        
     }
-     
+    
+    if (dim(Y)[2] == 1)
+    {
+        Y.names = "Y"
+    }else{
+        Y.names = dimnames(Y)[[2]]
+        if (is.null(Y.names))
+        {
+            Y.names = paste("Y", 1:q, sep = "")
+            dimnames(Y)[[2]]=Y.names
+        }
+    }
+    
     ind.names = dimnames(X)[[1]]
-    if (is.null(ind.names)) {
+    if (is.null(ind.names))
+    {
         ind.names = dimnames(Y)[[1]]
         rownames(X) = ind.names
     }
-     	
-    if (is.null(ind.names)) {
+    
+    if (is.null(ind.names))
+    {
         ind.names = 1:n
         rownames(X) = rownames(Y) = ind.names
     }
-     
+
     #-- centrer et r?duire les donn?es --#
     X = scale(X, center = TRUE, scale = TRUE)
-    Y = scale(Y, center = TRUE, scale = TRUE) 
+    Y = scale(Y, center = TRUE, scale = TRUE)
 
     X.temp = X
     Y.temp = Y
@@ -127,6 +134,7 @@ function(X,
 	if (any(is.na.X)) na.X = TRUE
     if (any(is.na.Y)) na.Y = TRUE
      
+    iter=NULL
     #-- boucle sur h --#
     for (h in 1:ncomp) {
         nx = p - keepX[h]
@@ -134,18 +142,18 @@ function(X,
          
         #-- svd de M = t(X)*Y --#
         X.aux = X.temp		
-        if (na.X) X.aux[is.na.X] = 0
-         
-        Y.aux = Y.temp       	
-        if (na.Y) Y.aux[is.na.Y] = 0
-         
+        if (na.X) { X.aux[is.na.X] = 0}
+        Y.aux = Y.temp
+        if (na.Y) {Y.aux[is.na.Y] = 0}
+        
         M = crossprod(X.aux, Y.aux)
         svd.M = svd(M, nu = 1, nv = 1)
         a.old = svd.M$u
         b.old = svd.M$v
          
         #-- latent variables --#
-        if (na.X) {
+        if (na.X)
+        {
             t = X.aux %*% a.old
             A = drop(a.old) %o% n.ones
             A[t(is.na.X)] = 0
@@ -153,12 +161,12 @@ function(X,
             t = t / diag(a.norm)
             # update 5.0-2: t is not normed
             #t = t / drop(sqrt(crossprod(t)))
-        }
-        else {
+        }else{
             t = X.temp %*% a.old / drop(crossprod(a.old))
         }
          
-        if (na.Y) {
+        if (na.Y)
+        {
             u = Y.aux %*% b.old
             B = drop(b.old) %o% n.ones
             B[t(is.na.Y)] = 0
@@ -166,34 +174,49 @@ function(X,
             u = u / diag(b.norm)
             # update 5.0-2: u is not normed
             #u = u / drop(sqrt(crossprod(u)))
-        }
-        else {
+        }else{
             u = Y.temp %*% b.old / drop(crossprod(b.old))
         }
          
-        iter = 1
+        iterh = 1
          
         #-- convergence of a  --#
-        repeat {
-            if (na.X) a = t(X.aux) %*% u
-            else a = t(X.temp) %*% u #/ drop(crossprod(u)), useless because a is scaled after soft_thresholding
-			
-			if (na.Y) b = t(Y.aux) %*% t
-            else b = t(Y.temp) %*% t #/ drop(crossprod(t)), useless because b is scaled after soft_thresholding
-             
-            if (nx != 0) { 
-                a = ifelse(abs(a) > abs(a[order(abs(a))][nx]), 
-                    (abs(a) - abs(a[order(abs(a))][nx])) * sign(a), 0)
+        repeat{
+            if (na.X)
+            {
+                a = t(X.aux) %*% u
+            }else{
+                a = t(X.temp) %*% u #/ drop(crossprod(u)), useless because a is scaled after soft_thresholding
+            }
+			if (na.Y)
+            {
+                b = t(Y.aux) %*% t
+            }else{
+                b = t(Y.temp) %*% t #/ drop(crossprod(t)), useless because b is scaled after soft_thresholding
+            }
+
+
+            # note on the variable selection below. Before 5.0-4, the selection was done so that the keepX/keepY highest coefficients were the only one not put to 0.
+            # However, a bug occured with ties. It is now changed so that all ties follow the same treatment.
+            # If keepX=1 and two ties, then two variables are kept at this iteration
+            if (nx != 0) {
+        		absa = abs(a)
+        		if(any(rank(absa, ties.method = "max") <= nx)) {
+          			a = ifelse(rank(absa, ties.method = "max") <= nx, 0, sign(a) * (absa - max(absa[rank(absa, ties.method = "max") <= nx])))     
+        		}
             }
             a = a / drop(sqrt(crossprod(a)))
 		     
-            if (ny != 0) {
-                b = ifelse(abs(b) > abs(b[order(abs(b))][ny]),
-                    (abs(b) - abs(b[order(abs(b))][ny])) * sign(b), 0)
+            if(ny != 0) {
+                absb=abs(b)
+		        if(any(rank(absb, ties.method = "max") <= ny)) {
+          			b = ifelse(rank(absb, ties.method = "max") <= ny, 0, sign(b) * (absb - max(absb[rank(absb, ties.method = "max") <= ny])))         
+        		}
             }
             b = b / drop(sqrt(crossprod(b)))
 			 
-            if (na.X) {
+            if (na.X)
+            {
                 t = X.aux %*% a
                 A = drop(a) %o% n.ones
                 A[t(is.na.X)] = 0
@@ -201,12 +224,12 @@ function(X,
                 t = t / diag(a.norm)
                 # update 5.0-2: t is not normed
                 #t = t / drop(sqrt(crossprod(t)))
-            }
-            else {
+            }else{
                 t = X.temp %*% a / drop(crossprod(a))
             }
              
-            if (na.Y) {
+            if (na.Y)
+            {
                 u = Y.aux %*% b
                 B = drop(b) %o% n.ones
                 B[t(is.na.Y)] = 0
@@ -214,26 +237,25 @@ function(X,
                 u = u / diag(b.norm)
                 # update 5.0-2: u is not normed
                 #u = u / drop(sqrt(crossprod(u)))
-            }
-            else {
+            }else{
                 u = Y.temp %*% b / drop(crossprod(b))
             }
            
-            if (crossprod(a - a.old) < tol) break
-             
-            if (iter == max.iter) {
-                warning(paste("Maximum number of iterations reached for the component", h),
-                        call. = FALSE)
+            if (crossprod(a - a.old) < tol) {break}
+            if (iterh == max.iter)
+            {
+                warning(paste("Maximum number of iterations reached for the component", h),call. = FALSE)
                 break
             }
              
             a.old = a
             b.old = b
-            iter = iter + 1
+            iterh = iterh + 1
         }
          
         #-- deflation des matrices --#
-        if (na.X) {
+        if (na.X)
+        {
             X.aux = X.temp
             X.aux[is.na.X] = 0
             c = crossprod(X.aux, t)				
@@ -241,16 +263,17 @@ function(X,
             T[is.na.X] = 0
             t.norm = crossprod(T)				
             c = c / diag(t.norm)
-        }
-        else {
+        }else{
             c = crossprod(X.temp, t) / drop(crossprod(t))
         }	
 		
         X.temp = X.temp - t %*% t(c)   
          
         #-- mode canonique --#
-        if (mode == "canonical") {
-            if (na.Y) {
+        if (mode == "canonical")
+        {
+            if (na.Y)
+            {
                 Y.aux = Y.temp
                 Y.aux[is.na.Y] = 0
                 e = crossprod(Y.aux, u)
@@ -258,8 +281,7 @@ function(X,
                 U[is.na.Y] = 0
                 u.norm = crossprod(U)				
                 e = e / diag(u.norm)					
-            }
-            else {
+            }else{
                 e = crossprod(Y.temp, u) / drop(crossprod(u))
             }
 			
@@ -267,8 +289,10 @@ function(X,
         }
          
         #-- mode regression --#
-        if(mode == "regression") {
-            if (TRUE) {#na.Y
+        if(mode == "regression")
+        {
+            if (na.Y)
+            {
                 Y.aux = Y.temp
                 Y.aux[is.na.Y] = 0
                 d = crossprod(Y.aux, t)
@@ -276,8 +300,7 @@ function(X,
                 T[is.na.Y] = 0
                 t.norm = crossprod(T)				
                 d = d / diag(t.norm)
-            }
-            else {				
+            }else{
                 d = crossprod(Y.temp, t) / drop(crossprod(t))
             }
              
@@ -289,10 +312,11 @@ function(X,
         mat.a[, h] = a
         mat.b[, h] = b
         mat.c[, h] = c
-        if (mode == "regression") mat.d[, h] = d
-	if (mode == "canonical") mat.e[, h] = e
-
-         
+        if (mode == "regression") {mat.d[, h] = d}
+        
+        if (mode == "canonical") {mat.e[, h] = e}
+        
+        iter=c(iter,iterh) #save the number of iteration per component
     } #-- fin boucle sur h --#
      
     #-- valeurs sortantes --#
@@ -313,16 +337,16 @@ function(X,
                   keepX = keepX,
                   keepY = keepY,
                   mat.c = mat.c,
-		              mat.d = mat.d,
-		              mat.e = mat.e, 
+                  mat.d = mat.d,
+		          mat.e = mat.e,
                   variates = list(X = mat.t, Y = mat.u),
                   loadings = list(X = mat.a, Y = mat.b),
                   names = list(X = X.names, Y = Y.names, indiv = ind.names),
-		              tol = tol,
-		              max.iter = max.iter,iter=iter
+		          tol = tol,
+		          max.iter = max.iter,iter=iter
 )
                   
-    if (length(nzv$Position > 0)) result$nzv = nzv
+    if (near.zero.var == TRUE) result$nzv = nzv
 
     class(result) = c("spls", "pls") 
     return(invisible(result))

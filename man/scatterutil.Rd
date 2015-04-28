@@ -5,7 +5,7 @@
 \alias{scatterutil.grid}
 \title{Graphical utility functions from ade4}
 \description{
-These are utilities used in graphical functions.
+These utilities are used in graphical functions such as \code{s.match}.
 }
 
 \details{

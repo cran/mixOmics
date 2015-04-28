@@ -2,15 +2,14 @@
 \encoding{latin1}
 \alias{splsda}
 
-\title{Sparse Partial Least Squares Discriminate Analysis (sPLS-DA)}
+\title{Sparse Partial Least Squares Discriminant Analysis (sPLS-DA)}
 
-\description{Function to perform sparse Partial Least Squares to classify samples. The sPLS-DA approach
-embeds variable selection for this purpose.
+\description{Function to perform sparse Partial Least Squares to classify samples (supervised analysis). sPLS-DA approach enables variable selection.
 }
 
 \usage{
 splsda(X, Y, ncomp = 2, keepX = rep(ncol(X), ncomp),
-       max.iter = 500, tol = 1e-06, near.zero.var = TRUE, ...)
+       max.iter = 500, tol = 1e-06, near.zero.var = TRUE)
 }	
 
 \arguments{
@@ -22,12 +21,11 @@ splsda(X, Y, ncomp = 2, keepX = rep(ncol(X), ncomp),
   \item{max.iter}{integer, the maximum number of iterations.}   
   \item{tol}{a positive real, the tolerance used in the iterative algorithm.} 
       \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations.}
-  \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 
 \details{
 \code{splsda} function fit sPLS models with \eqn{1, \ldots ,}\code{ncomp} components
-to the factor or class vector \code{Y}. The appropriate indicator 
+to the factor or class vector \code{Y}. The appropriate indicator (dummy)
 matrix is created.
 }
 
@@ -48,43 +46,52 @@ that contains the following components:
   \item{nzv}{list containing the zero- or near-zero predictors information.}
    \item{tol}{the tolerance used in the iterative algorithm, used for subsequent S3 methods}
   \item{max.iter}{the maximum number of iterations, used for subsequent S3 methods}
+\item{iter}{Number of iterations of the algorthm for each component}
 }
 
 \references{
 On sPLS-DA:
-Lê Cao, K.-A., Boitard, S. and Besse, P. (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. \emph{BMC Bioinformatics} \bold{12}:253.
+Le Cao, K.-A., Boitard, S. and Besse, P. (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. \emph{BMC Bioinformatics} \bold{12}:253.
 }
 
-\author{Ignacio González, Kim-Anh Lê Cao and Pierre Monget.}
+\author{Ignacio Gonzalez, Kim-Anh Le Cao and Pierre Monget.}
 
 \seealso{\code{\link{spls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
-\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{perf}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{perf}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## First example
 data(breast.tumors)
 X <- breast.tumors$gene.exp
-Y <- breast.tumors$sample$treatment
+# Y will be transformed as a factor in the function,
+# but we set it as a factor to set up the colors.
+Y <- as.factor(breast.tumors$sample$treatment)
 
 res <- splsda(X, Y, ncomp = 2, keepX = c(25, 25))
-palette(c("red", "blue"))
-col.breast <- as.numeric(as.factor(Y))
-plotIndiv(res, ind.names = TRUE, col = col.breast)
-legend('bottomleft', c("After", "Before"), pch = c(16, 16), 
-       col = unique(col.breast), cex = 1, pt.cex = c(1.2, 1.2), 
+
+col.breast <- color.mixo(as.numeric(Y))
+
+# individual names appear
+plotIndiv(res, ind.names = Y, col = col.breast)
+legend('topright', c('Before', 'After'), pch = c(16, 16), 
+       col = unique(col.breast), 
        title = "Treatment")
-palette("default")
 
 ## Second example
 \dontrun{
+## Second example
 data(liver.toxicity)
 X <- as.matrix(liver.toxicity$gene)
-Y <- liver.toxicity$treatment[, 4]
+# Y will be transformed as a factor in the function,
+# but we set it as a factor to set up the colors.
+Y <- as.factor(liver.toxicity$treatment[, 4])
 
-splsda.liver = splsda(X, Y, ncomp = 2, keepX = c(20, 20))
-col.rat <- as.numeric(as.factor(Y))
+splsda.liver <- splsda(X, Y, ncomp = 2, keepX = c(20, 20))
+
+col.rat <- color.mixo(Y)
+# individual name is set to the treatment
 plotIndiv(splsda.liver, col = col.rat, ind.names = Y)
 }
 }

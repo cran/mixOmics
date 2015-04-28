@@ -63,9 +63,9 @@ The returned value is a list with components:
   \item{mat}{matrix containing the cross-validation score computed on the grid.}
 }
 
-\author{Sébastien Déjean and Ignacio González.}
+\author{Sebastien Dejean and Ignacio Gonzalez.}
 
-\seealso{\code{\link{loo}}, \code{\link{Mfold}}, \code{\link{image.tune.rcc}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\seealso{\code{\link{loo}}, \code{\link{Mfold}}, \code{\link{image.tune.rcc}} and http://www.mixOmics.org for more details.}
 
 \examples{
 data(nutrimouse)

@@ -34,7 +34,7 @@ The returned value is a list with components:
   \item{tol}{the tolerance used for singular values.}
 }
 
-\author{Sébastien Déjean and Ignacio González.}
+\author{Sebastien Dejean and Ignacio Gonzalez.}
 
 \seealso{\code{\link{nipals}}}
 
@@ -52,4 +52,7 @@ mat.rank(m)
 mat.rank(m.na)
 }
 
+
 \keyword{algebra}
+
+

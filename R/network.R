@@ -1,7 +1,7 @@
 # Copyright (C) 2009 
-# Sébastien Déjean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio González, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Lê Cao, French National Institute for Agricultural Research and 
+# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
 # ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@ function(mat,
          Y.names = NULL,
          color.node = c("white", "white"), 
          shape.node = c("circle", "rectangle"), 
-         color.edge = c("blue", "red"), 
+         color.edge = color.GreenRed(100), 
          lty.edge = c("solid", "solid"), 
          lwd.edge = c(1, 1), 
          show.edge.labels = FALSE,
@@ -93,7 +93,7 @@ function(mat,
 		color.edge = c(color.edge, id$col[col.id[i]])
 	}
 
-	# Définition des sommets #
+	# Definition des sommets #
 	#------------------------#
     Xn = paste("X", 1:p, sep = "")
     Yn = paste("Y", 1:q, sep = "")
@@ -102,17 +102,17 @@ function(mat,
 	node.X = rep(Xn, each = q)
 	node.Y = rep(Yn, p)
 
-	# Définition des arêtes #
+	# Definition des aretes #
 	#-----------------------#
 	relations = data.frame(from = node.X, to = node.Y, weight = mat)
 
-	# Décide quels sont les arêtes à incluir dans le réseau #
+	# Decide quels sont les aretes a incluir dans le reseau #
 	#-------------------------------------------------------#
 	idx = abs(mat) >= threshold
 	relations = relations[idx, ]
 	color.edge = color.edge[idx]
 
-	# Génère un graphe avec toutes les arêtes signifiantes #
+	# Genere un graphe avec toutes les aretes signifiantes #
 	#------------------------------------------------------#
 	gR = graph.data.frame(relations, directed = FALSE, vertices = nodes)
 	
@@ -128,7 +128,7 @@ function(mat,
 	V(gR)$shape = shape.node[1]
 	V(gR)$shape[V(gR)$group == "y"] = shape.node[2]
 	
-	# Attributs des arêtes #
+	# Attributs des aretes #
 	#----------------------#
 	if (show.edge.labels) E(gR)$label = round(E(gR)$weight, 2)
 	
@@ -176,7 +176,7 @@ function(mat,
 	}
 	
 	#----------------------------------#
-	# Construction du graphe de départ #
+	# Construction du graphe de depart #
 	#----------------------------------#
 	nn = vcount(gR)
 	V(gR)$label.cex = min(2/log(nn), 1)
@@ -218,13 +218,13 @@ function(mat,
 	}	
 	
 	#----------------------#
-	# Procédure interactif #
+	# Procedure interactif #
 	#----------------------#
 	gE.none = FALSE
 	if (isTRUE(interactive)) {
         dev.off()
 		
-		# Barre de contrôle #
+		# Barre de controle #
 		#-------------------#
 		min.cut = threshold
 		max.cut = max(mat)
@@ -259,7 +259,7 @@ function(mat,
 
 		getOption("device")()
 
-		# Plot du graphe de départ #
+		# Plot du graphe de depart #
 		#--------------------------#
 		if (isTRUE(show.color.key)) {
 			layout(lmat, widths = lwid, heights = lhei, respect = FALSE)
@@ -327,11 +327,11 @@ function(mat,
 			#------------------------#
 			if (threshold >= threshold.old) {
 
-				# Décide quels sont les arêtes à supprimer du réseau #
+				# Decide quels sont les aretes a supprimer du reseau #
 				#----------------------------------------------------#
 				supp.edge = E(gR)[abs(E(gR)$weight) < threshold]
 
-				# Génère un graphe avec toutes les arêtes signifiantes #
+				# Genere un graphe avec toutes les aretes signifiantes #
 				#------------------------------------------------------#
 				gE = delete.edges(gR, supp.edge)
 #				gE = delete.vertices(gE, which(degree(gE) == 0) - 1)
@@ -380,11 +380,11 @@ function(mat,
 			}
 			else {
 				#-------------------------------------------------------#
-				# Décide quels sont les arêtes à incluir dans le réseau #
+				# Decide quels sont les aretes a incluir dans le reseau #
 				#-------------------------------------------------------#
 				supp.edge = E(gR)[abs(E(gR)$weight) < threshold]
 
-				# Génère un graphe avec toutes les arêtes signifiantes #
+				# Genere un graphe avec toutes les aretes signifiantes #
 				#------------------------------------------------------#
 				gE = delete.edges(gR, supp.edge)
 #				gE = delete.vertices(gE, which(degree(gE) == 0) - 1)

@@ -60,13 +60,13 @@ in the calculation of the distance.
 }
 
 \references{
-Tenenhaus, M. (1998). \emph{La r?gression PLS: th?orie et pratique}. Paris: Editions Technic.  
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.  
 }
 
-\author{S\'ebastien D\'ejean, Ignacio Gonz`alez, Kim-Anh L\^e Cao and Pierre Monget}
+\author{Sebastien Dejean, Ignacio Gonzalez, Kim-Anh Le Cao and Pierre Monget}
 
 
-\seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}} and http://www.mixOmics.org for more details.}
 
 \examples{
 data(linnerud)

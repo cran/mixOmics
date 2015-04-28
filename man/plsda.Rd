@@ -2,14 +2,14 @@
 \encoding{latin1}
 \alias{plsda}
 
-\title{Partial Least Squares Discriminate Analysis (PLS-DA).}
+\title{Partial Least Squares Discriminant Analysis (PLS-DA).}
 
 \description{Function to perform standard Partial Least Squares regression
 to classify samples.
 }
 
 \usage{
-plsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06, near.zero.var = TRUE, ...)
+plsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06, near.zero.var = TRUE)
 }	
 
 \arguments{
@@ -19,8 +19,6 @@ plsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06, near.zero.var = TRUE, ...)
   \item{max.iter}{integer, the maximum number of iterations.}  
   \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
     \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations.}
-
-  \item{...}{arguments to pass to \code{\link{nearZeroVar}}.}
 }
 
 \details{
@@ -44,11 +42,12 @@ that contains the following components:
   \item{nzv}{list containing the zero- or near-zero predictors information.}
    \item{tol}{the tolerance used in the iterative algorithm, used for subsequent S3 methods}
   \item{max.iter}{the maximum number of iterations, used for subsequent S3 methods}
+\item{iter}{Number of iterations of the algorthm for each component}
 
 }
 
 \references{
-Pérez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
+Perez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
 a partial least squares discriminant analysis (PLS-DA) approach. \emph{Human Genetics} 
 \bold{112}, 581-592.
 
@@ -56,14 +55,14 @@ Nguyen, D. V. and Rocke, D. M. (2002). Tumor classification by partial
 least squares using microarray gene expression data. \emph{Bioinformatics}
 \bold{18}, 39-50.
 
-Tenenhaus, M. (1998). \emph{La régression PLS: théorie et pratique}. Paris: Editions Technic.
+Tenenhaus, M. (1998). \emph{La régression PLS: theorie et pratique}. Paris: Editions Technic.
 }
 
-\author{Ignacio González, Kim-Anh Lê Cao and Pierre Monget.}
+\author{Ignacio Gonzalez, Kim-Anh Le Cao and Pierre Monget.}
 
 \seealso{\code{\link{splsda}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}, \code{\link{predict}}, \code{\link{perf}} and http://www.math.univ-toulouse.fr/~biostat/mixOmics/ for more details.}
+\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}, \code{\link{predict}}, \code{\link{perf}} and http://mixOmics.org for more details.}
 
 \examples{
 ## First example
