@@ -93,9 +93,9 @@ X <- nutrimouse$lipid
 Y <- nutrimouse$gene
 nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
-my.colors = color.mixo(as.numeric(nutrimouse$diet))
+my.colors = color.mixo(1:5)
 my.pch = ifelse(nutrimouse$genotype == 'wt', 16, 17)
-plotIndiv(nutri.res, ind.names = FALSE, col = my.colors, pch = my.pch, cex = 1.5)
+#plotIndiv(nutri.res, ind.names = FALSE, group = my.colors, pch = my.pch, cex = 1.5)
 
 }
 

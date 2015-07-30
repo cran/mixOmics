@@ -1,3 +1,39 @@
+Changes in 5.1.1 (minor ++ release)
+================
+
+New features:
+-------------
+1 - plotContrib for objects of class PLSDA and sPLSDA has been added and is of particular interest for those analysing microbial communities / metagenomics data. 
+
+2 - wrapper.sgccda was added to enable multiple data sets integration with one or several factor outcomes. Note: the prediction function for this new add-on has not been fully tested yet and is not available.
+
+3 - wrapper.sgcca and wrapper.sgccda now have an argument called 'keep' that you can use as an alternative to the 'penalty' old argument. Keep is the equivalent of the keepX in the PLS method to specify the number of variables to select on each component and each block. Refer to the help file, as keep should be input as a list of length the number of blocks, and each element of the list (corresponding to a block) indicates the number of variables to select on each component (yes, it becomes, indeed, complicated).
+
+4 - All wrapper methods for the multiblock module, i.e. wrapper.rgcca, wrapper.sgcca and wrapper.sgccda take the input argument 'blocks' (instead of previously 'data') - this is to enable a smoother transition to the next update!
+
+5 - plotIndiv has been improved dramatically. A single function can now be used for the objects PLS, sPLS, PLS-DA, SPLS-DA, rCC, PCA, sPCA, IPCA, sIPCA, rGCCA, sGCCA, sGCCDA (not an S3 function anymore). In addition, we now provide the new arguments (and more to come!):
+	- ellipse plots are now available, a group argument is requested for the unsupervised methods (PCA, IPCA, PLS)
+	-three types of graphical plot: graphics (version < 5.1-0), ggplot2 and lattice
+	-legend and title can be added
+  - NOTE: if you want to color each sample with respect to a factor (i.e. a factor of length n), then the argument to use is 'group'. If you use a supervised approach then col.per.group is a vector of length the number of groups. These arguments may change in the coming up updates.
+
+6 - cim has been implemented for PLS, sPLS, PLS-DA, SPLS-DA, rCC, PCA, sPCA, IPCA, sIPCA and includes a wide range of options to plot a single data set in the form of a heatmap (new!), or the cross correlation between two matching data sets via the methods rCC or (s)PLS using the cross product between latent variables and loading vectors (improved with legends and color bars). We will give more examples on our website.
+
+7 - added package dependencies: ggplot2 and ellipse
+
+
+Enhancements:
+----------
+1 - All wrappers for multiple data integration have been improved and re-implemented. Consequently, the dependency to RGCCA has been removed, and three wrapper functions are now available: wrapper.sgcca, wrapper.rgcca and wrapper.sgccda (see New Feature #2 above).
+
+2 - selectVar has been extended for the non sparse versions PCA, PLS and PLS-DA and output the features with decreasing absolute weights in the loading vectors. It is used in particular for plotContrib (see New feature #1 above)
+
+
+Bug fixes:
+----------
+1 - The sPLS algorithm was rewritten to ensure convergence. This implies that spls results might be slightly different from version < 5.1-0!
+
+
 Changes in 5.0-4
 ================
 

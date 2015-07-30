@@ -1,11 +1,9 @@
-# Copyright (C) 2009 
-# S?bastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonzelez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
-# Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
+# Copyright (C) 2015
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 # Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
 #
-# This function was borrowed from the mclust package
+# This function was borrowed from the mclust package and modified for mixOmics
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -21,40 +19,42 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-unmap <-
-function (classification, groups = NULL, noise = NULL, ...) 
-{
+unmap <- function (classification, groups = NULL, noise = NULL, ...) {
     n <- length(classification)
     u <- sort(unique(classification))
-	
-	if (is.null(groups)) {
-    groups <- u
-	}else {
-		if (any(match(u, groups, nomatch = 0) == 0)) 
-			stop("groups incompatible with classification")
-		miss <- match(groups, u, nomatch = 0) == 0
-	}
-	cgroups <- as.character(groups)
-	if (!is.null(noise)) {
-		noiz <- match(noise, groups, nomatch = 0)
-		if (any(noiz == 0)) 
-			stop("noise incompatible with classification")
-		groups <- c(groups[groups != noise], groups[groups == 
-			noise])
-		noise <- as.numeric(factor(as.character(noise), levels = unique(groups)))
-	}
-	groups <- as.numeric(factor(cgroups, levels = unique(cgroups)))
-	classification <- as.numeric(factor(as.character(classification), 
-		levels = unique(cgroups)))
-	k <- length(groups) - length(noise)
-	nam <- levels(groups)
-	if (!is.null(noise)) {
-		k <- k + 1
-		nam <- nam[1:k]
-		nam[k] <- "noise"
-	}
-	z <- matrix(0, n, k, dimnames = c(names(classification), 
-		nam))
-	for (j in 1:k) z[classification == groups[j], j] <- 1
-	z
+    levels =  levels(classification)### Add levels
+    
+    if (is.null(groups)) {
+        groups <- u
+    } else {
+        if (any(match(u, groups, nomatch = 0) == 0))
+        stop("groups incompatible with classification")
+        miss <- match(groups, u, nomatch = 0) == 0
+    }
+    
+    cgroups <- as.character(groups)
+    if (!is.null(noise)) {
+        noiz <- match(noise, groups, nomatch = 0)
+        if (any(noiz == 0))
+        stop("noise incompatible with classification")
+        groups <- c(groups[groups != noise], groups[groups ==
+        noise])
+        noise <- as.numeric(factor(as.character(noise), levels = unique(groups)))
+    }
+    
+    groups <- as.numeric(factor(cgroups, levels = unique(cgroups)))
+    classification <- as.numeric(factor(as.character(classification), levels = unique(cgroups)))
+    k <- length(groups) - length(noise)
+    nam <- levels(groups)
+    
+    if (!is.null(noise)) {
+        k <- k + 1
+        nam <- nam[1:k]
+        nam[k] <- "noise"
+    }
+    
+    z <- matrix(0, n, k, dimnames = c(names(classification), nam))
+    for (j in 1:k) z[classification == groups[j], j] <- 1
+    attr(z, "levels") = levels
+    z
 }

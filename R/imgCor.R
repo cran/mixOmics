@@ -1,9 +1,7 @@
 # Copyright (C) 2009 
-# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
 # Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
-# Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
-# Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
+# Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+# Florian Rohart, Australian Institute for Bioengineering and Nanotechnology, University of Queensland, Brisbane, QLD.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,21 +17,30 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+# -----------------------------------------
+# --- small example but see help file
+# ----------------------------------------
+#library(mixOmics)
+#data(liver.toxicity)
+#X <- liver.toxicity$gene
+#Y <- liver.toxicity$clinic
+#imgCor(X=X[,1:10],Y=Y[,1:4])
+
 
 imgCor <-
 function(X, 
          Y,  
          type = c("combine", "separate"), 
-         col = color.jet, 
-         X.names = TRUE, 
-         Y.names = TRUE,		 
-         XsideColor = "blue",
-         YsideColor = "red",
+         col = color.jet(25),
+         X.var.names = TRUE, 
+         Y.var.names = TRUE,		 
+         x.sideColors = "blue",
+         y.sideColors = "red",
          symkey = TRUE, 
-         keysize = 1, 
+         keysize = c(1,1),
          interactive.dev = TRUE,		 
-         cexRow = NULL, 
-         cexCol = NULL, 
+         row.cex = NULL, 
+         col.cex = NULL, 
          margins = c(5, 5), 
          lhei = NULL, 
          lwid = NULL) 
@@ -55,24 +62,24 @@ function(X,
     p = ncol(X)
     q = ncol(Y)	
 	
-    if (!is.logical(X.names)) {
-        if (!is.vector(X.names) || (length(X.names) != p))
-            stop("'X.names' must be a character vector of length ", p, ".")
+    if (!is.logical(X.var.names)) {
+        if (!is.vector(X.var.names) || (length(X.var.names) != p))
+            stop("'X.var.names' must be a character vector of length ", p, ".")
     }
     else {
-        if (isTRUE(X.names)) X.names = NULL else X.names = rep(" ", p)	
+        if (isTRUE(X.var.names)) X.var.names = NULL else X.var.names = rep(" ", p)	
     }
 	
-    if (!is.logical(Y.names)) {
-        if (!is.vector(Y.names) || (length(Y.names) != q))
-            stop("'Y.names' must be a character vector of length ", q, ".")
+    if (!is.logical(Y.var.names)) {
+        if (!is.vector(Y.var.names) || (length(Y.var.names) != q))
+            stop("'Y.var.names' must be a character vector of length ", q, ".")
     }
     else {
-        if (isTRUE(Y.names)) Y.names = NULL else Y.names = rep(" ", q)	
+        if (isTRUE(Y.var.names)) Y.var.names = NULL else Y.var.names = rep(" ", q)	
     }
 	
-    if (!is.null(X.names)) colnames(X) = X.names
-    if (!is.null(Y.names)) colnames(Y) = Y.names
+    if (!is.null(X.var.names)) colnames(X) = X.var.names
+    if (!is.null(Y.var.names)) colnames(Y) = Y.var.names
     type = match.arg(type)
      
     # representation de la matrice de correlation de #
@@ -81,21 +88,22 @@ function(X,
 
     if (type == "combine") {		
         matcor = cor(cbind(X, Y), use = "pairwise")
-        matcor = t(matcor[(p + q):1, ])
+        #matcor = t(matcor[(p + q):1, ])
+        matcor=matcor[(p + q):1,]
 		
-        ColSideColors = c(rep(YsideColor, q), rep(XsideColor, p))
-        RowSideColors = c(rep(XsideColor, p), rep(YsideColor, q))
+        ColSideColors = c(rep(x.sideColors, p), rep(y.sideColors, q))
+        RowSideColors = c(rep(y.sideColors, q), rep(x.sideColors, p))
 		
-        cim(matcor, col = col, dendrogram = "none",
+        cim(matcor, color = col, dendrogram = "none",
             labRow = NULL, labCol = NULL,		 
             symkey = symkey, keysize = keysize, 
             main = "[X,Y] correlation matrix",
-            ColSideColors = ColSideColors,
-            RowSideColors = RowSideColors,
-            cexRow = if(is.null(cexRow)) min(1, 0.2 + 1/log10(p + q)) else cexRow, 
-            cexCol = if(is.null(cexCol)) min(1, 0.2 + 1/log10(p + q)) else cexCol,			
+            col.sideColors = ColSideColors,
+            row.sideColors = RowSideColors,
+            row.cex = if(is.null(row.cex)) min(1, 0.2 + 1/log10(p + q)) else row.cex,
+            col.cex = if(is.null(col.cex)) min(1, 0.2 + 1/log10(p + q)) else col.cex,			
             margins = margins, lhei = lhei, lwid = lwid,
-            breaks = breaks)
+            breaks = breaks,cluster="none")
     }
      
     # representation des matrices de correlation de #
@@ -106,69 +114,69 @@ function(X,
         Ycor = cor(Y, use = "pairwise")
         XYcor = cor(X, Y, use = "pairwise")
 
-        Xcor = t(Xcor[p:1, ])
-        Ycor = t(Ycor[q:1, ])
-        XYcor = XYcor[, q:1]
+        Xcor = Xcor[p:1,]#t(Xcor[p:1, ])
+        Ycor = Ycor[q:1,]#t(Ycor[q:1, ])
+        XYcor = XYcor[p:1,]
 		
         if (interactive.dev) {   
-            cim(Xcor, col = col, dendrogram = "none",
+            cim(Xcor, color = col, dendrogram = "none",
             labRow = NULL, labCol = NULL,		 
             symkey = symkey, keysize = keysize, 
             main = "X correlation matrix",			
-            cexRow = if(is.null(cexRow)) min(1, 0.2 + 1/log10(p)) else cexRow, 
-            cexCol = if(is.null(cexRow)) min(1, 0.2 + 1/log10(p)) else cexRow, 
+            row.cex = if(is.null(row.cex)) min(1, 0.2 + 1/log10(p)) else row.cex, 
+            col.cex = if(is.null(row.cex)) min(1, 0.2 + 1/log10(p)) else row.cex, 
             margins = margins, lhei = lhei, lwid = lwid,
-            breaks = breaks)
+            breaks = breaks,cluster="none")
 			
             devAskNewPage(TRUE)
-            cim(Ycor, col = col, dendrogram = "none",
+            cim(Ycor, color = col, dendrogram = "none",
             labRow = NULL, labCol = NULL,		 
             symkey = symkey, keysize = keysize, 
             main = "Y correlation matrix",			
-            cexRow = if(is.null(cexCol)) min(1, 0.2 + 1/log10(q)) else cexCol, 
-            cexCol = if(is.null(cexCol)) min(1, 0.2 + 1/log10(q)) else cexCol, 
+            row.cex = if(is.null(col.cex)) min(1, 0.2 + 1/log10(q)) else col.cex, 
+            col.cex = if(is.null(col.cex)) min(1, 0.2 + 1/log10(q)) else col.cex, 
             margins = margins, lhei = lhei, lwid = lwid,
-            breaks = breaks)
+            breaks = breaks,cluster="none")
 
-		    cim(XYcor, col = col, dendrogram = "none",
+		    cim(XYcor, color = col, dendrogram = "none",
             labRow = NULL, labCol = NULL,		 
             symkey = symkey, keysize = keysize, 
             main = "XY correlation matrix",			
-            cexRow = if(is.null(cexRow)) min(1, 0.2 + 1/log10(p)) else cexRow, 
-            cexCol = if(is.null(cexCol)) min(1, 0.2 + 1/log10(q)) else cexCol,
+            row.cex = if(is.null(row.cex)) min(1, 0.2 + 1/log10(p)) else row.cex, 
+            col.cex = if(is.null(col.cex)) min(1, 0.2 + 1/log10(q)) else col.cex,
             margins = margins, lhei = lhei, lwid = lwid,
-            breaks = breaks)
+            breaks = breaks,cluster="none")
         }
 		else {
             getOption("device")("xpos" = 0, "ypos" = 0)
-            cim(XYcor, col = col, dendrogram = "none",
+            cim(XYcor, color = col, dendrogram = "none",
             labRow = NULL, labCol = NULL,		 
             symkey = symkey, keysize = keysize, 
             main = "XY correlation matrix",			
-            cexRow = if(is.null(cexRow)) min(1, 0.2 + 1/log10(p)) else cexRow, 
-            cexCol = if(is.null(cexCol)) min(1, 0.2 + 1/log10(q)) else cexCol,
+            row.cex = if(is.null(row.cex)) min(1, 0.2 + 1/log10(p)) else row.cex, 
+            col.cex = if(is.null(col.cex)) min(1, 0.2 + 1/log10(q)) else col.cex,
             margins = margins, lhei = lhei, lwid = lwid,
-            breaks = breaks)
+            breaks = breaks,cluster="none")
 			
             getOption("device")("xpos" = 34, "ypos" = 34)
-            cim(Ycor, col = col, dendrogram = "none",
+            cim(Ycor, color = col, dendrogram = "none",
             labRow = NULL, labCol = NULL,		 
             symkey = symkey, keysize = keysize, 
             main = "Y correlation matrix",			
-            cexRow = if(is.null(cexCol)) min(1, 0.2 + 1/log10(q)) else cexCol, 
-            cexCol = if(is.null(cexCol)) min(1, 0.2 + 1/log10(q)) else cexCol,
+            row.cex = if(is.null(col.cex)) min(1, 0.2 + 1/log10(q)) else col.cex, 
+            col.cex = if(is.null(col.cex)) min(1, 0.2 + 1/log10(q)) else col.cex,
             margins = margins, lhei = lhei, lwid = lwid,
-            breaks = breaks)
+            breaks = breaks,cluster="none")
 			
             getOption("device")("xpos" = 64, "ypos" = 64)
-            cim(Xcor, col = col, dendrogram = "none",
+            cim(Xcor, color = col, dendrogram = "none",
             labRow = NULL, labCol = NULL,		 
             symkey = symkey, keysize = keysize, 
             main = "X correlation matrix",			
-            cexRow = if(is.null(cexRow)) min(1, 0.2 + 1/log10(p)) else cexRow, 
-            cexCol = if(is.null(cexRow)) min(1, 0.2 + 1/log10(p)) else cexRow,
+            row.cex = if(is.null(row.cex)) min(1, 0.2 + 1/log10(p)) else row.cex, 
+            col.cex = if(is.null(row.cex)) min(1, 0.2 + 1/log10(p)) else row.cex,
             margins = margins, lhei = lhei, lwid = lwid,
-            breaks = breaks)
+            breaks = breaks,cluster="none")
 		}
     }	
 }

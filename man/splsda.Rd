@@ -71,13 +71,10 @@ Y <- as.factor(breast.tumors$sample$treatment)
 
 res <- splsda(X, Y, ncomp = 2, keepX = c(25, 25))
 
-col.breast <- color.mixo(as.numeric(Y))
 
 # individual names appear
-plotIndiv(res, ind.names = Y, col = col.breast)
-legend('topright', c('Before', 'After'), pch = c(16, 16), 
-       col = unique(col.breast), 
-       title = "Treatment")
+plotIndiv(res, ind.names = Y, add.legend = TRUE, plot.ellipse =TRUE)
+
 
 ## Second example
 \dontrun{
@@ -90,9 +87,8 @@ Y <- as.factor(liver.toxicity$treatment[, 4])
 
 splsda.liver <- splsda(X, Y, ncomp = 2, keepX = c(20, 20))
 
-col.rat <- color.mixo(Y)
 # individual name is set to the treatment
-plotIndiv(splsda.liver, col = col.rat, ind.names = Y)
+plotIndiv(splsda.liver, ind.names = Y, plot.ellipse = TRUE, add.legend = TRUE)
 }
 }
 

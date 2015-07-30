@@ -457,8 +457,8 @@ perf.spls <-function(object,
         remove.naX = which(is.na(featuresX[[k]]))
         remove.naY = which(is.na(featuresY[[k]]))
         # then summarise as a factor and output the percentage of appearance
-        list.features.X[[k]] = sort(summary(as.factor(featuresX[[k]][-remove.naX]))/M, decreasing = TRUE)
-        list.features.Y[[k]] = sort(summary(as.factor(featuresY[[k]][-remove.naY]))/M, decreasing = TRUE)
+        list.features.X[[k]] = sort(table(as.factor(featuresX[[k]][-remove.naX]))/M, decreasing = TRUE)
+        list.features.Y[[k]] = sort(table(as.factor(featuresY[[k]][-remove.naY]))/M, decreasing = TRUE)
         
     }
     names(list.features.X)  = names(list.features.Y) = paste('comp', 1:ncomp)

@@ -57,10 +57,9 @@ values are handled by casewise deletion in the \code{rcc} function.
 contains the following components:
   \item{X}{the original \eqn{X} data.}
   \item{Y}{the original \eqn{Y} data.}
-  \item{lambda}{a vector containing the regularization parameters.}
   \item{cor}{a vector containing the canonical correlations.}
-  \item{loadings}{list containing the estimated loadings for the \eqn{X} and 
-	\eqn{Y} canonical variates.}
+  \item{lambda}{a vector containing the regularization parameters.}
+  \item{loadings}{list containing the estimated coefficients used to calculate the canonical variates in  \eqn{X} and \eqn{Y}.}
   \item{variates}{list containing the canonical variates.}	
   \item{names}{list containing the names to be used for individuals and variables.} 
 }

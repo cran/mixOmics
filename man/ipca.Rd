@@ -82,8 +82,8 @@ ipca.res <- ipca(liver.toxicity$gene, ncomp = 3, mode="deflation")
 ipca.res
 
 # samples representation
-plotIndiv(ipca.res, ind.names = liver.toxicity$treatment[, 4], cex = 0.5, 
-          col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
+plotIndiv(ipca.res, ind.names = as.character(liver.toxicity$treatment[, 4]),
+          group = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
 \dontrun{
 plot3dIndiv(ipca.res, cex = 0.01,
             col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))

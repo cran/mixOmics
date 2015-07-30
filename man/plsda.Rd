@@ -55,7 +55,7 @@ Nguyen, D. V. and Rocke, D. M. (2002). Tumor classification by partial
 least squares using microarray gene expression data. \emph{Bioinformatics}
 \bold{18}, 39-50.
 
-Tenenhaus, M. (1998). \emph{La régression PLS: theorie et pratique}. Paris: Editions Technic.
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 }
 
 \author{Ignacio Gonzalez, Kim-Anh Le Cao and Pierre Monget.}
@@ -71,13 +71,7 @@ X <- breast.tumors$gene.exp
 Y <- breast.tumors$sample$treatment
 
 plsda.breast <- plsda(X, Y, ncomp = 2)
-palette(c("red", "blue"))
-col.breast <- as.numeric(as.factor(Y))
-plotIndiv(plsda.breast, ind.names = TRUE, col = col.breast)
-legend('bottomleft', c("After", "Before"), pch = c(16, 16), 
-       col = unique(col.breast), cex = 1, pt.cex = c(1.2, 1.2), 
-       title = "Treatment")
-palette("default")
+plotIndiv(plsda.breast, ind.names = TRUE, plot.ellipse = TRUE, add.legend = TRUE)
 
 \dontrun{
 ## Second example
@@ -86,8 +80,8 @@ X <- liver.toxicity$gene
 Y <- liver.toxicity$treatment[, 4]
 
 plsda.liver <- plsda(X, Y, ncomp = 2)
-col.rat <- as.numeric(as.factor(Y))
-plotIndiv(plsda.liver, col = col.rat, ind.names = Y)
+plotIndiv(plsda.liver, ind.names = Y, plot.ellipse = TRUE, add.legend =TRUE)
+
 }
 }
 

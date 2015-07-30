@@ -69,8 +69,8 @@ plotVar(spca.rat, X.label = TRUE, cex = 0.5)
 \dontrun{plot3dVar(spca.rat)}
 
 ## samples representation
-plotIndiv(spca.rat, ind.names = liver.toxicity$treatment[, 3], cex = 0.5, 
-          col = as.numeric(liver.toxicity$treatment[, 3]))
+plotIndiv(spca.rat, ind.names = liver.toxicity$treatment[, 3], 
+          group = as.numeric(liver.toxicity$treatment[, 3]))
 \dontrun{plot3dIndiv(spca.rat, cex = 0.01, 
             col = as.numeric(liver.toxicity$treatment[, 3]))}
 }

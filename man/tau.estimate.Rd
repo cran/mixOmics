@@ -1,8 +1,8 @@
-\name{tau.estim}
-\alias{tau.estim}
+\name{tau.estimate}
+\alias{tau.estimate}
 \title{Optimal shrinkage intensity parameters.}
 \usage{
-  tau.estim(x)
+  tau.estimate(x)
 }
 \arguments{
   \item{x}{A list of matched data matrices on which the covariance matrix will be estimated.}
@@ -16,11 +16,11 @@
   described in [1,2] and implemented in
   \pkg{RGCCA} [2].
   
-  The shrinkage estimates can be used in the \code{\link{rcc}} function instead of the \code{\link{tune.rcc}} which can be long and costly to compute with very large data sets. Note that both functions \code{\link{tune.rcc}}  (which uses cross-validation) and \code{\link{tau.estim}} (which uses the formula from [1]) may output different results. 
+  The shrinkage estimates can be used in the \code{\link{rcc}} function instead of the \code{\link{tune.rcc}} which can be long and costly to compute with very large data sets. Note that both functions \code{\link{tune.rcc}}  (which uses cross-validation) and \code{\link{tau.estimate}} (which uses the formula from [1]) may output different results. 
   
-  Note: we advise to center and scale the input matrices in \code{\link{rcc}} since the intput data for \code{tau.estim} are centered and scaled to estimate the shrinkage parameters (as in [1]).
+  Note: we advise to center and scale the input matrices in \code{\link{rcc}} since the intput data for \code{tau.estimate} are centered and scaled to estimate the shrinkage parameters (as in [1]).
   
-  The shrinkage parameters are also estimated using that function when running \code{\link{wrapper.rgcca}} when \code{tau = 'optimal'}. This esxplains the name of this function (tau.estim), which may not fit with our current nomenclature with \code{\link{rcc}}.
+  The shrinkage parameters are also estimated using that function when running \code{\link{wrapper.rgcca}} when \code{tau = 'optimal'}. This esxplains the name of this function (tau.estimate), which may not fit with our current nomenclature with \code{\link{rcc}}.
   
 }
 
@@ -50,7 +50,7 @@ Y <- nutrimouse$gene
 # create a list as an input
 A = list(X, Y)
 
-param = sapply(A, tau.estim)
+param = sapply(A, tau.estimate)
 # regularisation parameters for X (first) and then Y
 param
 
@@ -58,6 +58,5 @@ param
 rcc.result = rcc(scale(X), scale(Y), ncomp = 2, lambda1 = param[1], lambda2 = param[2])
 
 # we observe quite a good deparation of the diets
-my.colors = color.mixo(as.numeric(nutrimouse$genotype))
-plotIndiv(rcc.result, ind.names = nutrimouse$diet, col = my.colors)
+plotIndiv(rcc.result, ind.names = nutrimouse$diet, group = nutrimouse$genotype)
 }

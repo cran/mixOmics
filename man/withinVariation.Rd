@@ -74,9 +74,9 @@ col.stim <- c("darkblue", "purple", "green4","red3")
 col.stim <- col.stim[as.numeric(vac18$stimulation)]
 
 # plotIndiv comparing both PCA and PCA multilevel
-plotIndiv(res.pca, ind.names = vac18$stimulation, col = col.stim)
+plotIndiv(res.pca, ind.names = vac18$stimulation, group = col.stim)
 title(main = 'PCA ')
-plotIndiv(res.pca.1level, ind.names = vac18$stimulation, col = col.stim)
+plotIndiv(res.pca.1level, ind.names = vac18$stimulation, group = col.stim)
 title(main = 'PCA multilevel')
 }
 

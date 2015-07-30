@@ -24,7 +24,7 @@ withinVariation <- function(X, design){
 	
     # need a matrix for matrix calculations
     X = as.matrix(X)
-    rep.measures = design[, 1]
+    rep.measures = factor(design[, 1])
     factors = design[, -1, drop = FALSE] 
     
     # calculate the variation

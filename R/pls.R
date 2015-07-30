@@ -143,84 +143,115 @@ function(X,
     iter=NULL
     #-- boucle sur h --#
     for (h in 1:ncomp) {
-        
-        #-- initialisation --#
-        u = Y.temp[, 1] 
-		if (any(is.na(u))) u[is.na(u)] = 0
-        a.old = 0
-        b.old = 0
-        iterh = 1
-         	
+
+      X.aux = X.temp
+      if (na.X)
+      {
+        X.aux[is.na.X] = 0
+      }
+
+      Y.aux = Y.temp
+      if (na.Y)
+      {
+        Y.aux[is.na.Y] = 0
+      }  
+      
+      #-- initialisation --#
+      M = crossprod(X.aux, Y.aux)
+      svd.M = svd(M, nu = 1, nv = 1)
+      a.old = svd.M$u
+      b.old = svd.M$v
+      
+      #-- latent variables --#
+      if (na.X)
+      {
+        t = X.aux %*% a.old
+        A = drop(a.old) %o% n.ones
+        A[t(is.na.X)] = 0
+        a.norm = crossprod(A)
+        t = t / diag(a.norm)
+        # update 5.0-2: t is not normed
+        #t = t / drop(sqrt(crossprod(t)))
+      }else{
+        t = X.temp %*% a.old / drop(crossprod(a.old))
+      }
+      
+      if (na.Y)
+      {
+        u = Y.aux %*% b.old
+        B = drop(b.old) %o% n.ones
+        B[t(is.na.Y)] = 0
+        b.norm = crossprod(B)
+        u = u / diag(b.norm)
+        # update 5.0-2: u is not normed
+        #u = u / drop(sqrt(crossprod(u)))
+      }else{
+        u = Y.temp %*% b.old / drop(crossprod(b.old))
+      }
+      iterh = 1
+         
+      #-- convergence of a  --#
+      repeat{
         if (na.X)
         {
-            X.aux = X.temp
-            X.aux[is.na.X] = 0
+          a = t(X.aux) %*% u
+        }else{
+          a = t(X.temp) %*% u #/ drop(crossprod(u)), useless because a is scaled after soft_thresholding
         }
-         
+        a = a / drop(sqrt(crossprod(a)))
+        
+        if (na.X)
+        {
+          t = X.aux %*% a
+          A = drop(a) %o% n.ones
+          A[t(is.na.X)] = 0
+          a.norm = crossprod(A)
+          t = t / diag(a.norm)
+          # update 5.0-2: t is not normed
+          #t = t / drop(sqrt(crossprod(t)))
+        }else{
+          t = X.temp %*% a / drop(crossprod(a))
+        }
+        
         if (na.Y)
         {
-            Y.aux = Y.temp
-            Y.aux[is.na.Y] = 0
+          b = t(Y.aux) %*% t
+        }else{
+          b = t(Y.temp) %*% t #/ drop(crossprod(t)), useless because b is scaled after soft_thresholding
         }
-         
-        repeat{
-            #--compute loading vectors and variates associated to X
-            if (na.X)
-            {
-                a = crossprod(X.aux, u)
-                U = drop(u) %o% p.ones
-                U[is.na.X] = 0
-                u.norm = crossprod(U)				
-                a = a / diag(u.norm)
-                a = a / drop(sqrt(crossprod(a)))
-                t = X.aux %*% a
-                A = drop(a) %o% n.ones
-                A[t(is.na.X)] = 0
-                a.norm = crossprod(A)
-                t = t / diag(a.norm)				
-            }else{
-                a = crossprod(X.temp, u)#/ drop(crossprod(u)), not useful as a is scaled below
-                a = a / drop(sqrt(crossprod(a)))
-                t = X.temp %*% a / drop(crossprod(a))
-            }
-             
-            #--compute loading vectors and variates associated to Y
-            if (na.Y){
-                b = crossprod(Y.aux, t)
-                T = drop(t) %o% q.ones
-                T[is.na.Y] = 0
-                t.norm = crossprod(T)				
-                b = b / diag(t.norm)
-                u = Y.aux %*% b
-                B = drop(b) %o% n.ones
-                B[t(is.na.Y)] = 0
-                b.norm = crossprod(B)
-                u = u / diag(b.norm)					
-            }else{
-                b = crossprod(Y.temp, t) #/ drop(crossprod(t)), not useful as b is scaled below
-                b=b / drop(sqrt(crossprod(b)))
-                u = Y.temp %*% b / drop(crossprod(b))
-            }
-				
-            if (crossprod(a - a.old) < tol) {break}
-             
-            if (iterh == max.iter)
-            {
-                warning(paste("Maximum number of iterations reached for dimension", h),call. = FALSE)
-                break
-            }
-             
-            a.old = a
-            b.old = b
-            iterh = iterh + 1
+        b = b / drop(sqrt(crossprod(b)))
+        
+        if (na.Y)
+        {
+          u = Y.aux %*% b
+          B = drop(b) %o% n.ones
+          B[t(is.na.Y)] = 0
+          b.norm = crossprod(B)
+          u = u / diag(b.norm)
+          # update 5.0-2: u is not normed
+          #u = u / drop(sqrt(crossprod(u)))
+        }else{
+          u = Y.temp %*% b / drop(crossprod(b))
         }
+        
+        if (crossprod(a - a.old) < tol) {break}
+        if (iterh == max.iter)
+        {
+          warning(paste("Maximum number of iterations reached for the component", h),call. = FALSE)
+          break
+        }
+        
+        a.old = a
+        b.old = b
+        iterh = iterh + 1
+      }
         
         #-- deflation des matrices --#
         if (na.X)
         {
             X.aux = X.temp
             X.aux[is.na.X] = 0
-            c = crossprod(X.aux, t)				
+            c = crossprod(X.aux, t)		
             T = drop(t) %o% p.ones
             T[is.na.X] = 0
             t.norm = crossprod(T)				

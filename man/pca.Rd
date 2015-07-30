@@ -79,8 +79,8 @@ print(pca.res)
 biplot(pca.res, xlabs = multidrug$cell.line$Class, cex = 0.7)
 
 # samples representation
-plotIndiv(pca.res, ind.names = multidrug$cell.line$Class, cex = 0.5, 
-          col = as.numeric(as.factor(multidrug$cell.line$Class)))
+plotIndiv(pca.res, ind.names = multidrug$cell.line$Class, 
+          group = as.numeric(as.factor(multidrug$cell.line$Class)))
 \dontrun{
 plot3dIndiv(pca.res, cex = 0.2,
             col = as.numeric(as.factor(multidrug$cell.line$Class)))

@@ -4,10 +4,21 @@
 \alias{Mfold}
 \alias{bin.color}
 \alias{map}
-\alias{unmap}
 \alias{pcasvd}
 \alias{ica.def}
 \alias{ica.par}
+% from the helpers file:
+\alias{soft_thresholding_L1}
+\alias{soft.threshold}
+\alias{sparsity}
+\alias{l2.norm}
+% borrowed from RGCCA
+\alias{cov2}
+\alias{scale2}
+\alias{initsvd}
+\alias{miscrossprod}
+\alias{defl.select}
+\alias{deflation}
 
 
 \title{Internal Functions}

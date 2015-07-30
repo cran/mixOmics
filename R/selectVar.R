@@ -26,20 +26,20 @@ function(...) UseMethod("selectVar")
 
 
 
-# ------------------ for sPLS object --------------------
-selectVar.spls = function(object, comp =1, ...){ 
+# ------------------ for (psarse) PLS object --------------------
+selectVar.pls = selectVar.spls =function(object, comp =1, ...){
   
   if(comp > object$ncomp) stop('The comp value you indicated is larger than the fitted model')
   
   # variables from data set X
   # name of selected variables
-  name.var.X = names(sort(abs(object$loadings$X[,comp]), decreasing = T)[1:object$keepX[comp]])
+  name.var.X = names(sort(abs(object$loadings$X[,comp]), decreasing = T)[1:sum(object$loadings$X[,comp]!=0)])
   #value on the loading vector
   value.var.X = object$loadings$X[name.var.X,comp]
   
   # variables from data set Y
   # name of selected variables
-  name.var.Y = names(sort(abs(object$loadings$Y[,comp]), decreasing = T)[1:object$keepY[comp]])
+  name.var.Y = names(sort(abs(object$loadings$Y[,comp]), decreasing = T)[1:sum(object$loadings$Y[,comp]!=0)])
   #value on the loading vector
   value.var.Y = object$loadings$Y[name.var.Y,comp]
   
@@ -50,13 +50,13 @@ selectVar.spls = function(object, comp =1, ...){
 }
 
 
-# ------------------ for sPLS-DA object --------------------
-selectVar.splsda =  function(object, comp=1, ...){ 
+# ------------------ for (sparse) PLS-DA object --------------------
+selectVar.plsda =  selectVar.splsda =function(object, comp=1, ...){
   
   if(comp > object$ncomp) stop('The comp value you indicated is larger than the fitted model')
   
   # variables from data set X
-  name.var = names(sort(abs(object$loadings$X[,comp]), decreasing = T)[1:object$keepX[comp]])
+  name.var = names(sort(abs(object$loadings$X[,comp]), decreasing = T)[1:sum(object$loadings$X[,comp]!=0)])
   #value on the loading vector
   value.var = object$loadings$X[name.var,comp]
   
@@ -67,13 +67,13 @@ selectVar.splsda =  function(object, comp=1, ...){
 
 
 
-# ------------------ for sPCA object --------------------
-selectVar.spca = function(object, comp=1, ...){ 
+# ------------------ for (sparse) PCA object --------------------
+selectVar.pca = selectVar.spca =function(object, comp=1, ...){
   
   if(comp > object$ncomp) stop('The comp value you indicated is larger than the fitted model')
   
   # variables from data set X
-  name.var = names(sort(abs(object$rotation[,comp]), decreasing = T)[1:object$keepX[comp]])
+  name.var = names(sort(abs(object$rotation[,comp]), decreasing = T)[1:sum(object$rotation[,comp]!=0)])
   #value on the loading vector
   value.var = object$rotation[name.var,comp]
   

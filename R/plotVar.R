@@ -30,7 +30,7 @@ function(object, ...) UseMethod("plotVar")
 #--------------------- PLS, (plsda, sPLS, sPLSDA below)---------------------#
 plotVar.pls <-  
 function(object, 
-         comp = 1:2, 
+         comp = c(1,2), 
          rad.in = 0.5, 
          X.label = FALSE, 
          Y.label = FALSE, 
@@ -208,7 +208,7 @@ function(object,
 # ----------------------plsda ---------------------------#
 plotVar.plsda <-  
 function(object, 
-         comp = 1:2, 
+         comp = c(1,2), 
          rad.in = 0.5, 
          var.label = FALSE, 
          pch = NULL, 
@@ -363,7 +363,7 @@ function(object,
 #--------------------- sPLS ---------------------#
 plotVar.spls <- 
 function(object, 
-         comp = 1:2, 
+         comp = c(1,2), 
          rad.in = 0.5, 
          X.label = FALSE, 
          Y.label = FALSE, 
@@ -562,7 +562,7 @@ function(object,
 # ---------------------- sPLSDA -------------------------#
 plotVar.splsda <- 
 function(object, 
-         comp = 1:2, 
+         comp = c(1,2), 
          rad.in = 0.5, 
          var.label = FALSE, 
          pch = NULL, 
@@ -731,7 +731,7 @@ function(object,
 #-------------------------- rCC -------------------------#
 plotVar.rcc <-
 function(object, 
-         comp = 1:2, 
+         comp = c(1,2), 
          rad.in = 0.5, 
          cutoff = NULL, 
          X.label = FALSE, 
@@ -954,7 +954,7 @@ function(object,
 # -------------------------------- sPCA ----------------------------------------
 plotVar.spca <- 
 function(object, 
-         comp = 1:2, 
+         comp = c(1,2), 
          rad.in = 0.5, 
          var.label = FALSE, 
          pch = NULL, 
@@ -1123,7 +1123,7 @@ function(object,
 # ------------------------------ PCA object ------------------------------------
 plotVar.pca <-
 function(object, 
-         comp = 1:2,
+         comp = c(1,2),
          rad.in = 0.5, 		 
          var.label = FALSE,		 
          ...) 
@@ -1193,7 +1193,7 @@ function(object,
 # ------------------------------ IPCA object ------------------------------------
 plotVar.ipca <-
 function(object, 
-         comp = 1:2,
+         comp = c(1,2),
          rad.in = 0.5, 		 
          var.label = FALSE,		 
          ...) 
@@ -1268,7 +1268,7 @@ function(object,
 # -------------------------------- sIPCA ----------------------------------------
 plotVar.sipca <- 
 function(object, 
-         comp = 1:2, 
+         comp = c(1,2), 
          rad.in = 0.5, 
          var.label = FALSE, 
          pch = NULL, 
@@ -1433,8 +1433,9 @@ function(object,
     return(invisible(list(coord.X = cord.X)))
 }
 
-
-# ---------------------- RGCCA/SGCCA -------------------------#
+# ----------------------------
+#  SGCCA 
+# -------------------------#
 
 plotVar.sgcca <- 
   function(object, 
@@ -1462,8 +1463,8 @@ plotVar.sgcca <-
     if (any(comp > object$ncomp[block])) 
       stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
     
-    if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
-      warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
+    #if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
+    # warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
     
     if(all(ncomp.select != comp))
       stop("All argument from 'ncomp.select' differ from 'comp'")
@@ -1473,7 +1474,7 @@ plotVar.sgcca <-
     if(any(ncomp.select > object$ncomp[comp]))
       stop("At least one argument from 'ncomp.select' is greater than the actual number of components in the sgcca model")
     
-    cat('PlotVar will only display variables selected on components', ncomp.select[1], 'and', ncomp.select[2], '\n')
+    cat('plotVar will only display variables selected on components', ncomp.select[1], 'and', ncomp.select[2], '\n')
     
 #     # check that the user did not enter extra arguments #
 #     # --------------------------------------------------#
@@ -1490,31 +1491,11 @@ plotVar.sgcca <-
     single.block = ifelse(length(block) == 1, TRUE, FALSE)
     
     #extract data
-    data = object$data
+    data = object$blocks
     
     # extraire la matrice de design
     design = object$design
-    
-    # choose the mode (canonical or regression) and if regression, decide which component to compute
-    # the correlation on
-    reg = NULL
-    if(length(block) >1){
-      if(design[block[1], block[2]] + design[block[1], block[2]] == 0) warning("There is no relationship designed between these two blocks")
-      
-      if(design[block[1], block[2]] == design[block[2], block[1]]){ 
-        mode = 'canonical'
-      } else {
-        mode = 'regression'
-        #define where to regress on:
-        # data 1 on data 2 -> reg = 1
-        # data 2 on data 1 -> reg = 0  # double check with Artur
-        reg = ifelse(design[block[1], block[2]] == 1, 1, 0)
-      }
-    } else{ # single block case
-      #check that there is a relationship between this block??
-      mode = 'regression'
-    }
-    
+
     
     keep = list()
     j=1
@@ -1530,7 +1511,7 @@ plotVar.sgcca <-
         j=j+1        
       }   
     }
-    
+        
     # -------------------------
     # compute coordinates
     # -------------------------
@@ -1540,26 +1521,10 @@ plotVar.sgcca <-
     coord = list()
     j=1
     # canonical mode or when representing only one block
-    if((mode == 'canonical') | is.null(reg)){
-      for(k in block){
+    for(k in block)
+    {
         coord[[j]] = cor(data[[k]][, keep[[j]]], object$variates[[k]][,comp], use = "pairwise")
         j=j+1
-      }
-    }else{
-      # ----- regression mode type
-      # correlation between original variables and frst latent variables (because of the deflation
-      # made for regression mode)
-      # !!!! remove??!
-      if(reg == 1){  #data 1 on data 2 
-        for(j in 1:length(block)){
-          coord[[j]] = cor(data[[block[2]]][, keep[[j]]], object$variates[[block[1]]][,comp], use = "pairwise")
-        }
-      }
-      if(reg == 0){        #data 2 on data 1 
-        for(j in 1:length(block)){
-          coord[[j]] = cor(data[[block[1]]][, keep[[j]]], object$variates[[block[2]]][,comp], use = "pairwise")
-        }
-      }
     }
     
     
@@ -1639,7 +1604,7 @@ plotVar.rgcca <-
            labels = FALSE,
            pch = c(16,17), 
            cex =  c(0.5, 0.5), 
-           col =  color.mixo(2),       #c('green', 'blue'),
+           col =  color.mixo(c(1,2)),       #c('green', 'blue'),
            font = c(2,3),
            rad.in = 0.5, 
            ...) 
@@ -1659,8 +1624,8 @@ plotVar.rgcca <-
     if (any(comp > object$ncomp[block])) 
       stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
     
-    if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
-      warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
+    #if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
+    # warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
     
 #     # check that the user did not enter extra arguments #
 #     # --------------------------------------------------#
@@ -1677,30 +1642,10 @@ plotVar.rgcca <-
     single.block = ifelse(length(block) == 1, TRUE, FALSE)
     
     #extract data
-    data = object$data
+    data = object$block
     
     # extraire la matrice de design
     design = object$design
-    
-    # choose the mode (canonical or regression) and if regression, decide which component to compute
-    # the correlation on
-    reg = NULL
-    if(single.block == FALSE){
-      if(design[block[1], block[2]] + design[block[1], block[2]] == 0) stop("There is no relationship designed between these two blocks")
-      
-      if(design[block[1], block[2]] == design[block[2], block[1]]){ 
-        mode = 'canonical'
-      } else {
-        mode = 'regression'
-        #define where to regress on:
-        # data 1 on data 2 -> reg = 1
-        # data 2 on data 1 -> reg = 0  # double check with Artur
-        reg = ifelse(design[block[1], block[2]] == 1, 1, 0)
-      }
-    } else{ # single block case
-      #check that there is a relationship between this block??
-      mode = 'regression'
-    }
     
     
     # -------------------------
@@ -1712,29 +1657,12 @@ plotVar.rgcca <-
     coord = list()
     j=1
     # canonical mode or when representing only one block
-    if((mode == 'canonical') | is.null(reg)){
-      for(k in block){
+    for(k in block)
+    {
         coord[[j]] = cor(data[[k]], object$variates[[k]][,comp], use = "pairwise")
         j=j+1
-      }
-    }else{
-      # ----- regression mode type
-      # correlation between original variables and frst latent variables (because of the deflation
-      # made for regression mode)
-      # !!!! remove??!
-      if(reg == 1){  #data 1 on data 2 
-        for(j in 1:length(block)){
-          coord[[j]] = cor(data[[block[2]]], object$variates[[block[1]]][,comp], use = "pairwise")
-        }
-      }
-      if(reg == 0){        #data 2 on data 1 
-        for(j in 1:length(block)){
-          coord[[j]] = cor(data[[block[1]]], object$variates[[block[2]]][,comp], use = "pairwise")
-        }
-      }
     }
-    
-    
+
     # -------------------
     # input parameters
     # -------------------
@@ -1764,7 +1692,7 @@ plotVar.rgcca <-
     
     par(pty = "s")
     plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste('sGCCA, component 1'), ylab = paste('sGCCA, component 2'))
+         xlab = paste('rGCCA, component 1'), ylab = paste('rGCCA, component 2'))
     
     for(j in 1:length(block)){
       if(labels){

@@ -1,5 +1,24 @@
 
-import(MASS, lattice, RGCCA, igraph, rgl, pheatmap)
+import(MASS, lattice, igraph, rgl, pheatmap, ggplot2, ellipse)
+
+importFrom("grDevices", "as.graphicsAnnot", "chull", "col2rgb",
+             "colorRamp", "colorRampPalette", "colors", "dev.cur",
+             "dev.new", "dev.off", "dev.prev", "dev.set",
+             "devAskNewPage", "graphics.off", "gray", "gray.colors",
+             "heat.colors", "rgb")
+
+importFrom("graphics", "abline", "arrows", "axis", "barplot", "box",
+             "image", "layout", "legend", "lines", "locator", "mtext",
+             "par", "plot", "plot.default", "points", "polygon", "rect",
+             "segments", "strheight", "strwidth", "symbols", "text",
+             "title")
+
+importFrom("stats", "as.dendrogram", "as.dist", "coefficients", "cor",
+             "cov", "dist", "hclust", "lm", "lsfit", "median", "na.omit",
+             "order.dendrogram", "predict", "quantile", "reorder", "var")
+
+importFrom("utils", "setTxtProgressBar", "txtProgressBar")
+
 
 export(
 bin.color, 
@@ -7,16 +26,22 @@ color.jet,
 color.GreenRed,
 color.spectral,
 color.mixo,
-cim,  
+cov2,
+cim, 
+deflation,
+defl.select,
 ica.par,
 ica.def,
 image.tune.rcc, 
 imgCor,
+initsvd,
 ipca,
 loo,
+l2.norm,
 mat.rank, 
 map,
 Mfold,
+miscrossprod,
 multilevel,
 nearZeroVar,
 network,
@@ -25,23 +50,29 @@ pca,
 pcasvd,
 perf,
 pheatmap.multilevel,
+plotContrib,
 plot3dIndiv, 
 plot3dVar,
+plotContrib,
 plotIndiv, 
 plotVar, 
 pls,
 plsda, 
 rcc,
+scale2,
 scatterutil.base, 
 scatterutil.eti, 
 scatterutil.grid, 
 selectVar,
 sipca,
 s.match,
+soft_thresholding_L1,
+soft.threshold,
+sparsity,
 spca,
 spls,
 splsda,
-tau.estim,
+tau.estimate,
 tune.multilevel,
 tune.splsdalevel1,
 tune.splsdalevel2,
@@ -49,40 +80,22 @@ tune.splslevel,
 tune.pca,
 tune.rcc,
 unmap,
-valid,
 vip,
 withinVariation,
 wrapper.rgcca,
-wrapper.sgcca)
-
-
-S3method(cim, default)
-S3method(cim, rcc)
-S3method(cim, spls)
-S3method(cim, pls)
+wrapper.sgcca,
+wrapper.sgccda)
 
 S3method(perf, pls)
 S3method(perf, spls)
 S3method(perf, plsda)
 S3method(perf, splsda)
 
-
 S3method(image, tune.rcc)
 
 S3method(plot, perf)
 S3method(plot, rcc)
 S3method(plot, pca)
-
-S3method(plotIndiv, pls)
-S3method(plotIndiv, spls)
-S3method(plotIndiv, plsda)
-S3method(plotIndiv, splsda)
-S3method(plotIndiv, rcc)
-S3method(plotIndiv, pca)
-S3method(plotIndiv, ipca)
-S3method(plotIndiv, sipca)
-S3method(plotIndiv, rgcca)
-S3method(plotIndiv, sgcca)
 
 S3method(plotVar, pls)
 S3method(plotVar, spls)
@@ -137,6 +150,9 @@ S3method(plot3dVar, spca)
 S3method(plot3dVar, ipca)
 S3method(plot3dVar, sipca)
 
+S3method(selectVar, pls)
+S3method(selectVar, plsda)
+S3method(selectVar, pca)
 S3method(selectVar, spls)
 S3method(selectVar, splsda)
 S3method(selectVar, spca)

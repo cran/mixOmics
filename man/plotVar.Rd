@@ -18,54 +18,68 @@ This function provides variables representation for (regularized) CCA, (sparse) 
 }
 
 \usage{
-\method{plotVar}{rcc}(object, comp = 1:2, rad.in = 0.5, cutoff = NULL,
+\method{plotVar}{rcc}(object, comp = c(1,2), rad.in = 0.5, cutoff = NULL,
         X.label = FALSE, Y.label = FALSE,
         pch = NULL, cex = NULL, col = NULL, font = NULL, \ldots)
 
-\method{plotVar}{pls}(object, comp = 1:2, rad.in = 0.5, 
+\method{plotVar}{pls}(object, comp = c(1,2), rad.in = 0.5, 
         X.label = FALSE, Y.label = FALSE, pch = NULL, cex = NULL, 
         col = NULL, font = NULL, \ldots)
 
-\method{plotVar}{plsda}(object, comp = 1:2, rad.in = 0.5, 
+\method{plotVar}{plsda}(object, comp = c(1,2), rad.in = 0.5, 
         var.label = FALSE, pch = NULL, cex = NULL, col = NULL, 
         font = NULL, \ldots)		
 
-\method{plotVar}{spls}(object, comp = 1:2, rad.in = 0.5, 
+\method{plotVar}{spls}(object, comp = c(1,2), rad.in = 0.5, 
         X.label = FALSE, Y.label = FALSE, pch = NULL, cex = NULL, 
         col = NULL, font = NULL, \ldots)	 
 
-\method{plotVar}{splsda}(object, comp = 1:2, rad.in = 0.5, 
+\method{plotVar}{splsda}(object, comp = c(1,2), rad.in = 0.5, 
         var.label = FALSE, pch = NULL, cex = NULL, col = NULL, 
         font = NULL, \ldots)
 
-\method{plotVar}{pca}(object, comp = 1:2, rad.in = 0.5, 
+\method{plotVar}{pca}(object, comp = c(1,2), rad.in = 0.5, 
         var.label = FALSE, \ldots)
 
-\method{plotVar}{spca}(object, comp = 1:2, rad.in = 0.5, 
+\method{plotVar}{spca}(object, comp = c(1,2), rad.in = 0.5, 
         var.label = FALSE, pch = NULL, cex = NULL, col = NULL, 
         font = NULL, \ldots)	
 
-\method{plotVar}{rgcca}(object, comp = c(1,2), block = c(1,2),
-           labels = FALSE, pch = c(16,17), cex =  c(0.5, 0.5), 
-           col = color.mixo(2), font = c(2,3), rad.in = 0.5, 
-           \ldots) 
+\method{plotVar}{rgcca}(
+          object, 
+           comp = c(1,2), 
+           block = c(1,2),
+           labels = FALSE,
+           pch = c(16,17), 
+           cex =  c(0.5, 0.5), 
+           col =  color.mixo(c(1,2)),       
+           font = c(2,3),
+           rad.in = 0.5, 
+           ...)
+
         
-\method{plotVar}{sgcca}(object, 
-comp = c(1,2), 
-block = c(1,2), ncomp.select = c(1,2), 
-labels = FALSE, pch = c(16,17), 
-cex =  c(0.5, 0.5), 
-col = color.mixo(2), 
-font = c(2,3), 
-rad.in = 0.5,\ldots)	
+\method{plotVar}{sgcca}(
+          object, 
+           comp = c(1,2), 
+           block = c(1,2),
+           ncomp.select = c(1,2),
+           labels = FALSE,
+           pch = c(16,17), 
+           cex =  c(0.5, 0.5), 
+           col =  color.mixo(2),   
+           font = c(2,3),
+           rad.in = 0.5, 
+           ...)	
          
 }
 
 \arguments{
   \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"}, 
     \code{"spls"}, \code{"splsda"}, \code{"pca"} or \code{"spca"}.}
+  \item{block}{for an object of class \code{"rgcca"} or \code{"sgcca"}, a numerical vector indicating the block variables to display.}
   \item{comp}{integer vector of length two. The components that will be used on the horizontal 
 	and the vertical axis respectively to project the variables.}
+  \item{ncomp.select}{for the sparse versions, an input vector indicating the components on which the variables were selected. Only those selected variables are displayed.}
   \item{rad.in}{numeric between 0 and 1, the radius of the inner circle. Defaults to \code{0.5}.}
   \item{cutoff}{numeric between 0 and 1. Variables with correlations below this cutoff 
     in absolute value are not plotted (see Details).}
@@ -78,8 +92,7 @@ rad.in = 0.5,\ldots)
 	or integers, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables). See \code{\link{points}} for all alternatives.}
   \item{cex}{numeric vector of character expansion sizes for the plotted character and symbols, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables).}
   \item{font}{numeric vector of font to be used, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables). See \code{\link{par}} for details.}
-  \item{block}{for an object of class \code{"rgcca"} or \code{"sgcca"}, a numerical vector indicating the block variables to display.}
-  \item{ncomp.select}{for the sparse versions, an input vector indicating the components on which the variables were selected. Only those selected variables are displayed.}
+
   \item{\ldots}{not used currently.}
 }
 
@@ -115,7 +128,7 @@ A list containing the following components:
   \item{coord.Y}{matrix of \eqn{Y}-variables coordinates.}
 }
 
-\author{Sebastien Dejean, Ignacio Gonzalez, Kim-Anh Le Cao.}
+\author{Ignacio Gonzalez, Kim-Anh Le Cao, Benoit Gautier, Florian Rohart.}
 
 \references{Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired 'omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}}
 
@@ -132,7 +145,7 @@ nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 plotVar(nutri.res) #(default)
 
-plotVar(nutri.res, comp = 1:2, cutoff = 0.5, 
+plotVar(nutri.res, comp = c(1,3), cutoff = 0.5, 
         X.label = TRUE, Y.label = TRUE)
 
 ## variable representation for objects of class 'pls' or 'spls'
@@ -161,6 +174,7 @@ plotVar(splsda.liver, var.label = FALSE)
 
 ## variable representation for objects of class 'sgcca' (or 'rgcca')
 # ----------------------------------------------------
+## see example in ??wrapper.sgcca
 data(nutrimouse)
 # need to unmap the Y factor diet
 Y = unmap(nutrimouse$diet)
@@ -180,9 +194,8 @@ design = matrix(c(0,1,1,
                   1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
 
 
-
 #note: the penalty parameters will need to be tuned
-wrap.result.sgcca = wrapper.sgcca(data = data, design = design, penalty = c(.3,.3, 1), 
+wrap.result.sgcca = wrapper.sgcca(blocks = data, design = design, penalty = c(.3,.3, 1),
                                   ncomp = c(2, 2, 1),
                                   scheme = "centroid", verbose = FALSE)
 wrap.result.sgcca
@@ -198,6 +211,7 @@ plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = c(1,1),
 title(main = c('Variables selected on component 1 only'))
 plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), ncomp.select = c(2,2), labels = TRUE)
 title(main = c('Variables selected on component 2 only'))
+
 # -> this one shows the variables selected on both components
 plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), labels = TRUE)
 title(main = c('Variables selected on components 1 and 2'))
@@ -205,8 +219,25 @@ title(main = c('Variables selected on components 1 and 2'))
 ## variable representation for objects of class 'rgcca'
 # ----------------------------------------------------
 data(nutrimouse)
-# need to unmap the Y factor diet
+# need to unmap Y for an unsupervised analysis, where Y is included as a data block in data
 Y = unmap(nutrimouse$diet)
+
+data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid, Y = Y)
+# with this design, all blocks are connected
+design = matrix(c(0,1,1,1,0,1,1,1,0), ncol = 3, nrow = 3, 
+                byrow = TRUE, dimnames = list(names(data), names(data)))
+
+nutrimouse.rgcca <- wrapper.rgcca(blocks = data,
+                                         design = design,
+                                         tau = "optimal",
+                                         ncomp = c(2, 2, 1),
+                                         scheme = "centroid",
+                                         verbose = FALSE)
+
+plotVar(nutrimouse.rgcca, comp = c(1,2), block = c(1,2), cex = c(1.5, 1.5))
+plotVar(nutrimouse.rgcca, comp = c(1,2), block = c(1,2), labels = TRUE)
+
+
 # set up the data as list
 data = list(nutrimouse$gene, nutrimouse$lipid,Y)
 # with this design, gene expression and lipids are connected to the diet factor
@@ -220,12 +251,13 @@ design = matrix(c(0,1,1,
                   1,0,1,
                   1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
 #note: the tau parameter is the regularization parameter
-wrap.result.rgcca = wrapper.rgcca(data = data, design = design, tau = c(1, 1, 0), 
+wrap.result.rgcca = wrapper.rgcca(blocks = data, design = design, tau = c(1, 1, 0),
                                   ncomp = c(2, 2, 1),
                                   scheme = "centroid", verbose = FALSE)
 #wrap.result.rgcca
 plotVar(wrap.result.rgcca, comp = c(1,2), block = c(1,2))
 plotVar(wrap.result.rgcca, comp = c(1,2), block = c(1,2), labels = TRUE)
+
 }
 
 \keyword{multivariate}

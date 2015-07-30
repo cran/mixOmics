@@ -49,7 +49,7 @@ function(X,
     result$ind.mat = ind.mat
     result$names$Y = levels(Y)
     
-    class(result) = "splsda"
+    class(result) = c("splsda","plsda")
     return(invisible(result))	
 }
 

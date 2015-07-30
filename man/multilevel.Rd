@@ -165,8 +165,7 @@ res.1level <- multilevel(X, ncomp = 3, design = design,
 
 # set up colors for plotIndiv
 col.stim <- c("darkblue", "purple", "green4","red3")
-col.stim <- col.stim[as.numeric(Y)]
-plotIndiv(res.1level, ind.names = Y, col = col.stim)
+plotIndiv(res.1level, ind.names = Y, col.per.group = col.stim)
 
 
 ## Second example: two-factor analysis with sPLS-DA, selecting a subset of variables
@@ -183,17 +182,8 @@ design <- data.frame(sample = vac18.simulated$sample,
 res.2level <- multilevel(X, ncomp = 2, design = design,
                          keepX = c(200, 200), method = 'splsda')
 
-# set up colors and pch for plotIndiv
-col.stimu <- as.numeric(design$stimu)
-pch.time <- c(20, 4)[as.numeric(design$time)]
-
-plotIndiv(res.2level, col = col.stimu, ind.names = FALSE,
-          pch = pch.time)
-legend('bottomright', legend = levels(design$stimu),
-       col = unique(col.stimu), pch = 20, cex = 0.8, 
-       title = "Stimulation")
-legend('topright', col = 'black', legend = levels(design$time),  
-       pch = unique(pch.time), cex = 0.8, title = "Time")
+plotIndiv(res.2level, group = design$stimu, ind.names = vac18.simulated$time,
+    add.legend = TRUE, style = 'lattice')
 }       
 
 ## Third example: one-factor analysis with sPLS, selecting a subset of variables
@@ -218,17 +208,24 @@ res.spls.1level <- multilevel(X = liver.toxicity$gene,
                                        method = 'spls', mode = 'canonical')
 
 # set up colors and pch for plotIndiv
-col.stimu <- as.numeric(as.factor(design$stimu))
+col.stimu <- 1:nlevels(design$stimu)
 
 plotIndiv(res.spls.1level, rep.space = 'X-variate', ind.names = FALSE, 
-          col = col.stimu, pch = 20)
-title(main = 'Gene expression space')
+group = liver.toxicity$treatment$Dose.Group,
+          pch = 20, main = 'Gene expression subspace',
+          add.legend = TRUE)
+
+
 plotIndiv(res.spls.1level, rep.space = 'Y-variate', ind.names = FALSE,
-          col = col.stimu, pch = 20)
-title(main = 'Clinical measurements space')
-legend('bottomright', legend = levels(as.factor(design$stimu)),
-       col = unique(col.stimu), pch = 20, cex = 0.8, 
-       title = "Dose")
+group = liver.toxicity$treatment$Dose.Group,
+          pch = 20, main = 'Clinical measurements ssubpace',
+          add.legend = TRUE)
+          
+plotIndiv(res.spls.1level, rep.space = 'XY-variate', ind.names = FALSE,
+group = liver.toxicity$treatment$Dose.Group,
+          pch = 20, main = 'Both Gene expression and Clinical subspaces',
+          add.legend = TRUE)
+
 }
 }
 

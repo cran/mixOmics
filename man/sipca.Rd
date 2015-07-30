@@ -72,8 +72,8 @@ sipca.res <- sipca(liver.toxicity$gene, ncomp = 3, mode="deflation", keepX=c(50,
 sipca.res
 
 # samples representation
-plotIndiv(sipca.res, ind.names = liver.toxicity$treatment[, 4], cex = 0.5, 
-          col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
+plotIndiv(sipca.res, ind.names = liver.toxicity$treatment[, 4], 
+          group = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
 \dontrun{
 plot3dIndiv(sipca.res, cex = 0.01,
             col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
