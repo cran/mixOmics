@@ -1535,7 +1535,9 @@ plotVar.sgcca <-
     name.labels = list()
     #if(IS.TRUE(labels)){
     for(j in 1:length(block)){
-      name.labels[[j]] = colnames(data[[j]][, keep[[j]]])
+      #name.labels[[j]] = colnames(data[[j]][, keep[[j]]])
+      # trying to fill from the wrong data block - TC
+      name.labels[[j]] = colnames(data[[block[j]]][, keep[[j]]]) 
     }
     
     #determine number of variables in each block
@@ -1551,12 +1553,13 @@ plotVar.sgcca <-
     }
 
     # this is to display only the selected variables
-    for(j in 1:length(block)){
-      pch.plot[[j]] = pch.plot[[j]][keep[[j]]]
-      col.plot[[j]] = col.plot[[j]][keep[[j]]]
-      cex.plot[[j]] = cex.plot[[j]][keep[[j]]]
-      font.plot[[j]] = font.plot[[j]][keep[[j]]]
-    }
+    # Is this needed? Causing graphical bugs with X.plot being shorter than needed when plotting - TC
+    #for(j in 1:length(block)){
+      #pch.plot[[j]] = pch.plot[[j]][keep[[j]]]
+      #col.plot[[j]] = col.plot[[j]][keep[[j]]]
+      #cex.plot[[j]] = cex.plot[[j]][keep[[j]]]
+      #font.plot[[j]] = font.plot[[j]][keep[[j]]]
+    #}
     
     
     # ---------------------------
