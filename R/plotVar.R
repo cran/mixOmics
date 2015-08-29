@@ -1,9 +1,11 @@
-# Copyright (C) 2009 
-# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Copyright (C) 2015
+# Benoit Gautier, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 # Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
-# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
-#
+# Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Florian Rohart, Australian Institute for Bioengineering and Nanotechnology, University of Queensland, Brisbane, QLD.
+# Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+
+
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -19,1698 +21,539 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#------------------------------------------------------------------#
-#-- Includes plotVar for PLS, sPLS, PLS-DA, SPLS-DA, rCC and PCA --#
-#------------------------------------------------------------------#
+#----------------------------------------------------------------------------------------------------------#
+#-- Includes plotVar for PLS, sPLS, PLS-DA, SPLS-DA, rCC, PCA, sPCA, IPCA, sIPCA, rGCCA, sGCCA, sGCCDA --#
+#----------------------------------------------------------------------------------------------------------#
 
 plotVar <-
-function(object, ...) UseMethod("plotVar")
-
-
-#--------------------- PLS, (plsda, sPLS, sPLSDA below)---------------------#
-plotVar.pls <-  
-function(object, 
-         comp = c(1,2), 
-         rad.in = 0.5, 
-         X.label = FALSE, 
-         Y.label = FALSE, 
-         pch = NULL, 
-         cex = NULL, 
-         col = NULL, 
-         font = NULL,
-        ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-
-    if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
-    
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
-
-		
-    if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
-#     
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-#     
-
-    # calcul des coordonnees #
-    #------------------------#
-      if (object$mode == "canonical") {
-          cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-          cord.Y = cor(object$Y, object$variates$Y[, c(comp1, comp2)], use = "pairwise")
-      }
-      else {
-          cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-          cord.Y = cor(object$Y, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-      }
-
-    p = ncol(object$X)
-    q = ncol(object$Y)
-
-    # le plot des variables #
-    #-----------------------#
-    if (length(X.label) > 1 & length(X.label) != p)
-        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
-
-    if (length(Y.label) > 1 & length(Y.label) != q)
-        stop("'Y.label' must be a vector of length 'ncol(Y)' or a boolean atomic vector.")
-
-    if (is.null(pch)) {
-        pch = list(rep(16, p), rep(17, q))
-    }
-    else {
-        if (is.list(pch)) {
-            if (length(pch[[1]]) != p || length(pch[[2]]) != q) 
-                stop("'pch' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(pch) == 2) { 
-                pch = list(rep(pch[1], p), rep(pch[2], q))
-            }
-            else {
-                stop("'pch' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(cex)) {
-        cex = list(rep(1, p), rep(1, q))
-    }
-    else {
-        if (is.list(cex)) {
-            if (length(cex[[1]]) != p || length(cex[[2]]) != q) 
-                stop("'cex' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(cex) == 2) { 
-                cex = list(rep(cex[1], p), rep(cex[2], q))
-                }
-            else {
-                    stop("'cex' must be a vector of length 2 or a list of two
-                         vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(col)) {
-        col = list(rep("red", p), rep("blue", q))
-    }
-    else {
-        if (is.list(col)) {
-            if (length(col[[1]]) != p || length(col[[2]]) != q) 
-                stop("'col' must be a vector of length 2 or a list of two
-                vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(col) == 2) { 
-                col = list(rep(col[1], p), rep(col[2], q))
-            }
-            else {
-                stop("'col' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(font)) {
-        font = list(rep(2, p), rep(3, q))
-    }
-    else {
-        if (is.list(font)) {
-            if (length(font[[1]]) != p || length(font[[2]]) != q) 
-                stop("'font' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(font) == 2) { 
-                font = list(rep(font[1], p), rep(font[2], q))
-            }
-            else {
-                stop("'font' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (isTRUE(X.label)) X.label = object$names$X
-    if (isTRUE(Y.label)) Y.label = object$names$Y
-
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
-
-    if (length(X.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], X.label, col = col[[1]], 
-             font = font[[1]], cex = cex[[1]])
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
-               cex = cex[[1]], col = col[[1]])
-    }
-
-    if (length(Y.label) > 1) {
-        text(cord.Y[, 1], cord.Y[, 2], Y.label, col = col[[2]], 
-             font = font[[2]], cex = cex[[2]])
-    }
-    else {
-        points(cord.Y[, 1], cord.Y[, 2], pch = pch[[2]], 
-               cex = cex[[2]], col = col[[2]]) 
-    }
-
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-    
-	return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
-}
-
-# ----------------------plsda ---------------------------#
-plotVar.plsda <-  
-function(object, 
-         comp = c(1,2), 
-         rad.in = 0.5, 
-         var.label = FALSE, 
-         pch = NULL, 
-         cex = NULL, 
-         col = NULL, 
-         font = NULL,
-	 ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-    
-    if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
-    
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
-
-		
-    if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-
-    # calcul des coordonnees #
-    #------------------------#
-    cord.X = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
-
-    p = ncol(object$X)
-
-    # le plot des variables #
-    #-----------------------#
-    if (length(var.label) > 1 & length(var.label) != p)
-        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
-
-    if (is.null(pch)) {
-        pch = list(rep(16, p))
-
-    }
-    else {
-        if (is.list(pch)) {
-            if (length(pch[[1]]) != p) 
-                stop("'pch'  must be a vector of length 1 or a vector of length ", p)
-
-        }
-        else { 
-            if (length(pch) == 1) { 
-                pch = list(rep(pch[1], p))
-            }
-
-            else {
-                stop("'pch'  must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-    if (is.null(cex)) {
-        cex = list(rep(1, p))
-
-    }
-    else {
-        if (is.list(cex)) {
-            if (length(cex[[1]]) != p) 
-                stop("'cex'  must be a vector of length 1 or a vector of length ", p)
-
-        }
-        else { 
-            if (length(cex) == 1) { 
-                cex = list(rep(cex[1], p))
-
-                }
-            else {
-                    stop("'cex'  must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-    if (is.null(col)) {
-        col = list(rep("red", p))
-
-    }
-    else {
-        if (is.list(col)) {
-            if (length(col[[1]]) != p) 
-                stop("'col' must be a vector of length 1 or a vector of length ", p)
-        }
-        else { 
-            if (length(col) == 1) { 
-                col = list(rep(col[1], p))
-
-            }
-            if (length(col) == p) {
-                col = list(col)
-              }
-            else {
-                stop("'col' must be a vector of length 1 or a vector of length ", p)
-            }
-        }
-    }
-
-    if (is.null(font)) {
-        font = list(rep(2, p))
-
-    }
-    else {
-        if (is.list(font)) {
-            if (length(font[[1]]) != p) 
-                stop("'font' must be a vector of length 1 or a vector of length ", p)
-
-        }
-        else { 
-            if (length(font) == 2) { 
-                font = list(rep(font[1], p), rep(font[2], q))
-
-            }
-            else {
-                stop("'font'  must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-    if (isTRUE(var.label)) var.label = object$names$X
-
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
-
-    if (length(var.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], var.label, col = col[[1]], 
-             font = font[[1]], cex = cex[[1]])
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
-               cex = cex[[1]], col = col[[1]])
-    }
-
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-  
-    return(invisible(list(coord.X = cord.X)))
-}
-
-
-#--------------------- sPLS ---------------------#
-plotVar.spls <- 
-function(object, 
-         comp = c(1,2), 
-         rad.in = 0.5, 
-         X.label = FALSE, 
-         Y.label = FALSE, 
-         pch = NULL, 
-         cex = NULL, 
-         col = NULL, 
-         font = NULL,
-	 ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-
-    if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
-    
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
-
-		
-    if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#      # what the function is expecting
-#     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
-#     
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-#     
-
-    # calcul des coordonnees #
-    #------------------------#
-        keep.X = apply(abs(object$loadings$X), 1, sum) > 0
-        keep.Y = apply(abs(object$loadings$Y), 1, sum) > 0
-
-        if (object$mode == "canonical") {
-            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
-                     use = "pairwise")
-            cord.Y = cor(object$Y[, keep.Y], object$variates$Y[, c(comp1, comp2)], 
-                     use = "pairwise")
-        }
-        else {
-            cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
-                     use = "pairwise")
-            cord.Y = cor(object$Y[, keep.Y], object$variates$X[, c(comp1, comp2)], 
-                     use = "pairwise")
-        }
-
-    p = ncol(object$X)
-    q = ncol(object$Y)
-
-    # le plot des variables #
-    #-----------------------#
-    if (length(X.label) > 1 & length(X.label) != p)
-        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
-
-    if (length(Y.label) > 1 & length(Y.label) != q)
-        stop("'Y.label' must be a vector of length 'ncol(Y)' or a boolean atomic vector.")
-
-    if (is.null(pch)) {
-        pch = list(rep(16, p), rep(17, q))
-    }
-    else {
-        if (is.list(pch)) {
-            if (length(pch[[1]]) != p || length(pch[[2]]) != q) 
-                stop("'pch' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(pch) == 2) { 
-                pch = list(rep(pch[1], p), rep(pch[2], q))
-            }
-            else {
-                stop("'pch' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(cex)) {
-        cex = list(rep(1, p), rep(1, q))
-    }
-    else {
-        if (is.list(cex)) {
-            if (length(cex[[1]]) != p || length(cex[[2]]) != q) 
-                stop("'cex' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(cex) == 2) { 
-                cex = list(rep(cex[1], p), rep(cex[2], q))
-                }
-            else {
-                    stop("'cex' must be a vector of length 2 or a list of two
-                         vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(col)) {
-        col = list(rep("red", p), rep("blue", q))
-    }
-    else {
-        if (is.list(col)) {
-            if (length(col[[1]]) != p || length(col[[2]]) != q) 
-                stop("'col' must be a vector of length 2 or a list of two
-                vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(col) == 2) { 
-                col = list(rep(col[1], p), rep(col[2], q))
-            }
-            else {
-                stop("'col' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(font)) {
-        font = list(rep(2, p), rep(3, q))
-    }
-    else {
-        if (is.list(font)) {
-            if (length(font[[1]]) != p || length(font[[2]]) != q) 
-                stop("'font' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(font) == 2) { 
-                font = list(rep(font[1], p), rep(font[2], q))
-            }
-            else {
-                stop("'font' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-      pch[[1]] = pch[[1]][keep.X]
-      pch[[2]] = pch[[2]][keep.Y]
-      col[[1]] = col[[1]][keep.X]
-      col[[2]] = col[[2]][keep.Y]
-      cex[[1]] = cex[[1]][keep.X]
-      cex[[2]] = cex[[2]][keep.Y]
-      font[[1]] = font[[1]][keep.X]
-      font[[2]] = font[[2]][keep.Y]
-
-    if (isTRUE(X.label)) X.label = object$names$X
-    if (isTRUE(Y.label)) Y.label = object$names$Y
-
-      if (length(X.label) == p) X.label = X.label[keep.X]
-      if (length(Y.label) == q) Y.label = Y.label[keep.Y]
-
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
-
-    if (length(X.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], X.label, col = col[[1]], 
-             font = font[[1]], cex = cex[[1]])
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
-               cex = cex[[1]], col = col[[1]])
-    }
-
-    if (length(Y.label) > 1) {
-        text(cord.Y[, 1], cord.Y[, 2], Y.label, col = col[[2]], 
-             font = font[[2]], cex = cex[[2]])
-    }
-    else {
-        points(cord.Y[, 1], cord.Y[, 2], pch = pch[[2]], 
-               cex = cex[[2]], col = col[[2]]) 
-    }
-
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-    
-    return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
-}
-
-	
-
-# ---------------------- sPLSDA -------------------------#
-plotVar.splsda <- 
-function(object, 
-         comp = c(1,2), 
-         rad.in = 0.5, 
-         var.label = FALSE, 
-         pch = NULL, 
-         cex = NULL, 
-         col = NULL, 
-         font = NULL,
-	 ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-
-    if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
-    
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
-
-		
-    if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
-#     
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-#     
-
-    # calcul des coordonnees #
-    #------------------------#
-    keep.X = apply(abs(object$loadings$X), 1, sum) > 0
-    cord.X = cor(object$X[, keep.X], object$variates$X[, c(comp1, comp2)], 
-                 use = "pairwise")
-
-    p = ncol(object$X)
-
-    # le plot des variables #
-    #-----------------------#
-    if (length(var.label) > 1 & length(var.label) != p)
-        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
-
-    if (is.null(pch)) {
-        pch = list(rep(16, p))
-
-    }
-    else {
-        if (is.list(pch)) {
-            if (length(pch[[1]]) != p) 
-                stop("'pch' must be a vector of length 1 or a vector of length ", p)
-        }
-
-        else { 
-            if (length(pch) == 2) { 
-                pch = list(rep(pch[1], p))
-
-            }
-            else {
-                stop("'pch' must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-    if (is.null(cex)) {
-        cex = list(rep(1, p))
-    }
-    else {
-        if (is.list(cex)) {
-            if (length(cex[[1]]) != p) 
-                stop("'cex' must be a vector of length 1 or a vector of length ", p)
-        }
-        else { 
-            if (length(cex) == 1) { 
-                cex = list(rep(cex[1], p))
-
-                }
-            else {
-                    stop("'cex' must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-    if (is.null(col)) {
-        col = list(rep("red", p))
-    }
-    else {
-        if (is.list(col)) {
-            if (length(col[[1]]) != p) 
-                stop("'col' must be a vector of length 1 or a vector of length ", p)
-        }
-
-        else { 
-            if (length(col) == 1) { 
-                col = list(rep(col[1], p))
-            }
-            
-              if (length(col) == p) {
-                col = list(col)
-              }
-            else {
-                stop("'col' must be a vector of length 1 or a vector of length ", p)
-            }
-        }
-    }
-
-    if (is.null(font)) {
-        font = list(rep(2, p))
-    }
-    else {
-        if (is.list(font)) {
-            if (length(font[[1]]) != p) 
-                stop("'font' must be a vector of length 1 or a vector of length ", p)
-        }
-        else { 
-            if (length(font) == 1) { 
-                font = list(rep(font[1], p))
-            }
-            else {
-                stop("'font' must be a vector of length 1 or a vector of length ", p)
-            }
-        }
-    }
-
-        pch[[1]] = pch[[1]][keep.X]
-        col[[1]] = col[[1]][keep.X]
-        cex[[1]] = cex[[1]][keep.X]
-        font[[1]] = font[[1]][keep.X]
-
-    if (isTRUE(var.label)) var.label = object$names$X
-    if (length(var.label) == p) var.label = var.label[keep.X]
-
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
-
-    if (length(var.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], var.label, col = col[[1]], 
-             font = font[[1]], cex = cex[[1]])
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
-               cex = cex[[1]], col = col[[1]])
-    }
-
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-  
-    return(invisible(list(coord.X = cord.X)))
-}
-
-
-
-#-------------------------- rCC -------------------------#
-plotVar.rcc <-
-function(object, 
-         comp = c(1,2), 
-         rad.in = 0.5, 
-         cutoff = NULL, 
-         X.label = FALSE, 
-         Y.label = FALSE, 
-         pch = NULL, 
-         cex = NULL, 
-         col = NULL, 
-         font = NULL,
-	  ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-
-    if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
-    
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
-    
-
-    p = ncol(object$X)
-    q = ncol(object$Y)
-    dim = min(p, q)
-
-    if (any(comp > dim)) 
-        stop("the elements of 'comp' must be smaller or equal than ", dim, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'rad.in', 'X.label', 'Y.label', 'pch', 'cex', 'col', 'font')
-#     
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-#     
-
-    # coordonnees des variables #
-	#---------------------------#
-    bisect = object$variates$X[, c(comp1, comp2)] + object$variates$Y[, c(comp1, comp2)]
-    cord.X = cor(object$X, bisect, use = "pairwise")
-    cord.Y = cor(object$Y, bisect, use = "pairwise")
-
-    # choix des variables avec au moins une coordonnee superieur au cutoff #
-    #----------------------------------------------------------------------#
-    if (!is.null(cutoff)) {
-        gp.X = vector(mode = "numeric")
-        gp.Y = vector(mode = "numeric")
-
-        k = 1
-        for(i in 1:p){  
-            if(any(abs(cord.X[i, ]) > cutoff)) { 
-                gp.X[k] = i
-                k = k + 1
-            }
-        }
-
-        k = 1
-        for(i in 1:q){  
-            if(any(abs(cord.Y[i, ]) > cutoff)) { 
-                gp.Y[k] = i
-                k = k + 1
-            }
-        }
-
-        if(length(gp.X) == 0 || length(gp.Y) == 0) 
-            stop("Cutoff value very high for the components ", comp1,
-                 " and ", comp2, ".No variable was selected.")
-
-        cord.X = matrix(cord.X[gp.X, ], length(gp.X), 2)
-        cord.Y = matrix(cord.Y[gp.Y, ], length(gp.Y), 2)
-        rad.in = cutoff
-    }
-
-    # le plot des variables #
-    #-----------------------#
-    if (length(X.label) > 1 & length(X.label) != p)
-        stop("'X.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
-
-    if (length(Y.label) > 1 & length(Y.label) != q)
-        stop("'Y.label' must be a vector of length 'ncol(Y)' or a boolean atomic vector.")
-
-    if (is.null(pch)) {
-        pch = list(rep(16, p), rep(17, q))
-    }
-    else {
-        if (is.list(pch)) {
-            if (length(pch[[1]]) != p || length(pch[[2]]) != q) 
-                stop("'pch' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(pch) == 2) { 
-                pch = list(rep(pch[1], p), rep(pch[2], q))
-            }
-            else {
-                stop("'pch' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(cex)) {
-        cex = list(rep(1, p), rep(1, q))
-    }
-    else {
-        if (is.list(cex)) {
-            if (length(cex[[1]]) != p || length(cex[[2]]) != q) 
-                stop("'cex' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(cex) == 2) { 
-                cex = list(rep(cex[1], p), rep(cex[2], q))
-            }
-            else {
-                stop("'cex' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(col)) {
-        col = list(rep("red", p), rep("blue", q))
-    }
-    else {
-        if (is.list(col)) {
-            if (length(col[[1]]) != p || length(col[[2]]) != q) 
-                stop("'col' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(col) == 2) { 
-                col = list(rep(col[1], p), rep(col[2], q))
-            }
-            else {
-                stop("'col' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (is.null(font)) {
-        font = list(rep(2, p), rep(3, q))
-    }
-    else {
-        if (is.list(font)) {
-            if (length(font[[1]]) != p || length(font[[2]]) != q) 
-                stop("'font' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-        }
-        else { 
-            if (length(font) == 2) { 
-                font = list(rep(font[1], p), rep(font[2], q))
-            }
-            else {
-                stop("'font' must be a vector of length 2 or a list of two
-                     vector components of length ", p, " and ", q, " respectively.")
-            }
-        }
-    }
-
-    if (!is.null(cutoff)) {
-        pch[[1]] = pch[[1]][gp.X]
-        pch[[2]] = pch[[2]][gp.Y]
-        col[[1]] = col[[1]][gp.X]
-        col[[2]] = col[[2]][gp.Y]
-        cex[[1]] = cex[[1]][gp.X]
-        cex[[2]] = cex[[2]][gp.Y]
-        font[[1]] = font[[1]][gp.X]
-        font[[2]] = font[[2]][gp.Y]
-    }
-
-    if (isTRUE(X.label)) X.label = object$names$X
-    if (isTRUE(Y.label)) Y.label = object$names$Y
-
-    if (!is.null(cutoff)) {
-        if (length(X.label) == p) X.label = X.label[gp.X]
-        if (length(Y.label) == q) Y.label = Y.label[gp.Y]
-    }
-
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
-
-    if (length(X.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], X.label, col = col[[1]], 
-             font = font[[1]], cex = cex[[1]])
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
-               cex = cex[[1]], col = col[[1]])
-    }
-
-    if (length(Y.label) > 1) {
-        text(cord.Y[, 1], cord.Y[, 2], Y.label, col = col[[2]], 
-             font = font[[2]], cex = cex[[2]])
-    }
-    else {
-        points(cord.Y[, 1], cord.Y[, 2], pch = pch[[2]], 
-               cex = cex[[2]], col = col[[2]]) 
-    }
-
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-   
-    return(invisible(list(coord.X = cord.X, coord.Y = cord.Y)))
-}
-
-
-# -------------------------------- sPCA ----------------------------------------
-plotVar.spca <- 
-function(object, 
-         comp = c(1,2), 
-         rad.in = 0.5, 
-         var.label = FALSE, 
-         pch = NULL, 
-         cex = NULL, 
-         col = NULL, 
-         font = NULL,
-	 ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-
-    if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
-    
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
-    
-		
-    if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
-#     
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-#     
-
-
-    # calcul des coordonnees #
-    #------------------------#
-    keep.X = apply(abs(object$rotation), 1, sum) > 0
-    cord.X = cor(object$X[, keep.X], object$x[, c(comp1, comp2)], 
-                 use = "pairwise")
-
-    p = ncol(object$X)
-
-    # le plot des variables #
-    #-----------------------#
-    if (length(var.label) > 1 & length(var.label) != p)
-        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
-
-    if (is.null(pch)) {
-        pch = list(rep(16, p))
-
-    }
-    else {
-        if (is.list(pch)) {
-            if (length(pch[[1]]) != p) 
-                stop("'pch' must be a vector of length 1 or a vector of length ", p)
-        }
-
-        else { 
-            if (length(pch) == 2) { 
-                pch = list(rep(pch[1], p))
-
-            }
-            else {
-                stop("'pch' must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-
-    if (is.null(cex)) {
-        cex = list(rep(1, p))
-    }
-    else {
-        if (is.list(cex)) {
-            if (length(cex[[1]]) != p) 
-                stop("'cex' must be a vector of length 1 or a vector of length ", p)
-        }
-        else { 
-            if (length(cex) == 1) { 
-                cex = list(rep(cex[1], p))
-
-                }
-            else {
-                    stop("'cex' must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-    if (is.null(col)) {
-        col = list(rep("red", p))
-    }
-    else {
-        if (is.list(col)) {
-            if (length(col[[1]]) != p) 
-                stop("'col' must be a vector of length 1 or a vector of length ", p)
-        }
-
-        else { 
-            if (length(col) == 1) { 
-                col = list(rep(col[1], p))
-            }
-              if (length(col) == p) {
-                col = list(col)
-              }
-            else {
-                stop("'col' must be a vector of length 1 or a vector of length ", p)
-            }
-        }
-    }
-
-    if (is.null(font)) {
-        font = list(rep(2, p))
-    }
-    else {
-        if (is.list(font)) {
-            if (length(font[[1]]) != p) 
-                stop("'font' must be a vector of length 1 or a vector of length ", p)
-        }
-        else { 
-            if (length(font) == 1) { 
-                font = list(rep(font[1], p))
-            }
-            else {
-                stop("'font' must be a vector of length 1 or a vector of length ", p)
-            }
-        }
-    }
-
-        pch[[1]] = pch[[1]][keep.X]
-        col[[1]] = col[[1]][keep.X]
-        cex[[1]] = cex[[1]][keep.X]
-        font[[1]] = font[[1]][keep.X]
-
-    if (isTRUE(var.label)) var.label = object$names$X
-    if (length(var.label) == p) var.label = var.label[keep.X]
-
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
-
-    if (length(var.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], var.label, col = col[[1]], 
-             font = font[[1]], cex = cex[[1]])
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
-               cex = cex[[1]], col = col[[1]])
-    }
-
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-    
-    return(invisible(list(coord.X = cord.X)))
-}
-
-
-# ------------------------------ PCA object ------------------------------------
-plotVar.pca <-
-function(object, 
-         comp = c(1,2),
-         rad.in = 0.5, 		 
-         var.label = FALSE,		 
-         ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-
-    if (!is.numeric(comp) || any(comp < 1))
-        stop("invalid vector for 'comp'.")
-
-	q = nrow(object$rotation)
-	
-    if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-	
-    if (is.logical(var.label)) {
-        if (isTRUE(var.label)) var.label = rownames(object$rotation)
-    }
-	
-	if (length(var.label) > 1) {
-        if (length(var.label) != q)
-            stop("'var.label' must be a character vector of length ", q, " or a boolean atomic vector.")
-    }
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'rad.in', 'var.label')
-#     
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-# 	if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-# 	
-	
-    # calcul des coordonnees #
-    #------------------------#
-    cord.X = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
-
-    # le plot des variables #
-    #-----------------------#	
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp[1]), ylab = paste("Comp ", comp[2]))
-
-    if (length(var.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], var.label, ...)
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], ...)
-    }
-
-    abline(v = 0, h = 0, lty = 2)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-    
-    return(invisible(list(coord.X = cord.X)))
-}
-
-# ------------------------------ IPCA object ------------------------------------
-plotVar.ipca <-
-function(object, 
-         comp = c(1,2),
-         rad.in = 0.5, 		 
-         var.label = FALSE,		 
-         ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-
-    if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
-    
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
-    
-
-	q = nrow(object$loadings)
-	
-    if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-	
-    if (is.logical(var.label)) {
-        if (isTRUE(var.label)) var.label = rownames(object$loadings)
-    }
-	
-	if (length(var.label) > 1) {
-        if (length(var.label) != q)
-            stop("'var.label' must be a character vector of length ", q, " or a boolean atomic vector.")
-    }
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'rad.in', 'var.label')
-#     
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-# 	if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-# 	
-	
-    # calcul des coordonnees #
-    #------------------------#
-    cord.X = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
-
-    # le plot des variables #
-    #-----------------------#	
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp[1]), ylab = paste("Comp ", comp[2]))
-
-    if (length(var.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], var.label, ...)
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], ...)
-    }
-
-    abline(v = 0, h = 0, lty = 2)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-    
-    return(invisible(list(coord.X = cord.X)))
-}
-
-
-# -------------------------------- sIPCA ----------------------------------------
-plotVar.sipca <- 
-function(object, 
-         comp = c(1,2), 
-         rad.in = 0.5, 
-         var.label = FALSE, 
-         pch = NULL, 
-         cex = NULL, 
-         col = NULL, 
-         font = NULL,
-	 ...) 
-{
-
-    # validation des arguments #
-    #--------------------------#
-    if (length(comp) != 2)
-        stop("'comp' must be a numeric vector of length 2.")
-
-    if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
-    
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
-    
-		
-    if (any(comp > object$ncomp)) 
-        stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-
-    comp1 = round(comp[1])
-    comp2 = round(comp[2])
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'rad.in', 'var.label', 'pch', 'cex', 'col', 'font')
-#     
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-#     
-
-
-    # calcul des coordonnees #
-    #------------------------#
-    keep.X = apply(abs(object$loadings), 1, sum) > 0
-    cord.X = cor(object$X[, keep.X], object$x[, c(comp1, comp2)], 
-                 use = "pairwise")
-
-    p = ncol(object$X)
-
-    # le plot des variables #
-    #-----------------------#
-    if (length(var.label) > 1 & length(var.label) != p)
-        stop("'var.label' must be a vector of length 'ncol(X)' or a boolean atomic vector.")
-
-    if (is.null(pch)) {
-        pch = list(rep(16, p))
-
-    }
-    else {
-        if (is.list(pch)) {
-            if (length(pch[[1]]) != p) 
-                stop("'pch' must be a vector of length 1 or a vector of length ", p)
-        }
-
-        else { 
-            if (length(pch) == 2) { 
-                pch = list(rep(pch[1], p))
-
-            }
-            else {
-                stop("'pch' must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-
-    if (is.null(cex)) {
-        cex = list(rep(1, p))
-    }
-    else {
-        if (is.list(cex)) {
-            if (length(cex[[1]]) != p) 
-                stop("'cex' must be a vector of length 1 or a vector of length ", p)
-        }
-        else { 
-            if (length(cex) == 1) { 
-                cex = list(rep(cex[1], p))
-
-                }
-            else {
-                    stop("'cex' must be a vector of length 1 or a vector of length ", p)
-
-            }
-        }
-    }
-
-    if (is.null(col)) {
-        col = list(rep("red", p))
-    }
-    else {
-        if (is.list(col)) {
-            if (length(col[[1]]) != p) 
-                stop("'col' must be a vector of length 1 or a vector of length ", p)
-        }
-
-        else { 
-            if (length(col) == 1) { 
-                col = list(rep(col[1], p))
-            }
-              if (length(col) == p) {
-                col = list(col)
-              }
-            else {
-                stop("'col' must be a vector of length 1 or a vector of length ", p)
-            }
-        }
-    }
-
-    if (is.null(font)) {
-        font = list(rep(2, p))
-    }
-    else {
-        if (is.list(font)) {
-            if (length(font[[1]]) != p) 
-                stop("'font' must be a vector of length 1 or a vector of length ", p)
-        }
-        else { 
-            if (length(font) == 1) { 
-                font = list(rep(font[1], p))
-            }
-            else {
-                stop("'font' must be a vector of length 1 or a vector of length ", p)
-            }
-        }
-    }
-
-        pch[[1]] = pch[[1]][keep.X]
-        col[[1]] = col[[1]][keep.X]
-        cex[[1]] = cex[[1]][keep.X]
-        font[[1]] = font[[1]][keep.X]
-
-    if (isTRUE(var.label)) var.label = object$names$X
-    if (length(var.label) == p) var.label = var.label[keep.X]
-
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste("Comp ", comp1), ylab = paste("Comp ", comp2))
-
-    if (length(var.label) > 1) {
-        text(cord.X[, 1], cord.X[, 2], var.label, col = col[[1]], 
-             font = font[[1]], cex = cex[[1]])
-    }
-    else {
-        points(cord.X[, 1], cord.X[, 2], pch = pch[[1]], 
-               cex = cex[[1]], col = col[[1]])
-    }
-
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
-    
-    return(invisible(list(coord.X = cord.X)))
-}
-
-# ----------------------------
-#  SGCCA 
-# -------------------------#
-
-plotVar.sgcca <- 
-  function(object, 
-           comp = c(1,2), 
-           #sgcca specific
-           block = c(1,2),
-           # the comp where the variables are selected
-           ncomp.select = c(1,2),
-           labels = FALSE,
-           pch = c(16,17), 
-           cex =  c(0.5, 0.5), 
-           col =  color.mixo(2),   #c('green', 'blue'),
-           font = c(2,3),
-           rad.in = 0.5, 
-           ...) 
+  function(object,
+           comp = c(1, 2),
+           comp.select = NULL,
+           var.names = NULL,
+           blocks = NULL, # to choose which block data to plot, when using GCCA module
+           X.label = NULL,
+           Y.label = NULL,
+           abline.line = TRUE,
+           col,
+           cex,
+           pch,
+           font,
+           cutoff = 0,
+           rad.in = 0.5,
+           main="Correlation Circle Plots",
+           style="ggplot2", # can choose between graphics, lattice or ggplot2,
+           overlap = TRUE,
+           ...)
 {
     
-    ## validation des arguments
-    if (length(comp) != 2)
-      stop("'comp' must be a numeric vector of length 2.")
+    class.object = class(object)
     
-    if (!is.numeric(comp) || any(comp < 1))
-      stop("invalid vector for 'comp'.")
+    object.pls=c("pls","spls","splsda","plsda","mlspls","mlsplsda","rcc")
+    object.pca=c("ipca","sipca","pca","spca")
+    object.blocks=c("sgcca","rgcca", "sgccda")
     
-    if (any(comp > object$ncomp[block])) 
-      stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
-    
-    #if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
-    # warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
-    
-    if(all(ncomp.select != comp))
-      stop("All argument from 'ncomp.select' differ from 'comp'")
-    
-    #KA changed condition
-    #if(any(ncomp.select > comp))
-    if(any(ncomp.select > object$ncomp[comp]))
-      stop("At least one argument from 'ncomp.select' is greater than the actual number of components in the sgcca model")
-    
-    cat('plotVar will only display variables selected on components', ncomp.select[1], 'and', ncomp.select[2], '\n')
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-#     
-    
-    
-    # define if single block is true or false
-    single.block = ifelse(length(block) == 1, TRUE, FALSE)
-    
-    #extract data
-    data = object$blocks
-    
-    # extraire la matrice de design
-    design = object$design
-
-    
-    keep = list()
-    j=1
-    # identify the selected variables selected on a given component ncomp.select
-    if(length(ncomp.select) > 1){
-      for(k in block){
-        keep[[j]] = apply(abs(object$loadings[[k]][,ncomp.select]), 1, sum) > 0
-        j=j+1
-      }
-    }else{
-      for(k in block){
-        keep[[j]] = abs(object$loadings[[k]][,ncomp.select])> 0
-        j=j+1        
-      }   
-    }
+    ### Start: Validation of arguments
+    ncomp = object$ncomp
+    if (class.object[1] %in% object.blocks) {
+      
+      if (is.null(blocks)){
+        blocks = object$names$blocks
         
-    # -------------------------
-    # compute coordinates
-    # -------------------------
-    # ----- canonical mode type
-    # correlation between original variables and latent variables
-
-    coord = list()
-    j=1
-    # canonical mode or when representing only one block
-    for(k in block)
-    {
-        coord[[j]] = cor(data[[k]][, keep[[j]]], object$variates[[k]][,comp], use = "pairwise")
-        j=j+1
-    }
-    
-    
-    # -------------------
-    # input parameters
-    # -------------------
-    # labels
-    name.labels = list()
-    #if(IS.TRUE(labels)){
-    for(j in 1:length(block)){
-      name.labels[[j]] = colnames(data[[j]][, keep[[j]]])
-    }
-    
-    #determine number of variables in each block
-    num.var = unlist(lapply(data, ncol))
-    
-    pch.plot = col.plot = cex.plot = font.plot = list()
-    # set arguments for plot
-    for(j in 1:length(block)){
-      pch.plot[[j]] = rep(pch[j], num.var[j])
-      col.plot[[j]] = rep(col[j], num.var[j])
-      cex.plot[[j]] = rep(cex[j], num.var[j])
-      font.plot[[j]] = rep(font[j], num.var[j])
-    }
-
-    # this is to display only the selected variables
-    for(j in 1:length(block)){
-      pch.plot[[j]] = pch.plot[[j]][keep[[j]]]
-      col.plot[[j]] = col.plot[[j]][keep[[j]]]
-      cex.plot[[j]] = cex.plot[[j]][keep[[j]]]
-      font.plot[[j]] = font.plot[[j]][keep[[j]]]
-    }
-    
-    
-    # ---------------------------
-    # plot the correlation circles
-    # --------------------------
-    
-    
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste('sGCCA, component 1'), ylab = paste('sGCCA, component 2'))
-    
-    for(j in 1:length(block)){
-      if(labels){
-        text(coord[[j]][, 1], coord[[j]][, 2], name.labels[[j]], col = col.plot[[j]], 
-             font = font.plot[[j]], cex = cex.plot[[j]])
-      }else{
-        points(coord[[j]][, 1], coord[[j]][, 2], pch = pch.plot[[j]], 
-               cex = cex.plot[[j]], col = col.plot[[j]])
+        if (class.object[1] == "sgccda")
+          blocks = blocks[-object$indY]
+        
+      } else if (is.numeric(blocks) & min(blocks) > 0 &  max(blocks) <= length(object$names$blocks)) {
+        blocks = object$names$blocks[blocks]
+      } else if (is.character(blocks)) {
+        if (!any(blocks %in% object$names$blocks))
+          stop("One element of 'blocks' does not match with the names of the blocks")
+      } else {
+        stop("Incorrect value for 'blocks", call. = FALSE)
       }
+      object$variates = object$variates[names(object$variates) %in% blocks]
+      object$names$colnames = object$names$colnames[names(object$names$colnames) %in% blocks] 
+      object$blocks = object$blocks[names(object$blocks) %in% blocks]
+      
+      if (any(object$ncomp[blocks] == 1)) {
+        stop(paste("The number of components for one selected block '", paste(blocks, collapse = " - "),"' is 1. The number of components must be superior or equal to 2."), call. = FALSE)
+      }
+      ncomp = object$ncomp[blocks]
+    } else if (class.object[1] %in% c("rcc", "pls", "spls", "mlspls")) {
+      blocks = c("X", "Y")
+    } else {
+      blocks = "X"
     }
     
+    #-- ellipse.level
+    if ((rad.in > 1) | (rad.in < 0))
+      stop("The value taken by 'rad.in' must be between 0 and 1")
     
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
+    #-- cutoff correlation
+    if ((cutoff > 1) | (cutoff < 0))
+      stop("The value taken by 'cutoff' must be between 0 and 1")
     
-    # output coordinates
-    return(invisible(list(coord = coord)))
-    
-  }
-
-
-# --------------
-# RGCCA
-# -------------
-
-
-
-plotVar.rgcca <- 
-  function(object, 
-           comp = c(1,2), 
-           #sgcca specific
-           block = c(1,2),
-           labels = FALSE,
-           pch = c(16,17), 
-           cex =  c(0.5, 0.5), 
-           col =  color.mixo(c(1,2)),       #c('green', 'blue'),
-           font = c(2,3),
-           rad.in = 0.5, 
-           ...) 
-{
-    
-    ## validation des arguments
+    #-- comp
     if (length(comp) != 2)
-      stop("'comp' must be a numeric vector of length 2.")
+      stop("'comp' must be a numeric vector of length 2.")      
     
     if (!is.numeric(comp))
-    stop("invalid vector for 'comp'.")
+      stop("Invalid vector for 'comp'.")
     
-    if (length(comp) == 1)
-    stop("Need at least 2 components to plot the graph")
+    if (any(ncomp < max(comp)) || min(comp) <= 0)
+      stop("Each element of 'comp' must be positive smaller or equal than ", max(object$ncomp), ".", call. = FALSE)
     
+    comp1 = round(comp[1]); comp2 = round(comp[2])
     
-    if (any(comp > object$ncomp[block])) 
-      stop("the elements of 'comp' must be smaller or equal than ", object$ncomp, ".")
+    #-- comp.select
+    if (!is.null(comp.select)){
+      if (!is.numeric(comp.select))
+        stop("Invalid vector for 'comp'.")
     
-    #if(any(c(length(pch),length(cex),length(font),length(cex)) > length(block)) )
-    # warning("Will only take into account the first ", length(block), " arguments (pch, cex, font or cex) for the plot")
-    
-#     # check that the user did not enter extra arguments #
-#     # --------------------------------------------------#
-#     # what the user has entered
-#     match.user =names(match.call())
-#     # what the function is expecting
-#     match.function = c('object', 'comp', 'block', 'ncomp.select', 'labels', 'pch', 'cex', 'col', 'font', 'rad.in')    
-#     #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-#     if(length(setdiff(match.user[-1], match.function)) > 0) warning('Some of the input arguments do not match the function arguments, see ?plotIndiv')
-#     
-    
-    
-    # define if single block is true or false
-    single.block = ifelse(length(block) == 1, TRUE, FALSE)
-    
-    #extract data
-    data = object$block
-    
-    # extraire la matrice de design
-    design = object$design
-    
-    
-    # -------------------------
-    # compute coordinates
-    # -------------------------
-    # ----- canonical mode type
-    # correlation between original variables and latent variables
-    
-    coord = list()
-    j=1
-    # canonical mode or when representing only one block
-    for(k in block)
-    {
-        coord[[j]] = cor(data[[k]], object$variates[[k]][,comp], use = "pairwise")
-        j=j+1
+      if (any(ncomp < max(comp.select)) || min(comp.select) <= 0)
+        stop("Each element of 'comp.select' must be positive and smaller or equal than ", max(object$ncomp), ".", call. = FALSE)
     }
-
-    # -------------------
-    # input parameters
-    # -------------------
-    # labels
-    name.labels = list()
-    #if(IS.TRUE(labels)){
-    for(j in 1:length(block)){
-      name.labels[[j]] = colnames(data[[j]])
-    }
-    
-    
-    #determine number of variables in each block
-    num.var = unlist(lapply(data, ncol))    
-    pch.plot = col.plot = cex.plot = font.plot = list()
-    # set arguments for plot
-    for(j in 1:length(block)){
-      pch.plot[[j]] = rep(pch[j], num.var[j])
-      col.plot[[j]] = rep(col[j], num.var[j])
-      cex.plot[[j]] = rep(cex[j], num.var[j])
-      font.plot[[j]] = rep(font[j], num.var[j])
-    }
-    
-    # ---------------------------
-    # plot the correlation circles
-    # --------------------------
-    
-    
-    par(pty = "s")
-    plot(0, type = "n", xlim = c(-1, 1), ylim = c(-1, 1), 
-         xlab = paste('rGCCA, component 1'), ylab = paste('rGCCA, component 2'))
-    
-    for(j in 1:length(block)){
-      if(labels){
-        text(coord[[j]][, 1], coord[[j]][, 2], name.labels[[j]], col = col.plot[[j]], 
-             font = font.plot[[j]], cex = cex.plot[[j]])
-      }else{
-        points(coord[[j]][, 1], coord[[j]][, 2], pch = pch.plot[[j]], 
-               cex = cex.plot[[j]], col = col.plot[[j]])
+      
+    #-- Start: Retrieve variates from object
+    cord.X = sample.X = ind.var.sel = list()
+    if (class.object[1] %in%  c(object.pls, object.blocks)) {
+      if (class.object[1] == "rcc"){
+        cord.X[[1]] = cor(object$X, object$variates$X[, c(comp1, comp2)] + object$variates$Y[, c(comp1, comp2)], use = "pairwise")
+        cord.X[[2]] = cor(object$Y, object$variates$X[, c(comp1, comp2)] + object$variates$Y[, c(comp1, comp2)], use = "pairwise")
+        sample.X = lapply(cord.X, function(x){1 : nrow(x)})
+      } else if (class.object[1] %in%  "pls") {
+        cord.X[[1]] = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+        cord.X[[2]] = cor(object$Y, if(object$mode ==  "canonical"){object$variates$Y[, c(comp1, comp2)]} else {object$variates$X[, c(comp1, comp2)]}, use = "pairwise")
+        sample.X = lapply(cord.X, function(x){1 : nrow(x)})
+      } else if (class.object[1] %in% "plsda"){
+        cord.X[[1]] = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
+        sample.X = lapply(cord.X, function(x){1 : nrow(x)})
+      } else if (class.object[1] %in%  c("spls", "mlspls")){
+        cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$name.X})))],
+                          object$variates$X[, c(comp1, comp2)], use = "pairwise")
+        cord.X[[2]] = cor(object$Y[, colnames(object$Y) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$name.Y})))],
+                          if(object$mode ==  "canonical"){object$variates$Y[, c(comp1, comp2)]} else {object$variates$X[, c(comp1, comp2)]}, use = "pairwise")
+        ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
+        ind.var.sel[[2]] = sample.X[[2]] = 1 : length(colnames(object$Y))
+        if (!is.null(comp.select)) {
+          cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name.X}))), ,drop = FALSE]
+          cord.X[[2]] = cord.X[[2]][row.names(cord.X[[2]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name.Y}))), , drop = FALSE]
+        }
+        ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[1]]))
+        ind.var.sel[[2]] = which(colnames(object$Y) %in% rownames(cord.X[[2]]))
+      } else if (class.object[1] %in%  c("splsda", "mlsplsda")){
+        cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2, comp.select), function(x){selectVar(object, comp = x)$name})))],
+                          object$variates$X[, c(comp1, comp2, comp.select)], use = "pairwise")      
+        ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
+        if (!is.null(comp.select)) {
+          cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name}))), ,drop = FALSE]
+        }
+        ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[1]]))
+      } else {
+        cord.X = lapply(blocks, function(x){cor(object$blocks[[x]], object$variates[[x]][, c(comp1, comp2)], use = "pairwise")})
+        ind.var.sel = sample.X = lapply(object$blocks, function(x){1 : ncol(x)})
+        if (!is.null(comp.select)) {
+          cord.X = lapply(1 : length(cord.X), function(z){cord.X[[z]][row.names(cord.X[[z]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, block = z, comp = x)$name.var[[1]]}))), ,drop = FALSE]})
+        }
+        for (i in 1 : length(cord.X)){
+          ind.var.sel[[i]] = which(colnames(object$X) %in% rownames(cord.X[[i]]))
+        }
+      }
+    } else if (class.object[1] %in%  object.pca) {
+      if (class.object[1] %in%  c("sipca", "spca")){
+        cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$name})))],
+                          object$x[, c(comp1, comp2)], use = "pairwise")
+        ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
+        if (!is.null(comp.select)) {
+          cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name}))), ,drop = FALSE]
+        }
+        ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[i]]))
+      } else {
+        cord.X[[1]] = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
+        ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
       }
     }
     
+    if (any(sapply(cord.X, nrow) == 0))
+      stop("No variable selected on at least one block")
     
-    abline(v = 0, h = 0)
-    lines(cos(seq(0, 2 * pi, l = 100)), sin(seq(0, 2 * pi, l = 100)))
-    lines(rad.in * cos(seq(0, 2 * pi, l = 100)), 
-          rad.in * sin(seq(0, 2 * pi, l = 100)))
+    #-- End: Retrieve variates from object
     
-    # output coordinates
-    return(invisible(list(coord = coord)))
+    #-- Names of labels X and Y
+    if (is.null(X.label)) X.label = paste("Component ", comp1)
+    if (is.null(Y.label)) Y.label = paste("Component ", comp2)
     
+    #-- Function to display an error message (used for the parameters var.names, cex, col, pch and font)
+    stop.message = function(argument, data){
+      if (length(data) == 1) {
+        count.data = sapply(data, length)
+      } else {
+        count.data = paste(paste(sapply(data[-length(data)], length), collapse =  ", "), length(data[[length(data)]]), sep = " and ")
+      }
+      stop(argument, " must be either a vector of length ", length(data), 
+           " or a list of ", length(data), " vector components of length ", count.data, " respectively.")
+    }
+    
+    #-- pch argument
+    missing.pch = FALSE
+    if (missing(pch)) {
+      missing.pch = TRUE
+      pch = unlist(lapply(1 : length(cord.X), function(x){rep(c(1:20)[x], sum(sapply(cord.X[x], nrow)))}))
+    } else if (is.vector(pch, mode = "double")) {
+      if (length(pch) != length(sample.X))
+        stop.message('pch', sample.X)
+      pch = unlist(lapply(1 : length(cord.X), function(x){rep(pch[x], sum(sapply(cord.X[x], nrow)))}))
+    } else if (is.list(pch)) {
+      if (length(pch) != length(sample.X) || length(unlist(pch)) != sum(sapply(sample.X, length)))
+        stop.message('pch', sample.X)  
+      if (length(ind.var.sel) != 0)
+        pch = lapply(1 : length(pch), function(x){pch[[x]][ind.var.sel[[x]]]})
+      pch = unlist(pch)
+    } else {
+      stop.message('pch', sample.X)     
+    }
+    
+    #-- col argument 
+    if (missing(col)) {
+      if (length(cord.X) < 10) {
+        col = unlist(lapply(1 : length(cord.X), function(x){rep(color.mixo(x), sum(sapply(cord.X[x], nrow)))}))
+      } else {
+        col = unlist(lapply(1 : length(cord.X), function(x){rep(color.jet(x), sum(sapply(cord.X[x], nrow)))}))
+      }
+    } else if (is.vector(col, mode = "double") | is.vector(col, mode = "character")) {
+      if (length(col) != length(sample.X))
+        stop.message('col', sample.X)
+      col = unlist(lapply(1 : length(cord.X), function(x){rep(col[x], sum(sapply(cord.X[x], nrow)))}))
+    } else if (is.list(col)) {
+      if (length(col) != length(sample.X) || length(unlist(col)) != sum(sapply(sample.X, length)))
+        stop.message('col', sample.X)  
+      if (length(ind.var.sel) != 0)
+        col = lapply(1 : length(col), function(x){col[[x]][ind.var.sel[[x]]]})
+      col = unlist(col)
+    } else {
+      stop.message('col', sample.X)     
+    }
+    
+    #-- cex argument
+    if (missing(cex)){
+      if (style == "ggplot2"){
+        cex = rep(5, sum(sapply(cord.X, nrow)))
+      } else {
+        cex = rep(1, sum(sapply(cord.X, nrow)))
+      }
+    } else if (is.vector(cex, mode = "double")) {
+      if (length(cex) != length(cord.X))
+        stop.message('cex', sample.X)
+      cex = unlist(lapply(1 : length(cord.X), function(x){rep(cex[x], sum(sapply(cord.X[x], nrow)))}))
+    } else if (is.list(cex)) {
+      if (length(cex) != length(sample.X) || length(unlist(cex)) != sum(sapply(sample.X, length)))
+        stop.message('cex', sample.X)  
+      if (length(ind.var.sel) != 0)
+        cex = lapply(1 : length(cex), function(x){cex[[x]][ind.var.sel[[x]]]})
+      cex = unlist(cex)
+    } else {
+      stop.message('cex', sample.X)     
+    }
+    
+    #-- font argument
+    if (missing(font)) {
+      font = rep(1, sum(sapply(cord.X, nrow)))
+    } else if (is.vector(font, mode = "double")) {
+      if (length(font) != length(cord.X))
+        stop.message('font', sample.X)
+      font = unlist(lapply(1 : length(cord.X), function(x){rep(font[x], sum(sapply(cord.X[x], nrow)))}))
+    } else if (is.list(font)) {
+      if (length(font) != length(sample.X) || length(unlist(font)) != sum(sapply(sample.X, length)))
+        stop.message('font', sample.X)  
+      if (length(ind.var.sel) != 0)
+        font = lapply(1 : length(font), function(x){font[[x]][ind.var.sel[[x]]]})
+      font = unlist(font)
+    } else {
+      stop.message('font', sample.X)     
+    }
+    
+    #-- var.names
+    ind.group = cumsum(c(0, sapply(cord.X, nrow)))
+    if (is.null(var.names)){
+      var.names.list = unlist(sapply(cord.X, rownames))
+      if (!missing.pch) {
+        var.names = rep(FALSE, length(cord.X))
+      } else {
+        var.names = rep(TRUE, length(cord.X))
+      }
+    } else if (is.vector(var.names, mode = "logical")) {
+      if (length(var.names) != length(cord.X))
+        stop.message('var.names', sample.X)
+      var.names.list = unlist(lapply(1 : length(var.names), function(x){if(var.names[x]){rownames(cord.X[[x]])}
+                                                                   else {pch[(ind.group[x] + 1) : ind.group[x + 1]]}}))
+    } else if (is.list(var.names)) {
+      if (length(var.names) != length(cord.X))
+        stop.message('var.names', sample.X)
+      
+      if (sum(sapply(1 : length(var.names), function(x){if(!lapply(var.names, is.logical)[[x]]){
+                                                          if(is.null(ind.var.sel[[x]])){
+                                                            length(var.names[[x]])
+                                                          } else {
+                                                            length(var.names[[x]][ind.var.sel[[x]]])
+                                                          }
+                                                        } else {0}})) !=
+          sum(sapply(1 : length(var.names), function(x){if(!lapply(var.names, is.logical)[[x]]){nrow(cord.X[[x]])}else {0}}))){
+        stop.message('var.names', sample.X)
+      }
+      
+      var.names.list = unlist(sapply(1 : length(var.names), function(x){if(lapply(var.names, is.logical)[[x]]){
+                                                                          if (var.names[[x]]) {
+                                                                            row.names(cord.X[[x]])
+                                                                          } else {
+                                                                            pch[(ind.group[x] + 1) : ind.group[x + 1]]
+                                                                          }
+                                                                        } else {
+                                                                          if (is.null(ind.var.sel[[x]])){
+                                                                            as.character(var.names[[x]])
+                                                                          } else {
+                                                                            as.character(var.names[[x]])[ind.var.sel[[x]]]
+                                                                          }
+                                                                        }
+                                                                        }))
+      var.names = sapply(var.names, function(x){if(is.logical(x)){x}else{TRUE}})
+    } else {
+      stop.message('var.names', sample.X)
+    }   
+    
+    #-- Start: Computation ellipse
+    circle = list()
+    circle[[1]] = ellipse(0, levels = 1, t = 1)
+    circle[[2]] = ellipse(0, levels = 1, t = rad.in)
+    circle = data.frame(do.call("rbind", circle), "Circle" = c(rep("Main circle", 100), rep("Inner circle", 100)))
+    #-- End: Computation ellipse
+          
+    #-- Start: data set  
+    df = data.frame(do.call(rbind, cord.X), "Block" = paste0("Block: ", unlist(lapply(1 : length(cord.X), function(z){rep(blocks[z], nrow(cord.X[[z]]))}))))
+    names(df)[1:2] = c("x", "y")
+    
+    df$names = var.names.list
+    
+    df$pch = pch; df$cex = cex; df$col = col; df$font = font
+    
+    if (cutoff != 0){
+      df = df[abs(df$x) > cutoff | abs(df$y) > cutoff, ,drop = FALSE]
+      ind.group = c(0, cumsum(table(df$Block)))
+    }
+    if (nrow(df) == 0)
+      stop("Cutoff value very high for the components ", comp1, " and ", comp2, ".No variable was selected.")
+    
+    if (overlap)
+      df$Block = ""
+    #-- End: data set
+    
+    #-- Start: ggplot2
+    if (style == "ggplot2"){
+      # visible variable issues for x, y and Circle
+      # according to http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when
+      # one hack is to set to NULL first.
+      x = y = Circle = NULL
+      
+      
+      #-- Initialise ggplot2
+      p = ggplot(df, aes(x = x, y = y), main = main, xlab = X.label, ylab = Y.label) + theme_bw()
+      
+      #-- Display sample or var.names
+      for (i in 1 : length(var.names)){
+        if (var.names[i]) {
+          p = p + geom_text(data = df[c((ind.group[i] + 1) : ind.group[i + 1]), ], 
+                            label = df[c((ind.group[i] + 1) : ind.group[i + 1]), "names"],
+                            size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                            color = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                            fontface = df[c((ind.group[i] + 1) : ind.group[i + 1]), "font"])
+        } else {
+          p = p + geom_point(data = df[c((ind.group[i] + 1) : ind.group[i + 1]), ], 
+                             size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                             shape = df[c((ind.group[i] + 1) : ind.group[i + 1]), "pch"],
+                             color = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"])
+        }
+      }
+      
+      #-- Modify scale colour - Change X/Ylabel - split plots into Blocks  
+      p = p + scale_x_continuous(limits = c(-1, 1)) + scale_y_continuous(limits = c(-1, 1))
+      p = p + labs(list(title = main, x = X.label, y = Y.label)) + facet_wrap(~ Block)
+      
+      #-- Remove Legend
+      p = p + theme(legend.position="none")
+      
+      #-- abline
+      if (abline.line)
+        p = p + geom_vline(aes(xintercept = 0), linetype = 2, colour = "darkgrey") + geom_hline(aes(yintercept = 0),linetype = 2,colour = "darkgrey")
+      
+      #-- circle correlation
+      for (i in c("Main circle", "Inner circle")){
+        p = p + geom_path(data = subset(circle, Circle == i), aes_string(x = "x", y = "y"), color = "Black")
+      }
+      
+      p = p + scale_colour_manual(values = levels(factor(df$col))) + scale_shape_manual(values = as.numeric(levels(factor(df$pch)))) + scale_size_discrete(range = range(df$cex))
+      print(p)
+      return(invisible(df))
+    }
+    #-- End: ggplot2
+    
+    #-- Start: Lattice
+    if(style == "lattice") {
+
+      if (overlap) {
+        p = xyplot(y ~ x | Block, data = df, xlab = X.label, ylab = Y.label, main = main,
+                   scales = list(x = list(relation = "free", limits = c(-1, 1)),
+                                 y = list(relation = "free", limits = c(-1, 1))),
+                   
+                   panel = function(x, y, ...) {
+                     
+                                    #-- Abline
+                                    if (abline.line) {panel.abline(v = 0, lty = 2, col = "darkgrey")
+                                                      panel.abline(h = 0, lty = 2, col = "darkgrey")}
+                             
+                                    #-- Display sample or row.names
+                                    for (i in 1 : length(var.names)){
+                                      if (var.names[i]) {
+                                        panel.text(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"],
+                                                   y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                                   df[c((ind.group[i] + 1) : ind.group[i + 1]), "names"],
+                                                   col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                                   cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                                                   font = df[c((ind.group[i] + 1) : ind.group[i + 1]), "font"])
+                                      } else {
+                                        panel.points(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"],
+                                                     y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                                     col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                                     cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                                                     pch = df[c((ind.group[i] + 1) : ind.group[i + 1]), "pch"])
+                                      }
+                                    }
+                   })
+        print(p)
+      
+        panels = trellis.currentLayout(which = "panel")
+        ind = which(panels == 1, arr.ind = TRUE)
+        trellis.focus("panel",ind[2], ind[1])
+        for (i in 1 : length(c("Main circle", "Inner circle"))){
+          panel.lines(x = circle[circle$Circle %in% c("Main circle", "Inner circle")[i], "x"],
+                      y = circle[circle$Circle %in% c("Main circle", "Inner circle")[i], "y"],
+                      col = "black")
+        }
+        trellis.unfocus()  
+      } else {
+        p = xyplot(y ~ x | Block, data = df, xlab = X.label, ylab = Y.label, main = main,
+                   scales = list(x = list(relation = "free", limits = c(-1, 1)),
+                                 y = list(relation = "free", limits = c(-1, 1))),
+                   col = "white",
+        )
+        print(p)
+        
+        panels = trellis.currentLayout(which = "panel")
+        for (k in 1 : length(cord.X)) {
+          ind = which(panels == k, arr.ind = TRUE)
+          trellis.focus("panel",ind[2], ind[1])
+  
+          if (var.names[k]){
+            panel.text(x = df[c((ind.group[k] + 1) : ind.group[k + 1]), "x"],
+                       y = df[c((ind.group[k] + 1) : ind.group[k + 1]), "y"],
+                       df[c((ind.group[k] + 1) : ind.group[k + 1]), "names"],
+                       col = df[c((ind.group[k] + 1) : ind.group[k + 1]), "col"],
+                       cex = df[c((ind.group[k] + 1) : ind.group[k + 1]), "cex"],
+                       font = df[c((ind.group[k] + 1) : ind.group[k + 1]), "font"]) 
+          } else {
+            panel.points(x = df[c((ind.group[k] + 1) : ind.group[k + 1]), "x"],
+                         y = df[c((ind.group[k] + 1) : ind.group[k + 1]), "y"],
+                         col = df[c((ind.group[k] + 1) : ind.group[k + 1]), "col"],
+                         cex = df[c((ind.group[k] + 1) : ind.group[k + 1]), "cex"],
+                         pch = df[c((ind.group[k] + 1) : ind.group[k + 1]), "pch"])               
+          }
+          
+          for (i in 1 : length(c("Main circle", "Inner circle"))){
+            panel.lines(x = circle[circle$Circle %in% c("Main circle", "Inner circle")[i], "x"],
+                        y = circle[circle$Circle %in% c("Main circle", "Inner circle")[i], "y"],
+                        col = "black")
+          }
+        }   
+        trellis.unfocus()
+      }
+    }
+    #-- End: Lattice
+    
+    #-- Start: graphics
+    if(style=="graphics") {
+      
+      if (overlap) {
+        plot(df$x, df$y, type = "n", xlab = X.label, ylab = Y.label, main = "", xlim = c(-1, 1), ylim = c(-1, 1))
+      
+        #-- Display sample or row.names
+        for (i in 1 : length(var.names)){
+          if (var.names[i]) {
+            text(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+                 y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                 labels = df[c((ind.group[i] + 1) : ind.group[i + 1]), "names"],
+                 col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                 cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                 font = df[c((ind.group[i] + 1) : ind.group[i + 1]), "font"])
+          } else {
+            points(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+                   y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                   col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                   cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                  pch = df[c((ind.group[i] + 1) : ind.group[i + 1]), "pch"])
+          }
+        }
+        
+        #-- Abline
+        if (abline.line)
+          abline(v = 0, h = 0, lty = 2)
+        
+        #-- Ellipse        
+        for (i in c("Main circle", "Inner circle")){
+          lines(x = circle[circle$Circle == i, "x"], y = circle[circle$Circle == i, "y"], col = "black")
+        }
+        
+        title(main, outer = TRUE, line = -1)
+      } else {      
+        opar <- par()[! names(par()) %in% c("cin", "cra", "csi", "cxy", "din", "page")]
+        #-- Define layout
+        layout(matrix(1 : (ceiling(length(cord.X)/2) * 2), ceiling(length(cord.X)/2), min(length(cord.X), 2), byrow = TRUE))
+      
+        for (k in 1 : length(cord.X)){
+          #-- initialise plot
+          plot(df[df$Block %in% paste0("Block: ", blocks[k]), "x" ],
+               df[df$Block %in% paste0("Block: ", blocks[k]), "y" ],
+               type = "n", xlab = X.label, ylab = Y.label, main = paste0("Block: ", blocks[k]),
+               xlim = c(-1, 1), ylim = c(-1, 1))
+          
+          #-- Display sample or row.names
+          if (var.names[k]) {
+            text(x = df[df$Block %in% paste0("Block: ", blocks[k]), "x"],
+                 y = df[df$Block %in% paste0("Block: ", blocks[k]), "y"],
+                 labels = df[df$Block %in% paste0("Block: ", blocks[k]), "names"],
+                 col = df[df$Block %in% paste0("Block: ", blocks[k]), "col"], 
+                 cex = df[df$Block %in% paste0("Block: ", blocks[k]), "cex"],
+                 font = df[df$Block %in% paste0("Block: ", blocks[k]), "font"])
+          } else {
+            points(x = df[df$Block %in% paste0("Block: ", blocks[k]), "x"],
+                   y = df[df$Block %in% paste0("Block: ", blocks[k]), "y"],
+                   col = df[df$Block %in% paste0("Block: ", blocks[k]), "col"], 
+                   cex = df[df$Block %in% paste0("Block: ", blocks[k]), "cex"], 
+                   pch = df[df$Block %in% paste0("Block: ", blocks[k]), "pch"])
+          }
+        }
+        
+        #-- Abline
+        if (abline.line)
+          abline(v = 0, h = 0, lty = 2)
+        
+        #-- Ellipse        
+        for (i in c("Main circle", "Inner circle")){
+          lines(x = circle[circle$Circle == i, "x"], y = circle[circle$Circle == i, "y"], col = "black")
+        }
+        
+        title(main, outer = TRUE, line = -1)
+        if (length(cord.X) != (round(length(cord.X)/2) * 2) & length(cord.X) != 1)
+          plot(1,1, type = "n", axes = FALSE, ann = FALSE)
+        par(opar)
+      }
+    }
+    #-- End: graphics
+    return(invisible(df))
   }

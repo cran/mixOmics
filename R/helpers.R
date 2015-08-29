@@ -212,8 +212,12 @@ defl.select = function(yy, rr, nncomp, nn, nbloc, indY = NULL, mode = "canonical
     } else {
       resdefl[[q]] <- rr[[q]]
       pdefl[[q]]   <-  rep(0,NCOL(rr[[q]]))
-    }
+    }    
   }
+  
+  if(!is.null(names(rr)))
+    names(resdefl) = names(rr)
+  
   return(list(resdefl=resdefl,pdefl=pdefl))
 }
 

@@ -760,7 +760,7 @@ perf.splsda <- function(object,
     #remove the NA value that was added for initialisation
     remove.na = which(is.na(features[[k]]))
     # then summarise as a factor and output the percentage of appearance
-    list.features[[k]] = sort(summary(as.factor(features[[k]][-remove.na]))/M, decreasing = TRUE)
+    list.features[[k]] = sort(table(as.factor(features[[k]][-remove.na]))/M, decreasing = TRUE)
   }
   
 

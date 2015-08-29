@@ -1,6 +1,6 @@
-5c7ed0a5bd3bdf72e8166cc43e4755be *DESCRIPTION
-034359fe59f8e21bd5b7bad10adf5f3d *NAMESPACE
-de23ea3e6253e2f0fcdd583f2e1d3ac0 *NEWS
+96b280346c078fc2e79b308e856077b3 *DESCRIPTION
+cb00649944bc419f2e69862ab4553df2 *NAMESPACE
+f9d86c052b653d51ca6a479e0914872b *NEWS
 5ba9697aedee8a896bac8eb9e3ca8863 *R/Mfold.R
 3890b3f76e61e17f012dcb04bd9c6d05 *R/bin.color.R
 9a90b441be947e705926d7b50efc46d8 *R/cim.R
@@ -8,7 +8,7 @@ de23ea3e6253e2f0fcdd583f2e1d3ac0 *NEWS
 ad6748bd258543958c528a624570198a *R/color.jet.R
 963682c37404bd2c0533a0b508ffdece *R/color.mixo.R
 f230796b142bdd2273a5805edf3e8aa6 *R/color.spectral.R
-4327c94d788d6ccd807f74893a1de09f *R/helpers.R
+c474f8b720756ab4b5498f8291bbf517 *R/helpers.R
 551bf69a430a60c7fdc0fa589717aace *R/ica.def.R
 497e9f99d703f93161a9e03343488a80 *R/ica.par.R
 7079c4d643524d85bf5b8ef1a2b9cfed *R/image.tune.rcc.R
@@ -25,7 +25,7 @@ c701c0ba128b00f9760bb9926316a9c5 *R/network.R
 27a6a6fb60e4e9e430e33c730d529f62 *R/nipals.R
 a5cd57f33da952774265401e70c3c600 *R/pca.R
 eee5b8f9becd5d4789f23d18b56f5084 *R/pcasvd.R
-ce08ca388427912d5fb7b090dc0ac430 *R/perf.R
+7f61ee56cc3df33e14c0eb49d84860e9 *R/perf.R
 aafd9f43253bb968eb4902479ac95516 *R/pheatmap.multilevel.R
 462e9ed4662c0a4dfafc921c47bd041c *R/pheatmap.multilevel.splsda1fact.R
 01046c2163a9129540cf65b81c36bd23 *R/pheatmap.multilevel.splsda2fact.R
@@ -35,8 +35,8 @@ c33ae57dfdb31ec6d0cfc018c803fc30 *R/plot.rcc.R
 e6ef9ccd68bdb91b797890bb16e54031 *R/plot3dIndiv.R
 321889aacf917114272bee486aa77c6b *R/plot3dVar.R
 39bc2c205e4ca96056697efe2c767f01 *R/plotContrib.R
-4cf9e9f114fdb193b25a5e2aadebe5bf *R/plotIndiv.R
-6ccbfbc95934285a168f3002e06e5bdd *R/plotVar.R
+fbcd96e72f4440949279eb002ebede9b *R/plotIndiv.R
+5e9d2dfeb7a638ada3bc9d45e7ef8229 *R/plotVar.R
 b749b730b41a2b473e14cbf968b82835 *R/pls.R
 8e00f8aecc86052684c0cc160d927407 *R/plsda.R
 e4a9e880c4188b3f419b6df66090cdaf *R/predict.R
@@ -47,7 +47,7 @@ b18dc194b028e4f4ef3ba50080591ebe *R/print.methods.R
 ce77359b20d220de5e8e95fae3becde5 *R/selectVar.R
 fdf675cd5f20f151b9b98be5a42b73e7 *R/sipca.R
 ca4f9e39632ad2751ee251172176a799 *R/spca.R
-e13d36650d580601e318498964972fe1 *R/spls.R
+65f15038b0538633b0fe5806044df0cd *R/spls.R
 a01f3c7d7811956ddd29d53dae4b91e6 *R/splsda.R
 f8b24e89123584487aaef71ad631cca0 *R/srgcca.R
 008a22be3144e39ec2b5190960b607fb *R/summary.R
@@ -101,8 +101,8 @@ d57f8c042928e2b007d7d316c17ea7bb *man/pcatune.Rd
 ee3e7ba91c966799638a53ee4f60e7b0 *man/plot3dIndiv.Rd
 9608998aac25b27b8b6c6fc4c74f1e43 *man/plot3dVar.Rd
 f03e4f4ef496b0c5c531c2bb7a508503 *man/plotContrib.Rd
-d28c3b0db43ca2a8505073e34196ffec *man/plotIndiv.Rd
-4aa35c23db3feb953a3a1c06f5d6fcf6 *man/plotVar.Rd
+57db0247c6c990253c4d6388a23dc613 *man/plotIndiv.Rd
+2009564ac595dc9ea66621e71ef99e41 *man/plotVar.Rd
 2577d5e162fb78ec7566876c4746a8e6 *man/pls.Rd
 0535e661630c9102e095e70eba078fd7 *man/plsda.Rd
 341bae7909f54e4a3df0cf9104776513 *man/predict.Rd
@@ -112,8 +112,8 @@ bd1d57202d2109c85c861dc18c92fa20 *man/print.methods.Rd
 3c8a4ff70af52e106060daf0b0bf7a1c *man/s.match.Rd
 fc0d5bfae5d60c580479bc856f2bcf4d *man/scatterutil.Rd
 90638559cc00665cd0906f32d2a2a2df *man/selectVar.Rd
-23e5325ad54382e2bafd59bf994b1738 *man/sipca.Rd
-9f612e9a77280f5b64564a8533942685 *man/spca.Rd
+60fe6d4ec690f748427f011271c1a8e2 *man/sipca.Rd
+4023905229430dfacc4f725078f1092b *man/spca.Rd
 2887e49a8a8f06142d33c01718883277 *man/spls.Rd
 adbd3b7ef94a4fded6dcc5c2892a60c0 *man/splsda.Rd
 1d2dce9d413f1f68992559ac734bdd7c *man/srbct.Rd

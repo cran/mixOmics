@@ -261,8 +261,7 @@ function(X,
         }
          
         #-- deflation des matrices --#
-        if (na.X)
-        {
+        if (na.X) {
             X.aux = X.temp
             X.aux[is.na.X] = 0
             c = crossprod(X.aux, t)	
@@ -273,7 +272,6 @@ function(X,
         }else{
             c = crossprod(X.temp, t) / drop(crossprod(t))
         }	
-		
         X.temp = X.temp - t %*% t(c)   
          
         #-- mode canonique --#

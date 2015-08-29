@@ -1,4 +1,23 @@
-Changes in 5.1.1 (minor ++ release)
+
+Changes in 5.1.2 (patches)
+================
+
+Enhancements:
+-------------
+1 - plotIndiv: the argument col is back! see our help file. 
+
+2 - plotVar has been dramatically improved with more efficient coding (not a S3method anymore) and availability of different plotting styles with 'ggplot2', 'lattice' or 'graphics'.
+
+
+Bug fixes:
+----------
+- plotIndiv: X and Y.label fixed, par() bug fixed
+
+-rgcca tau parameter output enhanced.
+
+
+
+Changes in 5.1.1 (major release)
 ================
 
 New features:

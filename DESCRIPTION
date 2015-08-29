@@ -1,7 +1,7 @@
 Package: mixOmics
 Type: Package
 Title: Omics Data Integration Project
-Version: 5.1.1
+Version: 5.1.2
 Date: 2015-07-30
 Depends: R (>= 2.10), MASS, lattice, ggplot2
 Imports: igraph, rgl, pheatmap, ellipse
@@ -27,6 +27,6 @@ URL: http://www.mixOmics.org
 BugReports: mixomics@math.univ-toulouse.fr or
         https://bitbucket.org/klecao/package-mixomics/issues
 Repository: CRAN
-Date/Publication: 2015-07-30 09:59:32
-Packaged: 2015-07-30 03:36:49 UTC; florian
+Date/Publication: 2015-08-29 09:26:37
+Packaged: 2015-08-29 00:12:30 UTC; klecao
 NeedsCompilation: no
