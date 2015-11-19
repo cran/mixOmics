@@ -1,5 +1,5 @@
-# Copyright (C) 2009 
-# Kim-Anh Le Cao, 
+# Copyright (C) 2009
+# Kim-Anh Le Cao,
 # Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
 #
 # This program is free software; you can redistribute it and/or
@@ -25,131 +25,68 @@ selectVar <-
 function(...) UseMethod("selectVar")
 
 
-
-# ------------------ for (psarse) PLS object --------------------
-selectVar.pls = selectVar.spls =function(object, comp =1, ...){
-  
-  if(comp > object$ncomp) stop('The comp value you indicated is larger than the fitted model')
-  
-  # variables from data set X
-  # name of selected variables
-  name.var.X = names(sort(abs(object$loadings$X[,comp]), decreasing = T)[1:sum(object$loadings$X[,comp]!=0)])
-  #value on the loading vector
-  value.var.X = object$loadings$X[name.var.X,comp]
-  
-  # variables from data set Y
-  # name of selected variables
-  name.var.Y = names(sort(abs(object$loadings$Y[,comp]), decreasing = T)[1:sum(object$loadings$Y[,comp]!=0)])
-  #value on the loading vector
-  value.var.Y = object$loadings$Y[name.var.Y,comp]
-  
-  return(
-    list(name.X = name.var.X, value.X = data.frame(value.var.X), name.Y = name.var.Y, value.Y = data.frame(value.var.Y), comp = comp)
-  )
-  
+get.name.and.value=function(x,comp)
+{
+    name.var=names(sort(abs(x[,comp]), decreasing = T)[1:sum(x[,comp]!=0)])
+    value.var=x[name.var,comp]
+    return(list(name = name.var, value = data.frame(value.var)))
 }
 
 
-# ------------------ for (sparse) PLS-DA object --------------------
-selectVar.plsda =  selectVar.splsda =function(object, comp=1, ...){
-  
-  if(comp > object$ncomp) stop('The comp value you indicated is larger than the fitted model')
-  
-  # variables from data set X
-  name.var = names(sort(abs(object$loadings$X[,comp]), decreasing = T)[1:sum(object$loadings$X[,comp]!=0)])
-  #value on the loading vector
-  value.var = object$loadings$X[name.var,comp]
-  
-  return(
-    list(name = name.var, value = data.frame(value.var), comp = comp)
-  )
-}
+# ------------------ for all object  --------------------
+selectVar.pls  = selectVar.plsda  =
+selectVar.sgcca = selectVar.rgcca = 
+selectVar.pca =selectVar.sipca=
+function(object, comp =1, block=NULL, ...)
+{
 
-
-
-# ------------------ for (sparse) PCA object --------------------
-selectVar.pca = selectVar.spca =function(object, comp=1, ...){
-  
-  if(comp > object$ncomp) stop('The comp value you indicated is larger than the fitted model')
-  
-  # variables from data set X
-  name.var = names(sort(abs(object$rotation[,comp]), decreasing = T)[1:sum(object$rotation[,comp]!=0)])
-  #value on the loading vector
-  value.var = object$rotation[name.var,comp]
-  
-  return(
-    list(name = name.var, value = data.frame(value.var), comp = comp)
-  )
-}
-
-# ------------------ for siPCA object --------------------
-selectVar.sipca = function(object, comp=1, ...){ 
-  
-  if(comp > object$ncomp) stop('The comp value you indicated is larger than the fitted model')
-  
-  # variables from data set X
-  name.var = names(sort(abs(object$loadings[,comp]), decreasing = T)[1:object$keepX[comp]])
-  #value on the loading vector
-  value.var = object$loadings[name.var,comp]
-  
-  return(
-    list(name = name.var, value = data.frame(value.var), comp = comp)
-  )
-}
-
-
-
-# ------------------ for sgcca object --------------------
-
-selectVar.sgcca = function(object, block = NULL, comp = 1, ...){ 
-  
-  # check arguments
-  # -----------------
-  if(length(comp) > 1)
+    # check arguments
+    # -----------------
+    if(length(comp) > 1)
     stop("Expecting one single value for 'comp'")
-  if(is.null(block)){
-    if(any(comp > object$ncomp))
-      stop("'comp' is greater than the number of components in the fitted model,
-         you need to specify the variable 'block' ")
-  }else{
-    if(any(comp > object$ncomp[block]))
-      stop("'comp' is greater than the number of components in the fitted model for the block you specified")
+    if(is.null(block)){
+        if(any(comp > object$ncomp))
+        stop("'comp' is greater than the number of components in the fitted model")
+    }else{
+        if(any(comp > object$ncomp[block]))
+        stop("'comp' is greater than the number of components in the fitted model for the block you specified")
+    }
     
-  }
-  
-  
-  # extract selected variables
-  # --------------------------
-  keep = list()
-  name.var = value.var = list()
-  if(is.null(block)){
-    # identify the selected variables selected on a given component comp
-    for(k in 1:length(object$data)){
-      keep[[k]] = abs(object$loadings[[k]][,comp])> 0      
-    }   
-    #store name and value of the selected variables
-    for(k in 1:length(object$data)){
-      name.var[[k]] = names(which(keep[[k]] == TRUE))   #object$names$var[keep[[k]]]
-      value.var[[k]] = object$loadings[[k]][keep[[k]], comp]
+    if(is.null(block))
+    {
+        null.block=TRUE
+        block=1:length(object$loadings)
+    }else{null.block=FALSE}
+    
+    # main function: get the names and values of the non zero loadings
+    # -----------------
+    out=lapply(object$loadings[block],get.name.and.value,comp=comp)
+    
+    
+    # outputs
+    # ----------
+    #if all blocks are considered by default (null.block=TRUE) and it's a DA analysis, then we don't show Y
+    if(null.block)
+    {
+        if(length(grep("plsda",class(object)))>0)
+        {
+            out=out[-2] #remove Y
+            out=out[[1]]
+        }
+        if(length(grep("sgccda",class(object)))>0)
+        {
+            out=out[-object$indY] #remove Y
+        }
     }
-  }else{ #end is.null(block)
-    j=1
-    # identify the selected variables selected on a given component ncomp.select
-    for(k in block){
-      keep[[j]] = abs(object$loadings[[k]][,comp])> 0
-      j=j+1        
-    }   
-    l=1
-    for(k in block){
-      name.var[[l]] = names(which(keep[[l]] == TRUE))  
-      value.var[[l]] = object$loadings[[k]][keep[[l]], comp]
-      l = l+1
+    
+    if(length(grep("pca",class(object)))>0 | length(grep("sipca",class(object)))>0)
+    {
+        out=out[[1]]
     }
-  } # end is.null (block)
-  
-  return(
-    list(name.var = name.var, value.var = value.var, comp = comp)
-  )
-  
+    
+    #we add comp as an output
+    out$comp=comp
+    
+    return(out)
 }
 

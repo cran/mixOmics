@@ -23,7 +23,7 @@
 # rgcca for multiple integration  and a regularisation parameter tau
 #--------------------------------------
 wrapper.rgcca <- function (blocks, 
-                           design = NULL, 
+                           design =  1 - diag(length(blocks)), 
                            ncomp = rep(2, length(blocks)), 
                            tau = "optimal",
                            scheme = "centroid", 
@@ -52,7 +52,7 @@ wrapper.rgcca <- function (blocks,
 # sgcca for multiple integration with variable selection in each block (lasso penalisation)
 #--------------------------------------
 wrapper.sgcca <- function (blocks, 
-                           design = NULL, 
+                           design =  1 - diag(length(blocks)),
                            penalty = NULL, 
                            ncomp = rep(2, length(blocks)),
                            keep = NULL, 
@@ -64,6 +64,7 @@ wrapper.sgcca <- function (blocks,
                            verbose = FALSE, 
                            near.zero.var = FALSE
                            ) {
+  
   
     # note here: mode is hard coded as canonical
   result.sgcca = srgcca(blocks = blocks, indY = NULL, design = design, tau = rep(1, length(blocks)), 
@@ -109,7 +110,7 @@ wrapper.sgccda <- function(
   }
   
   #-- ncomp
-  if (!is.vector(ncomp, mode = "double"))
+  if (!is.vector(ncomp, mode = "numeric"))
     stop("'ncomp' must be a vector")
   
   if (length(ncomp) == length(blocks)){
@@ -134,17 +135,18 @@ wrapper.sgccda <- function(
     message("'keep' has changed and include Y as a block")
   }
   
+  # merge blocks and Y only to run srgcca, the output "blocks" will not contain Y
   blocks[[length(blocks) + 1]] = ind.mat
   names(blocks)[length(blocks)] = "Y"
     
   # note here: mode is hard coded as regression as we are performing a supervised analysis w.r.t Y
-  result.sgccada = srgcca(blocks = blocks, indY = length(blocks), design = design, tau = rep(1, length(blocks)), 
+  result.sgccada = srgcca(blocks = blocks, indY = length(blocks), design = design, tau = rep(1, length(blocks)),
                         ncomp = ncomp, scheme = scheme, scale = scale, bias = bias, init = "svd.da", 
                         tol = tol, verbose = verbose, mode = "regression", max.iter = max.iter,
                         keep = keep, near.zero.var = near.zero.var, penalty = NULL)
   
   result.sgccada$Y = Y
-  result.sgccada$ind.mat = ind.mat;
+  result.sgccada$ind.mat = ind.mat
   result.sgccada$class = c("sgccda","sgcca")
   class(result.sgccada) = c("sgccda","sgcca")
   return(invisible(result.sgccada))

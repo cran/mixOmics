@@ -58,8 +58,8 @@ actually  done with the singular values of the data matrix).}
 \author{Ignacio Gonzalez and Leigh Coonan}
 
 \seealso{\code{\link{nipals}}, \code{\link{biplot}}, 
-\code{\link{plotIndiv}}, \code{\link{plotVar}},
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}} and http://www.mixOmics.org for more details.}
+\code{\link{plotIndiv}}, \code{\link{plotVar}}
+and http://www.mixOmics.org for more details.}
 
 \examples{
 data(liver.toxicity)

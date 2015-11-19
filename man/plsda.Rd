@@ -62,7 +62,7 @@ Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Edit
 
 \seealso{\code{\link{splsda}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}, \code{\link{predict}}, \code{\link{perf}} and http://mixOmics.org for more details.}
+\code{\link{predict}}, \code{\link{perf}} and http://mixOmics.org for more details.}
 
 \examples{
 ## First example

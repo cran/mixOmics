@@ -27,12 +27,14 @@
 
 plotVar <-
   function(object,
-           comp = c(1, 2),
-           comp.select = NULL,
+           comp = NULL,
+           comp.select = comp,
+           plot=TRUE,
            var.names = NULL,
            blocks = NULL, # to choose which block data to plot, when using GCCA module
            X.label = NULL,
            Y.label = NULL,
+           Z.label = NULL,
            abline.line = TRUE,
            col,
            cex,
@@ -41,16 +43,58 @@ plotVar <-
            cutoff = 0,
            rad.in = 0.5,
            main="Correlation Circle Plots",
-           style="ggplot2", # can choose between graphics, lattice or ggplot2,
+           add.legend = FALSE,
+           style="ggplot2", # can choose between graphics,3d, lattice or ggplot2,
            overlap = TRUE,
-           ...)
+           axes.box = "all", 
+           label.axes.box = "both"  )
 {
     
     class.object = class(object)
-    
     object.pls=c("pls","spls","splsda","plsda","mlspls","mlsplsda","rcc")
     object.pca=c("ipca","sipca","pca","spca")
     object.blocks=c("sgcca","rgcca", "sgccda")
+    
+    #-- check that the user did not enter extra arguments
+    arg.call = match.call()
+    user.arg = names(arg.call)[-1]
+    
+    err = tryCatch(mget(names(formals()), sys.frame(sys.nframe())), 
+                   error = function(e) e)
+    
+    if ("simpleError" %in% class(err))
+      stop(err[[1]], ".", call. = FALSE)
+    
+    #-- style
+    if (!style %in% c("ggplot2", "lattice", "graphics","3d"))
+      stop("'style' must be one of 'ggplot2', '3d' , lattice' or 'graphics'.", call. = FALSE)
+    
+    #-- plot
+    if (length(plot) > 1)
+      stop("'plot' must be single logical value.", call. = FALSE)
+    else if (!is.logical(plot))
+      stop("'plot' must be logical.", call. = FALSE)
+    if(!plot)
+      {
+      style="N"}
+    
+    #-- axes.box
+    if(style=="3d")
+    {choices = c("axes", "box", "bbox", "all")
+    axes.box = choices[pmatch(axes.box, choices)]
+    
+    if (is.na(axes.box)) 
+      stop("'axes.box' should be a subset of {'axes', 'box', 'bbox', 'all'}.", 
+           call. = FALSE)
+    
+    #-- label.axes.box
+    choices = c("axes", "box", "both")
+    label.axes.box = choices[pmatch(label.axes.box, choices)]
+    
+    if (is.na(label.axes.box)) 
+      stop("'label.axes.box' should be one of 'axes', 'box' or 'both'.", 
+           call. = FALSE)}
+    
     
     ### Start: Validation of arguments
     ncomp = object$ncomp
@@ -85,37 +129,120 @@ plotVar <-
     }
     
     #-- ellipse.level
-    if ((rad.in > 1) | (rad.in < 0))
-      stop("The value taken by 'rad.in' must be between 0 and 1")
+    if (!is.numeric(rad.in) | (rad.in > 1) | (rad.in < 0))
+      stop("The value taken by 'rad.in' must be between 0 and 1", call. = FALSE)
     
     #-- cutoff correlation
-    if ((cutoff > 1) | (cutoff < 0))
-      stop("The value taken by 'cutoff' must be between 0 and 1")
+    if (!is.numeric(cutoff) | (cutoff > 1) | (cutoff < 0))
+      stop("The value taken by 'cutoff' must be between 0 and 1", call. = FALSE)
     
     #-- comp
-    if (length(comp) != 2)
-      stop("'comp' must be a numeric vector of length 2.")      
+    if(is.null(comp))
+      {if (style=="3d")
+          comp=c(1:3)
+        else
+          comp=c(1:2)}
+    if (length(comp) != 2 && !(style=="3d"))
+      stop("'comp' must be a numeric vector of length 2.", call. = FALSE) 
+    else if(length(comp) != 3 && (style=="3d"))
+      stop("'comp' must be a numeric vector of length 3.", call. = FALSE)
+      
     
     if (!is.numeric(comp))
       stop("Invalid vector for 'comp'.")
     
     if (any(ncomp < max(comp)) || min(comp) <= 0)
-      stop("Each element of 'comp' must be positive smaller or equal than ", max(object$ncomp), ".", call. = FALSE)
+      stop("Each element of 'comp' must be positive smaller or equal than ", min(object$ncomp), ".", call. = FALSE)
     
     comp1 = round(comp[1]); comp2 = round(comp[2])
+    if (style=="3d") comp3 = round(comp[3])
     
     #-- comp.select
     if (!is.null(comp.select)){
       if (!is.numeric(comp.select))
-        stop("Invalid vector for 'comp'.")
-    
+        stop("Invalid vector for 'comp'.", call. = FALSE)
+      
       if (any(ncomp < max(comp.select)) || min(comp.select) <= 0)
         stop("Each element of 'comp.select' must be positive and smaller or equal than ", max(object$ncomp), ".", call. = FALSE)
     }
-      
+    
+    #-- abline.line
+    if (length(abline.line) > 1)
+      stop("'abline.line' must be single logical value.", call. = FALSE)
+    else if (!is.logical(abline.line))
+      stop("'abline.line' must be logical.", call. = FALSE)
+    
+    
+    #-- add.legend
+    if (length(add.legend) != 1 || !is.logical(add.legend))
+      stop("'add.legend' must be a logical value.", call. = FALSE)
+    
     #-- Start: Retrieve variates from object
     cord.X = sample.X = ind.var.sel = list()
-    if (class.object[1] %in%  c(object.pls, object.blocks)) {
+    if(style=="3d")
+    {
+      if (class.object[1] %in%  c(object.pls, object.blocks)) {
+        if (class.object[1] == "rcc"){
+          cord.X[[1]] = cor(object$X, object$variates$X[, c(comp1, comp2, comp3)] + object$variates$Y[, c(comp1, comp2, comp3)], use = "pairwise")
+          cord.X[[2]] = cor(object$Y, object$variates$X[, c(comp1, comp2, comp3)] + object$variates$Y[, c(comp1, comp2, comp3)], use = "pairwise")
+          sample.X = lapply(cord.X, function(x){1 : nrow(x)})
+        } else if (class.object[1] %in%  "pls") {
+          cord.X[[1]] = cor(object$X, object$variates$X[, c(comp1, comp2, comp3)], use = "pairwise")
+          cord.X[[2]] = cor(object$Y, if(object$mode ==  "canonical"){object$variates$Y[, c(comp1, comp2, comp3)]} else {object$variates$X[, c(comp1, comp2, comp3)]}, use = "pairwise")
+          sample.X = lapply(cord.X, function(x){1 : nrow(x)})
+        } else if (class.object[1] %in% "plsda"){
+          cord.X[[1]] = cor(object$X, object$variates$X[, c(comp1, comp2, comp3)], use = "pairwise")
+          sample.X = lapply(cord.X, function(x){1 : nrow(x)})
+        } else if (class.object[1] %in%  c("spls", "mlspls")){
+          cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2, comp3), function(x){selectVar(object, comp = x)$X$name})))],
+                            object$variates$X[, c(comp1, comp2, comp3)], use = "pairwise")
+          cord.X[[2]] = cor(object$Y[, colnames(object$Y) %in% unique(unlist(lapply(c(comp1, comp2, comp3), function(x){selectVar(object, comp = x)$Y$name})))],
+                            if(object$mode ==  "canonical"){object$variates$Y[, c(comp1, comp2, comp3)]} else {object$variates$X[, c(comp1, comp2, comp3)]}, use = "pairwise")
+          ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
+          ind.var.sel[[2]] = sample.X[[2]] = 1 : length(colnames(object$Y))
+          if (!is.null(comp.select)) {
+            cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$X$name}))), ,drop = FALSE]
+            cord.X[[2]] = cord.X[[2]][row.names(cord.X[[2]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$Y$name}))), , drop = FALSE]
+          }
+          ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[1]]))
+          ind.var.sel[[2]] = which(colnames(object$Y) %in% rownames(cord.X[[2]]))
+        } else if (class.object[1] %in%  c("splsda", "mlsplsda")){
+          cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2, comp3, comp.select), function(x){selectVar(object, comp = x)$name})))],
+                            object$variates$X[, c(comp1, comp2, comp3, comp.select)], use = "pairwise")      
+          ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
+          if (!is.null(comp.select)) {
+            cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name}))), ,drop = FALSE]
+          }
+          ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[1]]))
+        } else {
+          cord.X = lapply(blocks, function(x){cor(object$blocks[[x]], object$variates[[x]][, c(comp1, comp2, comp3)], use = "pairwise")})
+          ind.var.sel = sample.X = lapply(object$blocks, function(x){1 : ncol(x)})
+          if (!is.null(comp.select)) {
+            cord.X = lapply(1 : length(cord.X), function(z){cord.X[[z]][row.names(cord.X[[z]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, block = z, comp = x)[[1]]$name}))), ,drop = FALSE]})
+          }
+          for (i in 1 : length(cord.X)){
+            ind.var.sel[[i]] = which(colnames(object$X) %in% rownames(cord.X[[i]]))
+          }
+        }
+      } else if (class.object[1] %in%  object.pca) {
+        if (class.object[1] %in%  c("sipca", "spca")){
+          
+            cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2, comp3), function(x){selectVar(object, comp = x)$name})))],
+                              object$x[, c(comp1, comp2, comp3)], use = "pairwise")
+          ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
+          if (!is.null(comp.select)) {
+            cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name}))), ,drop = FALSE]
+          }
+          ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[1]]))
+        } else {
+          
+            cord.X[[1]] = cor(object$X, object$x[, c(comp1, comp2, comp3)], use = "pairwise")
+          ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
+        }
+      }
+    }
+    else
+    {if (class.object[1] %in%  c(object.pls, object.blocks)) {
       if (class.object[1] == "rcc"){
         cord.X[[1]] = cor(object$X, object$variates$X[, c(comp1, comp2)] + object$variates$Y[, c(comp1, comp2)], use = "pairwise")
         cord.X[[2]] = cor(object$Y, object$variates$X[, c(comp1, comp2)] + object$variates$Y[, c(comp1, comp2)], use = "pairwise")
@@ -128,15 +255,15 @@ plotVar <-
         cord.X[[1]] = cor(object$X, object$variates$X[, c(comp1, comp2)], use = "pairwise")
         sample.X = lapply(cord.X, function(x){1 : nrow(x)})
       } else if (class.object[1] %in%  c("spls", "mlspls")){
-        cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$name.X})))],
+        cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$X$name})))],
                           object$variates$X[, c(comp1, comp2)], use = "pairwise")
-        cord.X[[2]] = cor(object$Y[, colnames(object$Y) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$name.Y})))],
+        cord.X[[2]] = cor(object$Y[, colnames(object$Y) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$Y$name})))],
                           if(object$mode ==  "canonical"){object$variates$Y[, c(comp1, comp2)]} else {object$variates$X[, c(comp1, comp2)]}, use = "pairwise")
         ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
         ind.var.sel[[2]] = sample.X[[2]] = 1 : length(colnames(object$Y))
         if (!is.null(comp.select)) {
-          cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name.X}))), ,drop = FALSE]
-          cord.X[[2]] = cord.X[[2]][row.names(cord.X[[2]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name.Y}))), , drop = FALSE]
+          cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$X$name}))), ,drop = FALSE]
+          cord.X[[2]] = cord.X[[2]][row.names(cord.X[[2]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$Y$name}))), , drop = FALSE]
         }
         ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[1]]))
         ind.var.sel[[2]] = which(colnames(object$Y) %in% rownames(cord.X[[2]]))
@@ -152,26 +279,27 @@ plotVar <-
         cord.X = lapply(blocks, function(x){cor(object$blocks[[x]], object$variates[[x]][, c(comp1, comp2)], use = "pairwise")})
         ind.var.sel = sample.X = lapply(object$blocks, function(x){1 : ncol(x)})
         if (!is.null(comp.select)) {
-          cord.X = lapply(1 : length(cord.X), function(z){cord.X[[z]][row.names(cord.X[[z]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, block = z, comp = x)$name.var[[1]]}))), ,drop = FALSE]})
+          cord.X = lapply(1 : length(cord.X), function(z){cord.X[[z]][row.names(cord.X[[z]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, block = blocks[z], comp = x)[[1]]$name}))), ,drop = FALSE]})
         }
         for (i in 1 : length(cord.X)){
-          ind.var.sel[[i]] = which(colnames(object$X) %in% rownames(cord.X[[i]]))
+          ind.var.sel[[i]] = which(colnames(object$blocks[[i]]) %in% rownames(cord.X[[i]]))
         }
       }
     } else if (class.object[1] %in%  object.pca) {
       if (class.object[1] %in%  c("sipca", "spca")){
-        cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$name})))],
+        
+          cord.X[[1]] = cor(object$X[, colnames(object$X) %in% unique(unlist(lapply(c(comp1, comp2), function(x){selectVar(object, comp = x)$name})))],
                           object$x[, c(comp1, comp2)], use = "pairwise")
         ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
         if (!is.null(comp.select)) {
           cord.X[[1]] = cord.X[[1]][row.names(cord.X[[1]]) %in% unique(unlist(lapply(comp.select, function(x) {selectVar(object, comp = x)$name}))), ,drop = FALSE]
         }
-        ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[i]]))
+        ind.var.sel[[1]] = which(colnames(object$X) %in% rownames(cord.X[[1]]))
       } else {
-        cord.X[[1]] = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
+          cord.X[[1]] = cor(object$X, object$x[, c(comp1, comp2)], use = "pairwise")
         ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
       }
-    }
+    }}
     
     if (any(sapply(cord.X, nrow) == 0))
       stop("No variable selected on at least one block")
@@ -181,6 +309,13 @@ plotVar <-
     #-- Names of labels X and Y
     if (is.null(X.label)) X.label = paste("Component ", comp1)
     if (is.null(Y.label)) Y.label = paste("Component ", comp2)
+    if (is.null(Z.label) && style=="3d") Z.label = paste("Component ", comp3)
+    
+    if (!is.character(X.label))
+      stop("'X.label' must be a character.", call. = FALSE)
+    if (!is.character(Y.label))
+      stop("'Y.label' must be a character.", call. = FALSE)
+    
     
     #-- Function to display an error message (used for the parameters var.names, cex, col, pch and font)
     stop.message = function(argument, data){
@@ -190,27 +325,39 @@ plotVar <-
         count.data = paste(paste(sapply(data[-length(data)], length), collapse =  ", "), length(data[[length(data)]]), sep = " and ")
       }
       stop(argument, " must be either a vector of length ", length(data), 
-           " or a list of ", length(data), " vector components of length ", count.data, " respectively.")
+           " or a list of ", length(data), " vector components of length ", count.data, " respectively.",call.= FALSE)
     }
-    
+
     #-- pch argument
     missing.pch = FALSE
     if (missing(pch)) {
       missing.pch = TRUE
-      pch = unlist(lapply(1 : length(cord.X), function(x){rep(c(1:20)[x], sum(sapply(cord.X[x], nrow)))}))
-    } else if (is.vector(pch, mode = "double")) {
+      if(style=="3d")
+        pch = unlist(lapply(1 : length(cord.X), function(x){rep(c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")[x], sum(sapply(cord.X[x], nrow)))}))
+      else 
+        pch = unlist(lapply(1 : length(cord.X), function(x){rep(c(1:20)[x], sum(sapply(cord.X[x], nrow)))}))
+    
+      } else if (((is.vector(pch, mode = "double") || is.vector(pch, mode = "integer")) && !(style=="3d")) 
+                 || (is.vector(pch, mode = "character") && style=="3d")) {
       if (length(pch) != length(sample.X))
         stop.message('pch', sample.X)
       pch = unlist(lapply(1 : length(cord.X), function(x){rep(pch[x], sum(sapply(cord.X[x], nrow)))}))
-    } else if (is.list(pch)) {
+      } else if (is.list(pch)) {
       if (length(pch) != length(sample.X) || length(unlist(pch)) != sum(sapply(sample.X, length)))
         stop.message('pch', sample.X)  
       if (length(ind.var.sel) != 0)
         pch = lapply(1 : length(pch), function(x){pch[[x]][ind.var.sel[[x]]]})
       pch = unlist(pch)
-    } else {
+    } else if (style=="3d") {
+      if (!all(pch %in% c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")) && style=="3d")
+        stop("pch' must be a simple character or character vector from {'sphere', 'tetra', 'cube', 'octa', 'icosa', 'dodeca'}.", 
+             call. = FALSE)
+    }
+    else {  
       stop.message('pch', sample.X)     
     }
+    
+
     
     #-- col argument 
     if (missing(col)) {
@@ -257,7 +404,7 @@ plotVar <-
     #-- font argument
     if (missing(font)) {
       font = rep(1, sum(sapply(cord.X, nrow)))
-    } else if (is.vector(font, mode = "double")) {
+    } else if (is.vector(font, mode = "numeric")) {
       if (length(font) != length(cord.X))
         stop.message('font', sample.X)
       font = unlist(lapply(1 : length(cord.X), function(x){rep(font[x], sum(sapply(cord.X[x], nrow)))}))
@@ -281,39 +428,41 @@ plotVar <-
         var.names = rep(TRUE, length(cord.X))
       }
     } else if (is.vector(var.names, mode = "logical")) {
-      if (length(var.names) != length(cord.X))
+      if (length(var.names) == 1){
+        var.names = rep(var.names,length(cord.X))}
+      else if (length(var.names) != length(cord.X))
         stop.message('var.names', sample.X)
       var.names.list = unlist(lapply(1 : length(var.names), function(x){if(var.names[x]){rownames(cord.X[[x]])}
-                                                                   else {pch[(ind.group[x] + 1) : ind.group[x + 1]]}}))
+                                                                        else {pch[(ind.group[x] + 1) : ind.group[x + 1]]}}))
     } else if (is.list(var.names)) {
       if (length(var.names) != length(cord.X))
         stop.message('var.names', sample.X)
       
       if (sum(sapply(1 : length(var.names), function(x){if(!lapply(var.names, is.logical)[[x]]){
-                                                          if(is.null(ind.var.sel[[x]])){
-                                                            length(var.names[[x]])
-                                                          } else {
-                                                            length(var.names[[x]][ind.var.sel[[x]]])
-                                                          }
-                                                        } else {0}})) !=
-          sum(sapply(1 : length(var.names), function(x){if(!lapply(var.names, is.logical)[[x]]){nrow(cord.X[[x]])}else {0}}))){
+        if(is.null(ind.var.sel[[x]])){
+          length(var.names[[x]])
+        } else {
+          length(var.names[[x]][ind.var.sel[[x]]])
+        }
+      } else {0}})) !=
+        sum(sapply(1 : length(var.names), function(x){if(!lapply(var.names, is.logical)[[x]]){nrow(cord.X[[x]])}else {0}}))){
         stop.message('var.names', sample.X)
       }
       
       var.names.list = unlist(sapply(1 : length(var.names), function(x){if(lapply(var.names, is.logical)[[x]]){
-                                                                          if (var.names[[x]]) {
-                                                                            row.names(cord.X[[x]])
-                                                                          } else {
-                                                                            pch[(ind.group[x] + 1) : ind.group[x + 1]]
-                                                                          }
-                                                                        } else {
-                                                                          if (is.null(ind.var.sel[[x]])){
-                                                                            as.character(var.names[[x]])
-                                                                          } else {
-                                                                            as.character(var.names[[x]])[ind.var.sel[[x]]]
-                                                                          }
-                                                                        }
-                                                                        }))
+        if (var.names[[x]]) {
+          row.names(cord.X[[x]])
+        } else {
+          pch[(ind.group[x] + 1) : ind.group[x + 1]]
+        }
+      } else {
+        if (is.null(ind.var.sel[[x]])){
+          as.character(var.names[[x]])
+        } else {
+          as.character(var.names[[x]])[ind.var.sel[[x]]]
+        }
+      }
+      }))
       var.names = sapply(var.names, function(x){if(is.logical(x)){x}else{TRUE}})
     } else {
       stop.message('var.names', sample.X)
@@ -325,45 +474,52 @@ plotVar <-
     circle[[2]] = ellipse(0, levels = 1, t = rad.in)
     circle = data.frame(do.call("rbind", circle), "Circle" = c(rep("Main circle", 100), rep("Inner circle", 100)))
     #-- End: Computation ellipse
-          
+    
     #-- Start: data set  
     df = data.frame(do.call(rbind, cord.X), "Block" = paste0("Block: ", unlist(lapply(1 : length(cord.X), function(z){rep(blocks[z], nrow(cord.X[[z]]))}))))
-    names(df)[1:2] = c("x", "y")
+    if (style=="3d")
+      names(df)[1:3] = c("x", "y","z")
+    else
+      names(df)[1:2] = c("x", "y")
     
-    df$names = var.names.list
+    df$names = as.vector(var.names.list)
     
     df$pch = pch; df$cex = cex; df$col = col; df$font = font
     
     if (cutoff != 0){
-      df = df[abs(df$x) > cutoff | abs(df$y) > cutoff, ,drop = FALSE]
+      if(style=="3d")
+        df = df[abs(df$x) > cutoff | abs(df$y) > cutoff | abs(df$z) > cutoff, ,drop = FALSE]
+      else
+        df = df[abs(df$x) > cutoff | abs(df$y) > cutoff, ,drop = FALSE]
       ind.group = c(0, cumsum(table(df$Block)))
     }
+    
     if (nrow(df) == 0)
       stop("Cutoff value very high for the components ", comp1, " and ", comp2, ".No variable was selected.")
     
     if (overlap)
       df$Block = ""
     #-- End: data set
-    
+
     #-- Start: ggplot2
-    if (style == "ggplot2"){
+    if (style == "ggplot2" &  plot){
       # visible variable issues for x, y and Circle
       # according to http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when
       # one hack is to set to NULL first.
       x = y = Circle = NULL
-      
-      
+
       #-- Initialise ggplot2
-      p = ggplot(df, aes(x = x, y = y), main = main, xlab = X.label, ylab = Y.label) + theme_bw()
+      p = ggplot(df, aes(x = x, y = y), main = main, xlab = X.label, ylab = Y.label)+ theme_bw()
+      
       
       #-- Display sample or var.names
       for (i in 1 : length(var.names)){
         if (var.names[i]) {
-          p = p + geom_text(data = df[c((ind.group[i] + 1) : ind.group[i + 1]), ], 
-                            label = df[c((ind.group[i] + 1) : ind.group[i + 1]), "names"],
-                            size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
-                            color = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
-                            fontface = df[c((ind.group[i] + 1) : ind.group[i + 1]), "font"])
+            p = p + geom_text(data = df[c((ind.group[i] + 1) : ind.group[i + 1]), ],
+                              label = df[c((ind.group[i] + 1) : ind.group[i + 1]), "names"],
+                              size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                              color = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                              fontface = df[c((ind.group[i] + 1) : ind.group[i + 1]), "font"])
         } else {
           p = p + geom_point(data = df[c((ind.group[i] + 1) : ind.group[i + 1]), ], 
                              size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
@@ -377,7 +533,9 @@ plotVar <-
       p = p + labs(list(title = main, x = X.label, y = Y.label)) + facet_wrap(~ Block)
       
       #-- Remove Legend
-      p = p + theme(legend.position="none")
+   # p = p + theme(legend.position="none")
+    p=p+theme(legend.position="right")
+    
       
       #-- abline
       if (abline.line)
@@ -388,49 +546,51 @@ plotVar <-
         p = p + geom_path(data = subset(circle, Circle == i), aes_string(x = "x", y = "y"), color = "Black")
       }
       
-      p = p + scale_colour_manual(values = levels(factor(df$col))) + scale_shape_manual(values = as.numeric(levels(factor(df$pch)))) + scale_size_discrete(range = range(df$cex))
+    #  p = p + scale_colour_manual(values = levels(factor(df$col))) + scale_shape_manual(values = as.numeric(levels(factor(df$pch)))) + scale_size_discrete(range = range(df$cex))
       print(p)
-      return(invisible(df))
     }
     #-- End: ggplot2
     
     #-- Start: Lattice
-    if(style == "lattice") {
-
+    if(style == "lattice" ) {
+      legend = list(space = "right", title = "Legend", cex.title = 1.25, 
+                   points=list(col=unique(col),cex = unique(cex),pch = unique(pch)),                       
+                   text = list(blocks))
+      
       if (overlap) {
         p = xyplot(y ~ x | Block, data = df, xlab = X.label, ylab = Y.label, main = main,
                    scales = list(x = list(relation = "free", limits = c(-1, 1)),
                                  y = list(relation = "free", limits = c(-1, 1))),
-                   
+                   key=if (add.legend) {legend} else {NULL},
                    panel = function(x, y, ...) {
                      
-                                    #-- Abline
-                                    if (abline.line) {panel.abline(v = 0, lty = 2, col = "darkgrey")
-                                                      panel.abline(h = 0, lty = 2, col = "darkgrey")}
-                             
-                                    #-- Display sample or row.names
-                                    for (i in 1 : length(var.names)){
-                                      if (var.names[i]) {
-                                        panel.text(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"],
-                                                   y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
-                                                   df[c((ind.group[i] + 1) : ind.group[i + 1]), "names"],
-                                                   col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
-                                                   cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
-                                                   font = df[c((ind.group[i] + 1) : ind.group[i + 1]), "font"])
-                                      } else {
-                                        panel.points(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"],
-                                                     y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
-                                                     col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
-                                                     cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
-                                                     pch = df[c((ind.group[i] + 1) : ind.group[i + 1]), "pch"])
-                                      }
-                                    }
+                     #-- Abline
+                     if (abline.line) {panel.abline(v = 0, lty = 2, col = "darkgrey")
+                                       panel.abline(h = 0, lty = 2, col = "darkgrey")}
+                     
+                     #-- Display sample or row.names
+                     for (i in 1 : length(var.names)){
+                       if (var.names[i]) {
+                         panel.text(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"],
+                                    y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                    df[c((ind.group[i] + 1) : ind.group[i + 1]), "names"],
+                                    col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                    cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                                    font = df[c((ind.group[i] + 1) : ind.group[i + 1]), "font"])
+                       } else {
+                         panel.points(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"],
+                                      y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                      col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                      cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+                                      pch = df[c((ind.group[i] + 1) : ind.group[i + 1]), "pch"])
+                       }
+                     }
                    })
         print(p)
-      
+        
         panels = trellis.currentLayout(which = "panel")
         ind = which(panels == 1, arr.ind = TRUE)
-        trellis.focus("panel",ind[2], ind[1])
+        trellis.focus("panel",ind[2], ind[1],highlight = FALSE)
         for (i in 1 : length(c("Main circle", "Inner circle"))){
           panel.lines(x = circle[circle$Circle %in% c("Main circle", "Inner circle")[i], "x"],
                       y = circle[circle$Circle %in% c("Main circle", "Inner circle")[i], "y"],
@@ -442,14 +602,15 @@ plotVar <-
                    scales = list(x = list(relation = "free", limits = c(-1, 1)),
                                  y = list(relation = "free", limits = c(-1, 1))),
                    col = "white",
+                   key=if (add.legend) {legend} else {NULL},
         )
         print(p)
         
         panels = trellis.currentLayout(which = "panel")
         for (k in 1 : length(cord.X)) {
           ind = which(panels == k, arr.ind = TRUE)
-          trellis.focus("panel",ind[2], ind[1])
-  
+          trellis.focus("panel",ind[2], ind[1],highlight = FALSE)
+          
           if (var.names[k]){
             panel.text(x = df[c((ind.group[k] + 1) : ind.group[k + 1]), "x"],
                        y = df[c((ind.group[k] + 1) : ind.group[k + 1]), "y"],
@@ -473,15 +634,23 @@ plotVar <-
         }   
         trellis.unfocus()
       }
+      
     }
     #-- End: Lattice
     
     #-- Start: graphics
-    if(style=="graphics") {
+    if(style=="graphics" ) {
+      
       
       if (overlap) {
+        
+        if(add.legend){
+          opar = par(no.readonly = TRUE)
+          par(mai=c( 1.360000, 1.093333, 1.093333,max(strwidth("Legend","inches"),max(strwidth(blocks,"inches"))+0.3)+0.2),xpd=TRUE)     
+        }
+        
         plot(df$x, df$y, type = "n", xlab = X.label, ylab = Y.label, main = "", xlim = c(-1, 1), ylim = c(-1, 1))
-      
+        
         #-- Display sample or row.names
         for (i in 1 : length(var.names)){
           if (var.names[i]) {
@@ -496,13 +665,23 @@ plotVar <-
                    y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
                    col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
                    cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
-                  pch = df[c((ind.group[i] + 1) : ind.group[i + 1]), "pch"])
+                   pch = df[c((ind.group[i] + 1) : ind.group[i + 1]), "pch"])
           }
         }
         
+        #-- add.legend
+        if (add.legend)
+        legend(x = 1.09, y=0.2, 
+                    legend = blocks, 
+                    title="Legend",
+                    col = unique(col),
+                    pch = unique(pch), 
+                    pt.cex = unique(cex),
+                    bty = "n")
+        
         #-- Abline
         if (abline.line)
-          abline(v = 0, h = 0, lty = 2)
+          abline(v = 0, h = 0, lty = 2, xpd = FALSE)
         
         #-- Ellipse        
         for (i in c("Main circle", "Inner circle")){
@@ -510,11 +689,19 @@ plotVar <-
         }
         
         title(main, outer = TRUE, line = -1)
+        
+        if (add.legend) par(opar)
+        
       } else {      
         opar <- par()[! names(par()) %in% c("cin", "cra", "csi", "cxy", "din", "page")]
         #-- Define layout
-        layout(matrix(1 : (ceiling(length(cord.X)/2) * 2), ceiling(length(cord.X)/2), min(length(cord.X), 2), byrow = TRUE))
-      
+        mat = matrix(1 : (ceiling(length(cord.X)/2) * 2), ceiling(length(cord.X)/2), min(length(cord.X), 2), byrow = TRUE)
+        if (add.legend){
+          mat = matrix(rep(mat,each=2),nrow=nrow(mat),byrow=T)
+          mat = cbind(mat,rep(max(mat) + 1, nrow(mat)))
+        }       
+
+        layout(mat)
         for (k in 1 : length(cord.X)){
           #-- initialise plot
           plot(df[df$Block %in% paste0("Block: ", blocks[k]), "x" ],
@@ -537,23 +724,179 @@ plotVar <-
                    cex = df[df$Block %in% paste0("Block: ", blocks[k]), "cex"], 
                    pch = df[df$Block %in% paste0("Block: ", blocks[k]), "pch"])
           }
+          
+          #-- Abline
+          if (abline.line)
+            abline(v = 0, h = 0, lty = 2, xpd = FALSE)
+          
+          #-- Ellipse        
+          for (i in c("Main circle", "Inner circle")){
+            lines(x = circle[circle$Circle == i, "x"], y = circle[circle$Circle == i, "y"], col = "black")
+          }
         }
-        
-        #-- Abline
-        if (abline.line)
-          abline(v = 0, h = 0, lty = 2)
-        
-        #-- Ellipse        
-        for (i in c("Main circle", "Inner circle")){
-          lines(x = circle[circle$Circle == i, "x"], y = circle[circle$Circle == i, "y"], col = "black")
-        }
-        
-        title(main, outer = TRUE, line = -1)
-        if (length(cord.X) != (round(length(cord.X)/2) * 2) & length(cord.X) != 1)
-          plot(1,1, type = "n", axes = FALSE, ann = FALSE)
-        par(opar)
+
+       
+       title(main, outer = TRUE, line = -1)
+       if (length(cord.X) != max(mat) & length(cord.X) != 1){
+         for (i in 1 : (max(mat)-length(cord.X))){
+           plot(1,1, type = "n", axes = FALSE, ann = FALSE)
+         }
+       }
+       if (add.legend)
+         legend("center", 
+                legend = blocks, 
+                title="Legend",
+                col = unique(col),
+                pch = unique(pch), 
+                cex = unique(cex),
+                bty = "n")
+       
+       par(opar)
       }
+      
     }
     #-- End: graphics
-    return(invisible(df))
+   
+   #-- Start: 3d
+   if(style=="3d") {
+     
+     open3d()
+     par3d(windowRect = c(500, 30, 1100, 630))
+     Sys.sleep(0.5)
+     
+     if (!is.null(main)) {
+       mat = matrix(1:2, 2)
+       layout3d(mat, heights = c(1, 10), model = "inherit")
+       next3d()
+       text3d(0, 0, 0, main)  
+       next3d()
+     }
+     
+     par3d(userMatrix = rotationMatrix(pi/80, 1, -1/(100*pi), 0))
+     
+     
+  
+     
+     
+     if (add.legend) {
+       legend3d(x="right",
+                legend = blocks, 
+                col = unique(col),
+                pch = rep(16,length(unique(pch))), 
+                pt.cex = unique(cex),
+                bty="n")
+     }
+     
+     if (any(axes.box == "axes") || any(axes.box == "all"))
+       axes3d(c('x','y','z'), pos = c(0, 0, 0), nticks = 2, at = c(-1.2, 1.2), 
+              tick = FALSE, labels = "")
+     
+     for (i in 1 : length(var.names)){
+       if (var.names[i]) {
+         text3d(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+              y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+              z=df[c((ind.group[i] + 1) : ind.group[i + 1]), "z"],
+              texts = df[c((ind.group[i] + 1) : ind.group[i + 1]), "names"],
+              color = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+              cex = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"],
+              font = df[c((ind.group[i] + 1) : ind.group[i + 1]), "font"])
+       } else {
+         switch(unique(df[c((ind.group[i] + 1) : ind.group[i + 1]), "pch"]), 
+                sphere = plot3d(x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+                                y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                z=df[c((ind.group[i] + 1) : ind.group[i + 1]), "z"], type = "s", 
+                                col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"], radius = cex/20, add = TRUE),
+                tetra = shapelist3d(tetrahedron3d(), x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+                                    y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                    z=df[c((ind.group[i] + 1) : ind.group[i + 1]), "z"],
+                                    col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                    size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"]/25),
+                cube = shapelist3d(cube3d(), x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+                                   y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                   z=df[c((ind.group[i] + 1) : ind.group[i + 1]), "z"],
+                                   col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                   size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"]/30),
+                octa = shapelist3d(octahedron3d(), x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+                                   y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                   z=df[c((ind.group[i] + 1) : ind.group[i + 1]), "z"],
+                                   col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                   size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"]/17),
+                icosa = shapelist3d(icosahedron3d(), x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+                                    y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                    z=df[c((ind.group[i] + 1) : ind.group[i + 1]), "z"],
+                                    col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                    size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"]/20),
+                dodeca = shapelist3d(dodecahedron3d(), x = df[c((ind.group[i] + 1) : ind.group[i + 1]), "x"], 
+                                     y = df[c((ind.group[i] + 1) : ind.group[i + 1]), "y"],
+                                     z=df[c((ind.group[i] + 1) : ind.group[i + 1]), "z"],
+                                     col = df[c((ind.group[i] + 1) : ind.group[i + 1]), "col"],
+                                     size = df[c((ind.group[i] + 1) : ind.group[i + 1]), "cex"]/20))
+       }
+     }
+     
+     par3d(cex = 0.8)  
+     
+     #-- draws axes --#
+     if (any(axes.box == "axes") || any(axes.box == "all")) { 
+       if (any(label.axes.box == "axes") || any(label.axes.box == "both")) {	
+         text3d(1.2, -0.05, 0, texts = X.label, cex = 0.8, color = "black")
+         text3d(0, 1.27, 0, texts = Y.label, cex = 0.8, color = "black")
+         text3d(0, -0.05, 1.2, texts = Z.label, cex = 0.8, color = "black")
+       }
+       X =  c(1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09, 1.09, 1.2, 1.09,  1.09,
+              0.0, 0.0,  0.0, 0.0, 0.035, -0.035, 0.0, 0.035*sin(pi/4), -0.035*sin(pi/4), 0.0, 0.035*sin(pi/4), -0.035*sin(pi/4),
+              0.0, 0.0,  0.0, 0.0, 0.0,  0.0, 0.0, 0.035, -0.035, 0.0, 0.035*sin(pi/4), -0.035*sin(pi/4))
+       
+       Y = c(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.035, -0.035, 0.0, 0.035*sin(pi/4), -0.035*sin(pi/4),
+             1.2, 1.09,  1.09, 1.2, 1.09,  1.09, 1.2, 1.09,  1.09, 1.2, 1.09,  1.09,
+             0.0, 0.035, -0.035, 0.0, 0.0,  0.0, 0.0, 0.035*sin(pi/4), -0.035*sin(pi/4), 0.0, -0.035*sin(pi/4), 0.035*sin(pi/4))
+       
+       Z = c(0.0, 0.035, -0.035, 0.0, 0.035, -0.035, 0.0, 0.0,  0.0, 0.0, 0.035*sin(pi/4), -0.035*sin(pi/4),
+             0.0, 0.035, -0.035, 0.0, 0.0,  0.0, 0.0, 0.035*sin(pi/4), -0.035*sin(pi/4), 0.0, -0.035*sin(pi/4), 0.035*sin(pi/4),
+             1.2, 1.09,  1.09, 1.2, 1.09,  1.09, 1.2, 1.09,  1.09, 1.2, 1.09,  1.09)
+       triangles3d(x = X, y = Y, z = Z, col = "black")
+       
+     }
+     
+     points3d(1.2, 0, 0, size = 0.1, alpha = 0)  
+     points3d(0, 1.2, 0, size = 0.1, alpha = 0)
+     points3d(0, 0, 1.2, size = 0.1, alpha = 0)
+     points3d(-1.2, 0, 0, size = 0.1, alpha = 0)	
+     points3d(0, -1.2, 0, size = 0.1, alpha = 0)
+     points3d(0, 0, -1.2, size = 0.1, alpha = 0)
+     
+     #-- draws sphere --#
+     spheres3d(0, 0, 0, radius = rad.in, front = "fill", back = "fill", emission = gray(0.9), alpha = 0.4)
+     spheres3d(0, 0, 0, radius = rad.in, front = "line", back = "line", emission = gray(0.9))
+     
+     #-- draws axes/box and add axes labels --#
+     if (any(axes.box == "box") || any(axes.box == "all")) {
+       axes3d(marklen = 25)
+       box3d()
+       if (any(label.axes.box == "box") || any(label.axes.box == "both")) {
+         mtext3d(X.label, "x-+", line = 1)
+         mtext3d(Y.label, "y-+", line = 1.5)
+         mtext3d(Z.label, "z+-", line = 1)
+       }
+     }
+     
+     if (any(axes.box == "bbox") || any(axes.box == "all")) {
+       bbox3d(color = c("#333377", "black"), emission = gray(0.5), 
+              specular = gray(0.1), shininess = 5, alpha = 0.8, marklen = 25)  
+       if (any(label.axes.box == "box") || any(label.axes.box == "both")) {
+         mtext3d(X.label, "x-+", line = 1)
+         mtext3d(Y.label, "y-+", line = 1.5)
+         mtext3d(Z.label, "z+-", line = 1)
+       }
+     }
+     
+     
+   }
+   #-- End: graphics
+   if(plot){
+    return(invisible(df))}
+    else
+      return(df)
+      
   }

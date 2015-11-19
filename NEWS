@@ -1,4 +1,33 @@
 
+Changes in 5.1.3 (graphical improvements)
+================
+
+New features:
+-------------
+1 - plotArrow for PLS, sPLS, rCC,  rGCCA, sGCCA, sGCCDA is an improved version from our old s.match function (which is still available but will be soon deprecated)
+2 - rcc has a new argument method = c("ridge", "shrinkage") with shrinkage to estimate the shrinkage coefficients directly
+3 - plotIndiv directly implements 3d plots (style='3d'), including ellipses
+4 - plotVar  directly implements 3d plots (style='3d')
+5 - cim and network propose a new argument called save = c('jpeg','tiff','png','pdf') to save plots directly
+6 - biplot (from stats) now possible for sPCA
+
+Enhancements:
+-------------
+1 - network: a single function for all objects.
+2 - pheatmap.multilevel has been deprecated with the new enhancements of CIM
+3 - plot3dIndiv and plto3dVar have been deprecated  (see new features in plotIndiv and plotVar)
+4 - plotContrib also now available for sgccda object
+5 - imageMap has been deprecated (now included in cim directly)
+6 - pca also outputs 'loadings' and 'variates' to remain in the mixOmics spirit
+
+Bug fixes:
+----------
+1 - plotContrib now fixed (showed wrong contribution colors)
+2 - cim  has been fixed to show the ordered variable names after users reports (thanks!)
+3 - blank page in network when saving as a pdf solved
+
+
+
 Changes in 5.1.2 (patches)
 ================
 
@@ -14,6 +43,7 @@ Bug fixes:
 - plotIndiv: X and Y.label fixed, par() bug fixed
 
 -rgcca tau parameter output enhanced.
+
 
 
 

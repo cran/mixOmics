@@ -61,8 +61,8 @@ J L Marchini, C Heaton and B D Ripley (2010). fastICA: FastICA Algorithms to per
 }
 
 \seealso{\code{\link{ipca}}, \code{\link{pca}}, 
-\code{\link{plotIndiv}}, \code{\link{plotVar}},
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}} and http://www.mixOmics.org for more details.}
+\code{\link{plotIndiv}}, \code{\link{plotVar}}
+and http://www.mixOmics.org for more details.}
 
 \examples{
 data(liver.toxicity)
@@ -75,11 +75,13 @@ sipca.res
 plotIndiv(sipca.res, ind.names = liver.toxicity$treatment[, 4], 
           group = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
 \dontrun{
-plot3dIndiv(sipca.res, cex = 0.01,
-            col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
+plotIndiv(sipca.res, cex = 0.01,
+            col = as.numeric(as.factor(liver.toxicity$treatment[, 4])),style="3d")
 }
+# variables representation
+plotVar(sipca.res, cex = 2.5)
 \dontrun{
-plot3dVar(sipca.res, rad.in = 0.5, var.label = TRUE, cex = 0.5)
+plotVar(sipca.res, rad.in = 0.5, cex = 2.5,style="3d")
 }
 }
 

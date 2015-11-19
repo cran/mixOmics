@@ -24,97 +24,167 @@
 
 
 ipca <-
-function (X, ncomp = 3, mode = c("deflation","parallel"),
-          fun = c("logcosh", "exp"),
-          scale = FALSE, max.iter = 200,
-          tol = 1e-04, w.init= NULL)
-{
-    dim_x <- dim(X)
-    d <- dim_x[dim_x != 1]
-    if (length(d) != 2)
-        stop("data must be in a matrix form")
-    X <- if (length(d) != length(dim_x))
-        {matrix(X, d[1], d[2])}
-    else {as.matrix(X)}
-
-    alpha <- 1
+  function (X, 
+            ncomp = 2, 
+            mode = "deflation",
+            fun = "logcosh",
+            scale = FALSE, 
+            w.init = NULL,
+            max.iter = 200,
+            tol = 1e-04)
+  {
+    #-- checking general input parameters --------------------------------------#
+    #---------------------------------------------------------------------------#
     
-    mode <- match.arg(mode)
-    fun <- match.arg(fun)
+    #-- X matrix
+    if (is.data.frame(X)) X = as.matrix(X)
     
-    X.names = dimnames(X)[[2]]
-    if (is.null(X.names)) X.names = paste("X", 1:ncol(X), sep = "")
-
-    ind.names = dimnames(X)[[1]]
-    if (is.null(ind.names)) ind.names = 1:nrow(X)
-	
-    X <- scale(X, scale = FALSE)
-    if (scale) {X=scale(X, scale=scale)}
-    svd_mat <- svd(X)
-    right_sing_vect <- svd_mat$v
-    right_sing_vect <- scale(right_sing_vect, center=TRUE, scale=TRUE)
-    n <- nrow(t(X))
-    p <- ncol(t(X))
+    if (!is.matrix(X) || is.character(X))
+      stop("'X' must be a numeric matrix.", call. = FALSE)
     
-    if (ncomp > min(n, p)) {
-        message("'ncomp' is too large: reset to ", min(n, p))
-        ncomp <- min(n, p)
+    if (any(apply(X, 1, is.infinite))) 
+      stop("infinite values in 'X'.", call. = FALSE)
+    
+    if (any(is.na(X))) 
+      stop("missing values in 'X'.", call. = FALSE)
+    
+    nc = ncol(X)
+    nr = nrow(X)
+    
+    #-- put a names on the rows and columns of X --#
+    X.names = colnames(X)
+    if (is.null(X.names)) X.names = paste("V", 1:nc, sep = "")
+    
+    ind.names = rownames(X)
+    if (is.null(ind.names)) ind.names = 1:nr
+    
+    #-- ncomp
+    if (is.null(ncomp) || !is.numeric(ncomp) || ncomp < 1 || !is.finite(ncomp))
+      stop("invalid value for 'ncomp'.", call. = FALSE)
+    
+    ncomp = round(ncomp)
+    
+    if (ncomp > min(nc, nr))
+      stop("use smaller 'ncomp'", call. = FALSE)
+    
+    #-- scale
+    if (!is.logical(scale)) {
+      if (!is.numeric(scale) || (length(scale) != nc))
+        stop("'scale' should be either a logical value or a numeric vector of length equal to the number of columns of 'X'.", 
+             call. = FALSE)
     }
-    if(is.null(w.init))
-        w.init <- matrix(1/sqrt(ncomp),ncomp,ncomp)
+    
+    X = scale(X, center = TRUE, scale = scale)
+    sc = attr(X, "scaled:scale")
+    
+    if (any(sc == 0)) 
+      stop("cannot rescale a constant/zero column to unit variance.",
+           call. = FALSE)
+    
+    #-- mode
+    choices = c("deflation", "parallel")
+    mode = choices[pmatch(mode, choices)]
+    
+    if (is.na(mode)) 
+      stop("'mode' should be one of 'deflation' or 'parallel'.", 
+           call. = FALSE)    
+    
+    #-- fun
+    choices = c("logcosh", "exp")
+    fun = choices[pmatch(fun, choices)]
+    
+    if (is.na(fun)) 
+      stop("'fun' should be one of 'logcosh' or 'exp'.", 
+           call. = FALSE)
+    
+    #-- w.init
+    if (is.null(w.init))
+      w.init = matrix(1 / sqrt(ncomp), ncomp, ncomp)
     else {
-        if(!is.matrix(w.init) || length(w.init) != (ncomp^2))
-            stop("w.init is not a matrix or is the wrong size")
+      if(!is.matrix(w.init) || length(w.init) != (ncomp^2) || !is.numeric(w.init))
+        stop("'w.init' is not a numeric matrix or is the wrong size", call. = FALSE)
     }
     
-    X1 <- t(right_sing_vect)[1:ncomp,]
-         
-        if (mode == "deflation") {
-            unmix_mat <- ica.def(X1, ncomp, tol = tol, fun = fun,
-                           alpha = alpha, max.iter = max.iter, verbose = FALSE, w.init = w.init)
-        }
-        else if (mode == "parallel") {
-            unmix_mat <- ica.par(X1, ncomp, tol = tol, fun = fun,
-                           alpha = alpha, max.iter = max.iter, verbose = TRUE, w.init = w.init)
-        }
-        w <- unmix_mat 
-        independent_mat <- w %*% X1
-        #==order independent_mat by kurtosis==#
-           kurt <- vector(length=ncomp)
-           independent_mat.new <- matrix(nrow = ncomp, ncol = n)
-           for(h in 1:ncomp){
-               kurt[h] <- (mean(independent_mat[h,]^4)-3*(mean(independent_mat[h,]^2))^2)
-               }
-           for(i in 1:ncomp){
-               independent_mat.new[i,] <- independent_mat[order(kurt,decreasing=TRUE)[i],]
-               independent_mat.new[i,] <- independent_mat.new[i,]/crossprod(independent_mat.new[i,]) 
-               }         
-        
-        mix_mat <- t(w) %*% solve(w %*% t(w))
-
-        ipc_mat = matrix(nrow=p, ncol=ncomp)
-        ipc_mat = X %*% t(independent_mat.new)        
-        ##== force orthogonality ==##
-          for(h in 1:ncomp){
-              if(h==1){ipc_mat[,h]=X %*% (t(independent_mat.new)[,h])}
-              if(h>1){ipc_mat[,h]=(lsfit(y=X%*%(t(independent_mat.new)[,h]), ipc_mat[,1:(h-1)],intercept=FALSE)$res)}
-              ipc_mat[,h]=ipc_mat[,h]/sqrt(crossprod(ipc_mat[,h]))
-              }
-        ##== force over ==##   
-
-# put rownames of loading vectors
-	colnames(independent_mat.new) = colnames(X)
-
-             
-        cl = match.call()
-		cl[[1]] = as.name('ipca')
-		
-        result = list(call=cl, X = X, ncomp=ncomp, unmixing = t(unmix_mat), mixing = t(mix_mat), loadings = t(independent_mat.new), kurtosis = kurt[order(kurt,decreasing=TRUE)],
-		names = list(X = X.names, indiv = ind.names))
-		
-		result$x = ipc_mat
-        dimnames(result$x) = list(ind.names, paste("IPC", 1:ncol(result$loadings), sep = " "))
-			
-		class(result) = c("ipca")
-		return(invisible(result))
-	} 
+    if (any(is.infinite(w.init))) 
+      stop("infinite values in 'w.init'.", call. = FALSE)
+    
+    if(sum(w.init==0,na.rm=TRUE)==length(w.init))
+    stop("'w.init' has to be a non-zero matrix", call. = FALSE)
+ 
+    if(any(is.na(w.init)))
+    stop("'w.init' has to be a numeric matrix matrix with non-NA values", call. = FALSE)
+    
+ 
+    #-- max.iter
+    if (is.null(max.iter) || !is.numeric(max.iter) || max.iter < 1 || !is.finite(max.iter))
+      stop("invalid value for 'max.iter'.", call. = FALSE)
+    
+    max.iter = round(max.iter)  
+    
+    #-- tol
+    if (is.null(tol) || !is.numeric(tol) || tol < 0 || !is.finite(tol))
+      stop("invalid value for 'tol'.", call. = FALSE)
+    
+    
+    #-- end checking --#
+    #------------------#
+    
+    
+    #-- ipca approach ----------------------------------------------------------#
+    #---------------------------------------------------------------------------#
+    
+    V = svd(X)$v
+    V = scale(V, center = TRUE, scale = TRUE)  
+    V = t(V)[1:ncomp, , drop = FALSE]
+    
+    if (mode == "deflation") {
+      W = ica.def(V, ncomp = ncomp, tol = tol, fun = fun, alpha = 1, 
+                  max.iter = max.iter, verbose = FALSE, w.init = w.init)
+    }
+    else if (mode == "parallel") {
+      W = ica.par(V, ncomp = ncomp, tol = tol, fun = fun, alpha = 1, 
+                  max.iter = max.iter, verbose = FALSE, w.init = w.init)
+    }
+    
+    #-- independent loadings --#
+    S = matrix(W %*% V, nrow = ncomp)
+    
+    #-- order independent loadings by kurtosis --#
+    kurt = apply(S, 1, function(x) { n = length(x)
+                                     x = x - mean(x)
+                                     n * sum(x^4) / (sum(x^2)^2) - 3 } )
+    ord = order(kurt, decreasing = TRUE)
+    kurt = kurt[ord]
+    S = S[ord, , drop = FALSE]
+    norm = apply(S, 1, function(x) { crossprod(x) })
+    S = t(sweep(S, 1, norm, "/"))
+    
+    #-- independent PCs / force orthonormality --#
+    ipc = matrix(nrow = nr, ncol = ncomp)
+    ipc[, 1] = X %*% S[, 1]
+    ipc[, 1] = ipc[, 1] / sqrt(crossprod(ipc[, 1]))
+    
+    if (ncomp > 1) {
+      for (h in 2:ncomp) {
+        ipc[, h] = lsfit(y = X %*% S[, h], ipc[, 1:(h - 1)], intercept = FALSE)$res
+        ipc[, h] = ipc[, h] / sqrt(crossprod(ipc[, h]))
+      }
+    }
+    
+    
+    #-- output -----------------------------------------------------------------#
+    #---------------------------------------------------------------------------#
+    dimnames(S) = list(X.names, paste("IPC", 1:ncol(S), sep = ""))
+    dimnames(ipc) = list(ind.names, paste("IPC", 1:ncol(ipc), sep = ""))
+    
+    cl = match.call()
+    cl[[1]] = as.name('ipca')
+    
+    result = list(call = cl, X = X, ncomp = ncomp, x = ipc, 
+                  loadings=S,rotation=S,variates=S, kurtosis = kurt, unmixing = t(W),
+                  mixing = t(t(W) %*% solve(W %*% t(W))),
+                  names = list(var = X.names, sample = ind.names))
+    
+    class(result) = c("ipca", "pca")
+    return(invisible(result))
+  } 

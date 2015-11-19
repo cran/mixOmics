@@ -28,7 +28,7 @@ function(X, Y, lambda1, lambda2, folds, M)
      
     for (m in 1:M) {
         omit = folds[[m]]
-        result = rcc(X[-omit, ], Y[-omit, ], 1, lambda1, lambda2)
+        result = rcc(X[-omit, ], Y[-omit, ], 1, lambda1, lambda2,method="ridge")
         X[omit, ][is.na(X[omit, ])] = 0
         Y[omit, ][is.na(Y[omit, ])] = 0
         xscore = c(xscore, X[omit, ] %*% result$loadings$X[, 1])

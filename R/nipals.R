@@ -23,25 +23,53 @@ nipals <-
 function (X, ncomp = 1, reconst = FALSE, max.iter = 500, tol = 1e-09) 
 {
 
-    #-- validation des arguments --#
-    if (length(dim(X)) != 2) 
-        stop("'X' must be a numeric matrix.")
+  #-- X matrix
+  if (is.data.frame(X)) X = as.matrix(X)
+  
+  if (!is.matrix(X) || is.character(X))
+    stop("'X' must be a numeric matrix.", call. = FALSE)
+  
+  if (any(apply(X, 1, is.infinite))) 
+    stop("infinite values in 'X'.", call. = FALSE)
+  
+  nc = ncol(X)
+  nr = nrow(X)
+  #-- put a names on the rows and columns of X --#
+  X.names = colnames(X)
+  if (is.null(X.names)) X.names = paste("V", 1:ncol(X), sep = "")
+  
+  ind.names = rownames(X)
+  if (is.null(ind.names)) ind.names = 1:nrow(X)
      
-    X = as.matrix(X)
-     
-    if (!is.numeric(X)) 
-        stop("'X' must be a numeric matrix.")
-     
-    nc = ncol(X)
-    nr = nrow(X)
-     
-    if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0 || ncomp > nc)
-        stop("invalid number of variates, 'ncomp'.")    
+  #-- ncomp
+  if (is.null(ncomp) || !is.numeric(ncomp) || ncomp < 1 || !is.finite(ncomp))
+    stop("invalid value for 'ncomp'.", call. = FALSE)   
     ncomp = round(ncomp)
      
+  #-- reconst
+  if (!is.logical(reconst))
+    stop("'reconst' must be a logical constant (TRUE or FALSE).",
+         call. = FALSE)
+  
+  #-- max.iter
+  if (is.null(max.iter) || max.iter < 1 || !is.finite(max.iter))
+    stop("invalid value for 'max.iter'.", call. = FALSE)
+  
+  max.iter = round(max.iter)  
+  
+  #-- tol
+  if (is.null(tol) || tol < 0 || !is.finite(tol))
+    stop("invalid value for 'tol'.", call. = FALSE)
+  
+  #-- end checking --#
+  #------------------#
+  #-- pca approach -----------------------------------------------------------#
+  #---------------------------------------------------------------------------#
+  
+  
     #-- initialisation des matrices --#
     p = matrix(nrow = nc, ncol = ncomp)
-    t = matrix(nrow = nr, ncol = ncomp)
+    t.mat = matrix(nrow = nr, ncol = ncomp)
     eig = vector("numeric", length = ncomp)
     nc.ones = rep(1, nc)
     nr.ones = rep(1, nr)
@@ -51,7 +79,7 @@ function (X, ncomp = 1, reconst = FALSE, max.iter = 500, tol = 1e-09)
      
     #-- boucle sur h --#	
     for (h in 1:ncomp) {
-        th = X[, 1]
+      th = X[, which.max(apply(X, 2, var, na.rm = TRUE))]
         if (any(is.na(th))) th[is.na(th)] = 0
         ph.old = rep(1 / sqrt(nc), nc)
         ph.new = vector("numeric", length = nc)
@@ -66,9 +94,9 @@ function (X, ncomp = 1, reconst = FALSE, max.iter = 500, tol = 1e-09)
         while (diff > tol & iter <= max.iter) {
             if (na.X) {
                 ph.new = crossprod(X.aux, th)				
-                T = drop(th) %o% nc.ones
-                T[is.na.X] = 0
-                th.cross = crossprod(T)				
+                Th = drop(th) %o% nc.ones
+                Th[is.na.X] = 0
+                th.cross = crossprod(Th)				
                 ph.new = ph.new / diag(th.cross)				
             }
             else {			
@@ -98,20 +126,20 @@ function (X, ncomp = 1, reconst = FALSE, max.iter = 500, tol = 1e-09)
          
         X = X - th %*% t(ph.new)
         p[, h] = ph.new
-        t[, h] = th
+      t.mat[, h] = th
         eig[h] = sum(th * th, na.rm = TRUE)
     }
      
     eig = sqrt(eig)
-    t = scale(t, center = FALSE, scale = eig)
-    attr(t, "scaled:scale") = NULL
-    result = list(eig = eig, p = p, t = t)
+  t.mat = scale(t.mat, center = FALSE, scale = eig)
+    attr(t.mat, "scaled:scale") = NULL
+    result = list(eig = eig, p = p, t = t.mat)
      
     if (reconst) {
         X.hat = matrix(0, nrow = nr, ncol = nc)
          
         for (h in 1:ncomp) {
-            X.hat = X.hat + eig[h] * t[, h] %*% t(p[, h])
+            X.hat = X.hat + eig[h] * t.mat[, h] %*% t(p[, h])
         }
          
         colnames(X.hat) = colnames(X)

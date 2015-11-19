@@ -94,8 +94,10 @@ srgcca = function (blocks, indY = NULL,  design = 1 - diag(length(blocks)), tau 
   #-- block names 
   if (is.null(names(blocks))){
     names(blocks) = paste("Block", 1 : length(blocks))
-  } else if (any(names(blocks) == "")){
-    names(blocks)[names(blocks) == ""] = paste("Block", 1 : sum(names(blocks) == ""))
+  } else if (any(names(blocks) == "",na.rm=TRUE) ){
+    names(blocks)[which(names(blocks) == "")] = paste("Block", which(names(blocks) == ""))
+  } else if (any(is.na(names(blocks)))){
+  names(blocks)[which(is.na(names(blocks)))] = paste("Block", which(is.na(names(blocks))))
   }
 
   #-- put variable names in each block
@@ -203,7 +205,7 @@ srgcca = function (blocks, indY = NULL,  design = 1 - diag(length(blocks)), tau 
     stop("'verbose' must be a logical constant (TRUE or FALSE).", call. = FALSE)
   
   #-- design
-  if ((ncol(design) != nrow(design)) || (ncol(design) != length(blocks)))
+if ((ncol(design) != nrow(design)) || (ncol(design) != length(blocks)))
     stop("Incorrect design")
     
   #-- end checking --#

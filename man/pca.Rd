@@ -11,12 +11,16 @@ Decomposition, if there are some missing values, it uses the NIPALS algorithm.
 }
 
 \usage{
-pca(X, ncomp = 3, center = TRUE, scale = FALSE, 
-    comp.tol = NULL, max.iter = 500, tol = 1e-09)
+pca(X,
+ncomp = 2,
+center = TRUE,
+scale = FALSE,
+max.iter = 500,
+tol = 1e-09)
 }
 
 \arguments{
-  \item{X}{a numeric matrix (or data frame) which provides the 
+  \item{X}{a numeric matrix (or data frame) which provides the
     data for the principal components analysis. It can contain missing values.}
   \item{ncomp}{integer, if data is complete \code{ncomp} decides the number of components and associated 
     eigenvalues to display from the \code{pcasvd} algorithm and if the data has missing values, 
@@ -29,7 +33,6 @@ pca(X, ncomp = 3, center = TRUE, scale = FALSE,
     unit variance before the analysis takes place. The default is \code{FALSE} for consistency with \code{prcomp} 
     function, but in general scaling is advisable. Alternatively, a vector of length equal the number of 
     columns of \code{X} can be supplied. The value is passed to \code{\link{scale}}.} 
-  \item{comp.tol}{a value indicating the magnitude below which components should be omitted.} 
   \item{max.iter}{integer, the maximum number of iterations in the NIPALS algorithm.}
   \item{tol}{a positive real, the tolerance used in the NIPALS algorithm.}
 }
@@ -55,8 +58,10 @@ which would omit essentially constant components, or \code{comp.tol = 0}.
   \item{sdev}{the eigenvalues of the covariance/correlation matrix, though the calculation is actually 
     done with the singular values of the data matrix or by using NIPALS.} 
   \item{rotation}{the matrix of variable loadings (i.e., a matrix whose columns contain the eigenvectors).}
-  \item{X}{if \code{retx} is true the value of the rotated data (the centred (and scaled if requested) data 
-    multiplied by the rotation matrix) is returned.}  
+  \item{loadings}{same as 'rotation' to keep the mixOmics spirit}
+  \item{x}{the value of the rotated data (the centred (and scaled if requested) data 
+    multiplied by the rotation/loadings matrix), also called the principal components.}  
+      \item{variates}{same as 'x' to keep the mixOmics spirit}
   \item{center, scale}{the centering and scaling used, or \code{FALSE}.} 
 }
 
@@ -65,8 +70,8 @@ which would omit essentially constant components, or \code{comp.tol = 0}.
 \author{Ignacio Gonzalez.}
 
 \seealso{\code{\link{nipals}}, \code{\link{prcomp}}, \code{\link{biplot}}, 
-\code{\link{plotIndiv}}, \code{\link{plotVar}},
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}} and http://www.mixOmics.org for more details.}
+\code{\link{plotIndiv}}, \code{\link{plotVar}}
+and http://www.mixOmics.org for more details.}
 
 \examples{
 data(multidrug)
@@ -82,13 +87,13 @@ biplot(pca.res, xlabs = multidrug$cell.line$Class, cex = 0.7)
 plotIndiv(pca.res, ind.names = multidrug$cell.line$Class, 
           group = as.numeric(as.factor(multidrug$cell.line$Class)))
 \dontrun{
-plot3dIndiv(pca.res, cex = 0.2,
-            col = as.numeric(as.factor(multidrug$cell.line$Class)))
+plotIndiv(pca.res, cex = 0.2,
+            col = as.numeric(as.factor(multidrug$cell.line$Class)),style="3d")
 }
 # variables representation
-plotVar(pca.res, var.label = TRUE)
+plotVar(pca.res)
 \dontrun{
-plot3dVar(pca.res, rad.in = 0.5, var.label = TRUE, cex = 0.5)
+plotVar(pca.res, rad.in = 0.5, cex = 0.5,style="3d")
 }
 }
 

@@ -4,30 +4,25 @@
 \alias{selectVar.pls}
 \alias{selectVar.plsda}
 \alias{selectVar.pca}
-\alias{selectVar.spls}
-\alias{selectVar.splsda}
-\alias{selectVar.spca}
 \alias{selectVar.sipca}
 \alias{selectVar.sgcca}
+\alias{selectVar.rgcca}
 \alias{select.var}
 
 
 \title{Output of selected variables}
 
 \description{
-This function outputs the selected variables on each component for the sparse versions of the approaches (can also be generalised to the non sparse versions). 
-Note the change of name in version >= 5.0-4 to selectVar.
+This function outputs the selected variables on each component for the sparse versions of the approaches (was also generalised to the non sparse versions for our internal functions). 
 }
 
 \usage{
-\method{selectVar}{pls}(object, comp = 1, \ldots)
-\method{selectVar}{plsda}(object, comp = 1, \ldots)
-\method{selectVar}{pca}(object, comp = 1, \ldots)
-\method{selectVar}{spls}(object, comp = 1, \ldots)
-\method{selectVar}{splsda}(object, comp = 1, \ldots)
-\method{selectVar}{spca}(object, comp = 1, \ldots)
-\method{selectVar}{sipca}(object, comp = 1, \ldots)
-\method{selectVar}{sgcca}(object, block = NULL, comp = 1,  \ldots)
+\method{selectVar}{pls}(object, comp =1, block=NULL,\ldots)
+\method{selectVar}{pca}(object, comp =1, block=NULL,\ldots)
+\method{selectVar}{plsda}(object, comp =1, block=NULL,\ldots)
+\method{selectVar}{sipca}(object, comp =1, block=NULL,\ldots)
+\method{selectVar}{sgcca}(object, comp =1, block=NULL, \ldots)
+\method{selectVar}{rgcca}(object, comp =1, block=NULL, \ldots)
 }
 
 \arguments{
@@ -100,18 +95,23 @@ design = matrix(c(0,1,1,
                   1,0,1,
                   1,1,0), ncol = 3, nrow = 3, byrow = T)
 #note: the penalty parameters need to be tuned
-wrap.result.sgcca = wrapper.sgcca(data = data, design = design, penalty = c(.3,.3, 1), 
+wrap.result.sgcca = wrapper.sgcca(blocks = data, design = design, penalty = c(.3,.3, 1),
                                   ncomp = c(2, 2, 1),
                                   scheme = "centroid", verbose = FALSE)
 
-#variables selected on component 1 for the two blocs
-selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$name.var
+#variables selected and loadings values on component 1 for the two blocs
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))
+
+#variables selected on component 1 for each block
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'Block 1'$name
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'Block 2'$name
 
 #variables selected on component 2 for each block 
-selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$name.var
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'Block 1'$name
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'Block 2'$name
 
 # loading value of the variables selected on the first block
-selectVar(wrap.result.sgcca, comp = 1, block = 1)$value.var
+selectVar(wrap.result.sgcca, comp = 1, block = 1)$'Block 1'$value
 }
 
 }

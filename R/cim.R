@@ -29,12 +29,12 @@ cim <-
            col.sideColors = NULL,
            row.cex = NULL,
            col.cex = NULL,
+           threshold = 0,
            cluster = "both",
            dist.method = c("euclidean", "euclidean"),
            clust.method = c("complete", "complete"),
            cut.tree = c(0, 0),
            transpose = FALSE,
-           comp = NULL,
            symkey = TRUE, 
            keysize = c(1, 1),            
            zoom = FALSE, 
@@ -44,21 +44,18 @@ cim <-
            margins = c(5, 5),
            lhei = NULL,
            lwid = NULL,
-           sample.names = TRUE,
-           var.names = TRUE,
-           sample.sideColors = NULL,
-           var.sideColors = NULL,
+           comp=NULL,
            center = TRUE,
            scale = FALSE,
-           X.var.names = TRUE, 
-           Y.var.names = TRUE,
-           x.sideColors = NULL,
-           y.sideColors = NULL,
            mapping = "XY",
-           legend=NULL,
-           ...)
+           legend= NULL,
+           save = NULL,
+           name.save = NULL)
+           
 {
     class.object=class(mat)
+
+    
     
     #-- checking general input parameters --------------------------------------#
     #---------------------------------------------------------------------------#
@@ -89,16 +86,12 @@ cim <-
     #       msg = "unused argument "
     #       if (length(not.arg) > 1) msg = "unused arguments "  
     #       stop(msg, output, call. = FALSE)
-    #     }
-    
-    
-    
+    #     } 
     
     
     #-- color
     if (is.null(color)) 
       color = color.spectral(25)
-    
     
     
     #-- cluster
@@ -143,17 +136,20 @@ cim <-
       stop("'color' must be a character vector of recognized colors.", 
            call. = FALSE)
     
+    
     #-- row.sideColors
     if (any(!sapply(row.sideColors, function(row.sideColors) { 
       tryCatch(is.matrix(col2rgb(row.sideColors)), error = function(e) FALSE) }))) 
       stop("color names for vertical side bar must be a character vector of recognized colors.", 
            call. = FALSE)
     
+    
     #-- col.sideColors
     if (any(!sapply(col.sideColors, function(col.sideColors) { 
       tryCatch(is.matrix(col2rgb(col.sideColors)), error = function(e) FALSE) }))) 
       stop("color names for horizontal side bar must be a character vector of recognized colors.", 
            call. = FALSE)
+    
     
     #-- row.cex
     if (!is.null(row.cex)) {
@@ -239,12 +235,50 @@ cim <-
     #-- main
     main = as.graphicsAnnot(main)
     
+    #-- threshold correlation
+    if (!is.numeric(threshold) | (threshold > 1) | (threshold < 0))
+      stop("The value taken by 'threshold' must be between 0 and 1", call. = FALSE)
+    
+    #-- save
+    if (!is.null(save)){
+      if (! save %in% c("jpeg","tiff","png","pdf"))
+        stop("'save' must be one of 'jpeg', 'png', 'tiff' or 'pdf'.", call. = FALSE)
+    }
+    
+    #-- name.save
+    if (!is.null(name.save)){
+      if (! is.character(name.save) || length(name.save) > 1)
+        stop("'name.save' must be a character.", call. = FALSE)
+    } else {
+      if (!is.null(save))
+        name.save = paste0("cim_",gsub(".", "_", deparse(substitute(mat)) ,fixed = T))
+    }
+    
     #-- end checking --#
     #------------------#
-    object.list1=c("pca","spca","ipca","sipca","mlsplsda","splsda","plsda")
-    object.list2=c("rcc")
-    object.list3=c("pls","spls","mlspls")
+    if (!is.null(save)){
+      
+      while (dev.cur()>2)
+        dev.off()
+      
+      if (save == "jpeg")
+        jpeg(filename = paste0(name.save,".jpeg"), res = 600, width = 4000, height = 4000)
+      if (save == "png")
+        jpeg(filename = paste0(name.save,".png"), res = 600, width = 4000, height = 4000)
+      if (save == "tiff")
+        tiff(filename = paste0(name.save,".tiff"), res = 600, width = 4000, height = 4000)
+      if (save == "pdf")
+        pdf(file = paste0(name.save,".pdf"))
+      
+    }
+      
+    
+    
+    object.pca=c("pca","spca","ipca","sipca","mlsplsda","splsda","plsda")
+    object.rcc=c("rcc")
+    object.pls=c("pls","spls","mlspls")
     object.list=c("pca","spca","ipca","sipca","mlsplsda","splsda","plsda","rcc","pls","spls","mlspls")
+
     if(class.object[1] %in%  object.list)
       
     {p = ncol(mat$X)
@@ -269,86 +303,60 @@ cim <-
        comp=c(comp,comp)
      }
      
-     
-     
      comp = round(comp)
      
-     #-- sample.names
-     if (is.logical(sample.names)) {
-       if (isTRUE(sample.names)) sample.names = mat$names$indiv else sample.names = rep("", n)
-     }
-     else {
-       if (length(sample.names) != n)
-         stop("'sample.names' must be a character vector of length ", n, ".", 
-              call. = FALSE)
-     }
-     
-     #-- var.names
-     if (is.logical(var.names)) {
-       if(isTRUE(var.names)) var.names = mat$names$X else var.names = rep("", p)
-     }
-     else {
-       var.names = as.vector(var.names)
-       if (length(var.names) != p)
-         stop("'var.names' must be a character vector of length ", p, ".", 
-              call. = FALSE)
-     }
-     
-     #-- sample.sideColors
-     if (!is.null(sample.sideColors)) {
-       sample.sideColors = as.matrix(sample.sideColors)
-       if (nrow(sample.sideColors) != n)
-         stop("'sample.sideColors' must be a colors character vector (matrix) of length (nrow) ", n, ".", 
-              call. = FALSE)
-     }
-     row.sideColors = sample.sideColors
-     
-     #-- var.sideColors
-     if (!is.null(var.sideColors)) {
-       var.sideColors = as.matrix(var.sideColors)
-       if (nrow(var.sideColors) != p)
-         stop("'var.sideColors' must be a colors character vector (matrix) of length (nrow) ", p, ".", 
-              call. = FALSE)
-     }
-     col.sideColors = var.sideColors
-     
-     #-- X.var.names
-     if (is.logical(X.var.names)) {
-       if(isTRUE(X.var.names)) X.var.names = mat$names$X else X.var.names = rep("", p)
-     }
-     else {
-       X.var.names = as.vector(X.var.names)
-       if (length(X.var.names) != p)
-         stop("'X.var.names' must be a character vector of length ", p, ".", 
-              call. = FALSE)
-     }
-     
-     #-- Y.var.names
-     if (is.logical(Y.var.names)) {
-       if(isTRUE(Y.var.names)) Y.var.names = mat$names$Y else Y.var.names = rep("", q)
-     }
-     else {
-       Y.var.names = as.vector(Y.var.names)
-       if (length(Y.var.names) != q)
-         stop("'Y.var.names' must be a character vector of length ", q, ".", 
-              call. = FALSE)
-     }
-     if( ! class.object[1] %in%  object.list1)
-     {#-- x.sideColors
-       if (!is.null(x.sideColors)) {
-         x.sideColors = as.matrix(x.sideColors)
-         if (nrow(x.sideColors) != p)
-           stop("'x.sideColors' must be a colors character vector (matrix) of length (nrow) ", p, ".", 
-                call. = FALSE)
-       }
-       
-       #-- y.sideColors
-       if (!is.null(y.sideColors)) {
-         y.sideColors = as.matrix(y.sideColors)
-         if (nrow(y.sideColors) != q)
-           stop("'y.sideColors' must be a colors character vector (matrix) of length (nrow) ", q, ".", 
-                call. = FALSE)
-       }
+#      #-- row.names
+#      if (is.logical(row.names)) {
+#        if (isTRUE(row.names)) {
+#          if (class.object[1] %in% object.pca)
+#            row.names = mat$names$sample    
+#          else if (class.object[1] %in% c(object.pls,object.rcc))
+#            row.names = mat$names$X
+#          else if (class.object[1] %in% "matrix")
+#            row.names = rownames(mat) 
+#        }
+#        else {
+#          if (class.object[1] %in% object.pca)
+#            row.names = rep("", n)
+#          else if (class.object[1] %in% c(object.pls,object.rcc))
+#            row.names = rep("", p)
+#        }
+#      }
+#      else {
+#        if ((class.object[1] %in% object.pca) & length(row.names) != n)
+#          stop("'row.names' must be a character vector of length ", n, ".", 
+#               call. = FALSE)
+#        else if ((class.object[1] %in% c(object.pls,object.rcc)) & length(row.names) != p)
+#          stop("'row.names' must be a character vector of length ", p, ".", 
+#               call. = FALSE)
+#      }
+# 
+#      #-- col.names
+#      if (is.logical(col.names)) {
+#        if (isTRUE(col.names)) {
+#          if (class.object[1] %in% object.pca)
+#            col.names = mat$names$var        
+#          else if (class.object[1] %in% c(object.pls,object.rcc))
+#            col.names = mat$names$Y
+#        }
+#        else {
+#          if (class.object[1] %in% object.pca)
+#            col.names = rep("", p)
+#          else if (class.object[1] %in% c(object.pls,object.rcc))
+#            col.names = rep("", q)
+#        }
+#      }
+#      else {
+#        if ((class.object[1] %in% object.pca) & length(col.names) != p)
+#          stop("'col.names' must be a character vector of length ", p, ".", 
+#               call. = FALSE)
+#        else if ((class.object[1] %in% c(object.pls,object.rcc)) & length(col.names) != q)
+#          stop("'col.names' must be a character vector of length ", q, ".", 
+#               call. = FALSE)
+#      }
+          
+     if( ! class.object[1] %in%  object.pca)
+     {
        
        #-- mapping
        choices = c("XY", "X", "Y")
@@ -358,29 +366,162 @@ cim <-
          stop("'mapping' should be one of 'XY', 'X' or 'Y'.", call. = FALSE)
        
        if (mapping == "XY") {
-         row.sideColors = x.sideColors
-         col.sideColors = y.sideColors
+         if (is.logical(row.names)) {
+           if (isTRUE(row.names)) 
+             row.names = mat$names$X          
+           else 
+             row.names = rep("", p)
+         }       
+         else {
+           if (length(row.names) != p)
+             stop("'row.names' must be a character vector of length ", p, ".", 
+                  call. = FALSE)
+         }
+         
+         if (is.logical(col.names)) {
+           if (isTRUE(col.names)) 
+               col.names = mat$names$Y          
+           else 
+               col.names = rep("", q)
+           }       
+         else {
+           if (length(col.names) != q)
+             stop("'col.names' must be a character vector of length ", q, ".", 
+                  call. = FALSE)
+         }
+         
+         if (!is.null(row.sideColors)) {
+           row.sideColors = as.matrix(row.sideColors)       
+           if (nrow(row.sideColors) != p)
+             stop("'row.sideColors' must be a colors character vector (matrix) of length (nrow) ", p, ".", 
+                  call. = FALSE)
+         }
+         if (!is.null(col.sideColors)) {
+           col.sideColors = as.matrix(col.sideColors)       
+           if (nrow(col.sideColors) != q)
+             stop("'col.sideColors' must be a colors character vector (matrix) of length (nrow) ", q, ".", 
+                  call. = FALSE)
+         }
        }
        
+       
        if (mapping == "X") {
-         row.sideColors = sample.sideColors
-         col.sideColors = x.sideColors
+         if (is.logical(row.names)) {
+           if (isTRUE(row.names)) {
+             if (class.object[1] %in% object.rcc) row.names = mat$names$sample
+             else row.names = mat$names$indiv             
+           }
+           else 
+             row.names = rep("", n)
+         }       
+         else {
+           if (length(row.names) != n)
+             stop("'row.names' must be a character vector of length ", n, ".", 
+                  call. = FALSE)
+         }
+         if (is.logical(col.names)) {
+           if (isTRUE(col.names)) 
+             col.names = mat$names$X          
+           else 
+             col.names = rep("", p)
+         }       
+         else {
+           if (length(col.names) != p)
+             stop("'col.names' must be a character vector of length ", p, ".", 
+                  call. = FALSE)
+         }
+         
+         if (!is.null(row.sideColors)) {
+           row.sideColors = as.matrix(row.sideColors)       
+           if (nrow(row.sideColors) != n)
+             stop("'row.sideColors' must be a colors character vector (matrix) of length (nrow) ", n, ".", 
+                  call. = FALSE)
+         }
+         if (!is.null(col.sideColors)) {
+           col.sideColors = as.matrix(col.sideColors)       
+           if (nrow(col.sideColors) != p)
+             stop("'col.sideColors' must be a colors character vector (matrix) of length (nrow) ", p, ".", 
+                  call. = FALSE)
+         }
        }
        
        if (mapping == "Y") {
-         row.sideColors = sample.sideColors
-         col.sideColors = y.sideColors
+         if (is.logical(row.names)) {
+           if (isTRUE(row.names)) 
+           {
+             if (class.object[1] %in% object.rcc) row.names = mat$names$sample
+             else row.names = mat$names$indiv             
+           }         
+           else 
+             row.names = rep("", n)
+         }       
+         else {
+           if (length(row.names) != n)
+             stop("'row.names' must be a character vector of length ", n, ".", 
+                  call. = FALSE)
+         }
+         if (is.logical(col.names)) {
+           if (isTRUE(col.names)) 
+             col.names = mat$names$Y          
+           else 
+             col.names = rep("", q)
+         }       
+         else {
+           if (length(col.names) != q)
+             stop("'col.names' must be a character vector of length ", q, ".", 
+                  call. = FALSE)
+         }
+         
+         if (!is.null(row.sideColors)) {
+           row.sideColors = as.matrix(row.sideColors)       
+           if (nrow(row.sideColors) != n)
+             stop("'row.sideColors' must be a colors character vector (matrix) of length (nrow) ", n, ".", 
+                  call. = FALSE)
+         }
+         if (!is.null(col.sideColors)) {
+           col.sideColors = as.matrix(col.sideColors)       
+           if (nrow(col.sideColors) != q)
+             stop("'col.sideColors' must be a colors character vector (matrix) of length (nrow) ", q, ".", 
+                  call. = FALSE)
+         }
        }
      }
      
-     
-     if(class.object[1] %in%  object.list1)
+     if(class.object[1] %in%  object.pca)
      {
+
+       
+       #-- row.sideColors
+       if (!is.null(row.sideColors)) {
+         row.sideColors = as.matrix(row.sideColors)      
+           if (nrow(row.sideColors) != n)
+             stop("'row.sideColors' must be a colors character vector (matrix) of length (nrow) ", n, ".", 
+                  call. = FALSE)
+         }       
+       
+       #-- col.sideColors
+       if (!is.null(col.sideColors)) {
+         col.sideColors = as.matrix(col.sideColors)      
+           if (nrow(col.sideColors) != p)
+             stop("'col.sideColors' must be a colors character vector (matrix) of length (nrow) ", p, ".", 
+                  call. = FALSE)    
+       }
+       sample.sideColors = row.sideColors
        
        #-- clustering -------------------------------------------------------------#
        #---------------------------------------------------------------------------#
        if(class.object[1] %in%  c("splsda","plsda",'mlsplsda'))
        {
+         #-- row.names
+         if (is.logical(row.names)) {
+           if (isTRUE(row.names))
+             row.names = mat$names$indiv
+         }
+         #-- col.names
+         if (is.logical(col.names)) {
+           if (isTRUE(col.names))
+             col.names = mat$names$X
+         }
          if(class.object[1] %in%  c("splsda",'mlsplsda'))
            keep.X = apply(abs(mat$loadings$X[,comp]), 1, sum) > 0
          else
@@ -389,6 +530,16 @@ cim <-
          X.mat = as.matrix(mat$variates$X[, comp])
        }
        else{
+         #-- row.names
+         if (is.logical(row.names)) {
+           if (isTRUE(row.names))
+             row.names = mat$names$sample 
+         }
+         #-- col.names
+         if (is.logical(col.names)) {
+           if (isTRUE(col.names))
+             col.names = mat$names$var 
+         }
          if(class.object[1] %in%  c("spca","sipca"))
            keep.X = apply(abs(mat$rotation[,comp]), 1, sum) > 0
          else
@@ -396,6 +547,8 @@ cim <-
          cord.X = cor(mat$X[, keep.X], mat$x[, comp], use = "pairwise")
          X.mat = as.matrix(mat$x[, comp])
        }
+
+        
        #-- cheking center and scale
        if (!is.logical(center)) {
          if (!is.numeric(center) || (length(center) != ncol(mat$X)))
@@ -409,9 +562,7 @@ cim <-
        }
        
        object = scale(mat$X[, keep.X], center = center, scale = scale)
-       
-       row.names = sample.names
-       col.names = var.names[keep.X]
+       col.names = col.names[keep.X]
        
        if (!is.null(col.sideColors))
          col.sideColors = as.matrix(col.sideColors[keep.X, ])
@@ -476,19 +627,38 @@ cim <-
        class(res) = paste("cim",class.object[1],sep="_")
        
      }
-     else if(class.object[1] %in%  object.list2)
+     else if(class.object[1] %in%  object.rcc)
      {
        
        bisect = mat$variates$X[, comp] + mat$variates$Y[, comp]
        cord.X = cor(mat$X, bisect, use = "pairwise")
        cord.Y = cor(mat$Y, bisect, use = "pairwise")
        XY.mat = as.matrix(cord.X %*% t(cord.Y))
-       
+
        #-- if mapping = "XY"
        if (mapping == "XY") {
          object = XY.mat
-         row.names = X.var.names
-         col.names = Y.var.names
+         
+         cut=list()
+         if (threshold != 0) {
+           cut[[1]] = unlist(lapply(1:nrow(object),function(x){any(abs(object[x,]) > threshold)}))
+           object = object[cut[[1]],]
+           if (dist.method[1] != "correlation") cord.X = cord.X[cut[[1]],]
+           
+           
+           if (is.null(nrow(object)) || nrow(object) == 0)
+             stop("threshold value very high. No variable was selected.", call. = FALSE)
+           
+           
+           cut[[2]] = unlist(lapply(1:ncol(object),function(x){any(abs(object[,x]) > threshold)}))
+           object = object[,cut[[2]]]
+           if (dist.method[2] != "correlation") cord.Y = cord.Y[cut[[2]],]
+           
+           
+           if (is.null(ncol(object)) || ncol(object) == 0)
+             stop("threshold value very high. No variable was selected.", call. = FALSE)
+           
+         }
          
          if ((cluster == "both") || (cluster == "row")) {
            #Rowv = rowMeans(XY.mat)
@@ -496,9 +666,15 @@ cim <-
            
            if (dist.method[1] == "correlation") 
              dist.mat = as.dist(1 - cor(t(as.matrix(object)), method = "pearson"))
+           
            else
-             #dist.mat = dist(mat, method = dist.method[1])
              dist.mat = dist(cord.X, method = dist.method[1])
+                      
+           if (threshold > 0 ) {
+             row.names = row.names[cut[[1]]]
+             if (!is.null(row.sideColors)) 
+               row.sideColors = as.matrix(row.sideColors[cut[[1]], ])
+           }
            
            hcr = hclust(dist.mat, method = clust.method[1])
            ddr = as.dendrogram(hcr)
@@ -512,14 +688,18 @@ cim <-
          }    
          
          if ((cluster == "both") || (cluster == "column")) {
-           #Colv = colMeans(mat)
            Colv = rowMeans(cord.Y)
            
            if (dist.method[2] == "correlation") 
              dist.mat = as.dist(1 - cor(as.matrix(object), method = "pearson"))
            else
-             #dist.mat = dist(t(mat), method = dist.method[2])
              dist.mat = dist(cord.Y, method = dist.method[2])
+           
+           if (threshold > 0 ) {
+             col.names = col.names[cut[[2]]]
+             if (!is.null(col.sideColors)) 
+               col.sideColors = as.matrix(col.sideColors[cut[[2]], ])
+           }
            
            hcc = hclust(dist.mat, method = clust.method[2])
            ddc = as.dendrogram(hcc)
@@ -549,9 +729,7 @@ cim <-
          }
          
          object = scale(mat$X, center = center, scale = scale)
-         X.mat = as.matrix(mat$variates$X[, comp])
-         row.names = sample.names
-         col.names = X.var.names
+         X.mat = as.matrix(mat$variates$X[, comp])  
          
          if ((cluster == "both") || (cluster == "row")) { 
            Rowv = rowMeans(X.mat)
@@ -567,6 +745,7 @@ cim <-
            rowInd = order.dendrogram(ddr)
            object = object[rowInd, ]
            row.names = row.names[rowInd]
+           
            
            if (!is.null(row.sideColors)) 
              row.sideColors = as.matrix(row.sideColors[rowInd, ])
@@ -589,7 +768,9 @@ cim <-
            
            if (!is.null(col.sideColors)) 
              col.sideColors = as.matrix(col.sideColors[colInd, ])
+           
          }
+       
        }
        
        #-- if mapping = "Y"
@@ -609,8 +790,7 @@ cim <-
          
          object = scale(mat$Y, center = center, scale = scale)
          Y.mat = as.matrix(mat$variates$Y[, comp])
-         row.names = sample.names
-         col.names = Y.var.names
+             
          
          if ((cluster == "both") || (cluster == "row")) { 
            Rowv = rowMeans(Y.mat)
@@ -648,6 +828,7 @@ cim <-
            
            if (!is.null(col.sideColors)) 
              col.sideColors = as.matrix(col.sideColors[colInd, ])
+           
          }
        }
        
@@ -673,7 +854,7 @@ cim <-
        class(res) = "cim_rcc"
        
      }
-     else if(class.object[1] %in%  object.list3)
+     else if(class.object[1] %in%  object.pls)
      {
        if(class.object[1] %in% c("spls","mlspls"))
        {
@@ -683,7 +864,7 @@ cim <-
        {
          keep.X = apply(abs(mat$loadings$X), 1, sum) > 0
          keep.Y = apply(abs(mat$loadings$Y), 1, sum) > 0}
-         
+       
        
        
        if (mat$mode == "canonical") {
@@ -696,12 +877,35 @@ cim <-
        }
        
        XY.mat = as.matrix(cord.X %*% t(cord.Y))
+       sample.sideColors = row.sideColors
        
        #-- if mapping = "XY"
        if (mapping == "XY") {
          object = XY.mat
-         row.names = X.var.names[keep.X]
-         col.names = Y.var.names[keep.Y]
+         row.names = row.names[keep.X]
+         col.names = col.names[keep.Y]
+         
+         cut=list()
+         if (threshold != 0) {
+           cut[[1]] = unlist(lapply(1:nrow(object),function(x){any(abs(object[x,]) > threshold)}))
+           object = object[cut[[1]],]
+           if (dist.method[1] != "correlation") cord.X = cord.X[cut[[1]],]
+           
+           
+           if (is.null(nrow(object)) || nrow(object) == 0)
+             stop("threshold value very high. No variable was selected.", call. = FALSE)
+           
+           
+           cut[[2]] = unlist(lapply(1:ncol(object),function(x){any(abs(object[,x]) > threshold)}))
+           object = object[,cut[[2]]]
+           if (dist.method[2] != "correlation") cord.Y = cord.Y[cut[[2]],]
+           
+           
+           if (is.null(ncol(object)) || ncol(object) == 0)
+             stop("threshold value very high. No variable was selected.", call. = FALSE)
+           
+         }
+         
          
          if (!is.null(row.sideColors))
            row.sideColors = as.matrix(row.sideColors[keep.X, ])
@@ -709,6 +913,8 @@ cim <-
            col.sideColors = as.matrix(col.sideColors[keep.Y, ])
          
          if ((cluster == "both") || (cluster == "row")) { 
+           
+
            #Rowv = rowMeans(XY.mat)
            Rowv = rowMeans(cord.X)
            
@@ -717,6 +923,12 @@ cim <-
            else
              #dist.mat = dist(mat, method = dist.method[1])
              dist.mat = dist(cord.X, method = dist.method[1])
+           
+           if (threshold > 0 ) {
+             row.names = row.names[cut[[1]]]
+             if (!is.null(row.sideColors)) 
+               row.sideColors = as.matrix(row.sideColors[cut[[1]], ])
+           }
            
            hcr = hclust(dist.mat, method = clust.method[1])
            ddr = as.dendrogram(hcr)
@@ -738,6 +950,12 @@ cim <-
            else
              #dist.mat = dist(t(mat), method = dist.method[2])
              dist.mat = dist(cord.Y, method = dist.method[2])
+           
+           if (threshold > 0 ) {
+             col.names = col.names[cut[[2]]]
+             if (!is.null(col.sideColors)) 
+               col.sideColors = as.matrix(col.sideColors[cut[[2]], ])
+           }
            
            hcc = hclust(dist.mat, method = clust.method[2])
            ddc = as.dendrogram(hcc)
@@ -768,12 +986,14 @@ cim <-
          
          object = scale(mat$X[, keep.X], center = center, scale = scale)
          X.mat = as.matrix(mat$variates$X[, comp])
-         row.names = sample.names
-         col.names = X.var.names[keep.X]
+         col.names = col.names[keep.X]
          
+          
          if (!is.null(col.sideColors))
            col.sideColors = as.matrix(col.sideColors[keep.X, ])
          
+        
+           
          if ((cluster == "both") || (cluster == "row")) { 
            Rowv = rowMeans(X.mat)
            
@@ -810,6 +1030,7 @@ cim <-
            
            if (!is.null(col.sideColors)) 
              col.sideColors = as.matrix(col.sideColors[colInd, ])
+           
          }
        }
        
@@ -829,12 +1050,14 @@ cim <-
          }
          
          object = scale(mat$Y[, keep.Y], center = center, scale = scale)
-         Y.mat = as.matrix(mat$variates$Y[, comp])
-         row.names = sample.names
-         col.names = Y.var.names[keep.Y]
+         Y.mat = as.matrix(mat$variates$Y[, comp])       
+         col.names = col.names[keep.Y]
+         
          
          if (!is.null(col.sideColors))
            col.sideColors = as.matrix(col.sideColors[keep.Y, ])
+         
+         
          
          if ((cluster == "both") || (cluster == "row")) { 
            Rowv = rowMeans(Y.mat)
@@ -976,18 +1199,16 @@ cim <-
           dist.mat = as.dist(1 - cor(as.matrix(mat), method = "pearson"))
         else
           dist.mat = dist(t(mat), method = dist.method[2])
-        
         hcc = hclust(dist.mat, method = clust.method[2])
         ddc = as.dendrogram(hcc)
         ddc = reorder(ddc, Colv)
         colInd = order.dendrogram(ddc)
-        object = mat[, colInd]
+        object = object[, colInd]
         col.names = col.names[colInd]
         
         if (!is.null(col.sideColors)) 
           col.sideColors = as.matrix(col.sideColors[colInd, ])
       }
-      
       #-- calling the image.map function -----------------------------------------#
       
       
@@ -1043,7 +1264,7 @@ cim <-
        
        #-- col
        if (is.null(legend$col)) {
-         if (!is.null(row.sideColors) & !is.null(sample.sideColors)) 
+         if (!is.null(sample.sideColors)) 
            legend$col = unique(as.matrix(sample.sideColors[order(map(mat$ind.mat)), 1]))
        }
        
@@ -1095,378 +1316,18 @@ cim <-
      
      if (!is.null(legend$title))
        legend(x = legend$x, y = legend$y, legend = legend$legend, 
-              col = legend$col, fill = legend$fill, bty = legend$bty,title=legend$title,cex=legend$cex, ...)
+              col = legend$col, fill = legend$fill, bty = legend$bty,title=legend$title,cex=legend$cex)
      else
        legend(x = legend$x, y = legend$y, legend = legend$legend, 
-              col = legend$col, fill = legend$fill, bty = legend$bty,cex=legend$cex, ...)
+              col = legend$col, fill = legend$fill, bty = legend$bty,cex=legend$cex)
      
     }
-    return(invisible(res))
+if (class.object[1] %in% object.list & !class.object[1] %in% object.pca & mapping =="XY") 
+  res$mat.cor=object
+
+if (!is.null(save))
+  dev.off()
+  
+return(invisible(res))
   }
 
-
-
-imageMap <- 
-  function (mat,
-            color,
-            row.names,
-            col.names,
-            row.sideColors,
-            col.sideColors,
-            row.cex = NULL,
-            col.cex = NULL,
-            cluster,
-            ddr,
-            ddc,
-            cut.tree = c(0, 0),
-            transpose = FALSE,
-            symkey = TRUE, 
-            keysize = c(1, 1),            
-            zoom = FALSE, 
-            main = NULL,
-            xlab = NULL,
-            ylab = NULL,
-            margins = c(5, 5),
-            lhei = NULL,
-            lwid = NULL)
-{
-    #-- image map --------------------------------------------------------------#
-    #----------
-    
-    if (isTRUE(symkey)) {
-      max.mat = max(abs(mat), na.rm = TRUE)
-      min.mat = -max.mat
-    }
-    else {
-      max.mat = max(mat, na.rm = TRUE)
-      min.mat = min(mat, na.rm = TRUE)
-    }
-    
-    if (isTRUE(transpose)) {
-      mat = t(mat)
-      
-      temp = col.sideColors
-      col.sideColors = row.sideColors
-      row.sideColors = temp
-      
-      temp = col.names
-      col.names = row.names
-      row.names = temp
-      
-      if (cluster == "both")
-      {temp = ddc
-       ddc = ddr
-       ddr = temp}
-      else if (cluster == "column") 
-        ddr=ddc
-      else if (cluster == "row") 
-        ddc=ddr
-      
-      lhei = NULL
-      lwid = NULL
-    }
-    
-    nr = nrow(mat)
-    nc = ncol(mat)
-    
-    #-- row.cex and col.cex
-    if (is.null(row.cex)) row.cex = min(1, 0.2 + 1/log10(nr))
-    if (is.null(col.cex)) col.cex = min(1, 0.2 + 1/log10(nc))
-    
-    #-- breaks
-    breaks = length(color) + 1
-    breaks = seq(min.mat, max.mat, length = breaks)
-    
-    nbr = length(breaks)
-    ncol = nbr - 1
-    
-    min.breaks = min(breaks)
-    max.breaks = max(breaks)
-    
-    mat[mat < min.breaks] = min.breaks
-    mat[mat > max.breaks] = max.breaks
-    mat = t(mat)
-    
-    #-- layout matrix
-    lmat = matrix(c(1, 2, 3, 4), 2, 2, byrow = TRUE)
-    csc = rsc = FALSE
-    
-    if (!is.null(col.sideColors)) {
-      lmat = rbind(lmat[1, ], c(NA, 3), lmat[2, ] + 1)
-      if (is.null(lhei)) {
-        n.csc = ncol(col.sideColors)
-        lhei = c(keysize[2], 0.15 + 0.1 * (n.csc - 1), 4)
-      }
-      csc = TRUE
-    }
-    
-    if (!is.null(row.sideColors)) {
-      lmat = cbind(lmat[, 1], c(rep(NA, nrow(lmat) - 1), nrow(lmat) + 2), 
-                   lmat[, 2] + c(rep(0, nrow(lmat) - 1), 1))
-      if (is.null(lwid)) {
-        n.rsc = ncol(row.sideColors)
-        lwid = c(keysize[2], 0.15 + 0.1 * (n.rsc - 1), 4)
-      }
-      rsc = TRUE
-    }
-    
-    lmat[is.na(lmat)] = 0
-    
-    if (is.null(lhei)) 
-      lhei = c(keysize[2], 4)
-    
-    if (is.null(lwid)) 
-      lwid = c(keysize[1], 4)
-    
-    if (isTRUE(zoom)) {
-      graphics.off()
-      dev.new(pos=-1)#x11(xpos = -1)
-    }
-    
-    op = par(no.readonly = TRUE)
-    on.exit(par(op))
-    layout(lmat, widths = lwid, heights = lhei, respect = FALSE)
-    
-    #-- layout 1 --#
-    par(mar = c(5, 2, 2, 1), cex = 0.75)
-    
-    z = seq(0, 1, length = length(color))
-    z = matrix(z, ncol = 1)
-    image(z, col = color, xaxt = "n", yaxt = "n")
-    box()
-    par(usr = c(0, 1, 0, 1))
-    lv = c(min.breaks, (3*min.breaks + max.breaks)/4, (min.breaks + max.breaks)/2,
-           (3*max.breaks + min.breaks)/4, max.breaks)
-    xv = (as.numeric(lv) - min.mat) / (max.mat - min.mat)
-    axis(1, at = xv, labels = round(lv, 2))
-    title("Color key", font.main = 1)
-    
-    #-- layout 2 --#   
-    par(mar = c(ifelse(cut.tree[2] != 0, 0.5, 0), 0, ifelse(!is.null(main), 5, 0), margins[2]))
-    if ((cluster == "both") || (!transpose && cluster == "column") || (transpose && cluster == "row" )) {
-      h = attr(ddc, "height")
-      plot(ddc, axes = FALSE, xaxs = "i", leaflab = "none", 
-           ylim = c(cut.tree[2] * h, h))
-    }
-    else {
-      plot(0, 0, axes = FALSE, type = "n", xlab = "", ylab = "")  
-    }
-    
-    if (!is.null(main)) 
-      title(main, cex.main = 1.5 * op[["cex.main"]])
-    
-    #-- layout 3 --#
-    if (isTRUE(csc)) {
-      par(mar = c(0.5, 0, 0, margins[2]))
-      sideColors = as.vector(col.sideColors)
-      img = matrix(c(1:(n.csc * nc)), ncol = n.csc, byrow = FALSE)
-      
-      image(1:nc, 1:n.csc, img, col = sideColors, axes = FALSE, xlab = "", ylab = "")
-      abline(h = 1:(n.csc - 1) + 0.5, lwd = 2,
-             col = ifelse(par("bg") == "transparent", "white", par("bg")))  
-    }
-    
-    #-- layout 4 --#
-    par(mar = c(margins[1], 0, 0, ifelse(cut.tree[1] != 0, 0.5, 0)))
-    if ((cluster == "both") || (cluster == "row" & !transpose) || (cluster == "column" & transpose)) {
-      h = attr(ddr, "height")
-      plot(ddr, horiz = TRUE, axes = FALSE, yaxs = "i", leaflab = "none", 
-           xlim = c(h, cut.tree[1] * h))    
-    }
-    else {
-      plot(0, 0, axes = FALSE, type = "n", xlab = "", ylab = "")  
-    }
-    
-    #-- layout 5 --#
-    if (isTRUE(rsc)) {
-      par(mar = c(margins[1], 0, 0, 0.5))
-      n.rsc = ncol(row.sideColors)
-      r.sideColors = row.sideColors[, n.rsc:1]
-      sideColors = as.vector(r.sideColors)
-      img = matrix(1:(n.rsc * nr), nrow = n.rsc, byrow = TRUE)
-      
-      image(1:n.rsc, 1:nr, img, col = sideColors, axes = FALSE, xlab = "", ylab = "")
-      abline(v = 1:(n.rsc - 1) + 0.5, lwd = 2,
-             col = ifelse(par("bg") == "transparent", "white", par("bg")))  
-    }
-    
-    #-- layout 6 --#
-    par(mar = c(margins[1], 0, 0, margins[2]))
-    image(1:nc, 1:nr, mat, xlim = 0.5 + c(0, nc), ylim = 0.5 + 
-            c(0, nr), axes = FALSE, xlab = "", ylab = "", col = color, 
-          breaks = breaks)
-    axis(1, 1:nc, labels = col.names, las = 2, line = -0.5, tick = 0, 
-         cex.axis = col.cex)
-    
-    if (!is.null(xlab)) 
-      mtext(xlab, side = 1, line = margins[1] - 1.25)
-    
-    axis(4, 1:nr, labels = row.names, las = 2, line = -0.5, tick = 0, 
-         cex.axis = row.cex)
-    
-    if (!is.null(ylab)) 
-      mtext(ylab, side = 4, line = margins[2] - 1.25)
-    
-    #-- ZOOM --#
-    #----------#
-    flag1 = flag2 = FALSE
-    
-    if (isTRUE(zoom)) {
-      nD = dev.cur()
-      zone = FALSE
-      
-      repeat {
-        dev.set(nD)
-        
-        repeat {
-          loc = locator(1, type = "n")
-          
-          if (is.null(loc) & zone == TRUE) break
-          if (is.null(loc) & !isTRUE(flag1)) break
-          flag1 = TRUE
-          
-          x1 = round(loc[[1]] - 0.5) + 0.5
-          y1 = round(loc[[2]] - 0.5) + 0.5
-          
-          if (!(x1 < 0 | x1 > nc + 0.5 | y1 < 0 | y1 > nr + 0.5)) break
-        }
-        
-        if (is.null(loc) & zone == TRUE) break
-        
-        if (!is.null(loc) & zone == TRUE) {
-          rect(xleft.old, ybottom.old, xright.old, ytop.old, border = "white")
-          points(x1.old, y1.old, type = "p", pch = 3, 
-                 cex = 2, col = "white")
-        }
-        
-        if (is.null(loc) & zone == FALSE) {
-          break
-        }
-        else {
-          x1.old = x1
-          y1.old = y1
-          
-          points(x1, y1, type = "p", pch = 3, cex = 2)
-          
-          repeat {
-            loc = locator(1, type = "n")
-            
-            if (is.null(loc) & zone == TRUE) break
-            if (is.null(loc) & !isTRUE(flag2)) break
-            flag2 = TRUE
-            
-            x2 = round(loc[[1]] - 0.5) + 0.5
-            y2 = round(loc[[2]] - 0.5) + 0.5
-            
-            if (!(x2 < 0 | x2 > nc + 0.5 | y2 < 0 | y2 > nr + 0.5)) { zone = TRUE; break }         
-          }
-          
-          if (is.null(loc) & zone == TRUE) break
-          if (is.null(loc) & !isTRUE(flag2)) break
-          
-          xleft.old = min(x1, x2) 
-          xright.old = max(x1, x2) 
-          ybottom.old = min(y1, y2) 
-          ytop.old = max(y1, y2) 
-          
-          rect(xleft.old, ybottom.old, xright.old, ytop.old)
-        }
-        
-        dev.new()#x11()
-        plot.par = par(no.readonly = TRUE)
-        
-        if (isTRUE(zone)) {
-          xleft = xleft.old + 0.5
-          ybottom = ybottom.old + 0.5
-          xright = xright.old - 0.5
-          ytop = ytop.old - 0.5
-          nr.zoom = length(xleft:xright)
-          nc.zoom = length(ybottom:ytop)
-          mat.zoom = matrix(mat[xleft:xright, ybottom:ytop], 
-                            nrow = nr.zoom, ncol = nc.zoom)
-          rlab.zoom = col.names[xleft:xright]
-          clab.zoom = row.names[ybottom:ytop]
-          r.cex = min(1.2, 0.2 + 1/log10(nr.zoom))
-          c.cex = min(1.2, 0.2 + 1/log10(nc.zoom))
-          
-          layout(lmat, widths = lwid, heights = lhei, respect = FALSE)
-          
-          # layout 1
-          par(mar = c(5, 2, 2, 1), cex = 0.75)    		
-          image(z, col = color, xaxt = "n", yaxt = "n")
-          box()
-          par(usr = c(0, 1, 0, 1))
-          lv = c(min.breaks, (3*min.breaks + max.breaks)/4, (min.breaks + max.breaks)/2,
-                 (3*max.breaks + min.breaks)/4, max.breaks)
-          xv = (as.numeric(lv) - min.mat) / (max.mat - min.mat)
-          axis(1, at = xv, labels = round(lv, 2))
-          title("Color key", font.main = 1)
-          
-          #-- layout 2 --#   
-          par(mar = c(ifelse(cut.tree[2] != 0, 0.5, 0), 0, ifelse(!is.null(main), 5, 0), margins[2]))
-          if ((cluster == "both") || (cluster == "column" & !transpose) || (cluster == "row" & transpose)) {
-            plot(ddc, axes = FALSE, xaxs = "i", leaflab = "none", xlim = c(xleft - 0.5, xright + 0.5))
-          }
-          else {
-            plot(0, 0, axes = FALSE, type = "n", xlab = "", ylab = "")  
-          }
-          
-          if (!is.null(main)) 
-            title(main, cex.main = 1.5 * op[["cex.main"]])
-          
-          # layout 3
-          if (isTRUE(csc)) {
-            par(mar = c(0.5, 0, 0, margins[2]))
-            sideColors = as.vector(col.sideColors[xleft:xright, ])
-            img = matrix(c(1:(n.csc * nr.zoom)), ncol = n.csc, byrow = FALSE)
-            
-            image(1:nr.zoom, 1:n.csc, img, col = sideColors, axes = FALSE, xlab = "", ylab = "")
-            abline(h = 1:(n.csc - 1) + 0.5, lwd = 2,
-                   col = ifelse(par("bg") == "transparent", "white", par("bg")))
-          }
-          
-          #-- layout 4 --#
-          par(mar = c(margins[1], 0, 0, ifelse(cut.tree[1] != 0, 0.5, 0)))
-          if ((cluster == "both") || (cluster == "row" & !transpose) || (cluster == "column" & transpose)) {
-            plot(ddr, horiz = TRUE, axes = FALSE, yaxs = "i", leaflab = "none", ylim = c(ybottom - 0.5, ytop + 0.5))    
-          }
-          else {
-            plot(0, 0, axes = FALSE, type = "n", xlab = "", ylab = "")  
-          }
-          
-          # layout 5
-          if (isTRUE(rsc)) {
-            par(mar = c(margins[1], 0, 0, 0.5))
-            r.sideColors = row.sideColors[ybottom:ytop, n.rsc:1]
-            sideColors = as.vector(r.sideColors)
-            img = matrix(1:(n.rsc * nc.zoom), nrow = n.rsc, byrow = TRUE)
-            
-            image(1:n.rsc, 1:nc.zoom, img, col = sideColors, axes = FALSE, xlab = "", ylab = "")
-            abline(v = 1:(n.rsc - 1) + 0.5, lwd = 2,
-                   col = ifelse(par("bg") == "transparent", "white", par("bg")))
-          }
-          
-          # layout 6
-          par(mar = c(margins[1], 0, 0, margins[2]))
-          image(1:nr.zoom, 1:nc.zoom, mat.zoom, col = color, 
-                breaks = breaks, axes = FALSE, xlab = "", ylab = "")
-          
-          axis(1, 1:nr.zoom, labels = rlab.zoom, las = 2, 
-               line = -0.5, tick = 0, cex.axis = r.cex)
-          
-          if (!is.null(xlab)) 
-            mtext(xlab, side = 1, line = margins[1] - 1.25)
-          
-          axis(4, 1:nc.zoom, labels = clab.zoom, las = 2, 
-               line = -0.5, tick = 0, cex.axis = c.cex)
-          
-          if (!is.null(ylab)) 
-            mtext(ylab, side = 4, line = margins[2] - 1.25)
-        }
-        
-        par(plot.par)
-      }
-    }
-    
-    par(op)
-  }

@@ -12,7 +12,7 @@
 \usage{	
 wrapper.rgcca(  
                 blocks, 
-                design = NULL, 
+                design =  1 - diag(length(blocks)),
                 ncomp = rep(2, length(blocks)), 
                 tau = "optimal",
                 scheme = "centroid", 
@@ -26,7 +26,7 @@ wrapper.rgcca(
                  
 wrapper.sgcca(
             blocks, 
-            design = NULL, 
+            design =  1 - diag(length(blocks)), 
             penalty = NULL, 
             ncomp = rep(2, length(blocks)),
             keep = NULL, 
@@ -162,22 +162,24 @@ head(nutrimouse.rgcca$loadings[[3]])
 nutrimouse.sgcca <- wrapper.sgcca(blocks = data,
                                    design = design,
                                    penalty = c(0.3, 0.5, 1),
-                                   ncomp = c(2, 2, 1),
+                                   ncomp = c(3, 3, 2),
                                    scheme = "centroid",
                                    verbose = FALSE, 
                                    bias = FALSE)
 
-# In plotIndiv we indicate the diet variable colors and the blocks to be plotted 
-# (only blocks with comp  >=2!)
-plotIndiv(nutrimouse.sgcca, blocks = c(1,2), group = nutrimouse$diet, 
-  plot.ellipse = TRUE)
+\dontrun{
+    # In plotIndiv we indicate the diet variable colors and the blocks to be plotted
+    # (only blocks with comp  >=2!)
+    plotIndiv(nutrimouse.sgcca, blocks = c(1,2), group = nutrimouse$diet, 
+      plot.ellipse = TRUE)
 
-# which variables are selected on a given component?
-selectVar(nutrimouse.sgcca, comp = 1, block = 1)
-selectVar(nutrimouse.sgcca, comp = 1, block = 2)
+    # which variables are selected on a given component?
+    selectVar(nutrimouse.sgcca, comp = 1, block = 1)
+    selectVar(nutrimouse.sgcca, comp = 1, block = 2)
 
-# variable plot on the selected variables
-plotVar(nutrimouse.sgcca, col = color.mixo(1:2), cex = c(2,2))
+    # variable plot on the selected variables
+    plotVar(nutrimouse.sgcca, col = color.mixo(1:3), cex = c(2,5,3))
+}
 }
 
 # version 2 using the keep penalty criterion (number of variables to keep)
@@ -222,16 +224,17 @@ nutrimouse.sgccda <- wrapper.sgccda(blocks = data,
                                     verbose = FALSE,
                                     bias = FALSE)
 
-plotIndiv(nutrimouse.sgccda, blocks = c(1,2), group = nutrimouse$diet, 
-  plot.ellipse = TRUE)
+\dontrun{
+    plotIndiv(nutrimouse.sgccda, blocks = c(1,2), group = nutrimouse$diet,
+      plot.ellipse = TRUE)
 
-# which variables are selected on a given component?
-selectVar(nutrimouse.sgccda, comp = 1, block = 1)
-selectVar(nutrimouse.sgccda, comp = 1, block = 2)
+    # which variables are selected on a given component?
+    selectVar(nutrimouse.sgccda, comp = 1, block = 1)
+    selectVar(nutrimouse.sgccda, comp = 1, block = 2)
 
-# variable plot on the selected variables
-plotVar(nutrimouse.sgccda, col = color.mixo(1:2), cex = c(2,2))
-
+    # variable plot on the selected variables
+    plotVar(nutrimouse.sgccda, col = color.mixo(1:2), cex = c(2,2))
+}
 
 }
 

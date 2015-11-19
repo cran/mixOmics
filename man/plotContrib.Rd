@@ -5,45 +5,48 @@
 \title{Contribution plot of variables}
 
 \description{
-This function provides a horizontal bar plot to visualise the highest or lowest mean/median value of the variables with color code corresponding to the outcome of interest. Only applies to (sparse)PLSDA (including multilevel).
+This function provides a horizontal bar plot to visualise the highest or lowest mean/median value of the variables with color code corresponding to the outcome of interest. Applies DA objects (sPLSDA, PLSDA, and multilevel, SGCCDA) and for count data types.
 }
 
 \usage{
-plotContrib(
-                       object,
-                       contrib=c("max"),  # choose between 'max" or "min"
-                       method = c("mean", "median"), 
-                       comp = 1,
-                       ties = TRUE, 
-                       ndisplay = NULL, 
-                       cex.name = 0.7, 
-                       cex.legend = 0.8,
-                       name.var = NULL,
-                       legend = TRUE,
-                       legend.color = NULL, 
-                       main = NULL,
-                       legend.title = 'Outcome',
-                       plot = TRUE 
-                       
-                       )
-	  
+plotContrib(object,
+            contrib="max",  # choose between 'max" or "min"
+            method = "mean", # choose between 'mean" or "median"
+            block=1, #single value
+            comp = 1,
+            show.ties = TRUE,
+            col.ties="white",
+            ndisplay = NULL,
+            cex.name = 0.7,
+            cex.legend = 0.8,
+            name.var=NULL,
+            complete.name.var=FALSE,
+            legend = TRUE,
+            legend.color = NULL,
+            main = NULL,
+            legend.title = 'Outcome',
+            plot = TRUE)
+
 }
 
 \arguments{
-  \item{object}{object of class inheriting from a \code{plsda} or \code{splsda} class}, 
-  \item{contrib}{a character set to 'max' or 'min' indicating if the color of the bar should correspond to the group with the maximal or minimam expression levels / abundance. By default set to 'max'.}
-  \item{method}{a character set to 'mean' or 'median' indicating the criterion to assess the contribution. We recommend using median in the case of count or skewed data.}
-  \item{comp}{integer value indicating the component of interest from the object.}
-  \item{ties}{boolean. If TRUE then tie groups appear in white color which will appear in the legend. Ties can happen when dealing with count data type. By default set to TRUE.}
-  \item{ndisplay}{integer. }
+\item{object}{object of class inheriting from a \code{plsda}, \code{splsda} or \code{sgccda} class},
+\item{contrib}{a character set to 'max' or 'min' indicating if the color of the bar should correspond to the group with the maximal or minimal expression levels / abundance. By default set to 'max'.}
+\item{method}{a character set to 'mean' or 'median' indicating the criterion to assess the contribution. We recommend using median in the case of count or skewed data.}
+\item{block}{A single value indicating which block to consider in a \code{sgccda} object. Defaut is set to the first block.}
+\item{comp}{integer value indicating the component of interest from the object.}
+\item{show.ties}{Boolean. If TRUE then tie groups appear in the color set by \code{col.ties}, which will appear in the legend. Ties can happen when dealing with count data type. By default set to TRUE.}
+\item{col.ties}{Color corresponding to ties, only used if \code{show.ties=TRUE} and ties are present.}
+\item{ndisplay}{integer indicating how many of the most important variables are to be plotted (ranked by decreasing weights in each PLS-component). Useful to lighten a graph.}
   \item{cex.name}{A numerical value giving the amount by which plotting the variable name text should be magnified or reduced relative to the default.}
   \item{cex.legend}{A numerical value giving the amount by which plotting the legend text should be magnified or reduced relative to the default.}
   \item{name.var}{A character vector indicating the names of the variables. The names of the vector should match the names of the input data, see example.}
-  \item{legend}{boolean indicating if the legend indicating the group outcomes should be added to the plot. Default value is TRUE.}
+\item{complete.name.var}{Boolean. If \code{name.var} is supplied with some empty names, \code{complete.name.var} allows you to use the initial variable names to complete the graph (from colnames(X)). Defaut to FALSE. }
+\item{legend}{Boolean indicating if the legend indicating the group outcomes should be added to the plot. Default value is TRUE.}
   \item{legend.color}{A color vector of length the number of group outcomes. See examples.}
   \item{main}{A set of characters to indicate the title of the plot. Default value is NULL.}
   \item{legend.title}{A set of characters to indicate the title of the legend. Default value is NULL.}
-  \item{plot}{boolean indicating of the plot should be output. If set to FALSE the user can extract the contribution matrix, see example. Default value is TRUE.}
+  \item{plot}{Boolean indicating of the plot should be output. If set to FALSE the user can extract the contribution matrix, see example. Default value is TRUE.}
 }
 
 \details{
@@ -51,9 +54,9 @@ plotContrib(
 The contribution of each variable is represented in a barplot where eachbar length corresponds to the loading weight (importance) of the feature in (sparse)PLSDA for each component. The loading weight can be  positive or negative. The color corresponds to the group in which the feature is most 'abundant'.  Note that this type of graphical output is particularly insightful for count microbial data - in that latter case using the \code{method = 'median'} is advised.
 }
 
-\author{Kim-Anh Le Cao, Benoit Gautier, Florian Rohart}
+\author{Kim-Anh Le Cao, Benoit Gautier, Florian Rohart, Francois Bartolo}
 
-\seealso{\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}, for other variable plots and http://mixOmics.org/graphics for more details.}
+\seealso{\code{\link{plotVar}}, \code{\link{cim}}, for other variable plots and http://mixOmics.org/graphics for more details.}
 
 
 \examples{
@@ -91,6 +94,9 @@ names(name.var) = rownames(liver.toxicity$gene.ID)
 plotContrib(splsda.liver, comp = 2, method = 'median', 
 name.var = name.var, cex.name = 0.5)
 
+#missing names of some genes? complete with the original names
+plotContrib(splsda.liver, comp = 2, method = 'median',
+name.var = name.var, cex.name = 0.5,complete.name.var=TRUE)
 
 # look at the contribution (median) for each variable
 plot.contrib = plotContrib(splsda.liver, comp = 2, method = 'median', plot = FALSE)
@@ -131,6 +137,7 @@ name.var = name.var, cex.name = 0.2)
 # too many transcripts? only output the top ones
 plotContrib(res.1level, comp = 2, method = 'median', legend.title = 'Stimu', 
 name.var = name.var, cex.name = 0.5, ndisplay = 60)
+
 }
 
 # object 'plsda'
@@ -150,7 +157,8 @@ names(name.var) = colnames(X)
 # with gene IDs, showing the top 60
 plotContrib(plsda.breast, contrib = 'max', comp = 1, method = 'median', 
             ndisplay = 60, 
-            name.var = name.var, cex.name = 0.6,
+            name.var = name.var,
+            cex.name = 0.6,
             legend.color = color.mixo(1:2))
 }
 
@@ -173,6 +181,26 @@ plotContrib(plsda.liver, contrib = 'max', comp = 1, method = 'median', ndisplay 
             legend.color = color.mixo(1:4))
 }
 
+# object 'sgccda'
+# ----------------
+\dontrun{
+data(nutrimouse)
+Y = nutrimouse$diet
+data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid)
+design = matrix(c(0,1,1,1,0,1,1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
+
+nutrimouse.sgccda <- wrapper.sgccda(blocks = data,
+Y = Y,
+design = design,
+keep = list(c(10,10), c(15,15)),
+ncomp = c(2, 2, 1),
+scheme = "centroid",
+verbose = FALSE,
+bias = FALSE)
+
+plotContrib(nutrimouse.sgccda,block=2)
+plotContrib(nutrimouse.sgccda,block="gene")
+}
 }
 
 \keyword{multivariate}

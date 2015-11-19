@@ -1,78 +1,80 @@
 \name{plotVar}
 \encoding{latin1}
 \alias{plotVar}
+\alias{plotVar.rcc}
+\alias{plotVar.pls}
+\alias{plotVar.spls}
+\alias{plotVar.plsda}
+\alias{plotVar.splsda}
+\alias{plotVar.pca}
+\alias{plotVar.spca}
+\alias{plotVar.sgcca}
+\alias{plotVar.rgcca}
 
 \title{Plot of Variables}
 
 \description{
-This function provides variable representation through Correlation Circle Plots for sparse)(I)PCA, (regularized)CCA, (sparse)PLS(DA) and (sparse)(R)GCCA(DA).
+This function provides variables representation for (regularized) CCA, (sparse) PLS regression, PCA and (sparse) Regularized generalised CCA.
 }
 
 \usage{
 plotVar(object,
-           comp = c(1, 2),
-           comp.select = NULL,
-           var.names = NULL,
-           blocks = NULL, 
-           X.label = NULL,
-           Y.label = NULL,
-           abline.line = TRUE,
-           col,
-           cex,
-           pch,
-           font,
-           cutoff = 0,
-           rad.in = 0.5,
-           main="Correlation Circle Plots",
-           style="ggplot2", 
-           overlap = TRUE,
-           ...)
-         
+comp = NULL,
+comp.select = comp,
+plot=TRUE,
+var.names = NULL,
+blocks = NULL, # to choose which block data to plot, when using GCCA module
+X.label = NULL,
+Y.label = NULL,
+Z.label = NULL,
+abline.line = TRUE,
+col,
+cex,
+pch,
+font,
+cutoff = 0,
+rad.in = 0.5,
+main="Correlation Circle Plots",
+add.legend = FALSE,
+style="ggplot2", # can choose between graphics,3d, lattice or ggplot2,
+overlap = TRUE,
+axes.box = "all",
+label.axes.box = "both")
 }
 
 \arguments{
-  \item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"}, 
-    \code{"spls"}, \code{"splsda"}, \code{"pca"} or \code{"spca"}.}
-    
-   \item{comp}{integer vector of length two. The components that will be used on the horizontal 
-  and the vertical axis respectively to project the variables.}
-   
-     \item{comp.select}{for the sparse versions, an input vector indicating the components on which the variables were selected. Only those selected variables are displayed. See examples with \code{sgcca}}
-
-  \item{var.names}{a list of character vectors indicating alternative names to be displayed for all variables in all data sets.  Each vector should be the length of the the total number of variables in each data set. By default set to \code{NULL} to display the original variable names from the input data (i.e. columns names 
-  of the matrices). If you do not wish to show the variable name, then specify the argument \code{pch}.}	
-
-  \item{blocks}{for an object of class \code{"rgcca"} or \code{"sgcca"}, a numerical vector indicating the blocks of variables to display.}
-  
-  \item{X.label}{x axis titles, by default set to 'Component'}
-  \item{Y.label}{y axis titles, by default set to 'Component'}
-
-  \item{abline.line}{should the vertical and horizontal line through the center be plotted? Default set to \code{TRUE}}
-
-  \item{col}{character or integer vector of colors for plotted character and symbols, can be of length the number of data sets that are integrated, or a list of vectors associated to each data set, where each vector has for length the number of variables in that data set.}
-
-  \item{cex}{numeric vector of character expansion sizes for the plotted character and symbols, can be of length the number of data sets that are integrated, or a list of vectors associated to each data set, where each vector has for length the number of variables in that data set. See \code{\link{par}} for details.}
-
-  \item{pch}{numeric vector for symbols, can be of length the number of data sets that are integrated, or a list of vectors associated to each data set, where each vector has for length the number of variables in that data set. See \code{\link{points}} for all alternatives.}
-
-  \item{font}{numeric vector for font, can be of length the number of data sets that are integrated, or a list of vectors associated to each data set, where each vector has for length the number of variables in that data set. }
-
-  \item{cutoff}{numeric between 0 and 1. Variables with correlations below this cutoff in absolute value are not plotted on any of the components specified in \code{comp}.}
-
-  \item{rad.in}{numeric between 0 and 1, the radius of the inner circle. Defaults to \code{0.5}.}
-  
-    \item{main}{character indicating the title plot.}
-    
-      \item{style}{argument to be set to either \code{'graphics'}, \code{'lattice'} or \code{'ggplot2'} for a style of plotting.} 
-      
-      
-  \item{overlap}{boolean indicating whether the correlation circle plots should be idsplayed in an overlap fashion from each data set. By default set to \code{TRUE}.}	
-
-  \item{\ldots}{not used currently.}
+\item{object}{object of class inheriting from \code{"rcc"}, \code{"pls"}, \code{"plsda"},
+\code{"spls"}, \code{"splsda"}, \code{"pca"} or \code{"spca"}.}
+\item{comp}{integer vector of length two. The components that will be used on the horizontal
+and the vertical axis respectively to project the variables. By default, comp=c(1,2) except when style='3d', comp=c(1:3) }
+\item{comp.select}{for the sparse versions, an input vector indicating the components on which the variables were selected. Only those selected variables are displayed. By default, comp.select=comp}
+\item{plot}{if TRUE (the default) then a plot is produced. If not, the summaries which the plots are based on are returned.}
+\item{var.names}{either a character vector of names for the variables to be plotted,
+or \code{FALSE} for no names. If \code{TRUE}, the col names of the first (or second)
+data matrix is used as names.}
+\item{blocks}{for an object of class \code{"rgcca"} or \code{"sgcca"}, a numerical vector indicating the block variables to display.}
+\item{X.label}{x axis titles.}
+\item{Y.label}{y axis titles.}
+\item{Z.label}{z axis titles (when style = '3d').}
+\item{abline.line}{should the vertical and horizontal line through the center be plotted? Default set to \code{FALSE}}
+\item{col}{character or integer vector of colors for plotted character and symbols, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables).
+See Details.}
+\item{cex}{numeric vector of character expansion sizes for the plotted character and symbols, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables).}
+\item{pch}{plot character. A vector of single characters
+or integers, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables). See \code{\link{points}} for all alternatives.}
+\item{font}{numeric vector of font to be used, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables). See \code{\link{par}} for details.}
+\item{cutoff}{numeric between 0 and 1. Variables with correlations below this cutoff in absolute value are not plotted (see Details).}
+\item{rad.in}{numeric between 0 and 1, the radius of the inner circle. Defaults to \code{0.5}.}
+\item{main}{character indicating the title plot.}
+\item{add.legend}{boolean. Whether the legend should be added. Default is TRUE.}
+\item{style}{argument to be set to either \code{'graphics'}, \code{'lattice'}, \code{'ggplot2'} or \code{'3d'} for a style of plotting.}
+\item{overlap}{boolean. Whether the variables should be plotted in one single figure. Default is TRUE.}
+\item{axes.box}{for style '3d', argument to be set to either \code{'axes'}, \code{'box'}, \code{'bbox'} or \code{'all'}, defining the shape of the box.}
+\item{label.axes.box}{for style '3d', argument to be set to either \code{'axes'}, \code{'box'}, \code{'both'}, indicating which labels to print.}
 }
 
 \details{
-\code{plotVar} produce a "correlation circle", i.e. the correlations 
+\code{plotVar} produce a "correlation circle", i.e. the correlations
 between each variable and the selected components are plotted as scatter plot,
 with concentric circles of radius one et radius given by \code{rad.in}. Each point 
 corresponds to a variable. For (regularized) CCA the 
@@ -98,15 +100,17 @@ the \eqn{Y} attributs. Default values exist for this arguments.
 }
 
 \value{
-You can store the function in an object which will return a matrix containing the \eqn{x}- and \eqn{y}- coordinates of the plotted variables, along with the various grpahical parameters used to generate the plot.
+A list containing the following components:
+  \item{coord.X}{matrix of \eqn{X}-variables coordinates.}
+  \item{coord.Y}{matrix of \eqn{Y}-variables coordinates.}
 }
 
-\author{Benoit Gautier, Ignacio Gonzalez, Francois Bartolo, Florian Rohart, Kim-Anh Le Cao.}
+\author{Ignacio Gonzalez, Kim-Anh Le Cao, Benoit Gautier, Florian Rohart, Francois Bartolo.}
 
 \references{Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired 'omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}}
 
 
-\seealso{\code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}}, \code{\link{par}} and http://www.mixOmics.org for more details.}
+\seealso{\code{\link{cim}}, \code{\link{network}}, \code{\link{par}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## variable representation for objects of class 'rcc'
@@ -118,21 +122,7 @@ nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 plotVar(nutri.res) #(default)
 
-# playing with the style
-plotVar(nutri.res, style = 'lattice') #(default)
-
-# changing x and y labels
-plotVar(nutri.res, comp = c(1,3), cutoff = 0.5, 
-        X.label = 'PC1', Y.label = 'PC3')
-
-# one correlation circle plot per data set
-plotVar(nutri.res, comp = c(1,2), cutoff = 0.5, 
-        overlap = FALSE)
-
-
-# with pch symbols
-plotVar(nutri.res, comp = c(1,2), pch = c(16,2))
-
+plotVar(nutri.res, comp = c(1,3), cutoff = 0.5)
 
 ## variable representation for objects of class 'pls' or 'spls'
 # ----------------------------------------------------
@@ -141,50 +131,25 @@ X <- liver.toxicity$gene
 Y <- liver.toxicity$clinic
 toxicity.spls <- spls(X, Y, ncomp = 3, keepX = c(50, 50, 50), 
                       keepY = c(10, 10, 10))
-
-# default shows only the variables selected on the plotted components
-plotVar(toxicity.spls)
-
-# shows only the variables selected on the plotted components
-plotVar(toxicity.spls, comp = c(1,3))
-
-# shows only the variables selected on the selected components
-plotVar(toxicity.spls, comp.select = c(1:3))
-
-
-# change variable names
-new.names = list(paste('gene', 1:ncol(X)), paste('clinic', 1:ncol(Y)))
-plotVar(toxicity.spls, overlap = FALSE, var.names = new.names)
-
-# prefilter even further and use of pch
-plotVar(toxicity.spls, comp.select = c(1:3), cutoff = 0.8, pch = c(15,16))
-
-# change colors
-plotVar(toxicity.spls, col = color.mixo(3:4))
-
-my.col = list(c(rep(1, ncol(X))), c(rep(3,ncol(Y))))
-plotVar(toxicity.spls, col = my.col)
-
+	
+plotVar(toxicity.spls, cex = c(1,0.8))
 
 ## variable representation for objects of class 'splsda'
 # ----------------------------------------------------
 \dontrun{
-  data(liver.toxicity)
-  X <- liver.toxicity$gene
-  Y <- as.factor(liver.toxicity$treatment[, 4])
-  
-  ncomp <- 2
-  keepX <- rep(20, ncomp)
-  
-  splsda.liver <- splsda(X, Y, ncomp = ncomp, keepX = keepX)
-  # use of pch symbols
-  plotVar(splsda.liver, pch = 16, col = 3)
+data(liver.toxicity)
+X <- liver.toxicity$gene
+Y <- as.factor(liver.toxicity$treatment[, 4])
 
+ncomp <- 2
+keepX <- rep(20, ncomp)
+
+splsda.liver <- splsda(X, Y, ncomp = ncomp, keepX = keepX)
+plotVar(splsda.liver)
 }
 
-## variable representation for objects of class 'sgcca' 
+## variable representation for objects of class 'sgcca' (or 'rgcca')
 # ----------------------------------------------------
-
 ## see example in ??wrapper.sgcca
 data(nutrimouse)
 # need to unmap the Y factor diet
@@ -209,24 +174,28 @@ design = matrix(c(0,1,1,
 wrap.result.sgcca = wrapper.sgcca(blocks = data, design = design, penalty = c(.3,.3, 1),
                                   ncomp = c(2, 2, 1),
                                   scheme = "centroid", verbose = FALSE)
-#wrap.result.sgcca
+wrap.result.sgcca
+
+#variables selected on component 1 for the two blocks:
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$name.var
+
+#variables selected on component 2 for each block: 
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$name.var
 
 
-# showing 2 blocks, with variables selected on comp 1 for block 1 and comp 1 for block 2
-plotVar(wrap.result.sgcca, comp = c(1,2), 
-        blocks = c(1,2), comp.select = c(1,1), 
-        overlap = FALSE,
-        main = 'Variables selected on component 1 only')
+plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), comp.select = c(1,1),
+main = c('Variables selected on component 1 only'))
 
+\dontrun{
+    plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), comp.select = c(2,2),
+    main = c('Variables selected on component 2 only'))
 
-# displaying variables selected on comp 2 for block 1 and comp 2 for block 2
-plotVar(wrap.result.sgcca, comp = c(1,2), blocks = c(1,2), comp.select = c(2,2), 
-        main = 'Variables selected on component 2 only')
-
-
+    # -> this one shows the variables selected on both components
+    plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2),
+    main = c('Variables selected on components 1 and 2'))
+}
 ## variable representation for objects of class 'rgcca'
 # ----------------------------------------------------
-\dontrun{
 data(nutrimouse)
 # need to unmap Y for an unsupervised analysis, where Y is included as a data block in data
 Y = unmap(nutrimouse$diet)
@@ -237,36 +206,36 @@ design = matrix(c(0,1,1,1,0,1,1,1,0), ncol = 3, nrow = 3,
                 byrow = TRUE, dimnames = list(names(data), names(data)))
 
 nutrimouse.rgcca <- wrapper.rgcca(blocks = data,
-                                  design = design,
-                                  tau = "optimal",
-                                  ncomp = c(2, 2, 1),
-                                  scheme = "centroid",
-                                  verbose = FALSE)
+                                         design = design,
+                                         tau = "optimal",
+                                         ncomp = c(2, 2, 1),
+                                         scheme = "centroid",
+                                         verbose = FALSE)
 
-# changing cex
-plotVar(nutrimouse.rgcca, comp = c(1,2), blocks = c(1,2), cex = c(1.5, 1.5))
-# changing font
-plotVar(nutrimouse.rgcca, comp = c(1,2), blocks = c(1,2), font = c(1,3))
+plotVar(nutrimouse.rgcca, comp = c(1,2), block = c(1,2), cex = c(1.5, 1.5))
+
+\dontrun{
+    plotVar(nutrimouse.rgcca, comp = c(1,2), block = c(1,2))
 
 
-# set up the data as list
-data = list(nutrimouse$gene, nutrimouse$lipid,Y)
-# with this design, gene expression and lipids are connected to the diet factor
-# design = matrix(c(0,0,1,
-#                   0,0,1,
-#                   1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
+    # set up the data as list
+    data = list(nutrimouse$gene, nutrimouse$lipid,Y)
+    # with this design, gene expression and lipids are connected to the diet factor
+    # design = matrix(c(0,0,1,
+    #                   0,0,1,
+    #                   1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
 
-# with this design, gene expression and lipids are connected to the diet factor
-# and gene expression and lipids are also connected
-design = matrix(c(0,1,1,
-                  1,0,1,
-                  1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
-#note: the tau parameter is the regularization parameter
-wrap.result.rgcca = wrapper.rgcca(blocks = data, design = design, tau = c(1, 1, 0),
-                                  ncomp = c(2, 2, 1),
-                                  scheme = "centroid", verbose = FALSE)
-#wrap.result.rgcca
-plotVar(wrap.result.rgcca, comp = c(1,2), blocks = c(1,2))
+    # with this design, gene expression and lipids are connected to the diet factor
+    # and gene expression and lipids are also connected
+    design = matrix(c(0,1,1,
+                      1,0,1,
+                      1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
+    #note: the tau parameter is the regularization parameter
+    wrap.result.rgcca = wrapper.rgcca(blocks = data, design = design, tau = c(1, 1, 0),
+                                      ncomp = c(2, 2, 1),
+                                      scheme = "centroid", verbose = FALSE)
+    #wrap.result.rgcca
+    plotVar(wrap.result.rgcca, comp = c(1,2), block = c(1,2))
 }
 }
 

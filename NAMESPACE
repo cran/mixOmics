@@ -1,11 +1,11 @@
 
-import(MASS, lattice, igraph, rgl, pheatmap, ggplot2, ellipse)
+import(MASS, lattice, igraph, rgl, ggplot2,corpcor)
 
 importFrom("grDevices", "as.graphicsAnnot", "chull", "col2rgb",
              "colorRamp", "colorRampPalette", "colors", "dev.cur",
              "dev.new", "dev.off", "dev.prev", "dev.set",
              "devAskNewPage", "graphics.off", "gray", "gray.colors",
-             "heat.colors", "rgb")
+             "heat.colors", "rgb","jpeg", "pdf", "tiff", "x11")
 
 importFrom("graphics", "abline", "arrows", "axis", "barplot", "box",
              "image", "layout", "legend", "lines", "locator", "mtext",
@@ -17,8 +17,9 @@ importFrom("stats", "as.dendrogram", "as.dist", "coefficients", "cor",
              "cov", "dist", "hclust", "lm", "lsfit", "median", "na.omit",
              "order.dendrogram", "predict", "quantile", "reorder", "var")
 
-importFrom("utils", "setTxtProgressBar", "txtProgressBar")
+importFrom("utils", "setTxtProgressBar", "txtProgressBar","packageDescription")
 
+importFrom("ellipse","ellipse")
 
 export(
 bin.color, 
@@ -49,10 +50,7 @@ nipals,
 pca,
 pcasvd,
 perf,
-pheatmap.multilevel,
-plotContrib,
-plot3dIndiv, 
-plot3dVar,
+plotArrow,
 plotContrib,
 plotIndiv, 
 plotVar, 
@@ -97,6 +95,7 @@ S3method(plot, perf)
 S3method(plot, rcc)
 S3method(plot, pca)
 
+
 S3method(predict, pls)
 S3method(predict, spls)
 S3method(predict, plsda)
@@ -119,39 +118,10 @@ S3method(print, sipca)
 S3method(print, sgcca)
 S3method(print, rgcca)
 
-S3method(plot3dIndiv, pls)
-S3method(plot3dIndiv, spls)
-S3method(plot3dIndiv, plsda)
-S3method(plot3dIndiv, splsda)
-S3method(plot3dIndiv, rcc)
-S3method(plot3dIndiv, pca)
-S3method(plot3dIndiv, ipca)
-S3method(plot3dIndiv, sipca)
-
-S3method(plot3dVar, pls)
-S3method(plot3dVar, spls)
-S3method(plot3dVar, rcc)
-S3method(plot3dVar, pca)
-S3method(plot3dVar, plsda)
-S3method(plot3dVar, splsda)
-S3method(plot3dVar, spca)
-S3method(plot3dVar, ipca)
-S3method(plot3dVar, sipca)
 
 S3method(selectVar, pls)
 S3method(selectVar, plsda)
 S3method(selectVar, pca)
-S3method(selectVar, spls)
-S3method(selectVar, splsda)
-S3method(selectVar, spca)
 S3method(selectVar, sipca)
 S3method(selectVar, sgcca)
-
-S3method(network, default)
-S3method(network, rcc)
-S3method(network, pls)
-S3method(network, spls)
-
-S3method(pheatmap.multilevel, splsda1fact)
-S3method(pheatmap.multilevel, splsda2fact)
 

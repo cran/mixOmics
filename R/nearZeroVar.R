@@ -41,7 +41,7 @@ function (x, freqCut = 95/5, uniqueCut = 10)
     ## changed in mixOmics, here we are dealing with matrices only
     # (FR: it might speed up computation if we have a LOT of columns
     #percentUnique = 100 * lunique/apply(x, 2, length)
-     percentUnique = 100 * lunique/rep(nrow(x))
+     percentUnique = 100 * lunique/nrow(x)
     zeroVar = (lunique == 1) | apply(x, 2, function(data) all(is.na(data)))
 	
     out = list()

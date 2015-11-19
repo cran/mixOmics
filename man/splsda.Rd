@@ -4,7 +4,7 @@
 
 \title{Sparse Partial Least Squares Discriminant Analysis (sPLS-DA)}
 
-\description{Function to perform sparse Partial Least Squares to classify samples (supervised analysis). sPLS-DA approach enables variable selection.
+\description{Function to perform sparse Partial Least Squares to classify samples (supervised analysis) and select variables.
 }
 
 \usage{
@@ -58,7 +58,6 @@ Le Cao, K.-A., Boitard, S. and Besse, P. (2011). Sparse PLS Discriminant Analysi
 
 \seealso{\code{\link{spls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
 \code{\link{cim}}, \code{\link{network}}, \code{\link{predict}}, \code{\link{perf}} and http://www.mixOmics.org for more details.}
 
 \examples{

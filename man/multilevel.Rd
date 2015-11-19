@@ -145,7 +145,6 @@ Genetics and Molecular Biology} \bold{7}, article 35.
 
 \seealso{\code{\link{spls}}, \code{\link{splsda}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}},
 \code{\link{cim}}, \code{\link{network}}.}
 
 \examples{

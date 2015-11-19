@@ -11,7 +11,12 @@ to seek correlations between two data matrices.
 }
 
 \usage{
-rcc(X, Y, ncomp = 2, lambda1 = 0, lambda2 = 0)
+rcc(X,
+    Y,
+    ncomp = 2,
+    method = "ridge", #choose between c("ridge", "shrinkage")
+    lambda1 = 0,
+    lambda2 = 0)
 }
 
 \arguments{
@@ -19,9 +24,10 @@ rcc(X, Y, ncomp = 2, lambda1 = 0, lambda2 = 0)
     \code{NA}s are allowed.}
   \item{Y}{numeric matrix or data frame \eqn{(n \times q)}, the observations on the \eqn{Y} variables.
     \code{NA}s are allowed.}
+\item{method}{One of "ridge" or "shrinkage". If "ridge", \code{lambda1} and \code{lambda2} need to be supplied (see also our function tune.rcc); if "shrinkage", parameters are directly estimated with Strimmer's formula, see below and reference.}
   \item{ncomp}{the number of components to include in the model. Default to 2.}
-  \item{lambda1, lambda2}{a not negative real. The regularization parameter for the \emph{X} and
-    \emph{Y} data. Defaults to \code{lambda1=lambda2=0}.}	
+  \item{lambda1, lambda2}{a non-negative real. The regularization parameter for the \emph{X} and
+\emph{Y} data. Defaults to \code{lambda1=lambda2=0}. Only used if \code{method="ridge"}}
 }
 
 \details{
@@ -47,6 +53,10 @@ Cov\eqn{(X)+ \lambda_1 I} and Cov\eqn{(Y)+ \lambda_2 I}.
 When \code{lambda1=0} and \code{lambda2=0}, \code{rcc} performs a classical
 CCA, if possible (i.e. when \eqn{n > p+q}.
 
+The shrinkage estimates \code{method = "shrinkage"} can be used to bypass \code{\link{tune.rcc}} to choose the shrinkage parameters - which can be long and costly to compute with very large data sets. Note that both functions \code{\link{tune.rcc}}  (which uses cross-validation) and the whrinkage parameters (which uses the formula from Schafer and Strimmer) may output different results. 
+  
+Note: when \code{method = "shrinkage"} the input data are centered and scaled for the estimation of the shrinkage parameters and the calculation of the regularised variance-covariance matrices in \code{\link{rcc}}.
+
 The estimation of the missing values can be performed 
 by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
 values are handled by casewise deletion in the \code{rcc} function.
@@ -58,7 +68,7 @@ contains the following components:
   \item{X}{the original \eqn{X} data.}
   \item{Y}{the original \eqn{Y} data.}
   \item{cor}{a vector containing the canonical correlations.}
-  \item{lambda}{a vector containing the regularization parameters.}
+  \item{lambda}{a vector containing the regularization parameters whether those were input if ridge method or directly estimated with the shrinkage method.}
   \item{loadings}{list containing the estimated coefficients used to calculate the canonical variates in  \eqn{X} and \eqn{Y}.}
   \item{variates}{list containing the canonical variates.}	
   \item{names}{list containing the names to be used for individuals and variables.} 
@@ -75,13 +85,18 @@ Canonical correlation analysis when the data are curves.
 
 Vinod, H. D. (1976). Canonical ridge and econometrics of joint production. 
 \emph{Journal of Econometrics} \bold{6}, 129-137.
+
+Opgen-Rhein, R., and K. Strimmer. 2007. Accurate ranking of differentially expressed genes by a distribution-free shrinkage approach. Statist. emph{Appl. Genet. Mol. Biol.} \bold{6}:9. (http://www.bepress.com/sagmb/vol6/iss1/art9/)
+
+Sch"afer, J., and K. Strimmer. 2005. A shrinkage approach to large-scale covariance estimation and implications for functional genomics. Statist. emph{Appl. Genet. Mol. Biol.}  \bold{4}:32. (http://www.bepress.com/sagmb/vol4/iss1/art32/)
+
 }
 
-\author{Sebastien Dejean and Ignacio Gonzalez.}
+\author{Sebastien Dejean, Ignacio Gonzalez, Francois Bartolo.}
 
 \seealso{\code{\link{summary}}, \code{\link{tune.rcc}}, 
-\code{\link{plot.rcc}}, \code{\link{plotIndiv}}, \code{\link{plot3dIndiv}},
-\code{\link{plotVar}}, \code{\link{plot3dVar}}, \code{\link{cim}}, \code{\link{network}} and http://www.mixOmics.org for more details.}
+\code{\link{plot.rcc}}, \code{\link{plotIndiv}},
+\code{\link{plotVar}}, \code{\link{cim}}, \code{\link{network}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## Classic CCA
@@ -94,7 +109,12 @@ linn.res <- rcc(X, Y)
 data(nutrimouse)
 X <- nutrimouse$lipid
 Y <- nutrimouse$gene
-nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
+nutri.res1 <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
+
+## using shrinkage parameters
+nutri.res2 <- rcc(X, Y, ncomp = 3, method = 'shrinkage')
+nutri.res2$lambda # the shrinkage parameters
+
 }
 
 \keyword{multivariate}

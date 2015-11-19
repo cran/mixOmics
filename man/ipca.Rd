@@ -9,10 +9,14 @@ Performs independent principal component analysis on the given data matrix, a co
 }
 
 \usage{
-ipca(X, ncomp = 3, mode = c("deflation","parallel"),
-          fun = c("logcosh", "exp"),
-          scale = FALSE, max.iter = 200, 
-          tol = 1e-04, w.init=NULL)
+ipca(X,
+ncomp = 2,
+mode = "deflation",
+fun = "logcosh",
+scale = FALSE,
+w.init = NULL,
+max.iter = 200,
+tol = 1e-04)
 }
 
 \arguments{
@@ -71,7 +75,6 @@ J L Marchini, C Heaton and B D Ripley (2010). fastICA: FastICA Algorithms to per
 
 \seealso{\code{\link{sipca}}, \code{\link{pca}},
 \code{\link{plotIndiv}}, \code{\link{plotVar}},
-\code{\link{plot3dIndiv}}, \code{\link{plot3dVar}}
 and http://www.mixOmics.org for more details.}
 
 \examples{
@@ -85,16 +88,15 @@ ipca.res
 plotIndiv(ipca.res, ind.names = as.character(liver.toxicity$treatment[, 4]),
           group = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
 \dontrun{
-plot3dIndiv(ipca.res, cex = 0.01,
-            col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
+plotIndiv(ipca.res, cex = 0.01,
+            col = as.numeric(as.factor(liver.toxicity$treatment[, 4])),style="3d")
 }
 
 # variables representation
-plotVar(ipca.res, var.label = TRUE, cex = 0.5)
+plotVar(ipca.res, cex = 0.5)
 
 \dontrun{
-plot3dVar(ipca.res, rad.in = 0.5, cex = 0.5, 
-          col = as.numeric(as.factor(liver.toxicity$treatment[, 4])))
+plotVar(ipca.res, rad.in = 0.5, cex = 0.5,style="3d")
           }
 }
 

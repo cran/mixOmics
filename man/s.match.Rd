@@ -66,6 +66,7 @@ Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse ca
 for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 }
 
+\seealso{\code{\link{plotArrow}}}
 \examples{
 
 ## relevant only for canonical mode

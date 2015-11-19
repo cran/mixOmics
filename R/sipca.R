@@ -1,10 +1,13 @@
 # Copyright (C) 2009 
-# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
-# Queensland Facility for Bioinformatics, University of Queensland, Australia
 # Fangzhou Yao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia and
 # Shangai University of Finance and Economics, Shanghai, P.R. China
 # Jeff Coquery, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia and
 # Sup Biotech, Paris, France
+# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
+# Queensland Facility for Bioinformatics, University of Queensland, Australia
+
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -118,11 +121,12 @@ function (X, ncomp  = 3, mode = c("deflation","parallel"),
         cl = match.call()
 		cl[[1]] = as.name('sipca')
 
-        result = (list(call=cl, X = X, ncomp=ncomp, keepX=keepX, unmixing = t(unmix_mat), mixing = t(mix_mat), loadings = t(independent_mat.new), kurtosis = kurt[order(kurt,decreasing=TRUE)],
-		names = list(X = X.names, indiv = ind.names)))
+        result = (list(call=cl, X = X, ncomp=ncomp, keepX=keepX, unmixing = t(unmix_mat), mixing = t(mix_mat), loadings = list(t(independent_mat.new)), rotation = t(independent_mat.new),
+        kurtosis = kurt[order(kurt,decreasing=TRUE)],names = list(X = X.names, indiv = ind.names)))
 		
 		result$x = ipc_mat
-        dimnames(result$x) = list(ind.names, paste("IPC", 1:ncol(result$loadings), sep = " "))
+        result$variates=list(ipc_mat)
+        dimnames(result$x) = list(ind.names, paste("IPC", 1:ncol(result$rotation), sep = " "))
 		
 		class(result) = c("sipca")
 		return(invisible(result))

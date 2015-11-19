@@ -28,7 +28,7 @@ function (X, Y, lambda1, lambda2)
     nr = nrow(X)
      
     for (i in 1:nr) {
-        rcc.v = rcc(X[-i, ], Y[-i, ], 1, lambda1, lambda2)
+        rcc.v = rcc(X[-i, ], Y[-i, ], 1, lambda1, lambda2,method="ridge")
         X[i, is.na(X[i, ])] = 0
         Y[i, is.na(Y[i, ])] = 0
         xscore[i] = crossprod(X[i, ], rcc.v$loadings$X[, 1])

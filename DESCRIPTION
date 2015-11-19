@@ -1,10 +1,10 @@
 Package: mixOmics
 Type: Package
 Title: Omics Data Integration Project
-Version: 5.1.2
-Date: 2015-07-30
+Version: 5.2.0
+Date: 2015-11-06
 Depends: R (>= 2.10), MASS, lattice, ggplot2
-Imports: igraph, rgl, pheatmap, ellipse
+Imports: igraph, rgl, ellipse, corpcor
 Author: Kim-Anh Le Cao,  Ignacio Gonzalez, Sebastien Dejean with key contributors Florian Rohart, Benoit Gautier
         and contributions from Pierre Monget, Jeff Coquery, FangZou Yao, Benoit Liquet. 
 Maintainer: Kim-Anh Le Cao <k.lecao@uq.edu.au>
@@ -27,6 +27,6 @@ URL: http://www.mixOmics.org
 BugReports: mixomics@math.univ-toulouse.fr or
         https://bitbucket.org/klecao/package-mixomics/issues
 Repository: CRAN
-Date/Publication: 2015-08-29 09:26:37
-Packaged: 2015-08-29 00:12:30 UTC; klecao
+Date/Publication: 2015-11-19 11:02:25
+Packaged: 2015-11-19 02:17:00 UTC; klecao
 NeedsCompilation: no
