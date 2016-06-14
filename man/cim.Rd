@@ -27,7 +27,7 @@ transpose = FALSE,
 symkey = TRUE,
 keysize = c(1, 1),
 zoom = FALSE,
-main = NULL,
+title = NULL,
 xlab = NULL,
 ylab = NULL,
 margins = c(5, 5),
@@ -101,7 +101,7 @@ name.save = NULL)
   
   \item{zoom}{logical. Whether to use zoom for interactive zoom. See Details.}
   
-  \item{main, xlab, ylab}{main, \eqn{x}- and \eqn{y}-axis titles; default to none.}
+  \item{title, xlab, ylab}{title, \eqn{x}- and \eqn{y}-axis titles; default to none.}
   
   \item{margins}{numeric vector of length two containing the margins (see \code{\link{par}(mar)}) 
 	for column and row names respectively.}
@@ -202,7 +202,7 @@ paired 'omics' data sets. \emph{BioData Mining}; \bold{5}(1).
 \url{http://mixomics.org/graphics/} for more details on all options available.}
 
 \examples{
-## default method: shwos cross correlation between 2 data sets
+## default method: shows cross correlation between 2 data sets
 #------------------------------------------------------------------
 data(nutrimouse)
 X <- nutrimouse$lipid
@@ -213,9 +213,11 @@ cim(cor(X, Y), cluster = "none")
   
 ## CIM representation for objects of class 'rcc'
 #------------------------------------------------------------------
+\dontrun{
 nutri.rcc <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 cim(nutri.rcc, xlab = "genes", ylab = "lipids", margins = c(5, 6))
+}
 
 #-- interactive 'zoom' available as below
 \dontrun{
@@ -244,6 +246,7 @@ cim(nutri.rcc, xlab = "genes", ylab = "lipids", margins = c(5, 6))
 }
 ## CIM representation for objects of class 'spca' (also works for sipca)
 #------------------------------------------------------------------
+\dontrun{
 data(liver.toxicity)
 X <- liver.toxicity$gene
 
@@ -255,10 +258,11 @@ dose.col <- color.mixo(as.numeric(as.factor(liver.toxicity$treatment[, 3])))
 cim(liver.spca, row.sideColors = dose.col, col.names = FALSE,
     row.names = liver.toxicity$treatment[, 3],
     clust.method = c("ward", "ward"))
-    
+}
 
 ## CIM representation for objects of class '(s)pls' 
 #------------------------------------------------------------------
+\dontrun{
 data(liver.toxicity)
 
 X <- liver.toxicity$gene
@@ -270,7 +274,7 @@ liver.spls <- spls(X, Y, ncomp = 3,
 # default
 cim(liver.spls)
 
-\dontrun{
+
     # transpose matrix, choose clustering method
     cim(liver.spls, transpose = TRUE,   
         clust.method = c("ward", "ward"), margins = c(5, 7))
@@ -304,12 +308,21 @@ cim(liver.spls)
 
 ## CIM representation for objects of class '(s)plsda' 
 #------------------------------------------------------------------
+\dontrun{
+
+data(liver.toxicity)
+
+X <- liver.toxicity$gene
 # Setting up the Y outcome first
 Y <- liver.toxicity$treatment[, 3]
+#set up colors for cim
+dose.col <- color.mixo(as.numeric(as.factor(liver.toxicity$treatment[, 3])))
+
 
 liver.splsda <- splsda(X, Y, ncomp = 2, keepX = c(40, 30))
 
 cim(liver.splsda, row.sideColors = dose.col, row.names = Y)
+}
 
 
 ## CIM representation for objects of class splsda 'multilevel' 
@@ -317,26 +330,26 @@ cim(liver.splsda, row.sideColors = dose.col, row.names = Y)
 #------------------------------------------------------------------
 data(vac18.simulated)
 X <- vac18.simulated$genes
-design <- data.frame(samp = vac18.simulated$sample,
-                     time = vac18.simulated$time,
-                     stim = vac18.simulated$stimulation)
+design <- data.frame(samp = vac18.simulated$sample)
+Y = data.frame(time = vac18.simulated$time,
+               stim = vac18.simulated$stimulation)
 
-res.2level <- multilevel(X, ncomp = 2, design = design,
-                         keepX = c(120, 10), method = 'splsda')
+res.2level <- splsda(X, Y = Y, ncomp = 2, multilevel = design,
+                        keepX = c(120, 10))
 
 #define colors for the levels: stimulation and time
 stim.col <- c("darkblue", "purple", "green4","red3")
-stim.col <- stim.col[as.numeric(design$stim)]
-time.col <- c("orange", "cyan")[as.numeric(design$time)]
+stim.col <- stim.col[as.numeric(Y$stim)]
+time.col <- c("orange", "cyan")[as.numeric(Y$time)]
 
 
 # The row side bar indicates the two levels of the facteor, stimulation and time.
 # the sample names have been motified on the plot.
 cim(res.2level, row.sideColors = cbind(stim.col, time.col), 
-    row.names = paste(design$time, design$stim, sep = "_"),
+    row.names = paste(Y$time, Y$stim, sep = "_"),
     col.names = FALSE,
   #setting up legend:
-    legend=list(legend = c(levels(design$time), levels(design$stim)), 
+    legend=list(legend = c(levels(Y$time), levels(Y$stim)),
                 col = c("orange", "cyan", "darkblue", "purple", "green4","red3"), 
                 title = "Condition", cex = 0.7)
 )
@@ -355,12 +368,11 @@ repeat.indiv <- c(1, 2, 1, 2, 1, 2, 1, 2, 3, 3, 4, 3, 4, 3, 4, 4, 5, 6, 5, 5,
 # in the design (1 factor only here, sample)
 # sPLS takes as an input 2 data sets, and the variables selected
 design <- data.frame(sample = repeat.indiv) 
-res.spls.1level <- multilevel(X = liver.toxicity$gene,
+res.spls.1level <- spls(X = liver.toxicity$gene,
                               Y=liver.toxicity$clinic,
-                              design = design,
+                              multilevel = design,
                               ncomp = 2,
                               keepX = c(50, 50), keepY = c(5, 5),
-                              method = 'spls', 
                               mode = 'canonical')
 
 stim.col <- c("darkblue", "purple", "green4","red3")

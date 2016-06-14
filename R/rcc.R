@@ -1,8 +1,15 @@
+#############################################################################################################
+# Authors:
+#   Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+#   Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+#   Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+#   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#
+# created: 2009
+# last modified: 03-03-2016
+#
 # Copyright (C) 2009
-# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
-# Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,9 +24,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
 
 
-rcc <-
+rcc =
 function(   X,
             Y,
             ncomp = 2,
@@ -202,9 +210,15 @@ function(   X,
     cor = cor,
     loadings = list(X = xcoef, Y = ycoef),
     variates = list(X = U, Y = V),
-    names = list(X = X.names, Y = Y.names, indiv = ind.names,
+    names = list(sample = ind.names, colnames = list(X=colnames(X),Y=colnames(Y)), blocks = c("X","Y"),#list(X = X.names, Y = Y.names, indiv = ind.names,
     data = data.names),
     lambda = lambda)
+    
+    #calcul explained variance
+    explX=explained_variance(result$X,result$variates$X,ncomp)
+    explY=explained_variance(result$Y,result$variates$Y,ncomp)
+    result$explained_variance=list(X=explX,Y=explY)
+    
     
     class(result) = "rcc"
     return(invisible(result))

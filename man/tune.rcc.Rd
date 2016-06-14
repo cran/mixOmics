@@ -14,8 +14,8 @@ grid to determine optimal values for the parameters of regularization in
 \usage{
 tune.rcc(X, Y, grid1 = seq(0.001, 1, length = 5), 
             grid2 = seq(0.001, 1, length = 5), 
-            validation = c("loo", "Mfold"), folds,  
-            M = 10, plt = TRUE)
+            validation = c("loo", "Mfold"),
+            folds = 10, plot = TRUE)
 }
 
 \arguments{
@@ -28,11 +28,9 @@ tune.rcc(X, Y, grid1 = seq(0.001, 1, length = 5),
 	\code{grid1=grid2=seq(0.001, 1, length=5)}.}
   \item{validation}{character string. What kind of (internal) cross-validation method to use, 
     (partially) matching one of \code{"loo"} (leave-one-out) or \code{"Mfolds"} (M-folds). See Details.}
-  \item{folds}{list of vectors (as returned by \code{\link{split}}) 
-	containing the indices for the validation sample (see Details).}	
-  \item{M}{positive integer. Number of folds to use if \code{validation="Mfold"}. Defaults to
-    \code{M=10}.}
-  \item{plt}{logical argument indicating whether a image map should be
+  \item{folds}{positive integer. Number of folds to use if \code{validation="Mfold"}. Defaults to
+    \code{folds=10}.}
+  \item{plot}{logical argument indicating whether a image map should be
 	plotted by calling the \code{imgCV} function.}	
 
 }
@@ -65,7 +63,7 @@ The returned value is a list with components:
 
 \author{Sebastien Dejean and Ignacio Gonzalez.}
 
-\seealso{\code{\link{loo}}, \code{\link{Mfold}}, \code{\link{image.tune.rcc}} and http://www.mixOmics.org for more details.}
+\seealso{\code{\link{image.tune.rcc}} and http://www.mixOmics.org for more details.}
 
 \examples{
 data(nutrimouse)

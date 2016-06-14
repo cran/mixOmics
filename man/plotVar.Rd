@@ -27,15 +27,15 @@ blocks = NULL, # to choose which block data to plot, when using GCCA module
 X.label = NULL,
 Y.label = NULL,
 Z.label = NULL,
-abline.line = TRUE,
+abline = TRUE,
 col,
 cex,
 pch,
 font,
 cutoff = 0,
 rad.in = 0.5,
-main="Correlation Circle Plots",
-add.legend = FALSE,
+title="Correlation Circle Plots",
+legend = FALSE,
 style="ggplot2", # can choose between graphics,3d, lattice or ggplot2,
 overlap = TRUE,
 axes.box = "all",
@@ -56,7 +56,7 @@ data matrix is used as names.}
 \item{X.label}{x axis titles.}
 \item{Y.label}{y axis titles.}
 \item{Z.label}{z axis titles (when style = '3d').}
-\item{abline.line}{should the vertical and horizontal line through the center be plotted? Default set to \code{FALSE}}
+\item{abline}{should the vertical and horizontal line through the center be plotted? Default set to \code{FALSE}}
 \item{col}{character or integer vector of colors for plotted character and symbols, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables).
 See Details.}
 \item{cex}{numeric vector of character expansion sizes for the plotted character and symbols, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables).}
@@ -65,8 +65,8 @@ or integers, can be of length 2 (one for each data set) or of length (p+q) (i.e.
 \item{font}{numeric vector of font to be used, can be of length 2 (one for each data set) or of length (p+q) (i.e. the total number of variables). See \code{\link{par}} for details.}
 \item{cutoff}{numeric between 0 and 1. Variables with correlations below this cutoff in absolute value are not plotted (see Details).}
 \item{rad.in}{numeric between 0 and 1, the radius of the inner circle. Defaults to \code{0.5}.}
-\item{main}{character indicating the title plot.}
-\item{add.legend}{boolean. Whether the legend should be added. Default is TRUE.}
+\item{title}{character indicating the title plot.}
+\item{legend}{boolean. Whether the legend should be added. Default is TRUE.}
 \item{style}{argument to be set to either \code{'graphics'}, \code{'lattice'}, \code{'ggplot2'} or \code{'3d'} for a style of plotting.}
 \item{overlap}{boolean. Whether the variables should be plotted in one single figure. Default is TRUE.}
 \item{axes.box}{for style '3d', argument to be set to either \code{'axes'}, \code{'box'}, \code{'bbox'} or \code{'all'}, defining the shape of the box.}
@@ -155,7 +155,7 @@ data(nutrimouse)
 # need to unmap the Y factor diet
 Y = unmap(nutrimouse$diet)
 # set up the data as list
-data = list(nutrimouse$gene, nutrimouse$lipid,Y)
+data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid, Y = Y)
 
 # set up the design matrix:
 # with this design, gene expression and lipids are connected to the diet factor
@@ -171,28 +171,29 @@ design = matrix(c(0,1,1,
 
 
 #note: the penalty parameters will need to be tuned
-wrap.result.sgcca = wrapper.sgcca(blocks = data, design = design, penalty = c(.3,.3, 1),
-                                  ncomp = c(2, 2, 1),
+wrap.result.sgcca = wrapper.sgcca(X = data, design = design, penalty = c(.3,.3, 1),
+                                  ncomp = 2,
                                   scheme = "centroid", verbose = FALSE)
 wrap.result.sgcca
 
-#variables selected on component 1 for the two blocks:
-selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$name.var
+#variables selected on component 1 for each block
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'gene'$name
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'lipid'$name
 
-#variables selected on component 2 for each block: 
-selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$name.var
-
+#variables selected on component 2 for each block
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'gene'$name
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'lipid'$name
 
 plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), comp.select = c(1,1),
-main = c('Variables selected on component 1 only'))
+title = c('Variables selected on component 1 only'))
 
 \dontrun{
     plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2), comp.select = c(2,2),
-    main = c('Variables selected on component 2 only'))
+    title = c('Variables selected on component 2 only'))
 
     # -> this one shows the variables selected on both components
     plotVar(wrap.result.sgcca, comp = c(1,2), block = c(1,2),
-    main = c('Variables selected on components 1 and 2'))
+    title = c('Variables selected on components 1 and 2'))
 }
 ## variable representation for objects of class 'rgcca'
 # ----------------------------------------------------
@@ -205,10 +206,10 @@ data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid, Y = Y)
 design = matrix(c(0,1,1,1,0,1,1,1,0), ncol = 3, nrow = 3, 
                 byrow = TRUE, dimnames = list(names(data), names(data)))
 
-nutrimouse.rgcca <- wrapper.rgcca(blocks = data,
+nutrimouse.rgcca <- wrapper.rgcca(X = data,
                                          design = design,
                                          tau = "optimal",
-                                         ncomp = c(2, 2, 1),
+                                         ncomp = 2,
                                          scheme = "centroid",
                                          verbose = FALSE)
 
@@ -231,8 +232,8 @@ plotVar(nutrimouse.rgcca, comp = c(1,2), block = c(1,2), cex = c(1.5, 1.5))
                       1,0,1,
                       1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
     #note: the tau parameter is the regularization parameter
-    wrap.result.rgcca = wrapper.rgcca(blocks = data, design = design, tau = c(1, 1, 0),
-                                      ncomp = c(2, 2, 1),
+    wrap.result.rgcca = wrapper.rgcca(X = data, design = design, tau = c(1, 1, 0),
+                                      ncomp = 2,
                                       scheme = "centroid", verbose = FALSE)
     #wrap.result.rgcca
     plotVar(wrap.result.rgcca, comp = c(1,2), block = c(1,2))

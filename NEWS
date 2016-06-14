@@ -1,30 +1,77 @@
+Changes in 6.0.0 (major, implementation improvements and new methods)
+================
+In short,
+- argument names which changed in all plots for homogeneous call are:
+'main' changed to 'title', 'add.legend' -> 'legend', 'cex.xxx' -> 'size.xxx', 'plot.ellipse' -> 'ellipse'
+- ncomp is now a single value in all wrapper. and block. functions (multiple integration)
 
-Changes in 5.1.3 (graphical improvements)
+Please refer to our help files for the functions listed below.
+
+
+New features:
+-------------
+1- log.ratio transformation (log.ratio = c('CLR', 'ILR')) in PCA and PLS-like methods to deal with compositional microbiome data (see website www.mixOmics.org/mixMC for details)
+2 - plotLoadings is a novel graphical way of showing the regression coefficients of the selected variables (deprecated plotContrib)
+3 - mixMINT module to analyse independent data sets on the same type of variable. See www.mixOmics.org/mixMINT for details. 
+      Added methods: mint.pls, mint.plsda, mint.spls, mint.splsda; 
+      S3 visualisations: plotIndiv, plotLoadings, plotVar; 
+      Performance evaluation: perf (new, uses leave one out group), tune (new, uses leave one out group)
+4 - mixDIABLO module to integrate different omics data sets performed on the same samples. See www.mixOmics.org/mixDIABLO for details. 
+      Added methods: block.pls, block.plsda, block.spls, block.splsda; 
+      S3 visualisations: circosPlot (new), cimDiablo (new), plotDiablo (new), plotIndiv, plotLoadings, plotVar;   
+      Performance evaluation: perf, tune, predict (new with majority vote for DIABLO, $vote) 
+5 - new data sets: stemcell (for MINT), breast.TCGA (for DIABLO), diverse.16S and Koren.16S (for mixMC)
+
+Enhancements:
+-------------
+1 - plotIndiv: displays explained variance for sPLS objects
+2 - multilevel option is now included in PLS and PCA objects (argument multilevel = design or sample info)
+3 - WARNING: in all plots, homogeneous arguments call: 'main' changed to 'title', 'add.legend' -> 'legend', 'cex.xxx' -> 'size.xxx', 'plot.ellipse' -> 'ellipse'
+4 - print.method functions updated to show the range of graphics / other functions to use with the object
+5 - predict function now outputs class names in $class
+6 - data set vac18 reduced number of genes is now 1000 (memory issues with the package)
+7 - plotContrib has been deprecated for plotLoadings
+8 - tune.pca has been coded more efficiently
+9 - ncomp input is now a single value in wrapper.rgcca, wrapper.sgcca, block.pls, block.spls, block.plsda, block.splsda
+
+
+Bug fixes:
+----------
+1 - explained variance for NIPALS/PCA fixed in print.pca, tune.pca and pca
+2 - plot3d mistmatch legend color, double titles for plotIndiv ggplot2 and lattice, order of group for ggpot2 and lattice
+3 - retired: data set prostate
+
+
+Changes in 5.2.0 (graphical improvements)
 ================
 
 New features:
 -------------
 1 - plotArrow for PLS, sPLS, rCC,  rGCCA, sGCCA, sGCCDA is an improved version from our old s.match function (which is still available but will be soon deprecated)
+2 - network function has been enhanced with various options to represent the nodes (e.g. lty.edge='dotted',row.names = FALSE), see our website for more examples
 2 - rcc has a new argument method = c("ridge", "shrinkage") with shrinkage to estimate the shrinkage coefficients directly
-3 - plotIndiv directly implements 3d plots (style='3d'), including ellipses
-4 - plotVar  directly implements 3d plots (style='3d')
-5 - cim and network propose a new argument called save = c('jpeg','tiff','png','pdf') to save plots directly
-6 - biplot (from stats) now possible for sPCA
+3 - plotIndiv directly implements 3d plots (style='3d'), including ellipses, % of variance explained output for PCA, centroids and star plots (see example(plotIndiv))
+4 - plotVar directly implements 3d plots (style='3d'), legend can also be added with add.legend = TRUE
+5 - cim and network have new arguments: save = c('jpeg','tiff','png','pdf') to save plots directly, and name.save. Argument threshold has been added/updated for both displays. Some arguments underwent name changes, see ?network
+
 
 Enhancements:
 -------------
 1 - network: a single function for all objects.
 2 - pheatmap.multilevel has been deprecated with the new enhancements of CIM
-3 - plot3dIndiv and plto3dVar have been deprecated  (see new features in plotIndiv and plotVar)
-4 - plotContrib also now available for sgccda object
+3 - plot3dIndiv and plot3dVar have been deprecated  (see new features in plotIndiv and plotVar)
+4 - plotContrib also now available for sgccda plsda, splsda objects. Added arguments complete.name.var and col.ties (see ?plotContrib), changed argument name ties to show.ties
 5 - imageMap has been deprecated (now included in cim directly)
 6 - pca also outputs 'loadings' and 'variates' to remain in the mixOmics spirit
+7 - tau.estimate help file removed as now directly called as internal function from rcc and srgcca
+8 - imgCor: added argument 'main' and changed argument names x.sideColors and y.sideColors to sideColors
+9 - cim: changed argument names labRow and labCol to row.sideColors and col.sideColors
 
 Bug fixes:
 ----------
 1 - plotContrib now fixed (showed wrong contribution colors)
-2 - cim  has been fixed to show the ordered variable names after users reports (thanks!)
-3 - blank page in network when saving as a pdf solved
+2 - cim has been fixed to show the ordered variable names after users reports (thanks!)
+3 - resolved blank page in network when saving image as a pdf
 
 
 

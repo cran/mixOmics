@@ -2,9 +2,8 @@
 \encoding{latin1}
 \alias{selectVar}
 \alias{selectVar.pls}
-\alias{selectVar.plsda}
+\alias{selectVar.spls}
 \alias{selectVar.pca}
-\alias{selectVar.sipca}
 \alias{selectVar.sgcca}
 \alias{selectVar.rgcca}
 \alias{select.var}
@@ -19,8 +18,7 @@ This function outputs the selected variables on each component for the sparse ve
 \usage{
 \method{selectVar}{pls}(object, comp =1, block=NULL,\ldots)
 \method{selectVar}{pca}(object, comp =1, block=NULL,\ldots)
-\method{selectVar}{plsda}(object, comp =1, block=NULL,\ldots)
-\method{selectVar}{sipca}(object, comp =1, block=NULL,\ldots)
+\method{selectVar}{spls}(object, comp =1, block=NULL,\ldots)
 \method{selectVar}{sgcca}(object, comp =1, block=NULL, \ldots)
 \method{selectVar}{rgcca}(object, comp =1, block=NULL, \ldots)
 }
@@ -95,23 +93,23 @@ design = matrix(c(0,1,1,
                   1,0,1,
                   1,1,0), ncol = 3, nrow = 3, byrow = T)
 #note: the penalty parameters need to be tuned
-wrap.result.sgcca = wrapper.sgcca(blocks = data, design = design, penalty = c(.3,.3, 1),
-                                  ncomp = c(2, 2, 1),
+wrap.result.sgcca = wrapper.sgcca(X = data, design = design, penalty = c(.3,.3, 1),
+                                  ncomp = 2,
                                   scheme = "centroid", verbose = FALSE)
 
 #variables selected and loadings values on component 1 for the two blocs
 selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))
 
 #variables selected on component 1 for each block
-selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'Block 1'$name
-selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'Block 2'$name
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'block1'$name
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'block2'$name
 
 #variables selected on component 2 for each block 
-selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'Block 1'$name
-selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'Block 2'$name
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'block1'$name
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'block2'$name
 
 # loading value of the variables selected on the first block
-selectVar(wrap.result.sgcca, comp = 1, block = 1)$'Block 1'$value
+selectVar(wrap.result.sgcca, comp = 1, block = 1)$'block1'$value
 }
 
 }

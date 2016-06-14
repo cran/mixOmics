@@ -11,7 +11,8 @@
 
 \usage{
 tune.pca(X, ncomp = NULL, center = TRUE, scale = FALSE,
-        max.iter = 500, tol = 1e-09)
+max.iter = 500, tol = 1e-09, logratio = 'none',
+V = NULL, multilevel = NULL)
 }
 
 \arguments{
@@ -29,26 +30,36 @@ tune.pca(X, ncomp = NULL, center = TRUE, scale = FALSE,
     columns of \code{X} can be supplied. The value is passed to \code{\link{scale}}.} 
   \item{max.iter}{integer, the maximum number of iterations for the NIPALS algorithm.}
   \item{tol}{a positive real, the tolerance used for the NIPALS algorithm.}
+\item{logratio}{one of ('none','CLR','ILR'). Default to 'none'}
+\item{V}{Matrix used in the logratio transformation id provided.}
+\item{multilevel}{Design matrix for multilevel analysis (for repeated measurements).}
 }
 
 \details{
-The calculation is done either by a singular value decomposition of the (possibly centered and scaled) 
-data matrix, if the data is complete or by using the NIPALS algorithm if there is data missing. Unlike 
-\code{\link{princomp}}, the print method for these objects prints the results in a nice format and the 
-\code{plot} method produces a bar plot of the percentage of variance explained by the principal 
+The calculation is done either by a singular value decomposition of the (possibly centered and scaled)
+data matrix, if the data is complete or by using the NIPALS algorithm if there is data missing. Unlike
+\code{\link{princomp}}, the print method for these objects prints the results in a nice format and the
+\code{plot} method produces a bar plot of the percentage of variance explaned by the principal
 components (PCs).
 
-When using NIPALS (missing values), we make the assumption that the first (\code{min(ncol(X),} \code{nrow(X)}) 
+When using NIPALS (missing values), we make the assumption that the first (\code{min(ncol(X),} \code{nrow(X)})
 principal components will account for 100 \% of the explained variance.
 
 Note that \code{scale= TRUE} cannot be used if there are zero or constant (for \code{center = TRUE}) variables.
-}    
+
+Components are omitted if their standard deviations are less than or equal to \code{comp.tol} times
+the standard deviation of the first component. With the default null setting, no components are omitted.
+Other settings for \code{comp.tol} could be \code{comp.tol = sqrt(.Machine$double.eps)},
+which would omit essentially constant components, or \code{comp.tol = 0}.
+
+logratio transform and multilevel analysis are performed sequentially as internal pre-processing step, through \code{\link{logratio.transfo}} and \code{\link{withinVariation}} respectively.
+}
 
 \value{
 \code{tune.pca} returns a list with class \code{"tune.pca"} containing the following components: 
-  \item{var}{the eigenvalues of the covariance/correlation matrix, though the calculation is 
+  \item{sdev}{the square root of the eigenvalues of the covariance/correlation matrix, though the calculation is
 actually  done with the singular values of the data matrix).} 
-  \item{prop.var}{the proportion of explained variance accounted for by each 
+  \item{explained_variance}{the proportion of explained variance accounted for by each
 	principal component is calculated using the eigenvalues}
   \item{cum.var}{the cumulative proportion of explained variance 
 	accounted for by the sequential accumulation of principal components is calculated using the sum of the
@@ -64,6 +75,7 @@ and http://www.mixOmics.org for more details.}
 \examples{
 data(liver.toxicity)
 tune <- tune.pca(liver.toxicity$gene, center = TRUE, scale = TRUE)
+tune
 }
 
 \keyword{algebra}

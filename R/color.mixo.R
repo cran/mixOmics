@@ -1,5 +1,13 @@
-# Copyright (C) 2015 
-# Kim-Anh Le Cao, University of Queensland Diamantina Institute, Brisbane, Australia
+#############################################################################################################
+# Authors:
+#   Kim-Anh Le Cao, University of Queensland Diamantina Institute, Brisbane, Australia
+#   Benoit Gautier, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#
+# created: 2015
+# last modified: 12-04-2016
+#
+# Copyright (C) 2015
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -13,19 +21,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
 
 
+# ======================================
+#           mixOmics colors
+# ======================================
 
-
-
-
-#-- mixOmics colors --#
-#---------------------#
-color.mixo <- function(num.vector){
+color.mixo = function(num.vector)
+{
   
-  if(is.factor(num.vector)) num.vector=as.numeric(num.vector)
+  if (is.factor(num.vector))
+  num.vector=as.numeric(num.vector)
   
-  if(!is.numeric(num.vector)) stop(paste("num.vector has to be numeric", call. = FALSE))
+  if (!is.numeric(num.vector))
+  stop(paste("num.vector has to be numeric", call. = FALSE))
   
   # these are the colors in the logo (the first 3) and used in the Shiny web interface
   mixo.gray = gray.colors(1, start = 0.76, gamma = 1)
@@ -49,12 +59,11 @@ color.mixo <- function(num.vector){
   
   n = length(num.vector)
   #-- n: check that there are more colors available than requested
-  if (isTRUE(num.vector) > length(mixo.col)){
-    stop(paste("We only have a few mix.colors available, n <= ", length(mixo.col)), call. = FALSE)
-  }
-  if (isTRUE(!is.finite((num.vector))) ||  (n < 1)){
-    stop("'num.vector' must be an integer vector with positive values.", call. = FALSE)
-  }
+  if (isTRUE(num.vector) > length(mixo.col))
+  stop(paste("We only have a few mix.colors available, n <= ", length(mixo.col)), call. = FALSE)
+  
+  if (isTRUE(!is.finite((num.vector))) ||  (n < 1))
+  stop("'num.vector' must be an integer vector with positive values.", call. = FALSE)
   #-- end checking --#
   #------------------#
   

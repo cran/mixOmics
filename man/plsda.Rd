@@ -9,22 +9,41 @@ to classify samples.
 }
 
 \usage{
-plsda(X, Y, ncomp = 2, max.iter = 500, tol = 1e-06, near.zero.var = TRUE)
-}	
+plsda(X,
+Y,
+ncomp = 2,
+scale = TRUE,
+mode = c("regression", "canonical", "invariant", "classic"),
+tol = 1e-06,
+max.iter = 500,
+near.zero.var = FALSE,
+logratio="none",  # one of "none", "CLR"
+multilevel=NULL)
+}
 
 \arguments{
   \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
   \item{Y}{a factor or a class vector for the discrete outcome.}
   \item{ncomp}{the number of components to include in the model. Default to 2.}
-  \item{max.iter}{integer, the maximum number of iterations.}  
-  \item{tol}{a not negative real, the tolerance used in the iterative algorithm.}
-    \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations.}
+\item{scale}{boleean. If scale = TRUE, each block is standardized
+to zero means and unit variances (default: TRUE)}
+\item{mode}{character string. What type of algorithm to use, (partially) matching
+one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
+See Details.}
+\item{tol}{Convergence stopping value.}
+\item{max.iter}{integer, the maximum number of iterations.}
+\item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
+\item{logratio}{one of ('none','CLR') specifies the log ratio transformation to deal with compositional values that may arise from specific normalisation in sequencing dadta. Default to 'none'}
+\item{multilevel}{sample information for multilevel decomposition for repeated measurements. A numeric matrix or data frame. The first column indicates the repeated measures on each individual, i.e. the individuals ID. If \code{  method = 'splsda'}, the 2nd and 3rd columns are factors. If \code{method = 'spls'} then you can choose to only input the repeated measures (column 1) or the 2nd AND 3rd columns to split the variation for a 2 level factor. See examples in \code{splsda}.}
+
 }
 
 \details{
 \code{plsda} function fit PLS models with \eqn{1,...,}\code{ncomp} components
 to the factor or class vector \code{Y}. The appropriate indicator 
 matrix is created.
+
+logratio transform and multilevel analysis are performed sequentially as internal pre-processing step, through \code{\link{logratio.transfo}} and \code{\link{withinVariation}} respectively.
 }
 
 \value{
@@ -47,22 +66,27 @@ that contains the following components:
 }
 
 \references{
+On PLSDA:
+Barker M and Rayens W (2003). Partial least squares for discrimination. \emph{Journal of Chemometrics} \bold{17}(3), 166-173.
 Perez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
 a partial least squares discriminant analysis (PLS-DA) approach. \emph{Human Genetics} 
 \bold{112}, 581-592.
-
 Nguyen, D. V. and Rocke, D. M. (2002). Tumor classification by partial
 least squares using microarray gene expression data. \emph{Bioinformatics}
 \bold{18}, 39-50.
-
-Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
+On log ratio transformation:
+Filzmoser, P., Hron, K., Reimann, C.: Principal component analysis for compositional data with outliers. Environmetrics 20(6), 621-632 (2009)
+Le Cao, K.-A., Costello M.E., Chua X.-Y., Lakis V.A., Bartolo F., Brazeilles R., Rondeau, P. *In revision* MixMC: a multivariate statistical framework to gain insights into Microbial Communities. http://dx.doi.org/10.1101/044206
+On multilevel decomposition:
+Westerhuis, J.A., van Velzen, E.J., Hoefsloot, H.C., Smilde, A.K.: Multivariate paired data analysis: multilevel plsda versus oplsda. Metabolomics 6(1), 119-128 (2010)
+Liquet, B., Lê Cao, K.-A., Hocini, H., Thiébaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
 }
 
-\author{Ignacio Gonzalez, Kim-Anh Le Cao and Pierre Monget.}
+\author{Ignacio Gonzalez, Kim-Anh Le Cao.}
 
 \seealso{\code{\link{splsda}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
-\code{\link{predict}}, \code{\link{perf}} and http://mixOmics.org for more details.}
+\code{\link{predict}}, \code{\link{perf}}, \code{\link{mint.block.plsda}}, \code{\link{block.plsda}} and http://mixOmics.org for more details.}
 
 \examples{
 ## First example

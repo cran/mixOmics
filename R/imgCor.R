@@ -1,7 +1,13 @@
-# Copyright (C) 2009 
-# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
-# Florian Rohart, Australian Institute for Bioengineering and Nanotechnology, University of Queensland, Brisbane, QLD.
+#############################################################################################################
+# Authors:
+#   Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+#   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#   Florian Rohart, Australian Institute for Bioengineering and Nanotechnology, University of Queensland, Brisbane, QLD.
+#
+# created: 2009
+# last modified: 2015
+#
+# Copyright (C) 2009
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,6 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
+
 
 # -----------------------------------------
 # --- small example but see help file
@@ -35,7 +43,7 @@ function(X,
          Y.var.names = TRUE,  	 
          sideColors = TRUE,
          interactive.dev = TRUE,
-         main = TRUE,
+         title = TRUE,
          color, row.cex, col.cex,symkey, keysize, 
          xlab, ylab, margins, lhei, lwid) 
 {
@@ -126,9 +134,9 @@ function(X,
     stop("'interactive.dev' must be a logical constant (TRUE or FALSE).",
          call. = FALSE)
   
-  #-- main
-  if (!is.logical(main))
-    stop("'main' must be a logical constant (TRUE or FALSE).",
+  #-- title
+  if (!is.logical(title))
+    stop("'title' must be a logical constant (TRUE or FALSE).",
          call. = FALSE)
   
   #-- end checking --#
@@ -163,7 +171,7 @@ function(X,
         }
         
         cim(matcor, cluster = "none", 
-            main = if(main) "[X,Y] correlation matrix" else NULL,
+            title = if(title) "[X,Y] correlation matrix" else NULL,
             col.sideColors = col.sideColors,
             row.sideColors = row.sideColors,
             row.names = TRUE, col.names = TRUE)
@@ -183,16 +191,16 @@ function(X,
 		
         if (interactive.dev) {   
           cim(Xcor, cluster = "none",
-              main = if(main) "X correlation matrix" else NULL,
+              title = if(title) "X correlation matrix" else NULL,
               row.names = X.var.names, col.names = X.var.names)
           
           devAskNewPage(TRUE)
           cim(Ycor, cluster = "none", 
-              main = if(main) "Y correlation matrix" else NULL,
+              title = if(title) "Y correlation matrix" else NULL,
               row.names = Y.var.names, col.names = Y.var.names)
           
           cim(XYcor, cluster = "none",
-              main = if(main) "XY correlation matrix" else NULL,			
+              title = if(title) "XY correlation matrix" else NULL,			
               row.names = X.var.names, col.names = Y.var.names)
         }
 		else {
@@ -205,17 +213,17 @@ function(X,
 		  
 		  if (isTRUE(GD)) getOption("device")()
 		  cim(Xcor, cluster = "none",
-		      main = if(main) "X correlation matrix" else NULL,
+		      title = if(title) "X correlation matrix" else NULL,
 		      row.names = X.var.names, col.names = X.var.names)
 		  
 		  if (isTRUE(GD)) getOption("device")()
 		  cim(Ycor, cluster = "none", 
-		      main = if(main) "Y correlation matrix" else NULL,
+		      title = if(title) "Y correlation matrix" else NULL,
 		      row.names = Y.var.names, col.names = Y.var.names)
 		  
 		  if (isTRUE(GD)) getOption("device")()
 		  cim(XYcor, cluster = "none",
-		      main = if(main) "XY correlation matrix" else NULL,
+		      title = if(title) "XY correlation matrix" else NULL,
 		      row.names = X.var.names, col.names = Y.var.names)
 		}
     }	

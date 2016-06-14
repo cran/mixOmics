@@ -1,10 +1,13 @@
-# Copyright (C) 2009 
-# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
-# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
-# Fangzhou Yao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
-
+#############################################################################################################
+# Authors:
+#  Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+#  Kim-Anh Le Cao, French National Institute for Agricultural Research and ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+#  Fangzhou Yao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
+#
+# created: 2009
+# last modified: 2011
+#
+# Copyright (C) 2009
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,7 +22,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
+#############################################################################################################
 
 
 ##==========================SPARSE PCA =========================##
@@ -174,11 +177,17 @@ function(X,
                    iter = vect.iter,
                    rotation = mat.v,
                    x = mat.u,
-                   names = list(X = X.names, indiv = ind.names),
-                   loadings=list(mat.v),
-                   variates=list(mat.u)
+                   names = list(X = X.names, sample = ind.names),
+                   loadings=list(X=mat.v),
+                   variates=list(X=mat.u)
               ))
 			  
     class(result) = c("spca", "prcomp", "pca")
+    
+    #calcul explained variance
+    explX=explained_variance(X,result$variates$X,ncomp)
+    result$explained_variance=explX
+    
+    
     return(invisible(result))
 }

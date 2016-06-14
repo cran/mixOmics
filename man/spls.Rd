@@ -10,26 +10,44 @@ in a one-step strategy.
 }
 
 \usage{
-spls(X, Y, ncomp = 2, mode = c("regression", "canonical"),
-     max.iter = 500, tol = 1e-06, keepX = rep(ncol(X), ncomp), 
-     keepY = rep(ncol(Y), ncomp), near.zero.var = TRUE)
+spls(X,
+Y,
+ncomp = 2,
+mode = c("regression", "canonical", "invariant", "classic"),
+keepX.constraint=NULL,
+keepY.constraint=NULL,
+keepX,
+keepY,
+scale = TRUE,
+tol = 1e-06,
+max.iter = 500,
+near.zero.var = FALSE,
+logratio="none", 
+multilevel=NULL)
 }	
 
 \arguments{
   \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
   \item{Y}{numeric vector or matrix of responses (for multi-response models). 
-    \code{NA}s are allowed.}
+    \code{NA}s are allowed. For multilevel analysis, a data frame of up to two columns is accepted.}
   \item{ncomp}{the number of components to include in the model (see Details). 
     Default is set to from one to the rank of \code{X}.}
-  \item{mode}{character string. What type of algorithm to use, (partially) matching 
-    one of \code{"regression"} or \code{"canonical"}. See Details.}
-  \item{max.iter}{integer, the maximum number of iterations.}
-  \item{tol}{a positive real, the tolerance used in the iterative algorithm.}
-  \item{keepX}{numeric vector of length \code{ncomp}, the number of variables
-    to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
-  \item{keepY}{numeric vector of length \code{ncomp}, the number of variables
-    to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
-      \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations.}
+\item{mode}{character string. What type of algorithm to use, (partially) matching
+one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
+See Details.}
+\item{keepX.constraint}{A list containing which variables of X are to be kept on each of the first PLS-components}
+\item{keepY.constraint}{A list containing which variables of Y are to be kept on each of the first PLS-components}
+\item{keepX}{numeric vector of length \code{ncomp}, the number of variables
+to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
+\item{keepY}{numeric vector of length \code{ncomp}, the number of variables
+to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
+\item{scale}{boleean. If scale = TRUE, each block is standardized
+to zero means and unit variances (default: TRUE)}
+\item{tol}{Convergence stopping value.}
+\item{max.iter}{integer, the maximum number of iterations.}
+\item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
+\item{logratio}{one of ('none','CLR'). Default to 'none'}
+\item{multilevel}{Design matrix for multilevel anaylis (for repeated measurements) that indicates the repeated measures on each individual, i.e. the individuals ID. See Details.}
 }
 
 \details{
@@ -37,14 +55,17 @@ spls(X, Y, ncomp = 2, mode = c("regression", "canonical"),
 Multi-response models are fully supported. The \code{X} and \code{Y} datasets
 can contain missing values.
 
-The type of algorithm to use is specified with the \code{mode} argument. Two sPLS 
-algorithms are available: sPLS regression \code{("regression")} and sPLS canonical analysis 
-\code{("canonical")} (see References). 
+The type of algorithm to use is specified with the \code{mode} argument. Four PLS
+algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
+\code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
+algorithm \code{("classic")} (see References).
 
 The estimation of the missing values can be performed 
 by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
 values are handled by casewise deletion in the \code{spls} function without having to 
 delete the rows with missing data.
+
+logratio transform and multilevel analysis are performed sequentially as internal pre-processing step, through \code{\link{logratio.transfo}} and \code{\link{withinVariation}} respectively.
 }
 
 \value{
@@ -99,6 +120,50 @@ Y <- liver.toxicity$clinic
 
 toxicity.spls <- spls(X, Y, ncomp = 2, keepX = c(50, 50), 
                       keepY = c(10, 10))
+
+## Second example: one-factor analysis with sPLS, selecting a subset of variables
+#--------------------------------------------------------------
+\dontrun{
+data(liver.toxicity)
+# note: we made up those data, pretending they are repeated measurements
+repeat.indiv <- c(1, 2, 1, 2, 1, 2, 1, 2, 3, 3, 4, 3, 4, 3, 4, 4, 5, 6, 5, 5,
+6, 5, 6, 7, 7, 8, 6, 7, 8, 7, 8, 8, 9, 10, 9, 10, 11, 9, 9,
+10, 11, 12, 12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 14,
+13, 14, 15, 16, 15, 16, 15, 16, 15, 16)
+summary(as.factor(repeat.indiv)) # 16 rats, 4 measurements each
+
+# this is a spls (unsupervised analysis) so no need to mention any factor in design
+# we only perform a one level variation split
+design <- data.frame(sample = repeat.indiv)
+res.spls.1level <- spls(X = liver.toxicity$gene,
+Y=liver.toxicity$clinic,
+multilevel = design,
+ncomp = 3,
+keepX = c(50, 50, 50), keepY = c(5, 5, 5),
+mode = 'canonical')
+
+# set up colors and pch for plotIndiv
+col.stimu <- 1:nlevels(design$stimu)
+
+plotIndiv(res.spls.1level, rep.space = 'X-variate', ind.names = FALSE,
+group = liver.toxicity$treatment$Dose.Group,
+pch = 20, main = 'Gene expression subspace',
+add.legend = TRUE)
+
+
+plotIndiv(res.spls.1level, rep.space = 'Y-variate', ind.names = FALSE,
+group = liver.toxicity$treatment$Dose.Group,
+pch = 20, main = 'Clinical measurements ssubpace',
+add.legend = TRUE)
+
+plotIndiv(res.spls.1level, rep.space = 'XY-variate', ind.names = FALSE,
+group = liver.toxicity$treatment$Dose.Group,
+pch = 20, main = 'Both Gene expression and Clinical subspaces',
+add.legend = TRUE)
+
+}
+
+
 }
 
 \keyword{regression}

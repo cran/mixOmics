@@ -1,8 +1,6 @@
 \name{tune.multilevel}
 \encoding{latin1}
 \alias{tune.multilevel}
-\alias{tune.splsdalevel1}
-\alias{tune.splsdalevel2}
 \alias{tune.splslevel}
 
 \title{Tuning functions for multilevel analyses}
@@ -13,37 +11,52 @@ These functions were implemented to help tuning the variable selection parameter
 
 \usage{
 tune.multilevel(X, 
-                Y = NULL, 
-                design , 
-                ncomp = 1, 
-                test.keepX = c(5, 10, 15), 
-                test.keepY = NULL, 
-                already.tested.X = NULL, 
-                already.tested.Y = NULL, 
-                method, mode, dist, 
-                validation = c("Mfold", "loo"), 
-                folds = 10)
+Y,
+multilevel , 
+ncomp = 1, 
+test.keepX = c(5, 10, 15), 
+test.keepY = NULL, 
+already.tested.X = NULL, 
+already.tested.Y = NULL, 
+method,
+mode = "regression",
+validation = "Mfold",
+folds = 10,
+dist = "max.dist",
+measure = "BER",
+progressBar = TRUE,
+near.zero.var = FALSE,
+logratio = "none",
+nrepeat=1,
+light.output = TRUE)
 
-}	
+}
 
 \arguments{
-  \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
-  \item{Y}{\code{if(method = 'spls')} numeric vector or matrix of continuous responses (for multi-response models) \code{NA}s are allowed.}
-  \item{design}{a numeric matrix or data frame of 2 columns for a one-factor discrete
-    outcome, or of 3 columns for two-factor discrete outcome. The first column 
-    indicates the repeated measures on each individual, i.e. the individuals ID.}
-  \item{ncomp}{the number of components to include in the model.}
-  \item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
-  \item{test.keepY}{If \code{method = 'spls'}, numeric vector for the different number of variables to test from the \eqn{Y} data set}
-  \item{already.tested.X}{if \code{ncomp > 1} numeric vector indicating the number of variables to select rom the \eqn{X} data set on the previous ncomp-1 components}
-   \item{already.tested.Y}{if \code{method = 'spls'} and \code{if(ncomp > 1)} numeric vector indicating the number of variables to select rom the \eqn{Y} data set on the previous ncomp-1 components}
-  \item{method}{character string. Which multivariate method and type of analysis to choose, matching one of 'splsda' (Discriminant Analysis) or 'spls' (unsupervised integrative analysis). See Details.}
-  \item{mode}{In the case of \code{method = 'spls'}, should be set to 'canonical'. See details. }
-  \item{dist}{distance metric to use for \code{splsda} to estimate the classification error rate, 
-    should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \code{"max.dist"} (see Details).}
-      \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or 
-    \code{"loo"} (see below). Default is \code{"Mfold"}.}
-  \item{folds}{the folds in the Mfold cross-validation. See Details.}
+\item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
+\item{Y}{\code{if(method = 'spls')} numeric vector or matrix of continuous responses (for multi-response models) \code{NA}s are allowed.}
+\item{multilevel}{a numeric matrix that indicates the repeated measures on each individual, i.e. the individuals ID.}
+\item{ncomp}{the number of components to include in the model.}
+\item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
+\item{test.keepY}{If \code{method = 'spls'}, numeric vector for the different number of variables to test from the \eqn{Y} data set}
+\item{already.tested.X}{if \code{ncomp > 1} numeric vector indicating the number of variables to select rom the \eqn{X} data set on the pfirst components}
+\item{already.tested.Y}{if \code{method = 'spls'} and \code{if(ncomp > 1)} numeric vector indicating the number of variables to select from the \eqn{Y} data set on the first components}
+\item{method}{character string. Which multivariate method and type of analysis to choose, matching one of 'splsda' (Discriminant Analysis) or 'spls' (unsupervised integrative analysis). See Details.}
+\item{mode}{character string. What type of algorithm to use, (partially) matching
+one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
+See Details.}
+
+\item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or \code{"loo"} (see below). Default is \code{"Mfold"}.}
+\item{folds}{the folds in the Mfold cross-validation. See Details.}
+\item{dist}{distance metric to use for \code{splsda} to estimate the classification error rate,
+should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \code{"max.dist"} (see Details).}
+
+\item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
+\item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
+\item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Default value is FALSE}
+\item{logratio}{one of ('none','CLR'). Default to 'none'}
+\item{nrepeat}{Number of times the Cross-Validation process is repeated.}
+\item{light.output}{if set to FALSE, the prediction/classification of each sample for each of \code{test.keepX} and each comp is returned.}
 }
 
 \details{
@@ -69,9 +82,14 @@ If \code{validation = "loo"}, leave-one-out cross-validation is performed. By de
 
 \value{
 Depending on the type of analysis performed, a list that contains:
-  \item{error}{cross-validation overall error rate when one-factor sPLS-DA analysis is performed.}
-  \item{prediction.all}{cross-validation prediction for all samples and for the LAST keepX tested parameter when one-factor sPLS-DA analysis is performed.}
-  \item{cor.value}{compute the correlation between latent variables for two-factor sPLS-DA analysis or sPLS.}
+\item{mat.mean.error,}{returns the prediction error for each \code{test.keepX} on each component}
+\item{choice.keepX.constraint}{returns the variables selected by the optimal keepX on each component.}
+\item{error.per.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX}
+
+\item{predict}{Prediction values for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
+\item{class}{Predicted class for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
+
+\item{cor.value}{compute the correlation between latent variables for two-factor sPLS-DA analysis.}
 
 }
 
@@ -97,7 +115,7 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
                        stimu = vac18.simulated$stimulation)
   
     result.ex1 = tune.multilevel(vac18.simulated$genes,
-                               design = design,
+                               multilevel = design,
                                ncomp=2,
                                test.keepX=c(5, 10, 15), 
                                already.tested.X = c(50),
@@ -131,7 +149,7 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
                        time = time)
   
   result.ex2 = tune.multilevel(liver.toxicity$gene,
-                                design = design, 
+                                multilevel = design,
                                 ncomp=2,
                                 test.keepX=c(5, 10, 15), 
                                 already.tested.X = c(50),
@@ -154,7 +172,7 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
   design <- data.frame(sample = repeat.indiv)
   
   result.ex3 = tune.multilevel(X = liver.toxicity$gene, Y = liver.toxicity$clinic, 
-                                design = design,
+                                multilevel = design,
                                 mode = 'canonical',
                                 ncomp=2,
                                 test.keepX=c(5, 10, 15), 

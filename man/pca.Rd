@@ -16,25 +16,31 @@ ncomp = 2,
 center = TRUE,
 scale = FALSE,
 max.iter = 500,
-tol = 1e-09)
+tol = 1e-09,
+logratio = 'none',  # one of ('none','CLR','ILR')
+V = NULL,
+multilevel = NULL)
 }
 
 \arguments{
-  \item{X}{a numeric matrix (or data frame) which provides the
+\item{X}{a numeric matrix (or data frame) which provides the
     data for the principal components analysis. It can contain missing values.}
-  \item{ncomp}{integer, if data is complete \code{ncomp} decides the number of components and associated 
+\item{ncomp}{integer, if data is complete \code{ncomp} decides the number of components and associated
     eigenvalues to display from the \code{pcasvd} algorithm and if the data has missing values, 
-	\code{ncomp} gives the number of components to keep to perform the reconstitution of the data using 
+    \code{ncomp} gives the number of components to keep to perform the reconstitution of the data using
 	the NIPALS algorithm. If \code{NULL}, function sets \code{ncomp = min(nrow(X), ncol(X))}}	
-  \item{center}{a logical value indicating whether the variables should be shifted to be zero centered. 
+\item{center}{a logical value indicating whether the variables should be shifted to be zero centered.
     Alternately, a vector of length equal the number of columns of \code{X} can be supplied. 
     The value is passed to \code{\link{scale}}.} 
-  \item{scale}{a logical value indicating whether the variables should be scaled to have 
+\item{scale}{a logical value indicating whether the variables should be scaled to have
     unit variance before the analysis takes place. The default is \code{FALSE} for consistency with \code{prcomp} 
     function, but in general scaling is advisable. Alternatively, a vector of length equal the number of 
     columns of \code{X} can be supplied. The value is passed to \code{\link{scale}}.} 
-  \item{max.iter}{integer, the maximum number of iterations in the NIPALS algorithm.}
-  \item{tol}{a positive real, the tolerance used in the NIPALS algorithm.}
+\item{max.iter}{integer, the maximum number of iterations in the NIPALS algorithm.}
+\item{tol}{a positive real, the tolerance used in the NIPALS algorithm.}
+\item{logratio}{one of ('none','CLR','ILR'). Specifies the log ratio transformation to deal with compositional values that may arise from specific normalisation in sequencing dadta. Default to 'none'}
+\item{V}{Matrix used in the logratio transformation id provided.}
+\item{multilevel}{sample information for multilevel decomposition for repeated measurements.}
 }
 
 \details{
@@ -44,12 +50,19 @@ data matrix, if the data is complete or by using the NIPALS algorithm if there i
 \code{plot} method produces a bar plot of the percentage of variance explaned by the principal 
 components (PCs).
 
+When using NIPALS (missing values), we make the assumption that the first (\code{min(ncol(X),} \code{nrow(X)})
+principal components will account for 100 \% of the explained variance.
+
 Note that \code{scale= TRUE} cannot be used if there are zero or constant (for \code{center = TRUE}) variables. 
  
 Components are omitted if their standard deviations are less than or equal to \code{comp.tol} times 
 the standard deviation of the first component. With the default null setting, no components are omitted. 
 Other settings for \code{comp.tol} could be \code{comp.tol = sqrt(.Machine$double.eps)}, 
 which would omit essentially constant components, or \code{comp.tol = 0}.
+
+According to Filzmoser et al., a ILR log ratio transformation is more appropriate for PCA with compositional data. Both CLR and ILR are valid.
+
+Logratio transform and multilevel analysis are performed sequentially as internal pre-processing step, through \code{\link{logratio.transfo}} and \code{\link{withinVariation}} respectively.
 }    
 
 \value{
@@ -62,22 +75,31 @@ which would omit essentially constant components, or \code{comp.tol = 0}.
   \item{x}{the value of the rotated data (the centred (and scaled if requested) data 
     multiplied by the rotation/loadings matrix), also called the principal components.}  
       \item{variates}{same as 'x' to keep the mixOmics spirit}
-  \item{center, scale}{the centering and scaling used, or \code{FALSE}.} 
+  \item{center, scale}{the centering and scaling used, or \code{FALSE}.}
+ \item{explained_variance}{explained variance from the multivariate model, used for plotIndiv}
+}
+
+\references{
+On log ratio transformations:
+Filzmoser, P., Hron, K., Reimann, C.: Principal component analysis for compositional data with outliers. Environmetrics 20(6), 621-632 (2009)
+Le Cao, K.-A., Costello M.E., Chua X.-Y., Lakis V.A., Bartolo F., Brazeilles R., Rondeau, P. *In revision* MixMC: a multivariate statistical framework to gain insights into Microbial Communities. http://dx.doi.org/10.1101/044206
+On multilevel decomposition:
+Westerhuis, J.A., van Velzen, E.J., Hoefsloot, H.C., Smilde, A.K.: Multivariate paired data analysis: multilevel plsda versus oplsda. Metabolomics 6(1), 119-128 (2010)
+Liquet, B., Lê Cao, K.-A., Hocini, H., Thiébaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
 }
 
 
-
-\author{Ignacio Gonzalez.}
+\author{Florian Rohart, Kim-Anh Le Cao, Ignacio Gonzalez}
 
 \seealso{\code{\link{nipals}}, \code{\link{prcomp}}, \code{\link{biplot}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}
 and http://www.mixOmics.org for more details.}
 
 \examples{
-data(multidrug)
 
-## this data set contains missing values, therefore 
-## the 'prcomp' function cannot be applied
+# example with missing values where NIPALS is applied
+# --------------------------------
+data(multidrug)
 pca.res <- pca(multidrug$ABC.trans, ncomp = 4, scale = TRUE)
 plot(pca.res)
 print(pca.res)
@@ -90,11 +112,19 @@ plotIndiv(pca.res, ind.names = multidrug$cell.line$Class,
 plotIndiv(pca.res, cex = 0.2,
             col = as.numeric(as.factor(multidrug$cell.line$Class)),style="3d")
 }
-# variables representation
+# variable representation
 plotVar(pca.res)
 \dontrun{
 plotVar(pca.res, rad.in = 0.5, cex = 0.5,style="3d")
 }
+
+# example with multilevel decomposition and CLR log ratio transformation (ILR longer to run)
+# ----------------
+data("diverse.16S")
+pca.res = pca(X = diverse.16S$data.TSS, ncomp = 5,
+logratio = 'CLR', multilevel = diverse.16S$sample)
+plot(pca.res)
+plotIndiv(pca.res, ind.names = FALSE, group = diverse.16S$bodysite, title = '16S diverse data')
 }
 
 \keyword{algebra}

@@ -1,6 +1,12 @@
-# Copyright (C) 2009
-# Kim-Anh Le Cao,
-# Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
+#############################################################################################################
+# Author :
+#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#   Kim-Anh Le Cao, Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
+#
+# created: 2015
+# last modified: 17-03-2016
+#
+# Copyright (C) 2015
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -15,11 +21,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
 
 
-# object: a pls/spls object
+# ========================================================================================================
+# selectVar: output the variables that were selected on 'comp', for 'block'
+# ========================================================================================================
+
+# object: a pls, spls, block, mint, rcc, sgcca  object
 # comp: to display the variables selected on dimension 'comp'
-# names.X, names.Y: set to true means that the X and Y data frames have row names (see example below with srbct)
+# block: display the selected variables on the data 'block', from object$names$blocks
 
 selectVar <-
 function(...) UseMethod("selectVar")
@@ -27,62 +38,87 @@ function(...) UseMethod("selectVar")
 
 get.name.and.value=function(x,comp)
 {
-    name.var=names(sort(abs(x[,comp]), decreasing = T)[1:sum(x[,comp]!=0)])
+    if(length(x[,comp,drop=FALSE]) > 1)
+    {
+        name.var = names(sort(abs(x[,comp]), decreasing = T)[1:sum(x[,comp]!=0)])
+    } else {
+        name.var = rownames(x) # when only one number, sort loses the name of the variable
+    }
     value.var=x[name.var,comp]
     return(list(name = name.var, value = data.frame(value.var)))
 }
 
 
 # ------------------ for all object  --------------------
-selectVar.pls  = selectVar.plsda  =
+selectVar.spls  = selectVar.pls  =
 selectVar.sgcca = selectVar.rgcca = 
-selectVar.pca =selectVar.sipca=
+selectVar.pca =
 function(object, comp =1, block=NULL, ...)
 {
 
     # check arguments
     # -----------------
-    if(length(comp) > 1)
-    stop("Expecting one single value for 'comp'")
-    if(is.null(block)){
-        if(any(comp > object$ncomp))
-        stop("'comp' is greater than the number of components in the fitted model")
-    }else{
-        if(any(comp > object$ncomp[block]))
-        stop("'comp' is greater than the number of components in the fitted model for the block you specified")
-    }
-    
-    if(is.null(block))
+    if (length(comp) > 1)
+        stop("Expecting one single value for 'comp'")
+        
+    if (is.null(block))
     {
+        if (any(comp > object$ncomp))
+        stop("'comp' is greater than the number of components in the fitted model")
         null.block=TRUE
         block=1:length(object$loadings)
-    }else{null.block=FALSE}
+
+    }else{
+        if (any(class(object)%in%c("pca")))
+        object$names$blocks="X"
+        
+        if (is.numeric(block))
+        {
+            if (any(block>length(object$names$blocks)))
+            stop("'block' needs to be lower than the number of blocks in the fitted model, which is length(object$names$blocks)")
+            
+        }else if (is.character(block) & sum(!is.na(match(block,object$names$blocks)))==0) {
+            stop("No entry of 'block'  match object$names$blocks")
+            
+        }else if (is.character(block) & sum(is.na(match(block,object$names$blocks)))>0) {
+            warning("At least one entry of 'block' does not match object$names$blocks")
+        }
+
+        if (length(object$ncomp)>1)
+        {
+            if (any(comp > object$ncomp[block]))
+            stop("'comp' is greater than the number of components in the fitted model for the block you specified. See object$ncomp")
+
+        }else{
+            if (any(comp > object$ncomp))
+            stop("'comp' is greater than the number of components in the fitted model")
+        }
+        
+        null.block=FALSE
+    }
     
     # main function: get the names and values of the non zero loadings
     # -----------------
-    out=lapply(object$loadings[block],get.name.and.value,comp=comp)
+    out = lapply(object$loadings[block],get.name.and.value,comp=comp)
     
     
     # outputs
     # ----------
     #if all blocks are considered by default (null.block=TRUE) and it's a DA analysis, then we don't show Y
-    if(null.block)
+    if (null.block)
     {
-        if(length(grep("plsda",class(object)))>0)
-        {
-            out=out[-2] #remove Y
-            out=out[[1]]
-        }
-        if(length(grep("sgccda",class(object)))>0)
+        if (any(class(object)%in%c("block.plsda","block.splsda")))# the position of Y is in indY
         {
             out=out[-object$indY] #remove Y
+        }else if (any(class(object)%in%c("mint.plsda","mint.splsda","plsda","splsda"))) {
+            # Y is always in second position
+            out=out[[1]]
         }
+
     }
     
-    if(length(grep("pca",class(object)))>0 | length(grep("sipca",class(object)))>0)
-    {
-        out=out[[1]]
-    }
+    if (length(grep("pca",class(object)))>0)
+    out=out[[1]]
     
     #we add comp as an output
     out$comp=comp

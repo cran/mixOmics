@@ -1,7 +1,13 @@
-# Copyright (C) 2009
-# Kim-Anh Le Cao, French National Institute for Agricultural Research and
-# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
-# Leigh Coonan, Queensland Faculty for Advanced Bioinformatics, Australia
+#############################################################################################################
+# Authors:
+#   Kim-Anh Le Cao, French National Institute for Agricultural Research and ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#   Leigh Coonan, Queensland Faculty for Advanced Bioinformatics, Australia
+#
+# created: 2010
+# last modified: 19-04-2016
+#
+# Copyright (C) 2010
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,8 +22,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
 
-plot.pca  <- #plot.spca <- plot.ipca <- plot.sipca <-
+
+plot.pca  = #plot.spca <- plot.ipca <- plot.sipca <-
 function(   x,
             ncomp = min(10, length(x$sdev)),
             type = "barplot", # either barplot or any other type available in plot, as "l","b","p",..
@@ -44,15 +52,14 @@ function(   x,
     #-- scree plot -------------------------------------------------------------#
     #---------------------------------------------------------------------------#
     
-    variances = (x$sdev^2)
+    variances = (x$sdev^2)[1:ncomp] # relative variance
     if(explained.var==TRUE)
-    variances=variances[1:ncomp]/sum(variances) #explained variances
+    variances=variances/x$var.tot #explained variances
     
     if (type == "barplot")
-    barplot(variances, names.arg = seq(1, ncomp),
-    xlab = "Principal Components",
-    ylab = "Variances",...)
-    else {
+    {
+        barplot(variances, names.arg = seq(1, ncomp), xlab = "Principal Components", ylab = "Variances",...)
+    } else {
         plot(variances, type = type, axes = FALSE,
         xlab = "Principal Components",
         ylab = "Variances",... )

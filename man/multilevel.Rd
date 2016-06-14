@@ -7,7 +7,7 @@
 \title{Multilevel analysis for repeated measurements (cross-over design)}
 
 \description{
-The analysis of repeated measurements is performed by combining a multilevel 
+Superseeded - The analysis of repeated measurements is performed by combining a multilevel
 approach with multivariate methods: sPLS-DA (Discriminant Analysis) or sPLS 
 (Integrative analysis). Both approaches enable variable selection.
 }
@@ -61,6 +61,8 @@ multilevel(X,
 }
 
 \details{
+This function is now obsolete as the multilevel analysis is now fully integrated in PCA, PLS, sPLS, PLS-DA and sPLS-DA methods, as of mixOmics 6.0.0.
+
 \code{multilevel} function first decomposes the variance in the data sets \eqn{X} 
 (and \eqn{Y}) and applies either sPLS-DA (\code{method = "splsda"}) or sPLS 
 (\code{method = "spls"}) on the within-subject deviation. 
@@ -143,90 +145,13 @@ Genetics and Molecular Biology} \bold{7}, article 35.
 
 \author{Benoit Liquet, Kim-Anh Le Cao, Benoit Gautier, Ignacio Gonzalez.}
 
-\seealso{\code{\link{spls}}, \code{\link{splsda}}, 
+\seealso{\code{\link{pca}},
+\code{\link{pls}}, \code{\link{spls}},
+\code{\link{spls}}, \code{\link{splsda}},
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{cim}}, \code{\link{network}}.}
 
-\examples{
-## First example: one-factor analysis with sPLS-DA, selecting a subset of variables
-# as in the paper Liquet et al.
-#--------------------------------------------------------------
-data(vac18)
-X <- vac18$genes
-Y <- vac18$stimulation
-# sample indicates the repeated measurements
-design <- data.frame(sample = vac18$sample, 
-                     stimul = vac18$stimulation)
 
-# multilevel sPLS-DA model
-res.1level <- multilevel(X, ncomp = 3, design = design,
-                         method = "splsda", keepX = c(30, 137, 123))
-
-# set up colors for plotIndiv
-col.stim <- c("darkblue", "purple", "green4","red3")
-plotIndiv(res.1level, ind.names = Y, col.per.group = col.stim)
-
-
-## Second example: two-factor analysis with sPLS-DA, selecting a subset of variables
-# as in the paper Liquet et al.
-#--------------------------------------------------------------
-\dontrun{
-data(vac18.simulated) # simulated data
-
-X <- vac18.simulated$genes
-design <- data.frame(sample = vac18.simulated$sample,
-                     stimu = vac18.simulated$stimulation,
-                     time = vac18.simulated$time)
-
-res.2level <- multilevel(X, ncomp = 2, design = design,
-                         keepX = c(200, 200), method = 'splsda')
-
-plotIndiv(res.2level, group = design$stimu, ind.names = vac18.simulated$time,
-    add.legend = TRUE, style = 'lattice')
-}       
-
-## Third example: one-factor analysis with sPLS, selecting a subset of variables
-#--------------------------------------------------------------
-\dontrun{
-data(liver.toxicity)
-# note: we made up those data, pretending they are repeated measurements
-repeat.indiv <- c(1, 2, 1, 2, 1, 2, 1, 2, 3, 3, 4, 3, 4, 3, 4, 4, 5, 6, 5, 5,
-                 6, 5, 6, 7, 7, 8, 6, 7, 8, 7, 8, 8, 9, 10, 9, 10, 11, 9, 9,
-                 10, 11, 12, 12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 14,
-                 13, 14, 15, 16, 15, 16, 15, 16, 15, 16)
-summary(as.factor(repeat.indiv)) # 16 rats, 4 measurements each
-
-# this is a spls (unsupervised analysis) so no need to mention any factor in design
-# we only perform a one level variation split
-design <- data.frame(sample = repeat.indiv) 
-res.spls.1level <- multilevel(X = liver.toxicity$gene,
-                                       Y=liver.toxicity$clinic,
-                                       design = design,
-                                       ncomp = 3,
-                                       keepX = c(50, 50, 50), keepY = c(5, 5, 5),
-                                       method = 'spls', mode = 'canonical')
-
-# set up colors and pch for plotIndiv
-col.stimu <- 1:nlevels(design$stimu)
-
-plotIndiv(res.spls.1level, rep.space = 'X-variate', ind.names = FALSE, 
-group = liver.toxicity$treatment$Dose.Group,
-          pch = 20, main = 'Gene expression subspace',
-          add.legend = TRUE)
-
-
-plotIndiv(res.spls.1level, rep.space = 'Y-variate', ind.names = FALSE,
-group = liver.toxicity$treatment$Dose.Group,
-          pch = 20, main = 'Clinical measurements ssubpace',
-          add.legend = TRUE)
-          
-plotIndiv(res.spls.1level, rep.space = 'XY-variate', ind.names = FALSE,
-group = liver.toxicity$treatment$Dose.Group,
-          pch = 20, main = 'Both Gene expression and Clinical subspaces',
-          add.legend = TRUE)
-
-}
-}
 
 \keyword{regression}
 \keyword{multivariate}

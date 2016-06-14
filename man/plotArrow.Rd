@@ -10,16 +10,16 @@
 \usage{
 plotArrow(  object,
             comp = NULL,
-            abline.line = FALSE,
+            abline = FALSE,
             xlim = NULL,
             ylim = NULL,
             group=NULL,
             col,
             cex,
             pch,
-            main=NULL,
+            title=NULL,
             plot.arrows=TRUE,
-            add.legend=FALSE,
+            legend=FALSE,
             X.label = NULL,
             Y.label = NULL,
             ind.names=FALSE,
@@ -32,7 +32,7 @@ plotArrow(  object,
 \item{object}{object of class inheriting from \pkg{mixOmics}:  \code{PLS, sPLS, rCC, rGCCA, sGCCA, sGCCDA}},
 \item{comp}{integer vector of length two indicating the components represented on the horizontal
 and the vertical axis to project the individuals.}
-\item{abline.line}{should the vertical and horizontal line through the center be plotted? Default set to \code{FALSE}}
+\item{abline}{should the vertical and horizontal line through the center be plotted? Default set to \code{FALSE}}
 \item{xlim}{the ranges to be encompassed by the \eqn{x} axis, if \code{NULL} they are computed.}
 \item{ylim}{the ranges to be encompassed by the \eqn{y} axis, if \code{NULL} they are computed.}
 \item{group}{factor indicating the group membership for each sample. Coded as default for the supervised method \code{sGCCDA, sPLSDA}, but needs to be input for the unsupervised methods \code{PLS, sPLS, rCC, rGCCA, sGCCA}}
@@ -40,9 +40,9 @@ and the vertical axis to project the individuals.}
 \item{cex}{numeric character (or symbol) expansion, , color vector also possible.}
 \item{pch}{plot character. A character string or a vector of single characters
 or integers. See \code{\link{points}} for all alternatives.}
-\item{main}{set of characters for the title plot.}
+\item{title}{set of characters for the title plot.}
 \item{plot.arrows}{boolean. Whether arrows should be added or not. Default is \code{TRUE}.}
-\item{add.legend}{boolean. Whether the legend should be added. Only for the supervised methods and if group!=NULL. Default is \code{FALSE}.}
+\item{legend}{boolean. Whether the legend should be added. Only for the supervised methods and if group!=NULL. Default is \code{FALSE}.}
 \item{X.label}{x axis titles.}
 \item{Y.label}{y axis titles.}
 \item{ind.names}{If \code{TRUE}, the row names of the first (or second) data matrix are used as sample names (see Details). Can be a vector of length the sample size to display sample names.}
@@ -82,9 +82,10 @@ plotArrow(nutri.res)
 plotArrow(nutri.res,
 group = nutrimouse$genotype, ind.names = nutrimouse$genotype)
 
+\dontrun{
 plotArrow(nutri.res, group = nutrimouse$genotype,
-add.legend = TRUE)
-
+legend = TRUE)
+}
 
 
 ## plot of individuals for objects of class 'pls' or 'spls'
@@ -98,15 +99,17 @@ keepY = c(10, 10, 10))
 #default
 plotArrow(toxicity.spls)
 
+\dontrun{
 # colors indicate time of necropsy, text is the dose
 plotArrow(toxicity.spls,  group = liver.toxicity$treatment[, 'Time.Group'],
 ind.names  = liver.toxicity$treatment[, 'Dose.Group'],
-add.legend = TRUE)
+legend = TRUE)
 
 # colors indicate time of necropsy, text is the dose, label at start of arrow
 plotArrow(toxicity.spls,  group = liver.toxicity$treatment[, 'Time.Group'],
 ind.names  = liver.toxicity$treatment[, 'Dose.Group'],
-add.legend = TRUE, position.names = 'start')
+legend = TRUE, position.names = 'start')
+}
 
 ## variable representation for objects of class 'sgcca' (or 'rgcca')
 # ----------------------------------------------------
@@ -114,10 +117,10 @@ data(nutrimouse)
 Y = unmap(nutrimouse$diet)
 data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid, Y = Y)
 design1 = matrix(c(0,1,1,1,0,1,1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
-nutrimouse.sgcca <- wrapper.sgcca(blocks = data,
+nutrimouse.sgcca <- wrapper.sgcca(X = data,
 design = design1,
 penalty = c(0.3, 0.5, 1),
-ncomp = c(2, 2, 3),
+ncomp = 3,
 scheme = "centroid",
 verbose = FALSE,
 bias = FALSE)
@@ -125,32 +128,33 @@ bias = FALSE)
 # default style: same color for all samples
 plotArrow(nutrimouse.sgcca)
 
-plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, add.legend =TRUE,
-main = 'my plot')
+\dontrun{
+plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, legend =TRUE,
+title = 'my plot')
 
 # ind.names to visualise the unique individuals
-plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, add.legend =TRUE,
-main = 'my plot', ind.names = TRUE)
+plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, legend =TRUE,
+title = 'my plot', ind.names = TRUE)
 
 # ind.names to visualise the unique individuals
-plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, add.legend =TRUE,
-main = 'my plot', ind.names = TRUE,position.names   = 'start')
+plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, legend =TRUE,
+title = 'my plot', ind.names = TRUE,position.names   = 'start')
 
-plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, add.legend =TRUE,
-main = 'my plot', ind.names = TRUE,position.names   = 'end')
+plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, legend =TRUE,
+title = 'my plot', ind.names = TRUE,position.names   = 'end')
 
 # ind.names indicates the diet
-plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, add.legend =TRUE,
-main = 'my plot', ind.names = nutrimouse$diet, position.names= 'start')
+plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, legend =TRUE,
+title = 'my plot', ind.names = nutrimouse$diet, position.names= 'start')
 
 # ind.names to visualise the unique individuals, start position
-plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, add.legend =TRUE,
-main = 'my plot', ind.names = TRUE, position.names   = 'start')
+plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, legend =TRUE,
+title = 'my plot', ind.names = TRUE, position.names   = 'start')
 
 # end position
-plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, add.legend =TRUE,
-main = 'my plot', ind.names = TRUE, position.names   = 'end')
-
+plotArrow(nutrimouse.sgcca, group = nutrimouse$diet, legend =TRUE,
+title = 'my plot', ind.names = TRUE, position.names   = 'end')
+}
 
 ## variable representation for objects of class 'sgccda'
 # ----------------------------------------------------
@@ -160,11 +164,11 @@ Y = nutrimouse$diet
 data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid)
 design1 = matrix(c(0,1,0,1), ncol = 2, nrow = 2, byrow = TRUE)
 
-nutrimouse.sgccda1 <- wrapper.sgccda(blocks = data,
+nutrimouse.sgccda1 <- wrapper.sgccda(X = data,
 Y = Y,
 design = design1,
-ncomp = c(2, 2),
-keep = list(c(10,10), c(15,15)),
+ncomp = 2,
+keepX = list(gene = c(10,10), lipid = c(15,15)),
 scheme = "centroid",
 verbose = FALSE,
 bias = FALSE)
@@ -173,10 +177,11 @@ bias = FALSE)
 #  default colors correspond to outcome Y
 plotArrow(nutrimouse.sgccda1)
 
+\dontrun{
 # with legend and title and indiv ID
-plotArrow(nutrimouse.sgccda1,  add.legend = TRUE, main = 'my sample plot',
+plotArrow(nutrimouse.sgccda1,  legend = TRUE, title = 'my sample plot',
 ind.names = TRUE, position.names = 'start')
-
+}
 }
 
 \keyword{multivariate}

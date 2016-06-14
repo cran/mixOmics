@@ -5,7 +5,7 @@
 \alias{scatterutil.grid}
 \title{Graphical utility functions from ade4}
 \description{
-These utilities are used in graphical functions such as \code{s.match}.
+These utilities are used in graphical functions such as \code{plotArrow}.
 }
 
 \details{
@@ -21,7 +21,7 @@ The functions scatter use some utilities functions :
 \author{Daniel Chessel, Stephane Dray \email{dray@biomserv.univ-lyon1.fr}}
 
 \seealso{
-\code{\link{s.match}}
+\code{\link{plotArrow}}
 }
 
 \keyword{multivariate}

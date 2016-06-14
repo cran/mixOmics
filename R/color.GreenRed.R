@@ -1,5 +1,12 @@
-# Copyright (C) 2015 
-# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+#############################################################################################################
+# Authors:
+#   Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+#
+# created: 2015
+# last modified:
+#
+# Copyright (C) 2015
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -13,33 +20,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
 
 
 #-- green-black-red gradient colors --#
 #-------------------------------------#
-color.GreenRed <-
-  function (n, alpha = 1) 
-  {
+color.GreenRed =
+function (n, alpha = 1)
+{
     #-- checking general input parameters --------------------------------------#
     #---------------------------------------------------------------------------#
     
     #-- n
     if (length(n) > 1 || !is.finite(n))
-      stop("'n' must be an integer positive value.", 
-           call. = FALSE)
+    stop("'n' must be an integer positive value.", call. = FALSE)
     
     if (n < 1)
-      stop("'n' must be an integer positive value.", 
-           call. = FALSE)
+    stop("'n' must be an integer positive value.", call. = FALSE)
     
     #-- alpha
     if (length(alpha) > 1 || !is.finite(alpha))
-      stop("'alpha' must be an numeric value in the range [0, 1].", 
-           call. = FALSE)
+    stop("'alpha' must be an numeric value in the range [0, 1].", call. = FALSE)
     
     if (alpha < 0 || alpha > 1)
-      stop("'alpha' must be an numeric value in the range [0, 1].", 
-           call. = FALSE)
+    stop("'alpha' must be an numeric value in the range [0, 1].", call. = FALSE)
     
     alpha = round(255 * alpha)
     
@@ -53,6 +57,6 @@ color.GreenRed <-
     ramp = colorRamp(c(green, "black", red), space = "Lab")
     
     rgb(ramp(seq(0, 1, length = n)), alpha = alpha, maxColorValue = 255)
-  }
+}
 
 

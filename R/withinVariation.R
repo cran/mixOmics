@@ -1,8 +1,16 @@
-# Copyright (C) 2015 
-# Benoit Liquet, Universite de Bordeaux, France
-# Kim-Anh Le Cao, University of Queensland, Brisbane, Australia
-# Benoit Gautier, University of Queensland, Brisbane, Australia
-# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+#############################################################################################################
+# Authors:
+#   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#   Benoit Gautier, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#   Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#   Benoit Liquet, Universite de Bordeaux, France.
+#
+# created: 2011
+# last modified: 24-05-2016
+#
+# Copyright (C) 2011
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -16,22 +24,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
 
 # ---------------------------------------------
 # withinVariation function 
 # ---------------------------------------------
-withinVariation <- function(X, design){ 
+withinVariation = function(X, design){ 
 	
     # need a matrix for matrix calculations
     X = as.matrix(X)
     rep.measures = factor(design[, 1])
     factors = design[, -1, drop = FALSE] 
     
+    if(any(summary(as.factor(rep.measures)) == 1))
+    stop("A multilevel analysis can not be performed when at least one some sample is not repeated.")
+        
     # calculate the variation
     # ---------------------------
     # added condition for the spls case where the condition is not needed
     # all we need is the rep.measures
-    if ((ncol(factors) == 0) | (ncol(factors) == 1)) {
+    if ((ncol(factors) == 0) | (ncol(factors) == 1))
+    {
       message("Splitting the variation for 1 level factor.")
       
       # save sample names for the output

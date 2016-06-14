@@ -7,7 +7,7 @@
 \title{Human Breast Tumors Data}
 
 \description{
-This data set contains the expression of 1753 genes in 47 surgical specimens of
+This data set contains the expression of 1,000 genes in 47 surgical specimens of
 human breast tumours from 17 different individuals before and after chemotherapy treatment. 
 }
 
@@ -16,7 +16,7 @@ human breast tumours from 17 different individuals before and after chemotherapy
 \format{
 A list containing the following components:
   \describe{
-    \item{\code{gene.exp}}{data matrix with 47 rows and 1753 columns. Each row represents 
+    \item{\code{gene.exp}}{data matrix with 47 rows and 1000 columns. Each row represents 
       an experimental sample, and each column a single gene.}
 	\item{\code{sample}}{a list containing two character vector components:
 		\code{name} the name of the samples, and \code{treatment} the treatment status.}
@@ -28,11 +28,11 @@ A list containing the following components:
 
 \details{
 This data consists of 47 breast cancer samples and 1753 cDNA clones
-pre-selected by P?rez-Enciso \emph{et al.} (2003) to draw their Fig. 1.
+pre-selected by Perez-Enciso \emph{et al.} (2003) to draw their Fig. 1.
 The authors selected 47 samples for which there was information
 at least before or before and after chemotherapy treatment.
 There were 20 tumours that were microarrayed both before
-and after treatment.
+and after treatment. For illustrative purposes we then randomly selected 1000 cDNA clones for this data set.
 }
 
 \source{

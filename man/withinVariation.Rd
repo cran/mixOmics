@@ -5,7 +5,7 @@
 \title{Within matrix decomposition for repeated measurements (cross-over design)}
 
 \description{
-This function is called by the multilevel function for cross-over design data, but can be called independently for other types of analyses (e.g. PCA multilevel).
+This function is internally called by \code{pca}, \code{pls}, \code{spls}, \code{plsda} and \code{splsda} functions for cross-over design data, but can be called independently for other types of analyses.
 }
 
 \usage{
@@ -16,7 +16,7 @@ withinVariation(X, design)
   \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
     
   \item{design}{a numeric matrix or data frame. The first column 
-    indicates the repeated measures on each individual, i.e. the individuals ID. If \code{  method = 'splsda'}, the 2nd and 3rd columns are factors. If \code{method = 'spls'} then you can choose to only input the repeated measures (column 1) or the 2nd AND 3rd columns to split the variation for a 2 level factor. See Details.}
+    indicates the repeated measures on each individual, i.e. the individuals ID. The 2nd and 3rd columns are to split the variation for a 2 level factor.}
     
 }
 

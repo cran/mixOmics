@@ -1,9 +1,15 @@
-# Copyright (C) 2009 
-# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
-# Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
-# Pierre Monget, Ecole d'Ingenieur du CESI, Angouleme, France
+#############################################################################################################
+# Authors:
+#   Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+#   Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+#   Kim-Anh Le Cao, French National Institute for Agricultural Research and
+#   Queensland Facility for Advanced Bioinformatics, University of Queensland, Australia
+# Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#
+# created: 2011
+# last modified: 19-04-2016
+#
+# Copyright (C) 2011
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,42 +24,45 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
 
 
-plot.perf <- 
-function (x, 
-          criterion = c("MSEP", "RMSEP", "R2", "Q2"),
-          pred.method = "all",
-          xlab = "number of components", 
-          ylab = NULL,
-          LimQ2 = 0.0975,
-          LimQ2.col = "darkgrey",
-          cTicks = NULL,
-          layout = NULL,		  
-          ...)
+
+plot.perf <-
+function (x,
+criterion = c("MSEP", "RMSEP", "R2", "Q2"),
+dist = "all",
+measure = "overall",
+xlab = "number of components",
+ylab = NULL,
+LimQ2 = 0.0975,
+LimQ2.col = "darkgrey",
+cTicks = NULL,
+layout = NULL,
+...)
 {
-
+    
     #-- plot for pls and spls ----------------------------------------#
-    if (any(class(x) == "pls.mthd") | any(class(x) == "spls.mthd"))
+    if (any(class(x) == "perf.pls.mthd") | any(class(x) == "perf.spls.mthd"))
     {
-         
-        if (!any(criterion %in% c("MSEP", "RMSEP", "R2", "Q2")) || missing(criterion)) 
-            stop("Choose a validation criterion: MSEP, RMSEP, R2 or Q2.")
+        
+        if (!any(criterion %in% c("MSEP", "RMSEP", "R2", "Q2")) || missing(criterion))
+        stop("Choose a validation criterion: MSEP, RMSEP, R2 or Q2.")
         y = switch(criterion, MSEP = x$MSEP, RMSEP = sqrt(x$MSEP), R2 = x$R2, Q2 = x$Q2)
-		 
+        
         Q2.total = NULL
         if ((criterion == "Q2") & is.list(y)) {
             Q2.total = y$Q2.total
             y = y$variables
         }
-        	
+        
         if (is.null(ylab))
-            ylab = switch(criterion, MSEP = "MSEP", RMSEP = "RMSEP", 
-                          R2 = expression(R^~2), Q2 = expression(Q^~2))
-         	
+        ylab = switch(criterion, MSEP = "MSEP", RMSEP = "RMSEP",
+        R2 = expression(R^~2), Q2 = expression(Q^~2))
+        
         nResp = nrow(y)  # Number of response variables
         nComp = ncol(y)  # Number of components
-         
+        
         if (nResp > 1) {
             if (is.null(layout)) {
                 nRows = min(c(3, nResp))
@@ -62,53 +71,67 @@ function (x,
             }
             else {
                 if (length(layout) != 2 || !is.numeric(layout) || any(is.na(layout)))
-                    stop("'layout' must be a numeric vector of length 2.")
+                stop("'layout' must be a numeric vector of length 2.")
                 nRows = layout[1]
-                nCols = layout[2]		
-           }
-    		
-            if (nRows * nCols < nResp) devAskNewPage(TRUE) 
+                nCols = layout[2]
+            }
+            
+            if (nRows * nCols < nResp) devAskNewPage(TRUE)
             ynames = rownames(y)
         }
         else {
-            ynames = "Y"		
+            ynames = "Y"
         }
-         
+        
         val = comps = vector("numeric")
         varName = vector("character")
-         	
+        
         for (i in 1:nResp) {
             val = c(val, y[i, ])
             comps = c(comps, 1:nComp)
             varName = c(varName, rep(ynames[i], nComp))
         }
-         
+        
         df = data.frame(val = val, comps = comps, varName = varName)
         if (is.null(cTicks)) cTicks = 1:ncol(y)
         yList = list(relation = "free")
-			
-    } # end plot for pls and spls	
-	
+        
+    } # end plot for pls and spls
+    
     #-- plot for plsda and splsda ----------------------------------------#
-    if (any(class(x) == "plsda.mthd") | any(class(x) == "splsda.mthd"))
+    if (any(class(x) == "perf.plsda.mthd") | any(class(x) == "perf.splsda.mthd"))
     {
-     
-        if (any(pred.method == "all")) pred.method = colnames(x$error.rate)
-		 
-        if (!any(pred.method %in% colnames(x$error.rate)))
-            stop("Choose the prediction methods.")
-			
+        
+        if (hasArg(pred.method))
+        stop("'pred.method' argument has been replaced by 'dist' to match the 'tune' and 'perf' functions")
+        pred.method = NULL # to pass R CMD check
+
+        if (any(dist == "all"))
+        dist = colnames(x$error.rate[[measure]])
+        
+        if (is.null(dist))
+        stop("'measure' should be among the ones used in your call to 'perf': ", paste(names(x$error.rate),collapse = ", "),".")
+
+        if (!any(dist %in% colnames(x$error.rate[[measure]])))
+        stop("'dist'should be among the ones used in your call to 'perf': ", paste(colnames(x$error.rate[[measure]]), collapse = ", "),".")
+        
         # KA changed
         #x = matrix(x[, pred.method], ncol = length(pred.method))
-        x = matrix(x$error.rate[, pred.method], ncol = length(pred.method))
+        x = matrix(x$error.rate[[measure]][, dist], ncol = length(dist))
         
         
         if (is.null(ylab))
+        {
+            if (measure == "overall")
             ylab = "error rate"
-         	
+            
+            if (measure == "BER")
+            ylab = "balanced error rate"
+            
+        }
         nResp = ncol(x)  # Number of prediction methods
         nComp = nrow(x)  # Number of components
-         
+        
         if (nResp > 1) {
             if (is.null(layout)) {
                 nRows = min(c(2, nResp))
@@ -117,54 +140,54 @@ function (x,
             }
             else {
                 if (length(layout) != 2 || !is.numeric(layout) || any(is.na(layout)))
-                    stop("'layout' must be a numeric vector of length 2.")
+                stop("'layout' must be a numeric vector of length 2.")
                 nRows = layout[1]
-                nCols = layout[2]		
-           }
- 		 
-            if (nRows * nCols < nResp) devAskNewPage(TRUE) 
+                nCols = layout[2]
+            }
+            
+            if (nRows * nCols < nResp) devAskNewPage(TRUE)
         }
-         
-        ynames = pred.method         
+        
+        ynames = dist
         val = comps = vector("numeric")
         varName = vector("character")
-          	
+        
         for (i in 1:nResp) {
             val = c(val, x[, i])
             comps = c(comps, 1:nComp)
             varName = c(varName, rep(ynames[i], nComp))
         }
-         
+        
         df = data.frame(val = val, comps = comps, varName = varName)
         if (is.null(cTicks)) cTicks = 1:nComp
-        yList = list()		 
-         
-        criterion = ""		
-    } # end plot for plsda and splsda	
-	
+        yList = list()
+        
+        criterion = ""
+    } # end plot for plsda and splsda
+    
     if (criterion == "Q2")
     {
-        plt = xyplot(val ~ comps | varName, data = df, xlab = xlab, ylab = ylab,	
-            scales = list(y = yList, x = list(at = cTicks)), 
-            as.table = TRUE, layout = layout, 
-            panel = function(x, y) {
-                        if (LimQ2.col != "none") panel.abline(h = LimQ2, col = LimQ2.col)
-                        panel.xyplot(x, y, ...)})
+        plt = xyplot(val ~ comps | varName, data = df, xlab = xlab, ylab = ylab,
+        scales = list(y = yList, x = list(at = cTicks)),
+        as.table = TRUE, layout = layout,
+        panel = function(x, y) {
+            if (LimQ2.col != "none") panel.abline(h = LimQ2, col = LimQ2.col)
+            panel.xyplot(x, y, ...)})
         plot(plt)
-		
+        
         if (!is.null(Q2.total)) {
             devAskNewPage(TRUE)
-            Q2.df = data.frame(Q2 = Q2.total, comps = 1:nComp, varName = rep("Total", nComp))	
-            xyplot(Q2 ~ comps | varName, data = Q2.df, xlab = xlab, ylab = ylab, 
-            scales = list(y = yList, x = list(at = cTicks)), as.table = TRUE, 
+            Q2.df = data.frame(Q2 = Q2.total, comps = 1:nComp, varName = rep("Total", nComp))
+            xyplot(Q2 ~ comps | varName, data = Q2.df, xlab = xlab, ylab = ylab,
+            scales = list(y = yList, x = list(at = cTicks)), as.table = TRUE,
             panel = function(x, y) {
-                        if (LimQ2.col != "none") panel.abline(h = LimQ2, col = LimQ2.col)
-                        panel.xyplot(x, y, ...)})
+                if (LimQ2.col != "none") panel.abline(h = LimQ2, col = LimQ2.col)
+                panel.xyplot(x, y, ...)})
         }
     }
     else {
-        xyplot(val ~ comps | varName, data = df, xlab = xlab, ylab = ylab,	
-        scales = list(y = yList, x = list(at = cTicks)), 
-        as.table = TRUE, layout = layout, ...)	
+        xyplot(val ~ comps | varName, data = df, xlab = xlab, ylab = ylab,
+        scales = list(y = yList, x = list(at = cTicks)),
+        as.table = TRUE, layout = layout, ...)
     }
 }

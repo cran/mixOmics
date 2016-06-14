@@ -7,7 +7,7 @@
   Converts a class or group vector or factor into a matrix of indicator variables. 
 }
 \usage{
-  unmap(classification, groups=NULL, noise=NULL, \dots)
+  unmap(classification, groups=NULL, noise=NULL)
 }
 \arguments{
   \item{classification}{
@@ -22,10 +22,7 @@
   \item{noise}{
     A single numeric or character value used to indicate the value of
     \code{groups} corresponding to noise.
-  }
- \item{\dots }{
-     Catches unused arguments in indirect or list calls via \code{do.call}.
-  }
+}
 }
 \value{
   An \emph{n} by \emph{K} matrix of \emph{(0,1)} indicator variables,

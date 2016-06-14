@@ -18,7 +18,7 @@ X.var.names = TRUE,
 Y.var.names = TRUE,
 sideColors = TRUE,
 interactive.dev = TRUE,
-main = TRUE,
+title = TRUE,
 color, row.cex, col.cex,symkey, keysize,
 xlab, ylab, margins, lhei, lwid)
 }
@@ -37,7 +37,7 @@ vector with \eqn{X}- and/or \eqn{Y}-variable labels to use.}
 and vertical side bars that may be used to annotate the \eqn{X} and \eqn{Y}
 correlation matrices.}
 \item{interactive.dev}{boolean. The current graphics device that will be opened is interactive?}
-\item{main}{logical, should the main titles be shown?}
+\item{title}{logical, should the main titles be shown?}
 \item{color,xlab, ylab}{arguments passed to \code{cim}.}
 \item{row.cex, col.cex}{positive numbers, used as \code{cex.axis} in for the row or column
 axis labeling. The defaults currently only use number of rows or columns, respectively.}

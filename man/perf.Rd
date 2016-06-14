@@ -5,12 +5,14 @@
 \alias{perf.spls}
 \alias{perf.plsda}
 \alias{perf.splsda}
+\alias{perf.mint.splsda}
+\alias{perf.sgccda}
 
-\title{Compute evaluation criteria for PLS, sPLS, PLS-DA and sPLS-DA}
+\title{Compute evaluation criteria for PLS, sPLS, PLS-DA, sPLS-DA, MINT and DIABLO}
 
 \description{
 Function to evaluate the performance of the fitted PLS, sparse PLS,
-PLS-DA and sparse PLS-DA models using various criteria.
+PLS-DA, sparse PLS-DA, MINT (mint.splsda) and DIABLO (block.splsda) models using various criteria.
 }
 
 \usage{
@@ -22,46 +24,59 @@ PLS-DA and sparse PLS-DA models using various criteria.
           folds = 10, progressBar = TRUE, \ldots)
 
 \method{perf}{plsda}(object,
-          method.predict = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
+          dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
           validation = c("Mfold", "loo"), 
-          folds = 10, progressBar = TRUE, near.zero.var = FALSE, \ldots)	
+          folds = 10, progressBar = TRUE, \ldots)
 
 \method{perf}{splsda}(object, 
-          method.predict = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
+          dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
           validation = c("Mfold", "loo"),  
-          folds = 10, progressBar = TRUE, near.zero.var = FALSE, \ldots)		  
+          folds = 10, progressBar = TRUE, \ldots)
+
+\method{perf}{mint.splsda}(object,
+            dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
+            progressBar = TRUE, \ldots)
+
+\method{perf}{sgccda}(object,
+            dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
+            validation = c("Mfold", "loo"),
+            folds = 10, \ldots)
+
 }
 
 \arguments{
-  \item{object}{object of class inheriting from \code{"pls"}, \code{"plsda"}, 
-    \code{"spls"} or \code{"splsda"}. The function will retrieve some key parameters stored in that object.}
-  \item{method.predict}{only applies to an object inheriting from \code{"plsda"} or \code{"splsda"} to evaluate the classification performance of the model. Should be a subset of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. Default is \code{"all"}. See \code{\link{predict}}.}
+  \item{object}{object of class inheriting from \code{"pls"}, \code{"plsda"},
+    \code{"spls"}, \code{"splsda"} or  \code{"mint.splsda"}. The function will retrieve some key parameters stored in that object.}
+\item{dist}{only applies to an object inheriting from \code{"plsda"}, \code{"splsda"} or \code{"mint.splsda"} to evaluate the classification performance of the model. Should be a subset of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. Default is \code{"all"}. See \code{\link{predict}}.}
   \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or 
     \code{"loo"} (see below). Default is \code{"Mfold"}.}
   \item{folds}{the folds in the Mfold cross-validation. See Details.}
   \item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
-  \item{near.zero.var}{default is set to \code{FALSE)} in perf.plsda and perf.splsda. However, the nearZeroVar function is still applied by default on the whole data set at the start of the function. When set to \code{TRUE}, nearZeroVar is also applied on each cross-validation fold.}
-  \item{...}{other arguments to pass to the s/PLS/DA functions.}
+\item{...}{not used}
 }
 
 \details{
-For fitted PLS and sPLS regression models, \code{perf} estimates the 
-mean squared error of prediction (MSEP), \eqn{R^2}, and \eqn{Q^2} to assess the predictive 
-perfity of the model using M-fold or leave-one-out cross-validation. Note that only the \code{classic}, \code{regression} and  \code{invariant} modes can be applied.
+The process of evaluating the performance of a fitted model \code{object} is similar for all PLS-derived methods; a cross-validation approach is used to fit the method of \code{object} on \code{folds-1} subsets of the data and then to predict on the subset left out. Different measures of performance are available depending on the model. Parameters such as \code{logratio}, \code{multilevel}, \code{keepX} or \code{keepY} are retrieved from \code{object}.
 
-If \code{validation = "Mfold"}, M-fold cross-validation is performed. 
-How many folds to generate is selected by specifying the number of folds in \code{folds}.
-The folds also can be supplied as a list of vectors containing the indexes defining each 
+If \code{validation = "Mfold"}, M-fold cross-validation is performed.
+\code{folds} specifies the number of folds to generate.
+The folds also can be supplied as a list of vectors containing the indexes defining each
 fold as produced by \code{split}. When using \code{validation = "Mfold"}, make sure that you repeat the process several times (as the results will be highly dependent on the random splits and the sample size).
 
 If \code{validation = "loo"}, leave-one-out cross-validation is performed (in that case, there is no need to repeat the process).
 
-For fitted PLS-DA and sPLS-DA models, \code{perf} estimates the classification error rate 
-using cross-validation. 
 
-For the sparse approaches (sPLS and sLDA), note that the \code{perf} function will retrieve the \code{keepX} and \code{keepY} inputs from the previously run object. The sPLS or sPLS-DA functions will then be run again on several and different subsets of data (the cross-folds) and will certainly lead different subset of selected features. Those are summarised in the output \code{features$stable} (see output Value below) to assess how often the variables are selected on across all folds.
+For fitted PLS and sPLS regression models, \code{perf} estimates the 
+mean squared error of prediction (MSEP), \eqn{R^2}, and \eqn{Q^2} to assess the predictive 
+perfity of the model using M-fold or leave-one-out cross-validation. Note that only the \code{classic}, \code{regression} and  \code{invariant} modes can be applied.
+For sPLS, the MSEP, \eqn{R^2}, and \eqn{Q^2} criteria are averaged across all folds.
+Note that for PLS and sPLS objects, perf is performed on the pre-processed data after log ratio transform and multilevel analysis, if any.
 
-For sPLS, the MSEP, \eqn{R^2}, and \eqn{Q^2} criteria are averaged across all folds. For sPLS-DA, the classification erro rate is averaged across all folds.
+
+The sPLS, sPLS-DA and sgccda functions are run on several and different subsets of data (the cross-folds) and will certainly lead to different subset of selected features. Those are summarised in the output \code{features$stable} (see output Value below) to assess how often the variables are selected across all folds.
+Note that for PLS-DA and sPLS-DA objects, perf is performed on the original data, i.e. before the pre-processing step of the log ratio transform and multilevel analysis, if any. In addition for these methods, the classification error rate is averaged across all folds.
+
+The mint.sPLS-DA function estimates errors based on Leave-one-group-out cross validation (where each levels of object$study is left out (and predicted) once) and provides study-specific outputs (\code{study.specific.error}) as well as global outputs (\code{global.error}).
 
 }
 
@@ -77,10 +92,33 @@ For PLS and sPLS models, \code{perf} produces a list with the following componen
     \item{error.rate}{
 For PLS-DA and sPLS-DA models, \code{perf} produces a matrix of classification error rate estimation. 
 The dimensions correspond to the components in the model and to the prediction method used, respectively. Note that error rates reported in any component include the performance of the model in earlier components for the specified \code{keepX} parameters (e.g. error rate reported for component 3 for \code{keepX = 20} already includes the fitted model on components 1 and 2 for  \code{keepX = 20}). For more advanced usage of the \code{perf} function, see \url{www.mixomics.org/methods/spls-da/} and consider using the \code{predict} function.}
+
+For mint.splsda models, \code{perf} produces the following outputs:
+\item{study.specific.error}{A list that gives BER, overall error rate and error rate per class, for each study}
+\item{global.error}{A list that gives BER, overall error rate and error rate per class for all samples}
+\item{predict}{A list of length \code{ncomp} that produces the predicted values of each sample for each class}
+\item{class}{A list which gives the predicted class of each sample for each \code{dist} and each of the \code{ncomp} components. Directly obtained from the \code{predict} output.}
+
+
+For sgccda models, \code{perf} produces the following outputs:
+\item{error.rate}{Prediction error rate for each block of \code{object$X} and each \code{dist}}
+\item{error.rate.class}{Prediction error rate for each block of \code{object$X}, each \code{dist} and each class}
+\item{predict}{Predicted values of each sample for each class, each block and each component}
+\item{class}{Predicted class of each sample for each block, each \code{dist} and each component}
+\item{features}{a list of features selected across the folds (\code{$stable.X} and \code{$stable.Y}) for the \code{keepX} and \code{keepY} parameters from the input object.}
+\item{AveragePredict.class}{if more than one block, returns the average predicted class over the blocks}
+\item{AveragePredict.error.rate}{if more than one block, returns the average predicted error rate over the blocks}
+\item{MajorityClass}{if more than one block, returns the majority class over the blocks. NA for a sample means that there is no consensus on the predicted class for this particular sample over the blocks.}
+\item{MajorityClass.error.rate}{if more than one block, returns the error rate of the MajorityClass output}
 }
 
 \references{
-Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic. (warning: do not not to use that definition anymore).  
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
+DIABLO - multi omics integration for biomarker discovery.
+
+Rohart F. et al (2016, submitted). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms.
+
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 
 Chavent, Marie and Patouille, Brigitte (2003). Calcul des coefficients de r{e}gression et du PRESS en r{e}gression PLS1. \emph{Modulad n}, \bold{30} 1-11. (this is the formula we use to calculate the Q2 in perf.pls and perf.spls)
 
@@ -101,83 +139,116 @@ Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of C
 \dontrun{
 ## validation for objects of class 'pls' (regression)
 # ----------------------------------------
-  data(liver.toxicity)
-  X <- liver.toxicity$gene
-  Y <- liver.toxicity$clinic
-  
-  
-  # try tune the number of component to choose
-  # ---------------------
-  # first learn the full model
-  liver.pls <- pls(X, Y, ncomp = 10)
-  
-  # with 5-fold cross validation: we use the same parameters as in model above
-  # but we perform cross validation to compute the MSEP, Q2 and R2 criteria
-  # ---------------------------
-  liver.val <- perf(liver.pls, validation = "Mfold", folds = 5)
-  
-  # Q2 total should decrease until it reaches a threshold
-  liver.val$Q2.total
-  
-  # ncomp = 2 is enough
-  plot(liver.val$Q2.total, type = 'l', col = 'red', ylim = c(-0.5, 0.5),
-       xlab = 'PLS components', ylab = 'Q2 total')
-  abline(h = 0.0975, col = 'darkgreen')
-  legend('topright', col = c('red', 'darkgreen'), 
-  legend = c('Q2 total', 'threshold 0.0975'), lty = 1)
-  title('Liver toxicity PLS 5-fold, Q2 total values')
-  
-  #have a look at the other criteria
-  # ----------------------
-  # R2
-  liver.val$R2
-  matplot(t(liver.val$R2), type = 'l', xlab = 'PLS components', ylab = 'R2 for each variable')
-  title('Liver toxicity PLS 5-fold, R2 values')
-  
-  # MSEP
-  liver.val$MSEP
-  matplot(t(liver.val$MSEP), type = 'l', xlab = 'PLS components', ylab = 'MSEP for each variable')
-  title('Liver toxicity PLS 5-fold, MSEP values')
-  
-  
-  ## validation for objects of class 'spls' (regression)
-  # ----------------------------------------
-  ncomp = 7
-  # first, learn the model on the whole data set
-  model.spls = spls(X, Y, ncomp = ncomp, mode = 'regression',
-                    keepX = c(rep(10, ncomp)), keepY = c(rep(4,ncomp)))
-  
-  
-  # with leave-one-out cross validation
-  ##set.seed(45)
-  model.spls.val <- perf(model.spls, validation = "Mfold", folds = 5 )#validation = "loo")
-  
-  #Q2 total
-  model.spls.val$Q2.total
-  
-  # R2:we can see how the performance degrades when ncomp increases
-  model.spls.val$R2
-  plot(model.spls.val, criterion="R2", type = 'l')
-  plot(model.spls.val, criterion="Q2", type = 'l')
-  
-  
-  ## validation for objects of class 'splsda' (classification)
-  # ----------------------------------------
-  data(srbct)
-  X <- srbct$gene
-  Y <- srbct$class  
-  
-  ncomp = 5
-  
-  srbct.splsda <- splsda(X, Y, ncomp = ncomp, keepX = rep(10, ncomp))  
-  
-  # with Mfold
-  # ---------
-  set.seed(45)
-  error <- perf(srbct.splsda, validation = "Mfold", folds = 8, 
-                method.predict = "all")
-  
-  plot(error, type = "l")
+data(liver.toxicity)
+X <- liver.toxicity$gene
+Y <- liver.toxicity$clinic
+
+
+# try tune the number of component to choose
+# ---------------------
+# first learn the full model
+liver.pls <- pls(X, Y, ncomp = 10)
+
+# with 5-fold cross validation: we use the same parameters as in model above
+# but we perform cross validation to compute the MSEP, Q2 and R2 criteria
+# ---------------------------
+liver.val <- perf(liver.pls, validation = "Mfold", folds = 5)
+
+# Q2 total should decrease until it reaches a threshold
+liver.val$Q2.total
+
+# ncomp = 2 is enough
+plot(liver.val$Q2.total, type = 'l', col = 'red', ylim = c(-0.5, 0.5),
+xlab = 'PLS components', ylab = 'Q2 total')
+abline(h = 0.0975, col = 'darkgreen')
+legend('topright', col = c('red', 'darkgreen'),
+legend = c('Q2 total', 'threshold 0.0975'), lty = 1)
+title('Liver toxicity PLS 5-fold, Q2 total values')
+
+#have a look at the other criteria
+# ----------------------
+# R2
+liver.val$R2
+matplot(t(liver.val$R2), type = 'l', xlab = 'PLS components', ylab = 'R2 for each variable')
+title('Liver toxicity PLS 5-fold, R2 values')
+
+# MSEP
+liver.val$MSEP
+matplot(t(liver.val$MSEP), type = 'l', xlab = 'PLS components', ylab = 'MSEP for each variable')
+title('Liver toxicity PLS 5-fold, MSEP values')
+
+
+## validation for objects of class 'spls' (regression)
+# ----------------------------------------
+ncomp = 7
+# first, learn the model on the whole data set
+model.spls = spls(X, Y, ncomp = ncomp, mode = 'regression',
+keepX = c(rep(10, ncomp)), keepY = c(rep(4,ncomp)))
+
+
+# with leave-one-out cross validation
+##set.seed(45)
+model.spls.val <- perf(model.spls, validation = "Mfold", folds = 5 )#validation = "loo")
+
+#Q2 total
+model.spls.val$Q2.total
+
+# R2:we can see how the performance degrades when ncomp increases
+model.spls.val$R2
+plot(model.spls.val, criterion="R2", type = 'l')
+plot(model.spls.val, criterion="Q2", type = 'l')
+
+
+## validation for objects of class 'splsda' (classification)
+# ----------------------------------------
+data(srbct)
+X <- srbct$gene
+Y <- srbct$class
+
+ncomp = 5
+
+srbct.splsda <- splsda(X, Y, ncomp = ncomp, keepX = rep(10, ncomp))
+
+# with Mfold
+# ---------
+set.seed(45)
+error <- perf(srbct.splsda, validation = "Mfold", folds = 8,
+dist = "all")
+
+plot(error, type = "l")
+
+
+## validation for objects of class 'mint.splsda' (classification)
+# ----------------------------------------
+
+data(stemcells)
+res = mint.splsda(X = stemcells$gene, Y = stemcells$celltype, ncomp = 3, keepX = c(10, 5, 15),
+study = stemcells$study)
+
+out = perf(res)
+out
+
+## validation for objects of class 'sgccda' (classification)
+# ----------------------------------------
+
+data(nutrimouse)
+Y = nutrimouse$diet
+data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid)
+design = matrix(c(0,1,1,1,0,1,1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
+
+
+nutrimouse.sgccda <- block.splsda(X=data,
+Y = Y,
+design = design,
+keepX = list(gene=c(10,10), lipid=c(15,15)),
+ncomp = 2,
+scheme = "centroid",
+verbose = FALSE,
+bias = FALSE)
+
+perf = perf(nutrimouse.sgccda)
+perf
+
 }
 
 }

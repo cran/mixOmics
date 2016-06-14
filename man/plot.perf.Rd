@@ -11,7 +11,7 @@ function of the number of components.
 
 \usage{
 \method{plot}{perf}(x, criterion = c("MSEP", "RMSEP", "R2", "Q2"),
-     pred.method = "all",
+     dist = "all", measure = "overall",
      xlab = "number of components", ylab = NULL,
      LimQ2 = 0.0975, LimQ2.col = "darkgrey",
      cTicks = NULL, layout = NULL, \dots)
@@ -22,9 +22,10 @@ function of the number of components.
   \item{criterion}{character string. What type of validation criterion to plot for 
     \code{pls} or \code{spls}. One of \code{"MSEP"}, \code{"RMSEP"}, \code{"R2"} or \code{"Q2"}. 
 	See \code{\link{perf}}.}
-  \item{pred.method}{prediction method applied in \code{perf} for \code{plsda} or \code{splsda}. 
+  \item{dist}{prediction method applied in \code{perf} for \code{plsda} or \code{splsda}. 
 	See \code{\link{perf}}.}
-  \item{xlab, ylab}{titles for \eqn{x} and \eqn{y} axes.  Typically character strings, 
+\item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
+\item{xlab, ylab}{titles for \eqn{x} and \eqn{y} axes.  Typically character strings,
     but can be expressions (e.g., \code{expression(R^2)}).}
   \item{LimQ2}{numeric value. Signification limit for the components in the model. 
     Default is \code{LimQ2 = 0.0975}.}

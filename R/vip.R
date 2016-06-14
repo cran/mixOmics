@@ -1,8 +1,15 @@
-# Copyright (C) 2009 
-# Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-# Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
-# Kim-Anh Le Cao, French National Institute for Agricultural Research and 
-# ARC Centre of Excellence ins Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+#############################################################################################################
+# Authors:
+#   Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
+# Kim-Anh Le Cao, French National Institute for Agricultural Research and ARC Centre of Excellence in Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
+#   Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+#
+# This function was borrowed from the mclust package and modified for mixOmics
+#
+# created: 2009
+# last modified:
+#
+# Copyright (C) 2009
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,9 +24,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#############################################################################################################
 
-
-vip <-
+vip =
 function(object)
 {
 
@@ -35,13 +42,15 @@ function(object)
      
     VIP[, 1] = W[, 1]^2
      
-    if (H > 1) {
-        for (h in 2:H) {
-            if (q == 1) {
+    if (H > 1)
+    {
+        for (h in 2:H)
+        {
+            if (q == 1)
+            {
                 Rd = cor2[, 1:h] 
                 VIP[, h] = Rd %*% t(W[, 1:h]^2) / sum(Rd)
-            }
-            else {
+            } else {
                 Rd = apply(cor2[, 1:h], 2, sum)
                 VIP[, h] = Rd %*% t(W[, 1:h]^2) / sum(Rd)
             }
