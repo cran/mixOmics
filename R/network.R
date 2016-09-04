@@ -83,9 +83,9 @@ name.save = NULL)
         stop(msg, output, call. = FALSE)
     }
     
-    #-- check blocks
-    if(length(blocks) != 2)
-    stop("We can only display 2 blocks",call.=FALSE)
+#    #-- check blocks
+#    if(length(blocks) != 2)
+#    stop("We can only display 2 blocks",call.=FALSE)
     
     #-- save
     if (!is.null(save))
@@ -123,7 +123,7 @@ name.save = NULL)
     class.object = class(mat)
     object.pls=c("pls","spls","mlspls")
     object.rcc="rcc"
-    object.blocks=c("sgcca","rgcca", "sgccda")
+    object.blocks=c("sgcca","rgcca")
     
     if (! any(class.object %in% c(object.pls,object.rcc,object.blocks, "matrix")))
     stop( " 'network' is only implemented for the following objects: matrix, pls, plsda, spls, splsda, rcc, sgcca, rgcca, sgccda", call.=FALSE)
@@ -132,12 +132,10 @@ name.save = NULL)
     if(any(class.object %in% c(object.rcc,object.pls)))
     {
         p = ncol(mat$X)
+        if(any(class.object == "DA")) # object is DA
+        mat$Y = mat$ind.mat
+
         q = ncol(mat$Y)
-        if(length(q)==0)
-        {
-            mat$Y=mat$ind.mat
-            q=ncol(mat$indY)
-        }
         n = nrow(mat$X)
         ncomp = mat$ncomp
         
@@ -239,6 +237,15 @@ name.save = NULL)
         }
         
     } else if(any(class.object %in% object.blocks)) {
+        
+        # remove Y from the list of blocks for DA objects
+        if(any(class.object == "DA"))
+        {
+            mat$names$blocks = mat$names$blocks [-mat$indY]
+            mat$names$colnames = mat$names$colnames [-mat$indY]
+            mat$ncomp = mat$ncomp [-mat$indY]
+        }
+        
         if (is.null(blocks))
         {
             if (any(mat$ncomp > 1))
@@ -250,7 +257,7 @@ name.save = NULL)
         } else if (is.numeric(blocks) & min(blocks) > 0 &  max(blocks) <= length(mat$names$blocks)) {
             blocks = mat$names$blocks[blocks]
         } else if (is.character(blocks)) {
-            if (!any(blocks %in% mat$names$blocks))
+            if (!all(blocks %in% mat$names$blocks))
             stop("One element of 'blocks' does not match with the names of the blocks")
         } else {
             stop("Incorrect value for 'blocks", call. = FALSE)
@@ -309,7 +316,9 @@ name.save = NULL)
             call. = FALSE)
             
             vec=(which(block.var.names==FALSE))
-            block.var.names=mat$names$colnames
+            
+            block.var.names = mat$names$colnames
+            
             for (i in 1:length(blocks))
             {
                 if (i %in% vec)

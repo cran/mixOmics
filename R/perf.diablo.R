@@ -67,24 +67,30 @@ folds = 10,
     if (!(validation %in% c("Mfold", "loo")))
     stop("Choose 'validation' among the two following possibilities: 'Mfold' or 'loo'")
 
-    
-    if (validation == "Mfold")
+
+    #-- define the folds --#
+    if (validation ==  "Mfold")
     {
-        
-        if (!(abs(folds - round(folds)) < .Machine$double.eps) || is.null(folds) || folds < 2 || folds > n)
+        if (is.null(folds) || !is.numeric(folds) || folds < 2 || folds > n)
         {
-            stop(paste("Invalid number of folds.", "folds must be an integer contained between", 2, "and", n))
+            stop("Invalid number of folds.")
         } else {
-            M = folds
-            folds = split(sample(1:n), rep(1:M, length = n))
-            folds = lapply(folds, sort)
+            M = round(folds)
+            
+            temp = stratified.subsampling(Y, folds = M)
+            folds = temp$SAMPLE
+            if(temp$stop > 0) # to show only once
+            warning("At least one class is not represented in one fold, which may unbalance the error rate.\n  Consider a number of folds lower than the minimum in table(Y): ", min(table(Y)))
+
         }
-    } else if (validation == "loo") {
-        M = n
+    } else if (validation ==  "loo") {
         folds = split(1:n, rep(1:n, length = n))
+        M = n
     } else {
         stop("validation can be only 'Mfold' or 'loo'")
     }
+    M = length(folds)
+
     ### Start: Check parameter validation / set up sample
     
     ### Start: Training samples (X.training and Y.training) and Test samples (X.test / Y.test)

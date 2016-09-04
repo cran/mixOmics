@@ -6,7 +6,7 @@
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 2013
-# last modified: 24-05-2016
+# last modified: 24-08-2016
 #
 # Copyright (C) 2013
 #
@@ -49,12 +49,15 @@
 tune.splsda = function (X, Y,
 ncomp = 1,
 test.keepX = c(5, 10, 15),
-already.tested.X = NULL,
+already.tested.X,
+constraint = FALSE, #if TRUE, expect a list in already.tested.X, otherwise a number(keepX)
 validation = "Mfold",
 folds = 10,
 dist = "max.dist",
 measure = "BER", # one of c("overall","BER")
+auc = FALSE,
 progressBar = TRUE,
+max.iter = 100,
 near.zero.var = FALSE,
 nrepeat = 1,
 logratio = c('none','CLR'),
@@ -139,25 +142,49 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     #if ((!is.null(already.tested.X)) && (length(already.tested.X) != (ncomp - 1)) )
     #stop("The number of already tested parameters should be NULL or ", ncomp - 1, " since you set ncomp = ", ncomp)
     
-    if(length(already.tested.X) >= ncomp)
-    stop("'ncomp' needs to be higher than the number of components already tuned ('length(already.tested.X)')", call. = FALSE)
+    if (missing(already.tested.X))
+    {
+        if(constraint == TRUE)
+        {
+            already.tested.X = list()
+        } else {
+            already.tested.X = NULL
+        }
+    } else {
+        if(is.null(already.tested.X) | length(already.tested.X)==0)
+        stop("''already.tested.X' must be a vector of keepX values (if 'constraint'= FALSE) or a list (if'constraint'= TRUE) ")
 
-    if ((!is.null(already.tested.X)) && (!is.numeric(already.tested.X)))
-    stop("Expecting a numerical value in already.tested.X", call. = FALSE)
-    
-    if (!is.null(already.tested.X))
-    cat("Number of variables selected on the first ", length(already.tested.X), "component(s) was ", already.tested.X,"\n")
-    
+        if(constraint == TRUE)
+        {
+            if(!is.list(already.tested.X))
+            stop("''already.tested.X' must be a list since 'constraint' is set to TRUE")
+            
+            message(paste("A total of",paste(lapply(already.tested.X,length),collapse=" and "),"specific variables ('already.tested.X') were selected on the first ", length(already.tested.X), "component(s)"))
+        } else {
+            if(is.list(already.tested.X))
+            stop("''already.tested.X' must be a vector of keepX values since 'constraint' is set to FALSE")
+
+            message(paste("Number of variables selected on the first", length(already.tested.X), "component(s):", paste(already.tested.X,collapse = " ")))
+        }
+    }
+    if(length(already.tested.X) >= ncomp)
+    stop("'ncomp' needs to be higher than the number of components already tuned, which is length(already.tested.X)=",length(already.tested.X) , call. = FALSE)
     
     if (any(is.na(validation)) || length(validation) > 1)
     stop("'validation' should be one of 'Mfold' or 'loo'.", call. = FALSE)
+    
+    #-- test.keepX
+    if (is.null(test.keepX) | length(test.keepX) == 1 | !is.numeric(test.keepX))
+    stop("'test.keepX' must be a numeric vector with more than two entries", call. = FALSE)
     
     #-- end checking --#
     #------------------#
     
    
     #---------------------------------------------------------------------------#
-    #-- multilevel approach ----------------------------------------------------#
+    #-- logration + multilevel approach ----------------------------------------#
+    # we can do logratio and multilevel on the whole data as these transformation are done per sample
+    X = logratio.transfo(X = X, logratio = logratio)
     
     if (!is.null(multilevel) & logratio == "none") # if no logratio, we can do multilevel on the whole data; otherwise it needs to be done after each logratio inside the CV
     {
@@ -179,13 +206,20 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     #-- cross-validation approach  ---------------------------------------------#
     #---------------------------------------------------------------------------#
     
-    
     test.keepX = sort(test.keepX) #sort test.keepX so as to be sure to chose the smallest in case of several minimum
-    
+    names(test.keepX) = test.keepX
     # if some components have already been tuned (eg comp1 and comp2), we're only tuning the following ones (comp3 comp4 .. ncomp)
     if ((!is.null(already.tested.X)))
     {
         comp.real = (length(already.tested.X) + 1):ncomp
+        #check and match already.tested.X to X
+        if(constraint == TRUE)
+        {
+            already.tested.X = get.keepA.and.keepA.constraint (X = list(X=X), keepX.constraint = list(X=already.tested.X), ncomp = length(already.tested.X))$keepA.constraint$X
+            #transform already.tested.X to characters
+            already.tested.X = relist(colnames(X), skeleton = already.tested.X)
+        }
+
     } else {
         comp.real = 1:ncomp
     }
@@ -202,14 +236,14 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     error.per.class = list()
 
     mat.sd.error = matrix(0,nrow = length(test.keepX), ncol = ncomp-length(already.tested.X),
-    dimnames = list(c(test.keepX), c(paste('comp', comp.real))))
+    dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))
     mat.mean.error = matrix(nrow = length(test.keepX), ncol = ncomp-length(already.tested.X),
-    dimnames = list(c(test.keepX), c(paste('comp', comp.real))))
+    dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))
 
     error.per.class.mean = matrix(nrow = nlevels(Y), ncol = ncomp-length(already.tested.X),
-        dimnames = list(c(levels(Y)), c(paste('comp', comp.real))))
+        dimnames = list(c(levels(Y)), c(paste('comp', comp.real, sep=''))))
     error.per.class.sd = matrix(0,nrow = nlevels(Y), ncol = ncomp-length(already.tested.X),
-        dimnames = list(c(levels(Y)), c(paste('comp', comp.real))))
+        dimnames = list(c(levels(Y)), c(paste('comp', comp.real, sep=''))))
         
    
     # first: near zero var on the whole data set
@@ -232,6 +266,13 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
         if(light.output == FALSE)
         prediction.all = class.all = list()
         
+        if(auc)
+        {
+            auc.mean.sd=list()
+            if(light.output == FALSE)
+            auc.all=list()
+        }
+        
         error.per.class.keepX.opt=list()
         # successively tune the components until ncomp: comp1, then comp2, ...
         for(comp in 1:length(comp.real))
@@ -241,10 +282,13 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
             cat("\ncomp",comp.real[comp], "\n")
             
             result = MCVfold.splsda (X, Y, multilevel = multilevel, validation = validation, folds = folds, nrepeat = nrepeat, ncomp = 1 + length(already.tested.X),
-            choice.keepX = already.tested.X, test.keepX = test.keepX, measure = measure, dist = dist, logratio = logratio,
-            near.zero.var = near.zero.var, progressBar = progressBar, class.object = "splsda")
+            choice.keepX = if(constraint){NULL}else{already.tested.X},
+            choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
+            test.keepX = test.keepX, measure = measure, dist = dist,
+            near.zero.var = near.zero.var, progressBar = progressBar, class.object = "splsda", max.iter = max.iter, auc = auc)
             
             # in the following, there is [[1]] because 'tune' is working with only 1 distance and 'MCVfold.splsda' can work with multiple distances
+            mat.error.rate[[comp]] = result[[measure]]$mat.error.rate[[1]]
             mat.mean.error[, comp]=result[[measure]]$error.rate.mean[[1]]
             if (!is.null(result[[measure]]$error.rate.sd[[1]]))
             mat.sd.error[, comp]=result[[measure]]$error.rate.sd[[1]]
@@ -253,9 +297,15 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
             error.per.class.keepX.opt[[comp]]=result[[measure]]$confusion[[1]]
 
             # best keepX
-            already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
-            
-            mat.error.rate[[comp]] = result[[measure]]$mat.error.rate[[1]]
+            if(!constraint)
+            {
+                already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
+            } else {
+                fit = splsda(X, Y, ncomp = 1 + length(already.tested.X),
+                keepX.constraint = already.tested.X, keepX = result[[measure]]$keepX.opt[[1]], near.zero.var = near.zero.var, mode = "regression")
+                
+                already.tested.X[[paste("comp",comp.real[comp],sep="")]] = selectVar(fit, comp = 1 + length(already.tested.X))$name
+            }
             
             if(light.output == FALSE)
             {
@@ -264,27 +314,46 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
                 prediction.all[[comp]] = result$prediction.comp
             }
             
+            if(auc)
+            {
+                auc.mean.sd[[comp]] = result$auc
+                if(light.output == FALSE)
+                auc.all[[comp]] = result$auc.all
+            }
+            
         } # end comp
-        names(mat.error.rate) = c(paste('comp', comp.real))
-        names(error.per.class.keepX.opt) = c(paste('comp', comp.real))
-        names(already.tested.X) = c(paste('comp', 1:ncomp))
+        names(mat.error.rate) = c(paste('comp', comp.real, sep=''))
+        names(error.per.class.keepX.opt) = c(paste('comp', comp.real, sep=''))
+        names(already.tested.X) = c(paste('comp', 1:ncomp, sep=''))
         
         if (progressBar == TRUE)
         cat('\n')
         
         result = list(
-        mat.mean.error = mat.mean.error,
-        mat.sd.error = mat.sd.error,
-        mat.error.rate = mat.error.rate,
-        choice.keepX = already.tested.X ,
-        error.per.class = error.per.class.keepX.opt)
+        error.rate = mat.mean.error,
+        error.rate.sd = mat.sd.error,
+        error.rate.all = mat.error.rate,
+        choice.keepX = if(constraint){lapply(already.tested.X, length)}else{already.tested.X},
+        choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
+        error.rate.class = error.per.class.keepX.opt)
         
         if(light.output == FALSE)
         {
-            names(class.all) = names(prediction.all) = c(paste('comp', comp.real))
+            names(class.all) = names(prediction.all) = c(paste('comp', comp.real, sep=''))
             result$predict = prediction.all
             result$class = class.all
         }
+        if(auc)
+        {
+            names(auc.mean.sd) = c(paste('comp', comp.real, sep=''))
+            result$auc = auc.mean.sd
+            if(light.output == FALSE)
+            {
+                names(auc.all) = c(paste('comp', comp.real, sep=''))
+                result$auc.all =auc.all
+            }
+        }
+        result$measure = measure
         result$call = match.call()
 
         class(result) = "tune.splsda"

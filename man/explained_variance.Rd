@@ -31,7 +31,7 @@ explained_variance(data, variates, ncomp)
 
 \author{Florian Rohart}
 
-\seealso{\code{\link{multilevel}}, \code{\link{spls}}, \code{\link{splsda}}, 
+\seealso{\code{\link{spls}}, \code{\link{splsda}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{cim}}, \code{\link{network}}.}
 

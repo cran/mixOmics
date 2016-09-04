@@ -9,7 +9,7 @@
 #   Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
 #
 # created: 2009
-# last modified: 24-05-2016
+# last modified: 08-07-2016
 #
 # Copyright (C) 2009
 #
@@ -36,6 +36,7 @@ scale = FALSE,
 max.iter = 500,
 tol = 1e-09,
 logratio = 'none',# one of ('none','CLR','ILR')
+ilr.offset = 0.001,
 V = NULL,
 multilevel = NULL)
 {
@@ -126,39 +127,17 @@ multilevel = NULL)
     #-----------------------------#
     #-- logratio transformation --#
     
-    if (is.null(V)) # back-transformation to clr-space, will be used later to recalculate loadings etc
+    if (is.null(V) & logratio == "ILR") # back-transformation to clr-space, will be used later to recalculate loadings etc
     V = clr.backtransfo(X)
     
-    X = logratio.transfo(X = X, logratio = logratio)
+    X = logratio.transfo(X = X, logratio = logratio, offset = if(logratio == "ILR") {ilr.offset} else {0})
     
     #as X may have changed
     if (ncomp > min(ncol(X), nrow(X)))
     stop("use smaller 'ncomp'", call. = FALSE)
     
-    
-    X = scale(X, center = center, scale = scale)
-    cen = attr(X, "scaled:center")
-    sc = attr(X, "scaled:scale")
-    
-    if (any(sc == 0))
-    stop("cannot rescale a constant/zero column to unit variance.",
-    call. = FALSE)
-    
     #-- logratio transformation --#
     #-----------------------------#
-    
-    is.na.X = is.na(X)
-    na.X = FALSE
-    if (any(is.na.X)) na.X = TRUE
-    NA.X = any(is.na.X)
-    
-    cl = match.call()
-    cl[[1]] = as.name('pca')
-    result = list(call = cl, X = X, ncomp = ncomp,NA.X = NA.X,
-    center = if (is.null(cen)) {FALSE} else {cen},
-    scale = if (is.null(sc)) {FALSE} else {sc},
-    names = list(X = X.names, sample = ind.names))
-    
     
     #---------------------------------------------------------------------------#
     #-- multilevel approach ----------------------------------------------------#
@@ -181,6 +160,26 @@ multilevel = NULL)
     }
     #-- multilevel approach ----------------------------------------------------#
     #---------------------------------------------------------------------------#
+    
+    X = scale(X, center = center, scale = scale)
+    cen = attr(X, "scaled:center")
+    sc = attr(X, "scaled:scale")
+    
+    if (any(sc == 0))
+    stop("cannot rescale a constant/zero column to unit variance.",
+    call. = FALSE)
+ 
+    is.na.X = is.na(X)
+    na.X = FALSE
+    if (any(is.na.X)) na.X = TRUE
+    NA.X = any(is.na.X)
+    
+    cl = match.call()
+    cl[[1]] = as.name('pca')
+    result = list(call = cl, X = X, ncomp = ncomp,NA.X = NA.X,
+    center = if (is.null(cen)) {FALSE} else {cen},
+    scale = if (is.null(sc)) {FALSE} else {sc},
+    names = list(X = X.names, sample = ind.names))
     
     
     #-- pca approach -----------------------------------------------------------#

@@ -934,10 +934,10 @@ keepX.constraint)
     #need to give the default values of mint.block.spls to mixOmics
     
     if (!is.list(X))
-    stop("X must be a list of at list two matrices")
+    stop("X must be a list of at least two matrices")
     
     if (length(X)<2)
-    stop("X must be a list of at list two matrices")
+    stop("X must be a list of at least two matrices")
     
     if (length(unique(unlist(lapply(X, nrow)))) != 1)
     stop("Unequal number of rows among the blocks of 'X'")

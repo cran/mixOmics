@@ -53,16 +53,19 @@ function(   x,
     #---------------------------------------------------------------------------#
     
     variances = (x$sdev^2)[1:ncomp] # relative variance
+    ylab = "Variance"
     if(explained.var==TRUE)
-    variances=variances/x$var.tot #explained variances
-    
+    {
+        variances=variances/x$var.tot #explained variances
+        ylab = "Explained Variance"
+    }
     if (type == "barplot")
     {
-        barplot(variances, names.arg = seq(1, ncomp), xlab = "Principal Components", ylab = "Variances",...)
+        barplot(variances, names.arg = seq(1, ncomp), xlab = "Principal Components", ylab = ylab,...)
     } else {
         plot(variances, type = type, axes = FALSE,
         xlab = "Principal Components",
-        ylab = "Variances",... )
+        ylab = ylab,... )
         axis(1, at = 1:ncomp)
         axis(2)
     }

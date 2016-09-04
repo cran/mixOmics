@@ -5,7 +5,7 @@
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 22-04-2016
-# last modified: 26-04-2016
+# last modified: 25-08-2016
 #
 # Copyright (C) 2016
 #
@@ -38,8 +38,9 @@ ncomp,
 study, # mint.splsda
 test.keepX = c(5, 10, 15), # all but pca, rcc
 test.keepY = NULL, # rcc, multilevel
-already.tested.X = NULL, # all but pca, rcc
-already.tested.Y = NULL, #multilevel
+already.tested.X, # all but pca, rcc
+already.tested.Y, #multilevel
+constraint,
 mode = "regression", # multilevel
 nrepeat = 1, #multilevel, splsda
 grid1 = seq(0.001, 1, length = 5), # rcc
@@ -48,12 +49,13 @@ validation = "Mfold", # all but pca
 folds = 10, # all but pca
 dist = "max.dist", # all but pca, rcc
 measure = c("BER"), # all but pca, rcc
+auc = FALSE,
 progressBar = TRUE, # all but pca, rcc
 near.zero.var = FALSE, # all but pca, rcc
 logratio = "none", # all but pca, rcc
 center = TRUE, # pca
 scale = TRUE, # mint, splsda
-max.iter = 500, #pca
+max.iter = 100, #pca
 tol = 1e-09, #pca
 light.output = TRUE # mint, splsda
 )
@@ -66,13 +68,18 @@ light.output = TRUE # mint, splsda
 
         if (missing(ncomp))
         ncomp = 1
+        if(missing(constraint))
+        constraint = TRUE
+        
         result = tune.mint.splsda(X = X, Y = Y,
         ncomp = ncomp,
         study = study,
         test.keepX = test.keepX,
         already.tested.X = already.tested.X,
+        constraint = constraint,
         dist = dist,
         measure = measure,
+        auc = auc,
         progressBar = progressBar,
         scale = scale,
         tol = tol,
@@ -112,20 +119,24 @@ light.output = TRUE # mint, splsda
 
             if (missing(ncomp))
             ncomp = 1
-
+            if(missing(constraint))
+            constraint = FALSE
+            
             result = tune.splsda (X = X, Y = Y,
             ncomp = ncomp,
             test.keepX = test.keepX,
             already.tested.X = already.tested.X,
+            constraint = constraint,
             validation = validation,
             folds = folds,
             dist = dist ,
             measure = measure,
+            auc = auc,
             progressBar = progressBar,
+            max.iter = max.iter,
             near.zero.var = near.zero.var,
             nrepeat = nrepeat,
             logratio = logratio,
-            multilevel = multilevel,
             light.output = light.output)
         } else {
             message("Calling 'tune.multilevel' with method = 'splsda'")
@@ -135,8 +146,10 @@ light.output = TRUE # mint, splsda
             result = tune.multilevel(X = X,
             multilevel = multilevel,
             ncomp = ncomp, test.keepX = test.keepX, dist = dist,
-            already.tested.X = already.tested.X, validation = validation, folds = folds,
-            measure = measure, progressBar = progressBar, near.zero.var = near.zero.var,
+            already.tested.X = already.tested.X,
+            constraint = constraint, validation = validation, folds = folds,
+            measure = measure, auc = auc,
+            progressBar = progressBar, near.zero.var = near.zero.var,
             logratio = logratio, nrepeat = nrepeat)
         }
         
@@ -146,7 +159,8 @@ light.output = TRUE # mint, splsda
 
         if (missing(ncomp))
         ncomp = 1
-
+        if (missing(already.tested.Y))
+        already.tested.Y = NULL
         result = tune.multilevel(X = X, Y = Y,
         multilevel = multilevel,
         mode = mode,

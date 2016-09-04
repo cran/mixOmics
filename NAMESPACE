@@ -1,5 +1,11 @@
 
-import(MASS, lattice, igraph, rgl, ggplot2,corpcor,parallel, RColorBrewer, plyr)
+import(MASS, lattice, igraph, ggplot2,corpcor,parallel, RColorBrewer, plyr)
+
+importFrom(rgl, axes3d, bbox3d, box3d, cube3d, dodecahedron3d,
+            ellipse3d, icosahedron3d, layout3d, legend3d, mtext3d,
+            next3d, octahedron3d, open3d, par3d, plot3d, points3d,
+            rotationMatrix, segments3d, shade3d, shapelist3d, spheres3d,
+            tetrahedron3d, text3d, title3d, triangles3d)
 
 importFrom("grDevices", "as.graphicsAnnot", "chull", "col2rgb",
              "colorRamp", "colorRampPalette", "colors", "dev.cur",
@@ -11,11 +17,11 @@ importFrom("graphics", "abline", "arrows", "axis", "barplot", "box",
              "image", "layout", "legend", "lines", "locator", "mtext",
              "par", "plot", "plot.default", "points", "polygon", "rect",
              "segments", "strheight", "strwidth", "symbols", "text",
-             "title","Axis","boxplot","rasterImage")
+             "title","Axis","boxplot","rasterImage","matplot")
 
 importFrom("stats", "as.dendrogram", "as.dist", "coefficients", "cor",
              "cov", "dist", "hclust", "lm", "lsfit", "median", "na.omit",
-             "order.dendrogram", "predict", "quantile", "reorder", "var","sd")
+             "order.dendrogram", "predict", "quantile", "reorder", "var","sd","pnorm")
 
 importFrom("utils", "setTxtProgressBar", "txtProgressBar","packageDescription","relist")
 
@@ -23,7 +29,7 @@ importFrom("ellipse","ellipse")
 
 importFrom("grDevices","rainbow")
 
-importFrom("methods", "hasArg")
+importFrom("methods", "hasArg", "is")
 
 importFrom("dplyr","group_by")
 
@@ -31,7 +37,9 @@ importFrom("tidyr","gather")
 
 importFrom("reshape2","melt","dcast")
 
+
 export(
+auroc,
 block.pls,
 block.plsda,
 block.spls,
@@ -59,7 +67,6 @@ mint.plsda,
 mint.spls,
 mint.splsda,
 mixOmics,
-multilevel,
 nearZeroVar,
 network,
 nipals, 
@@ -86,6 +93,7 @@ study_split,
 tune,
 tune.mint.splsda,
 tune.splsda,
+tune.block.splsda,
 tune.multilevel,
 tune.splslevel,
 tune.pca,
@@ -96,6 +104,12 @@ withinVariation,
 wrapper.rgcca,
 wrapper.sgcca,
 wrapper.sgccda)
+
+S3method(auroc, plsda)
+S3method(auroc, splsda)
+S3method(auroc, sgccda)
+S3method(auroc, mint.plsda)
+S3method(auroc, mint.splsda)
 
 S3method(perf, pls)
 S3method(perf, spls)
@@ -109,10 +123,17 @@ S3method(perf, mint.splsda)
 
 S3method(image, tune.rcc)
 
-S3method(plot, perf)
+S3method(plot, perf.pls.mthd)
+S3method(plot, perf.spls.mthd)
+S3method(plot, perf.plsda.mthd)
+S3method(plot, perf.splsda.mthd)
+S3method(plot, perf.mint.plsda.mthd)
+S3method(plot, perf.mint.splsda.mthd)
+S3method(plot, perf.sgccda.mthd)
 S3method(plot, rcc)
 S3method(plot, pca)
 S3method(plot, sgccda)
+S3method(plot, tune.splsda)
 
 
 S3method(plotIndiv, pls)

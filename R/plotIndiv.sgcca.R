@@ -6,7 +6,7 @@
 #   Kim-Anh Le Cao, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 16-03-2016
-# last modified: 11-04-2016
+# last modified: 24-08-2016
 #
 # Copyright (C) 2016
 #
@@ -67,14 +67,15 @@ size.ylabel = rel(1),
 size.axis = rel(0.8), 
 size.legend = rel(1), 
 size.legend.title = rel(1.1), 
-legend.position = "right", 
+legend.title = "Legend",
+legend.position = "right",
 point.lwd = 1, 
 ...
 )
 {
     plot_parameters = list(size.title = size.title, size.subtitle = size.subtitle, size.xlabel = size.xlabel, size.ylabel = size.ylabel,
-    size.axis = size.axis, size.legend = size.legend, size.legend.title = size.legend.title, legend.position = legend.position,
-    point.lwd = point.lwd, alpha = alpha)
+    size.axis = size.axis, size.legend = size.legend, size.legend.title = size.legend.title, legend.title = legend.title,
+    legend.position = legend.position, point.lwd = point.lwd, alpha = alpha)
 
     if(any(class(object)%in%c("mint.block.pls", "mint.block.spls", "mint.block.plsda", "mint.block.splsda")))
     stop("No plotIndiv for the following functions at this stage: mint.block.pls, mint.block.spls, mint.block.plsda, mint.block.splsda.")

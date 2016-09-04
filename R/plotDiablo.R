@@ -5,7 +5,7 @@
 #   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 04-2015
-# last modified: 19-04-2016
+# last modified: 25-08-2016
 #
 # Copyright (C) 2015
 #
@@ -38,6 +38,7 @@
 
 plot.sgccda = plotDiablo = function(x,
 ncomp = 1,
+legend.ncol,
 ...)
 {
     
@@ -62,6 +63,9 @@ ncomp = 1,
     stop(paste0("'ncomp' must be a numeric value lower than ", min(object$ncomp),", which is min(object$ncomp)"))
     # end check parameters
     
+    if(missing(legend.ncol))
+    legend.ncol = min(5, nlevels(Y))
+
     numberOfCols = ncol(VarX)-1
     numberOfRows = numberOfCols #- 1
     
@@ -76,7 +80,9 @@ ncomp = 1,
     #bar=paste(1:(numberOfRows-1), numberOfCols, sep="_"),
     #stackedbar=paste(numberOfRows, numberOfCols, sep="_"))
     
-    par(mfrow = c(numberOfRows, numberOfCols), mar = rep.int(1/2, 4), oma = c(2,2,2,2))
+    par(mfrow = c(numberOfRows+1, numberOfCols), mar = rep.int(1/2, 4), oma = c(2,2,2,2))
+    layout(matrix(c(1:(numberOfCols)^2, rep((numberOfCols)^2+1,numberOfCols)),numberOfRows+1,numberOfCols, byrow=TRUE),
+    heights = c(rep(1,numberOfRows), 0.25 * floor(nlevels(Y)/legend.ncol)))
     for(i in 1:numberOfRows)
     {
         for(j in 1:numberOfCols)
@@ -94,6 +100,10 @@ ncomp = 1,
             Axis(side = 4, x=VarX[, i])
         }
     }
+    #add legend
+    plot(1:3,1:3,type="n",axes=FALSE,xlab="",ylab="")
+    legend("center",legend=levels(Y), col = color.mixo(1:nlevels(Y)), pch = 19, ncol = legend.ncol, cex = 1.5)
+    
     par(opar)
 }
 
@@ -104,7 +114,7 @@ splotMatPlot = function(x, y, datNames, Y, ptype)
     {
         plot(1, type = "n", axes = FALSE)
         r = round(cor(x, y), 2)
-        text(1, 1, labels=r, cex = 0.6/strwidth(r)*r)
+        text(1, 1, labels=r, cex = 0.6/strwidth(abs(r))*abs(r))
         box()
     }
     if(names(ptype) == "scatter")

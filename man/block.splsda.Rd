@@ -24,7 +24,7 @@ bias,
 init ,
 tol = 1e-06,
 verbose,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE)
 }
 
@@ -92,15 +92,13 @@ that contains the following components:
 
 
 \references{
-On multiple integration with sparse PLSDA:
-
+On multiple integration with sPLS-DA and 4 data blocks
 Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
-DIABLO - multi omics integration for biomarker discovery. In preparation.
+DIABLO - multi omics integration for biomarker discovery. BioRxiv available here: \url{http://biorxiv.org/content/early/2016/08/03/067611}
 
 Tenenhaus A., Philippe C., Guillemot V, Le Cao K.A., Grill J, Frouin V. Variable selection for generalized canonical correlation analysis. \emph{Biostatistics}. kxu001
 
 Gunther O., Shin H., Ng R. T. , McMaster W. R., McManus B. M. , Keown P. A. , Tebbutt S.J. , Le Cao K-A. ,  (2014) Novel multivariate methods for integration of genomics and proteomics data: Applications in a kidney transplant rejection study, OMICS: A journal of integrative biology, 18(11), 682-95.
-
 }
 
 \author{Florian Rohart, Benoit Gautier, Kim-Anh Le Cao}

@@ -39,7 +39,7 @@
 
 predict.block.pls <-predict.block.spls <- predict.mint.splsda <-
 predict.pls <-predict.spls <-
-function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),  ...)
+function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"), multilevel = NULL,  ...)
 {
     
     if(any(class(object)%in%c("rgcca","sparse.rgcca")))
@@ -147,6 +147,7 @@ function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist"
         if(any(is.na(ind.match)))
         warning("Some blocks are missing in 'newdata'; the prediction is based on the following blocks only: ", paste(names(X)[!is.na(ind.match)],collapse=", "))
         
+        #replace missing blocks by 0
         newdataA = list()
         for (q in 1:length(X))
         {
@@ -208,14 +209,20 @@ function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist"
         
     }
     
+    # logratio and multilevel transform if necessary
+    if (!is.null(object$logratio))
+    newdata2 = lapply(newdata, logratio.transfo, logratio = object$logratio)
+    
+    if(!is.null(multilevel))
+    newdata = lapply(newdata, withinVariation, design = data.frame(multilevel))
 
     p = lapply(X, ncol)
     q = ncol(Y)
-    J=length(X) #at this stage we have a list of blocks
+    J = length(X) #at this stage we have a list of blocks
     variatesX = object$variates[-(J + 1)];
     loadingsX = object$loadings[-(J + 1)]
     
-    scale=object$scale # X and Y are both mean centered by groups and if scale=TRUE they are scaled by groups
+    scale = object$scale # X and Y are both mean centered by groups and if scale=TRUE they are scaled by groups
     
     #save(list=ls(),file="temp.Rdata")
 

@@ -18,6 +18,7 @@ scale = FALSE,
 max.iter = 500,
 tol = 1e-09,
 logratio = 'none',  # one of ('none','CLR','ILR')
+ilr.offset = 0.001,
 V = NULL,
 multilevel = NULL)
 }
@@ -38,7 +39,8 @@ multilevel = NULL)
     columns of \code{X} can be supplied. The value is passed to \code{\link{scale}}.} 
 \item{max.iter}{integer, the maximum number of iterations in the NIPALS algorithm.}
 \item{tol}{a positive real, the tolerance used in the NIPALS algorithm.}
-\item{logratio}{one of ('none','CLR','ILR'). Specifies the log ratio transformation to deal with compositional values that may arise from specific normalisation in sequencing dadta. Default to 'none'}
+\item{logratio}{one of ('none','CLR','ILR'). Specifies the log ratio transformation to deal with compositional values that may arise from specific normalisation in sequencing data. Default to 'none'}
+\item{ilr.offset}{When logratio is set to 'ILR', an offset must be input to avoid infinite value after the logratio transform, default to 0.001.}
 \item{V}{Matrix used in the logratio transformation id provided.}
 \item{multilevel}{sample information for multilevel decomposition for repeated measurements.}
 }
@@ -63,6 +65,8 @@ which would omit essentially constant components, or \code{comp.tol = 0}.
 According to Filzmoser et al., a ILR log ratio transformation is more appropriate for PCA with compositional data. Both CLR and ILR are valid.
 
 Logratio transform and multilevel analysis are performed sequentially as internal pre-processing step, through \code{\link{logratio.transfo}} and \code{\link{withinVariation}} respectively.
+
+Logratio can only be applied if the data do not contain any 0 value (for count data, we thus advise the normalise raw data with a 1 offset). For ILR transformation and additional offset might be needed.
 }    
 
 \value{
@@ -120,11 +124,14 @@ plotVar(pca.res, rad.in = 0.5, cex = 0.5,style="3d")
 
 # example with multilevel decomposition and CLR log ratio transformation (ILR longer to run)
 # ----------------
+\dontrun{
 data("diverse.16S")
 pca.res = pca(X = diverse.16S$data.TSS, ncomp = 5,
 logratio = 'CLR', multilevel = diverse.16S$sample)
 plot(pca.res)
-plotIndiv(pca.res, ind.names = FALSE, group = diverse.16S$bodysite, title = '16S diverse data')
+plotIndiv(pca.res, ind.names = FALSE, group = diverse.16S$bodysite, title = '16S diverse data',
+legend = TRUE)
+}
 }
 
 \keyword{algebra}

@@ -38,7 +38,7 @@
 internal_mint.block = function (A, indY = NULL,  design = 1 - diag(length(A)), tau=NULL,#rep(1, length(A)),
 ncomp = rep(1, length(A)), scheme = "centroid", scale = TRUE,  bias = FALSE,
 init = "svd.single", tol = 1e-06, verbose = FALSE,
-mode = "canonical", max.iter = 500,study = NULL, keepA = NULL,
+mode = "canonical", max.iter = 100,study = NULL, keepA = NULL,
 keepA.constraint = NULL, penalty = NULL)
 {
     # A: list of matrices
@@ -260,7 +260,7 @@ keepA.constraint = NULL, penalty = NULL)
 # ----------------------------------------------------------------------------------------------------------
 
 sparse.mint.block_iteration = function (A, design, study = NULL, keepA.constraint = NULL, keepA = NULL,
-scheme = "centroid", init = "svd", max.iter = 500, tol = 1e-06, verbose = TRUE, bias = FALSE,
+scheme = "centroid", init = "svd", max.iter = 100, tol = 1e-06, verbose = TRUE, bias = FALSE,
 penalty=NULL)
 {
     
@@ -489,7 +489,7 @@ penalty=NULL)
 # ----------------------------------------------------------------------------------------------------------
 
 
-sparse.rgcca_iteration = function (A, design, tau = "optimal", scheme = "centroid", scale = FALSE, max.iter = 500,
+sparse.rgcca_iteration = function (A, design, tau = "optimal", scheme = "centroid", scale = FALSE, max.iter = 100,
 verbose = FALSE, init = "svd.single", bias = FALSE, tol = .Machine$double.eps, keepA = NULL, penalty = NULL)
 {
     ### Start: Initialisation parameters

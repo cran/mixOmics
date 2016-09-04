@@ -122,7 +122,9 @@ nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 
 plotVar(nutri.res) #(default)
 
+\dontrun{
 plotVar(nutri.res, comp = c(1,3), cutoff = 0.5)
+}
 
 ## variable representation for objects of class 'pls' or 'spls'
 # ----------------------------------------------------
@@ -197,6 +199,7 @@ title = c('Variables selected on component 1 only'))
 }
 ## variable representation for objects of class 'rgcca'
 # ----------------------------------------------------
+\dontrun{
 data(nutrimouse)
 # need to unmap Y for an unsupervised analysis, where Y is included as a data block in data
 Y = unmap(nutrimouse$diet)
@@ -215,7 +218,7 @@ nutrimouse.rgcca <- wrapper.rgcca(X = data,
 
 plotVar(nutrimouse.rgcca, comp = c(1,2), block = c(1,2), cex = c(1.5, 1.5))
 
-\dontrun{
+
     plotVar(nutrimouse.rgcca, comp = c(1,2), block = c(1,2))
 
 

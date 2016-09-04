@@ -18,12 +18,14 @@ test.keepX = c(5, 10, 15),
 test.keepY = NULL, 
 already.tested.X = NULL, 
 already.tested.Y = NULL, 
+constraint = FALSE,
 method,
 mode = "regression",
 validation = "Mfold",
 folds = 10,
 dist = "max.dist",
 measure = "BER",
+auc = FALSE,
 progressBar = TRUE,
 near.zero.var = FALSE,
 logratio = "none",
@@ -35,12 +37,13 @@ light.output = TRUE)
 \arguments{
 \item{X}{numeric matrix of predictors. \code{NA}s are allowed.}
 \item{Y}{\code{if(method = 'spls')} numeric vector or matrix of continuous responses (for multi-response models) \code{NA}s are allowed.}
-\item{multilevel}{a numeric matrix that indicates the repeated measures on each individual, i.e. the individuals ID.}
+\item{multilevel}{Design matrix for multilevel analysis (for repeated measurements). A numeric matrix or data frame. For a one level factor decomposition, the input is a vector indicating the repeated measures on each individual, i.e. the individuals ID. For a two level decomposition with splsda models, the two factors are included in Y. Finally for a two level decomposition with spls models, 2nd AND 3rd columns in design indicate those factors (see example in \code{?splsda} and \code{?spls}).}
 \item{ncomp}{the number of components to include in the model.}
 \item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
 \item{test.keepY}{If \code{method = 'spls'}, numeric vector for the different number of variables to test from the \eqn{Y} data set}
 \item{already.tested.X}{if \code{ncomp > 1} numeric vector indicating the number of variables to select rom the \eqn{X} data set on the pfirst components}
 \item{already.tested.Y}{if \code{method = 'spls'} and \code{if(ncomp > 1)} numeric vector indicating the number of variables to select from the \eqn{Y} data set on the first components}
+\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see examples. }
 \item{method}{character string. Which multivariate method and type of analysis to choose, matching one of 'splsda' (Discriminant Analysis) or 'spls' (unsupervised integrative analysis). See Details.}
 \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
@@ -52,6 +55,7 @@ See Details.}
 should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \code{"max.dist"} (see Details).}
 
 \item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
+\item{auc}{if \code{TRUE} calculate the Area Under the Curve (AUC) performance of the model. Only used for \code{method='splsda'}}
 \item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Default value is FALSE}
 \item{logratio}{one of ('none','CLR'). Default to 'none'}
@@ -60,13 +64,13 @@ should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \cod
 }
 
 \details{
-This tuning function should be used to tune the parameters in the \code{multilevel} function.
+This tuning function should be used to tune the parameters when using a variance decomposition ('multilevel') with a repeated measurement design.
 
 If \code{method = 'splsda'}, a distance metric must be used, see \code{help(predict.splsda)} for details about the distances.
 
 For a sPLS-DA one-factor analysis, M-fold cross-validation is performed, internally the training data is decomposed into within-subject variation.
 
-For a sPLS-DA two-factor analysis, the correlation between components from the within-subject variation of X and the \code{cond} matrix is computed on the whole data set. The reason why we cannot obtain a corss-validation error rate as for the spls-DA one-factor analysis is because of the dififculty to decompose and predict the within matrices within each fold.
+For a sPLS-DA two-factor analysis, the correlation between components from the within-subject variation of X and a matrix including the two factors (design[,-1]) is computed on the whole data set. We cannot obtain a cross-validation error rate as for the spls-DA one-factor analysis because of the difficulty to decompose and predict the within matrices within each fold.
 
 For a sPLS two-factor analysis a sPLS canonical mode is run, and the correlation between components from the within-subject variation of X and Y is computed on the whole data set.
 
@@ -103,18 +107,18 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
 
 }
 
-\author{Benoit Liquet, Kim-Anh Le Cao, Benoit Gautier.}
+\author{Benoit Liquet, Kim-Anh Le Cao, Florian Rohart.}
 
-\seealso{\code{\link{multilevel}} and http://www.mixOmics.org for more details.}
+\seealso{\code{\link{tune.splsda}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## First example: one-factor analysis with sPLS-DA
 \dontrun{
   data(vac18.simulated) # simulated data
-  design <- data.frame(sample = vac18.simulated$sample,
-                       stimu = vac18.simulated$stimulation)
+  design <- data.frame(sample = vac18.simulated$sample)
   
-    result.ex1 = tune.multilevel(vac18.simulated$genes,
+    result.ex1 = tune.multilevel(X = vac18.simulated$genes,
+                                Y = vac18.simulated$stimulation,
                                multilevel = design,
                                ncomp=2,
                                test.keepX=c(5, 10, 15), 
@@ -123,11 +127,10 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
                                dist = 'mahalanobis.dist',
                                validation = 'loo') 
   
-  # error rate for the tested parameters est.keepX=c(5, 10, 15)
-  result.ex1$error
-  # prediction for ncomp = 2 and keepX = c(50, 15) (15 is the last tested parameter)
-  result.ex1$prediction.all
-  table(vac18.simulated$stimulation, result.ex1$prediction.all)
+  # overall error rate
+  result.ex1$error.rate 
+  # classification error rate per class after 2 components
+  result.ex1$error.rate.class
 }
 
 
@@ -144,11 +147,10 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
                     13, 14, 15, 16, 15, 16, 15, 16, 15, 16)
   summary(as.factor(repeat.indiv)) # 16 rats, 4 measurements each
   
-  design <- data.frame(sample = repeat.indiv,
-                       dose = dose,
-                       time = time)
-  
+  design <- data.frame(sample = repeat.indiv)
+
   result.ex2 = tune.multilevel(liver.toxicity$gene,
+                                Y = data.frame(dose, time),
                                 multilevel = design,
                                 ncomp=2,
                                 test.keepX=c(5, 10, 15), 

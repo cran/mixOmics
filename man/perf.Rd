@@ -25,17 +25,17 @@ PLS-DA, sparse PLS-DA, MINT (mint.splsda) and DIABLO (block.splsda) models using
 
 \method{perf}{plsda}(object,
           dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-          validation = c("Mfold", "loo"), 
-          folds = 10, progressBar = TRUE, \ldots)
+          constraint = FALSE, validation = c("Mfold", "loo"), 
+          folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, \ldots)
 
 \method{perf}{splsda}(object, 
-          dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-          validation = c("Mfold", "loo"),  
-          folds = 10, progressBar = TRUE, \ldots)
+dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"), constraint = FALSE,
+validation = c("Mfold", "loo"),
+folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, \ldots)
 
 \method{perf}{mint.splsda}(object,
             dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-            progressBar = TRUE, \ldots)
+            constraint = TRUE, auc = FALSE, progressBar = TRUE, \ldots)
 
 \method{perf}{sgccda}(object,
             dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
@@ -48,9 +48,12 @@ PLS-DA, sparse PLS-DA, MINT (mint.splsda) and DIABLO (block.splsda) models using
   \item{object}{object of class inheriting from \code{"pls"}, \code{"plsda"},
     \code{"spls"}, \code{"splsda"} or  \code{"mint.splsda"}. The function will retrieve some key parameters stored in that object.}
 \item{dist}{only applies to an object inheriting from \code{"plsda"}, \code{"splsda"} or \code{"mint.splsda"} to evaluate the classification performance of the model. Should be a subset of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. Default is \code{"all"}. See \code{\link{predict}}.}
-  \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or 
+\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see examples. }
+\item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or
     \code{"loo"} (see below). Default is \code{"Mfold"}.}
   \item{folds}{the folds in the Mfold cross-validation. See Details.}
+\item{nrepeat}{Number of times the Cross-Validation process is repeated.}
+\item{auc}{if \code{TRUE} calculate the Area Under the Curve (AUC) performance of the model.}
   \item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
 \item{...}{not used}
 }
@@ -78,6 +81,8 @@ Note that for PLS-DA and sPLS-DA objects, perf is performed on the original data
 
 The mint.sPLS-DA function estimates errors based on Leave-one-group-out cross validation (where each levels of object$study is left out (and predicted) once) and provides study-specific outputs (\code{study.specific.error}) as well as global outputs (\code{global.error}).
 
+For PLS-DA, sPLS-DA, mint.PLS-DA and mint.sPLS-DA methods: if \code{auc=TRUE}, Area Under the Curve (AUC) values are calculated from the predicted values obtained from the cross-validation process, either for all samples or for study-specific samples (for mint models).
+
 }
 
 \value{
@@ -92,12 +97,16 @@ For PLS and sPLS models, \code{perf} produces a list with the following componen
     \item{error.rate}{
 For PLS-DA and sPLS-DA models, \code{perf} produces a matrix of classification error rate estimation. 
 The dimensions correspond to the components in the model and to the prediction method used, respectively. Note that error rates reported in any component include the performance of the model in earlier components for the specified \code{keepX} parameters (e.g. error rate reported for component 3 for \code{keepX = 20} already includes the fitted model on components 1 and 2 for  \code{keepX = 20}). For more advanced usage of the \code{perf} function, see \url{www.mixomics.org/methods/spls-da/} and consider using the \code{predict} function.}
+\item{auc}{Averaged AUC values over the \code{nrepeat}}
 
 For mint.splsda models, \code{perf} produces the following outputs:
 \item{study.specific.error}{A list that gives BER, overall error rate and error rate per class, for each study}
 \item{global.error}{A list that gives BER, overall error rate and error rate per class for all samples}
 \item{predict}{A list of length \code{ncomp} that produces the predicted values of each sample for each class}
 \item{class}{A list which gives the predicted class of each sample for each \code{dist} and each of the \code{ncomp} components. Directly obtained from the \code{predict} output.}
+\item{auc}{AUC values}
+\item{auc.study}{AUC values for each study}
+
 
 
 For sgccda models, \code{perf} produces the following outputs:
@@ -213,7 +222,9 @@ srbct.splsda <- splsda(X, Y, ncomp = ncomp, keepX = rep(10, ncomp))
 # ---------
 set.seed(45)
 error <- perf(srbct.splsda, validation = "Mfold", folds = 8,
-dist = "all")
+dist = "all", auc = TRUE)
+error
+error$auc
 
 plot(error, type = "l")
 
@@ -223,10 +234,13 @@ plot(error, type = "l")
 
 data(stemcells)
 res = mint.splsda(X = stemcells$gene, Y = stemcells$celltype, ncomp = 3, keepX = c(10, 5, 15),
-study = stemcells$study)
+study = stemcells$study, auc = TRUE)
 
 out = perf(res)
 out
+
+out$auc
+out$auc.study
 
 ## validation for objects of class 'sgccda' (classification)
 # ----------------------------------------
@@ -244,11 +258,12 @@ keepX = list(gene=c(10,10), lipid=c(15,15)),
 ncomp = 2,
 scheme = "centroid",
 verbose = FALSE,
-bias = FALSE)
+bias = FALSE,
+auc = TRUE)
 
 perf = perf(nutrimouse.sgccda)
 perf
-
+perf$auc
 }
 
 }

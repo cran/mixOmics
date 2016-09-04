@@ -6,7 +6,7 @@
 #   Kim-Anh Le Cao, University of Queensland Diamantina Institute, Brisbane, Australia
 #
 # created: 2015
-# last modified: 12-04-2016
+# last modified: 24-08-2016
 #
 # Copyright (C) 2015
 #
@@ -27,11 +27,14 @@
 
 
 circosPlot = function(object,
-corThreshold,
+comp = 1 : min(object$ncomp),
+cutoff,
+var.names = NULL,
 showIntraLinks = FALSE,
 line=TRUE,
 size.legend=0.8,
 ncol.legend=1,
+size.variables = 0.25,
 size.labels=1)
 {
     # to satisfy R CMD check that doesn't recognise x, y and group as variable (in aes)
@@ -57,11 +60,11 @@ size.labels=1)
     if (!any(class(object) == "block.splsda"))
     stop("circosPlot is only available for 'block.splsda' objects")
     
-    if (length(object$X) <= 1)
-    stop("This function is only available when there are more than 3 blocks") # so 2 blocks in X + the outcome Y
+    if (length(object$X) < 2)
+    stop("This function is only available when there are more than 3 blocks (2 in object$X + an outcome object$Y)") # so 2 blocks in X + the outcome Y
     
-    if (missing(corThreshold))
-    stop("'corThreshold' is missing", call.=FALSE) # so 2 blocks in X + the outcome Y
+    if (missing(cutoff))
+    stop("'cutoff' is missing", call.=FALSE) # so 2 blocks in X + the outcome Y
 
 
     X = object$X
@@ -71,14 +74,38 @@ size.labels=1)
     indY = object$indY
     object$variates = c(object$variates[-indY], object$variates[indY])
     object$loadings = c(object$loadings[-indY], object$loadings[indY])
+    object$ncomp = c(object$ncomp[-indY], object$ncomp[indY])
     
-    if (min(object$ncomp) != max(object$ncomp))
-    warning("unequal number of component per block: we use the minimum")
-    ncomp.min = min(object$ncomp)
+    #check var.names
+    sample.X = lapply(object$loadings[-length(object$loadings)], function(x){1 : nrow(x)})
+    if (is.null(var.names))
+    {
+        var.names.list = unlist(sapply(object$loadings[-length(object$loadings)], rownames))
+    } else if (is.list(var.names)) {
+        if (length(var.names) != length(object$loadings[-length(object$loadings)]))
+        stop.message('var.names', sample.X)
+        
+        if(sum(sapply(1 : length(var.names), function(x){
+            length(var.names[[x]]) == length(sample.X[[x]])})) != length(var.names))
+        stop.message('var.names', sample.X)
+        
+        var.names.list = var.names
+    } else {
+        stop.message('var.names', sample.X)
+    }
+
+
+    if(any(comp > min(object$ncomp)))
+    {
+        warning("Limitation to ",min(object$ncomp), " components, as determined by min(object$ncomp)")
+        comp[which(comp > min(object$ncomp))] = min(object$ncomp)
+    }
+    comp = unique(sort(comp))
+
     
-    keepA = lapply(object$loadings, function(i) apply(abs(i), 1, sum) > 0)
+    keepA = lapply(object$loadings, function(i) apply(abs(i)[, comp, drop = FALSE], 1, sum) > 0)
     cord = mapply(function(x, y, keep){
-        cor(x[, keep], y[, 1:ncomp.min], use = "pairwise")
+        cor(x[, keep], y[, comp], use = "pairwise")
     }, x=object$X, y=object$variates[-length(object$variates)], keep = keepA[-length(keepA)])
     
     simMatList = vector("list", length(X))
@@ -96,7 +123,8 @@ size.labels=1)
     
     AvgFeatExp0 = Xdat %>% mutate(Y = Y) %>% gather(Features, Exp, -Y) %>%
     group_by(Y, Features) %>% dplyr::summarise(Mean = mean(Exp), SD = sd(Exp))
-    AvgFeatExp0$Dataset = factor(rep(names(X), unlist(lapply(cord, nrow))), levels = names(X))
+    AvgFeatExp0$Dataset = factor(rep(names(X), unlist(lapply(cord, nrow))),
+    levels = names(X))[match(AvgFeatExp0$Features,colnames(Xdat))] # to match Xdat that is reordered in AvgFeatExp0
     featExp = AvgFeatExp0 %>% group_by(Dataset, Y) %>% arrange(Mean)
     # Generate a circular plot (circos like) from a correlation matrix (pairwise)
     #
@@ -104,12 +132,14 @@ size.labels=1)
     #   corMat: the main correlation matrix.
     #         -> colnames == rownames (pairwise)  values = correlations
     #   featExp: data.frame holding the expression data.
-    #   corThreshold: minimum value for correlations (<threshold will be ignored)
+    #   cutoff: minimum value for correlations (<threshold will be ignored)
     #   figSize: figure size
     #   segmentWidth: thickness of the segment (main circle)
     #   linePlotWidth: thickness of the line plot (showing expression data)
     #   showIntraLinks = display links intra segments
     
+    
+
     # 1) Generate karyotype data
     chr = genChr(featExp)
     chr.names = unique(chr$chrom) # paste("chr", 1:seg.num, sep="") 
@@ -118,9 +148,9 @@ size.labels=1)
     db = data.frame(db)
     
     # 2) Generate Links
-    links = genLinks(chr, corMat, threshold=corThreshold)
+    links = genLinks(chr, corMat, threshold=cutoff)
     if (nrow(links) < 1)
-    stop("Choose a lower correlation threshold")
+    warning("Choose a lower correlation threshold to highlight links between datasets")
     
     # 3) Plot
     # Calculate parameters
@@ -129,15 +159,21 @@ size.labels=1)
     linePlotR = circleR + segmentWidth
     chrLabelsR = (figSize / 2.0)
     
+    # replace chr$name by the ones in var.names (matching)
+    # matching var.names.list with object$loadings
+    ind.match = match(chr$name, unlist(sapply(object$loadings[-length(object$loadings)],rownames)))
+    chr$name.user = unlist(var.names.list)[ind.match]
+    
     opar1=par("mar")
     par(mar=c(2, 2, 2, 2))
     
     plot(c(1,figSize), c(1,figSize), type="n", axes=FALSE, xlab="", ylab="", main="")
     
     # Plot ideogram
-    drawIdeogram(R=circleR, cir=db, W=segmentWidth,  show.band.labels=TRUE, show.chr.labels=TRUE, chr.labels.R= chrLabelsR, chrData=chr,size.labels=size.labels)
+    drawIdeogram(R=circleR, cir=db, W=segmentWidth,  show.band.labels=TRUE, show.chr.labels=TRUE, chr.labels.R= chrLabelsR, chrData=chr, size.variables = size.variables, size.labels=size.labels)
     
     # Plot links
+    if(nrow(links)>0)
     drawLinks(R=linksR, cir=db,   mapping=links,   col=linkColors, drawIntraChr=showIntraLinks)
     
     # Plot expression values
@@ -179,17 +215,22 @@ size.labels=1)
     legend(x=figSize-(circleR/3), y = (circleR/3), title="Expression", legend=levels(Y),  ## changed PAM50 to Y
     col = lineCols, pch = 19, cex=size.legend, bty = "n",ncol=ncol.legend)
     # third legend top left corner
-    legend(x=figSize-(circleR/2), y = figSize, title="Correlation cut-off", legend=paste("r", corThreshold, sep = "="),
+    legend(x=figSize-(circleR/2), y = figSize, title="Correlation cut-off", legend=paste("r", cutoff, sep = "="),
     col = "black", cex=size.legend, bty = "n")
-    
+
+    legend(x=-circleR/4, y = figSize, legend=paste("Comp",paste(comp,collapse="-")),
+    col = "black", cex=size.legend, bty = "n")
+
+
     par(xpd=opar,mar=opar1)# put the previous defaut parameter for xpd
-    return(invisible())
+    return(invisible(corMat))
 }
 
 drawIdeogram = function(R, xc=400, yc=400, cir, W,
 show.band.labels = FALSE,
 show.chr.labels = FALSE, chr.labels.R = 0,
 chrData,
+size.variables,
 size.labels)
 {
     # Draw the main circular plot: segments, bands and labels
@@ -224,12 +265,12 @@ size.labels)
             draw.arc.s(xc, yc, R, w1, w2, col=col, lwd=W) 
             
             if (show.band.labels){
-                band.text = as.character(dat.v[i,4]) 
+                band.text = as.character(dat.v[i,"name.user"]) 
                 
                 band.po = ((w1+w2)/2)# - ((w2-w1)/3) #position around the circle
                 # print(c(band.po, w1, w2, (w2-w1)/3))
                 band.po.in = R-(W/3.0) #position on the band (middle)
-                draw.text.rt(xc, yc,band.po.in  , band.po , band.text , cex=0.25, segmentWidth = W, side="in" ) 
+                draw.text.rt(xc, yc,band.po.in  , band.po , band.text , cex = size.variables, segmentWidth = W, side="in" )
             }
         } #End for row
         if (show.chr.labels){

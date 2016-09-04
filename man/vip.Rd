@@ -14,7 +14,7 @@ vip(object)
 }
 
 \arguments{
-  \item{object}{object of class inheriting from \code{"pls"} or \code{"spls"}.}
+  \item{object}{object of class inheriting from \code{"pls"}, \code{"plsda"}, \code{"spls"} or  \code{"splsda"}.}
 }
 
 \details{

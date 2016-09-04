@@ -5,7 +5,7 @@
 #   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 2015
-# last modified: 12-04-2016
+# last modified: 19-08-2016
 #
 # Copyright (C) 2015
 #
@@ -38,6 +38,9 @@ cimDiablo = function(object,
 ncomp=1,
 margins = c(2, 15),
 legend.position="topright",
+transpose = FALSE,
+row.names = TRUE,
+col.names = TRUE,
 size.legend=1.5)
 {
     
@@ -71,12 +74,13 @@ size.legend=1.5)
     XDat[which(XDat < -2)] = -2
     
     dark = brewer.pal(n = 12, name = 'Paired')[seq(2, 12, by = 2)]
-    VarLabels = factor(rep(names(X), lapply(keepA[-length(keepA)], sum)), levels = names(X)[order(names(X))])
+    VarLabels = factor(rep(names(X), lapply(keepA[-length(keepA)], sum)), levels = names(X))#[order(names(X))])
     
     ## Plot heatmap
     opar = par()[! names(par()) %in% c("cin", "cra", "csi", "cxy", "din", "page")]
     par(mfrow=c(1,1))
-    cim(XDat, row.names = rep("", nrow(XDat)), col.names = rep("", ncol(XDat)),
+    cim(XDat,transpose= transpose,
+    row.names = row.names, col.names = col.names,
     col.sideColors = dark[as.numeric(VarLabels)],
     row.sideColors = color.mixo(as.numeric(Y)), margins = margins)
     
@@ -87,5 +91,7 @@ size.legend=1.5)
     text.font = c(2, rep(1, nlevels(Y)), NA, 2, rep(1, nlevels(VarLabels))))
     
     par(opar)
+    
+    return(invisible(XDat))
 }
 

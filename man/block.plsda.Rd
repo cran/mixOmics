@@ -20,7 +20,7 @@ bias,
 init ,
 tol = 1e-06,
 verbose,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE)
 }
 
@@ -92,8 +92,9 @@ least squares using microarray gene expression data. \emph{Bioinformatics}
 On multiple integration with PLS-DA
 Gunther O., Shin H., Ng R. T. , McMaster W. R., McManus B. M. , Keown P. A. , Tebbutt S.J. , Le Cao K-A. ,  (2014) Novel multivariate methods for integration of genomics and proteomics data: Applications in a kidney transplant rejection study, OMICS: A journal of integrative biology, 18(11), 682-95.
 
+On multiple integration with sPLS-DA and 4 data blocks
 Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
-DIABLO - multi omics integration for biomarker discovery. In preparation.
+DIABLO - multi omics integration for biomarker discovery. BioRxiv available here: \url{http://biorxiv.org/content/early/2016/08/03/067611}
 
 }
 
@@ -113,7 +114,7 @@ res = block.plsda(X = data, indY = 3) # indY indicates where the outcome Y is in
 plotIndiv(res, ind.names = FALSE, legend = TRUE)
 plotVar(res)
 
-# Y is provided
+# when Y is provided
 res2 = block.plsda(list(gene = nutrimouse$gene, lipid = nutrimouse$lipid),
     Y = nutrimouse$diet, ncomp = 2)
 plotIndiv(res2)

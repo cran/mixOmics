@@ -47,7 +47,7 @@ mode = c("regression", "canonical", "invariant", "classic"),
 study,
 scale = TRUE,
 tol = 1e-06,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE)
 {
     

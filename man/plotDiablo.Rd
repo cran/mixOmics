@@ -7,12 +7,13 @@
 \description{Function to visualise correlation between components from different data sets}
 
 \usage{
-plotDiablo(x, ncomp = 1, ...)
+plotDiablo(x, ncomp = 1, legend.ncol, ...)
 }
 
 \arguments{
 \item{x}{object of class inheriting from \code{"block.splsda"}.}
 \item{ncomp}{Which component to plot calculated from each data set. Has to be lower than the minimum of \code{object$ncomp}}
+\item{legend.ncol}{Number of columns for the legend. Default to \code{min(5,nlevels(x$Y))}}
 \item{\dots}{not used}
 }
 

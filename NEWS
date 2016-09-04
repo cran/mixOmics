@@ -1,3 +1,42 @@
+Changes in 6.1.0 (improvements and bug fixes)
+================
+In short,
+- cimDIABLO argument 'corThreshold' replaced by 'cutoff'
+- new plots of tune and perf results now available
+- tune function for block.splsda/DIABLO method
+- auroc for supervised methods
+
+New features:
+-------------
+- auroc function applicable for (mint).(block).(s)plsda objects. AUc values also included in perf and tune functions (except mixDIABLO module)
+- tune.block.splsda function to chose the keepX parameters of block.splsda (a.k.a mixDIABLO)
+- plot for perf objects displays the classification error rate w.r.t components
+- plot for tune objects displays the classification error rate w.r.t keepX values (not implemented for tune.block.splsda)
+- multilevel function has been removed (as planned) as it is now included as an argument in other functions (see pca, pls, splsda, etc)
+
+
+Enhancements:
+-------------
+1 - All tune functions (except for mixDIABLO/block.splsda module) include a 'constraint' argument to either build the model based on user input specific parameters (object$keepX.constraint) or based on the optimal parameter keepX determined by the tune function, see examples in help files.
+2 - All perf functions (except for mixDIABLO/block.splsda module) have now a 'constraint' argument that allows the performances to be calculate either based on the number of parameters (object$keepX) defined in object or based on the variables  selected on each component, see examples in help files.
+3 - max.iter has been set to 100 to speed up computational time for all multivariate methods except pca/spca.
+4 - cimDiablo: new arguments include transpose, row.names and col.names
+5 - circosPlot: new arguments include var.names and comp. Argument 'corThreshold' has been replaced by 'cutoff'.
+6 - plotIndiv: new argument legend.title
+7 - network function for block.spls(da) models and allows to plot for more than 2 blocks
+8 - PCA: new argument ilr.offset to be used only for ILR log transform in PCA (mixMC module)
+9 - Legend added in plotDiablo, new argument legend.ncol
+
+
+Bug fixes:
+----------
+1 - plotIndiv and ellipse: plot ellipse for all groups with more than 1 sample
+2 - predict function: argument multilevel added, log transform included
+3 - Call to plsda.vip() from the RVAideMemoire package
+4 - other small bugs as listed in out bitbucket issues, matching rgl package changes.
+
+
+
 Changes in 6.0.0 (major, implementation improvements and new methods)
 ================
 In short,

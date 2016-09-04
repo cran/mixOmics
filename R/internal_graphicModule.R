@@ -3,7 +3,7 @@
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 16-03-2016
-# last modified: 12-04-2016
+# last modified: 24-08-2016
 #
 # Copyright (C) 2016
 #
@@ -81,6 +81,7 @@ alpha)
     size.axis = plot_parameters$size.axis
     size.legend = plot_parameters$size.legend
     size.legend.title = plot_parameters$size.legend.title
+    legend.title = plot_parameters$legend.title
     legend.position = plot_parameters$legend.position
     point.lwd = plot_parameters$point.lwd
     
@@ -113,12 +114,7 @@ alpha)
         #-- Display sample or row.names
         for (i in levels(df$group))
         {
-            if (display.names)
-            {
-                p = p +geom_point(data = subset(df, df$group == i),size = 0, shape = 0)+ geom_text(data = subset(df, df$group == i), aes(label = names), size = 0,show.legend  = F)
-            } else {
-                p = p + geom_point(data = subset(df, df$group == i), size = 0, shape = 0)
-            }
+            p = p + geom_point(data = subset(df, df$group == i), size = 0, shape = 0)
             if (centroid == TRUE)
             {
                 p = p + geom_point(data = subset(df[, c("col", "x0", "y0", "Block", "cex", "pch", "group")], df$group == i), aes(x=x0,y=y0), size = 0, shape = 0)
@@ -127,7 +123,7 @@ alpha)
         
         
         #-- Modify scale colour - Change X/Ylabel - split plots into Blocks
-        p = p + scale_colour_manual(values = unique(col.per.group)[match(levels(factor(as.character(df$group))), levels(df$group))], name = "Legend", breaks = levels(df$group))
+        p = p + scale_colour_manual(values = unique(col.per.group)[match(levels(factor(as.character(df$group))), levels(df$group))], name = legend.title, breaks = levels(df$group))
         
         p = p + labs(list(title = title, x = X.label, y = Y.label)) + facet_wrap(~ Block, ncol = nCols, scales = "free", as.table = TRUE) #as.table to plot in the same order as the factor
         p = p + theme(plot.title=element_text(size=size.title),axis.title.x=element_text(size=size.xlabel),axis.title.y=element_text(size=size.ylabel),axis.text=element_text(size=size.axis))# bigger title
@@ -198,9 +194,13 @@ alpha)
         {
             for (i in 1 : nlevels(df$group))
             {
-                p = p + geom_path(data = df.ellipse,
-                aes_string(x = paste0("Col", 2*(i - 1) + 1), y = paste0("Col", 2 * i),
-                label = "Block", group = NULL), color = unique(col.per.group)[i], size = point.lwd)
+                if( !is.na(match(paste0("Col", 2*(i - 1) + 1), colnames(df.ellipse))))
+                {
+                    p = p + geom_path(data = df.ellipse,
+                    aes_string(x = paste0("Col", 2*(i - 1) + 1), y = paste0("Col", 2 * i),
+                    label = "Block", group = NULL), color = unique(col.per.group)[i], size = point.lwd)
+                }
+
             }
         }
         
@@ -240,7 +240,7 @@ alpha)
         }
         
         #-- Modify scale colour - Change X/Ylabel - split plots into Blocks
-        p = p + scale_colour_manual(values = unique(col.per.group)[match(levels(factor(as.character(df$group))), levels(df$group))], name = "Outcome", breaks = levels(df$group)) +
+        p = p + scale_colour_manual(values = unique(col.per.group)[match(levels(factor(as.character(df$group))), levels(df$group))], name = legend.title, breaks = levels(df$group)) +
             labs(shape = "Study")#levels(object$study)[study.ind])
 
         p = p + scale_shape_manual(values = as.numeric(levels(factor(df$pch)))) # replace the shape/pch by the input, it's converted by default to 1,2,3.. by ggplots
@@ -321,7 +321,7 @@ alpha)
         {
             if (!any(class.object%in%object.mint))
             {
-                list(space = legend.position, title = "Legend", cex.title = size.legend.title,
+                list(space = legend.position, title = legend.title, cex.title = size.legend.title,
                 point = list(col =  col.per.group),cex=size.legend, pch = if(display.names | any(class.object%in%object.mint)) {16} else unique(df$pch.legend),text = list(levels(df$group)))
             } else {#we add the shape legend
                 list(space = legend.position, cex.title = size.legend.title,
@@ -329,7 +329,7 @@ alpha)
                 col =  c(NA, col.per.group, NA, NA, rep("black", length(study.levels)))),
                 cex = c(size.legend.title, rep(size.legend, length(col.per.group)), size.legend, size.legend.title, rep(size.legend,nlevels(factor(df$pch)))),
                 pch = c(NA, rep(16, length(col.per.group)), NA, NA, as.numeric(levels(factor(df$pch)))),
-                text = list(outcome = c("Outcome", levels(df$group), "", "Study", study.levels))
+                text = list(outcome = c(legend.title, levels(df$group), "", "Study", study.levels))
                 )
             }
         } else {
@@ -569,7 +569,7 @@ alpha)
             
             if (legend)
             {
-                legend(par()$usr[2]+0.1, par()$usr[4] - (par()$usr[4]-par()$usr[3])/2, col = col.per.group, legend = levels(df$group), pch = if(display.names) {16} else unique(df$pch.legend), title = 'Legend', cex = size.legend, lty = 0,lwd = point.lwd)
+                legend(par()$usr[2]+0.1, par()$usr[4] - (par()$usr[4]-par()$usr[3])/2, col = col.per.group, legend = levels(df$group), pch = if(display.names) {16} else unique(df$pch.legend), title = legend.title, cex = size.legend, lty = 0,lwd = point.lwd)
                 
             }
             if (legend)
@@ -690,43 +690,69 @@ alpha)
             }
             
             #-- Display sample or row.names
-            
             for (i in unique(df$col))
             {
                 if (display.names)
                 {
-                    text3d(x = df[df$col == i &  other, "x"],
-                    y = df[df$col == i &  other, "y"],
-                    z = df[df$col == i &  other, "z"],
-                    texts = df[df$col == i &  other, "names"],
-                    color = df[df$col == i, ]$col, size = unique(df[df$col == i, ]$cex))
+                    for (cex_i in unique(df[df$col == i, ]$cex))
+                    {
+                        ind = which(df[df$col == i, ]$cex == cex_i)
+                        text3d(x = df[df$col == i &  other, "x"][ind],
+                        y = df[df$col == i &  other, "y"][ind],
+                        z = df[df$col == i &  other, "z"][ind],
+                        texts = df[df$col == i &  other, "names"][ind],
+                        color = df[df$col == i, ]$col[ind], cex = cex_i)#df[df$col == i, ]$cex)
+                    }
                 }else{
-                    cex=unique(df[df$col == i, ]$cex)*20
-                    switch(unique(df[df$col == i, ]$pch),
-                    sphere = plot3d(x = df[df$col == i & other, "x"],
-                    y = df[df$col == i & other, "y"],
-                    z = df[df$col == i & other, "z"],
-                    col = df[df$col == i, ]$col, size = cex, radius = cex/20, add = TRUE),
-                    tetra = shapelist3d(tetrahedron3d(), x = df[df$col == i &other, "x"],
-                    y = df[df$col == i & other, "y"],
-                    z = df[df$col == i & other, "z"],
-                    col = df[df$col == i, ]$col, size = cex/25),
-                    cube = shapelist3d(cube3d(),x = df[df$col == i & other, "x"],
-                    y = df[df$col == i & other, "y"],
-                    z = df[df$col == i & other, "z"],
-                    col = df[df$col == i, ]$col, size = cex/30),
-                    octa = shapelist3d(octahedron3d(), x = df[df$col == i & other, "x"],
-                    y = df[df$col == i & other, "y"],
-                    z = df[df$col == i & other, "z"],
-                    col = df[df$col == i, ]$col, size = cex/17),
-                    icosa = shapelist3d(icosahedron3d(), x = df[df$col == i & other, "x"],
-                    y = df[df$col == i & other, "y"],
-                    z = df[df$col == i &other, "z"],
-                    col = df[df$col == i, ]$col, size = cex/20),
-                    dodeca = shapelist3d(dodecahedron3d(), x = df[df$col == i &other, "x"],
-                    y = df[df$col == i & other, "y"],
-                    z = df[df$col == i & other, "z"],
-                    col = df[df$col == i, ]$col, size = cex/20))
+                    cex = 20*df[df$col == i, ]$cex
+                    for (pch_i in unique(df[df$col == i, ]$pch))
+                    {
+                        ind = which(df[df$col == i, ]$pch == pch_i)
+                        if(pch_i == "sphere")
+                        {
+                            for (cex_i in unique(df[df$col == i, ]$cex[ind]))
+                            {
+                                ind_cex = which(df[df$col[ind] == i, ]$cex == cex_i)
+                                points3d(x = df[df$col == i & other, "x"][ind][ind_cex],
+                                y = df[df$col == i & other, "y"][ind][ind_cex],
+                                z = df[df$col == i & other, "z"][ind][ind_cex],
+                                col = df[df$col == i, ]$col[ind][ind_cex], size = cex_i*20, radius = cex_i, add = TRUE)
+                            }
+
+                        } else if (pch_i == "tetra") {
+                            shapelist3d(tetrahedron3d(), x = df[df$col == i &other, "x"][ind],
+                            y = df[df$col == i & other, "y"][ind],
+                            z = df[df$col == i & other, "z"][ind],
+                            col = df[df$col == i, ]$col[ind], size = cex[ind]/25)
+                            
+                            
+                        } else if (pch_i == "cube") {
+                            shapelist3d(cube3d(),x = df[df$col == i & other, "x"][ind],
+                            y = df[df$col == i & other, "y"][ind],
+                            z = df[df$col == i & other, "z"][ind],
+                            col = df[df$col == i, ]$col[ind], size = cex[ind]/30)
+                            
+                            
+                        } else if (pch_i == "octa") {
+                            shapelist3d(octahedron3d(), x = df[df$col == i & other, "x"][ind],
+                            y = df[df$col == i & other, "y"][ind],
+                            z = df[df$col == i & other, "z"][ind],
+                            col = df[df$col == i, ]$col[ind], size = cex[ind]/17)
+                            
+                        } else if (pch_i == "icosa") {
+                            shapelist3d(icosahedron3d(), x = df[df$col == i & other, "x"][ind],
+                            y = df[df$col == i & other, "y"][ind],
+                            z = df[df$col == i &other, "z"][ind],
+                            col = df[df$col == i, ]$col[ind], size = cex[ind]/20)
+                            
+                            
+                        } else if (pch_i == "dodeca") {
+                            shapelist3d(dodecahedron3d(), x = df[df$col == i &other, "x"][ind],
+                            y = df[df$col == i & other, "y"][ind],
+                            z = df[df$col == i & other, "z"][ind],
+                            col = df[df$col == i, ]$col[ind], size = cex[ind]/20)
+                        }
+                    }
                 }
             }
             

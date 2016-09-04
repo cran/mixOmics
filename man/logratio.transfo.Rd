@@ -9,18 +9,19 @@ This function applies a log transformation to the data, either CLR or ILR
 }
 
 \usage{
-logratio.transfo(X, logratio = "none")
+logratio.transfo(X, logratio = "none", offset = 0)
 }	
 
 \arguments{
 \item{X}{numeric matrix of predictors}
 \item{logratio}{log-ratio transform to apply, one of "none", "CLR" or "ILR"}
+\item{offset}{Value that is added to X for CLR and ILR log transformation. Default to 0.}
 
 }
 
 \details{
 
-\code{logratio.transfo} applies a log transformation to the data, either CLR (centered log ratio transformation) or ILR (Isometric Log Ratio transformation).
+\code{logratio.transfo} applies a log transformation to the data, either CLR (centered log ratio transformation) or ILR (Isometric Log Ratio transformation). In the case of CLR log-transformation, X needs to be a matrix of non-negative values and \code{offset} is used to shift the values away from 0, as commonly done with counts data.
 }
 
 \references{

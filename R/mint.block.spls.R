@@ -70,7 +70,7 @@ bias,
 init ,
 tol = 1e-06,
 verbose,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE)
 {
     # call to 'internal_wrapper.mint.block'

@@ -3,11 +3,12 @@
 #   Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
 # Kim-Anh Le Cao, French National Institute for Agricultural Research and ARC Centre of Excellence in Bioinformatics, Institute for Molecular Bioscience, University of Queensland, Australia
 #   Sebastien Dejean, Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
+#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # This function was borrowed from the mclust package and modified for mixOmics
 #
 # created: 2009
-# last modified:
+# last modified: 08-07-2016
 #
 # Copyright (C) 2009
 #
@@ -29,14 +30,21 @@
 vip =
 function(object)
 {
-
+    if (any(class(object) %in% c("plsda","splsda")))
+    {
+        object$Y = object$ind.mat
+    } else if (any(class(object) %in% c("pls","spls"))) {
+        #nothing
+    } else {
+        stop( " 'vip' is only implemented for the following objects: pls, plsda, spls, splsda", call.=FALSE)
+    }
     #-- initialisation des matrices --#
     W = object$loadings$X
     H = object$ncomp
     q = ncol(object$Y)
     p = ncol(object$X)
     VIP = matrix(0, nrow = p, ncol = H)
-     
+    
     cor2 = cor(object$Y, object$variates$X, use = "pairwise")^2
     cor2 = as.matrix(cor2, nrow = q)
      

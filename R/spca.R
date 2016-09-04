@@ -34,27 +34,139 @@ function(X,
          scale = TRUE,
          keepX = rep(ncol(X), ncomp),
          max.iter = 500, 
-         tol = 1e-06)
+         tol = 1e-06,
+         logratio = 'none',# one of ('none','CLR')
+         ilr.offset = 0.001,
+         multilevel = NULL)
 {
+
+    #-- checking general input parameters --------------------------------------#
+    #---------------------------------------------------------------------------#
+
+    #-- check that the user did not enter extra arguments
+    arg.call = match.call()
+    user.arg = names(arg.call)[-1]
+
+    err = tryCatch(mget(names(formals()), sys.frame(sys.nframe())),
+    error = function(e) e)
+
+    if ("simpleError" %in% class(err))
+    stop(err[[1]], ".", call. = FALSE)
+
+    #-- X matrix
+    if (is.data.frame(X))
+    X = as.matrix(X)
+
+    if (!is.matrix(X) || is.character(X))
+    stop("'X' must be a numeric matrix.", call. = FALSE)
+
+    if (any(apply(X, 1, is.infinite)))
+    stop("infinite values in 'X'.", call. = FALSE)
+
+    #-- put a names on the rows and columns of X --#
+    X.names = colnames(X)
+    if (is.null(X.names))
+    X.names = paste("V", 1:ncol(X), sep = "")
+
+    ind.names = rownames(X)
+    if (is.null(ind.names))
+    ind.names = 1:nrow(X)
+
+    #-- ncomp
+    if (is.null(ncomp))
+    ncomp = min(nrow(X),ncol(X))
+
+    ncomp = round(ncomp)
+
+    if ( !is.numeric(ncomp) || ncomp < 1 || !is.finite(ncomp))
+    stop("invalid value for 'ncomp'.", call. = FALSE)
+
+    if (ncomp > min(ncol(X), nrow(X)))
+    stop("use smaller 'ncomp'", call. = FALSE)
+
+    #-- keepX
+    if (length(keepX) != ncomp)
+    stop("length of 'keepX' must be equal to ", ncomp, ".")
+    if (any(keepX > ncol(X)))
+    stop("each component of 'keepX' must be lower or equal than ", ncol(X), ".")
+
+    #-- log.ratio
+    choices = c('CLR','none')
+    logratio = choices[pmatch(logratio, choices)]
+
+    if (any(is.na(logratio)) || length(logratio) > 1)
+    stop("'logratio' should be one of 'CLR'or 'none'.", call. = FALSE)
+
+    if (logratio != "none" && any(X < 0))
+    stop("'X' contains negative values, you can not log-transform your data")
+
+
+    #-- cheking center and scale
+    if (!is.logical(center))
+    {
+        if (!is.numeric(center) || (length(center) != ncol(X)))
+        stop("'center' should be either a logical value or a numeric vector of length equal to the number of columns of 'X'.",
+        call. = FALSE)
+    }
+
+    if (!is.logical(scale))
+    {
+        if (!is.numeric(scale) || (length(scale) != ncol(X)))
+        stop("'scale' should be either a logical value or a numeric vector of length equal to the number of columns of 'X'.",
+        call. = FALSE)
+    }
+
+    #-- max.iter
+    if (is.null(max.iter) || !is.numeric(max.iter) || max.iter < 1 || !is.finite(max.iter))
+    stop("invalid value for 'max.iter'.", call. = FALSE)
+
+    max.iter = round(max.iter)
+
+    #-- tol
+    if (is.null(tol) || !is.numeric(tol) || tol < 0 || !is.finite(tol))
+    stop("invalid value for 'tol'.", call. = FALSE)
+
+    #-- end checking --#
+    #------------------#
+    
+    #-----------------------------#
+    #-- logratio transformation --#
+    X = logratio.transfo(X = X, logratio = logratio, offset = if(logratio == "ILR") {ilr.offset} else {0})
+    
+    #-- logratio transformation --#
+    #-----------------------------#
+
+    #---------------------------------------------------------------------------#
+    #-- multilevel approach ----------------------------------------------------#
+
+    if (!is.null(multilevel))
+    {
+        # we expect a vector or a 2-columns matrix in 'Y' and the repeated measurements in 'multilevel'
+        multilevel = data.frame(multilevel)
+        
+        if ((nrow(X) != nrow(multilevel)))
+        stop("unequal number of rows in 'X' and 'multilevel'.")
+        
+        if (ncol(multilevel) != 1)
+        stop("'multilevel' should have a single column for the repeated measurements.")
+        
+        multilevel[, 1] = as.numeric(factor(multilevel[, 1])) # we want numbers for the repeated measurements
+        
+        Xw = withinVariation(X, design = multilevel)
+        X = Xw
+    }
+    #-- multilevel approach ----------------------------------------------------#
+    #---------------------------------------------------------------------------#
+
 
     #--scaling the data--#
     X=scale(X,center=center,scale=scale)
     cen = attr(X, "scaled:center")
     sc = attr(X, "scaled:scale")
-    if (any(sc == 0)) 
+    if (any(sc == 0))
         stop("cannot rescale a constant/zero column to unit variance.")
 
-    # check that the user did not enter extra arguments #
-    # --------------------------------------------------#
-    # what the user has entered
-    match.user =names(match.call())
-    # what the function is expecting
-    match.function = c('X', 'ncomp', 'center', 'scale', 'keepX', 'max.iter', 'tol')
-    
-    #if arguments are not matching, put a warning (put a [-1] for match.user as we have a first blank argument)
-    if(length(setdiff(match.user[-1], match.function)) != 0) warning('Some of the input arguments do not match the function arguments, see ?plotVar')
-    
-    
+
     #--initialization--#
     X=as.matrix(X)
     X.temp=as.matrix(X)
@@ -67,14 +179,6 @@ function(X,
 
     ind.names = dimnames(X)[[1]]
     if (is.null(ind.names)) X.names = 1:nrow(X)
-
-    if (length(keepX) != ncomp) 
-            stop("length of 'keepX' must be equal to ", ncomp, ".")
-    if (any(keepX > p)) 
-            stop("each component of 'keepX' must be lower or equal than ", p, ".")
-
-    if (ncomp > min(ncol(X), nrow(X)))
-    stop("use smaller 'ncomp'", call. = FALSE)
 
     vect.varX=vector(length=ncomp)
     names(vect.varX) = c(1:ncomp)
@@ -164,7 +268,7 @@ function(X,
     
     rownames(mat.u) = ind.names
 
-    cl = match.call()
+   cl = match.call()
 		cl[[1]] = as.name('spca')
 
     result = (list(call = cl, X = X,

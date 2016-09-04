@@ -33,10 +33,13 @@ LOGOCV = function(X,
 Y,
 ncomp,
 study,
-keepX.constraint,
+choice.keepX = NULL, #either choice.keepX or choice.keepX.constraint, not both
+choice.keepX.constraint = NULL,
 test.keepX = c(5, 10, 15),
 dist = "max.dist",
 measure = c("BER"), # one of c("overall","BER")
+auc = auc,
+max.iter = 100,
 progressBar = TRUE,
 near.zero.var = FALSE,
 scale)
@@ -45,7 +48,8 @@ scale)
     # Y factor input
     # ncomp: which component we are tuning
     # study: study effect
-    # keepX.constraint: which variables are kept on the first ncomp-1 components
+    # choice.keepX: how many variables are kept on the first ncomp-1 components
+    # choice.keepX.constraint: which variables are kept on the first ncomp-1 components
     # test.keepX: grid of keepX that is to be tested in the CV
     # dist= which distance should be used to classify the samples?
     # showProgress=TRUE, show the progress of the iteration
@@ -128,8 +132,8 @@ scale)
             if (progressBar ==  TRUE)
             setTxtProgressBar(pb, (study_i-1)/M + (i-1)/length(test.keepX)/M)
             
-            object.res = mint.splsda(X.train, Y.train, study = study.learn.CV, ncomp = ncomp, keepX = test.keepX[i],
-            keepX.constraint = keepX.constraint, scale = scale, mode = "regression")
+            object.res = mint.splsda(X.train, Y.train, study = study.learn.CV, ncomp = ncomp, keepX = c(choice.keepX, test.keepX[i]),
+            keepX.constraint = choice.keepX.constraint, scale = scale, mode = "regression", max.iter = max.iter)
             
             # record selected features
             if (length(test.keepX) ==  1) # only done if only one test.keepX as not used if more so far
@@ -149,7 +153,22 @@ scale)
     
     result = list()
     
-    error.mean = error.sd = error.per.class.keepX.opt.comp = keepX.opt = test.keepX.out = choice.keepX.out = list()
+    auc.mean = error.mean = error.sd = error.per.class.keepX.opt.comp = keepX.opt = test.keepX.out = choice.keepX.out = list()
+    
+    if(auc)
+    {
+        data=list()
+        for (i in 1:length(test.keepX))
+        {
+            
+            data$outcome=Y
+            data$data=prediction.comp[, , i]
+            
+            auc.mean[[i]]=statauc(data)
+            
+        }
+        names(auc.mean)=test.keepX
+    }
     
     if (any(measure == "overall"))
     {
@@ -180,8 +199,12 @@ scale)
             
             
             test.keepX.out[[ijk]] = test.keepX[keepX.opt[[ijk]]]
-            choice.keepX.out[[ijk]] = c(lapply(keepX.constraint,length), test.keepX.out)
-            
+            if(is.null(choice.keepX))
+            {
+                choice.keepX.out[[ijk]] = c(lapply(choice.keepX.constraint,length), test.keepX.out)
+            }else{
+                choice.keepX.out[[ijk]] = c(choice.keepX, test.keepX.out)
+            }
             result$"overall"$error.rate.mean = error.mean
             result$"overall"$confusion = error.per.class.keepX.opt.comp
             result$"overall"$keepX.opt = test.keepX.out
@@ -222,8 +245,13 @@ scale)
             
             
             test.keepX.out[[ijk]] = test.keepX[keepX.opt[[ijk]]]
-            choice.keepX.out[[ijk]] = c(lapply(keepX.constraint,length), test.keepX.out)
-            
+            if(is.null(choice.keepX))
+            {
+                choice.keepX.out[[ijk]] = c(lapply(choice.keepX.constraint,length), test.keepX.out)
+            }else{
+                choice.keepX.out[[ijk]] = c(choice.keepX, test.keepX.out)
+            }
+
             result$"BER"$error.rate.mean = error.mean
             result$"BER"$confusion = error.per.class.keepX.opt.comp
             result$"BER"$keepX.opt = test.keepX.out
@@ -234,6 +262,7 @@ scale)
     
     result$prediction.comp = prediction.comp
     result$class.comp = class.comp
+    result$auc = auc.mean
     result$features$stable = sort(table(as.factor(features))/M, decreasing = TRUE)
     return(result)
     

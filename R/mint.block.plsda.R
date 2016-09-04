@@ -62,7 +62,7 @@ bias,
 init ,
 tol = 1e-06,
 verbose,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE)
 {
     # checking that the outcome, either in Y or X[indY] is a factor with more than 1 level
@@ -108,7 +108,7 @@ near.zero.var = FALSE)
         call = match.call(),
         X = result$X[-result$indY],
         Y = Y.input,
-        ind.mat = result$Y[[1]],
+        ind.mat = result$X[result$indY][[1]],
         ncomp = result$ncomp,
         mode = result$mode,
         study = result$study,

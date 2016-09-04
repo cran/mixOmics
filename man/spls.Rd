@@ -20,7 +20,7 @@ keepX,
 keepY,
 scale = TRUE,
 tol = 1e-06,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE,
 logratio="none", 
 multilevel=NULL)
@@ -47,7 +47,7 @@ to zero means and unit variances (default: TRUE)}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
 \item{logratio}{one of ('none','CLR'). Default to 'none'}
-\item{multilevel}{Design matrix for multilevel anaylis (for repeated measurements) that indicates the repeated measures on each individual, i.e. the individuals ID. See Details.}
+\item{multilevel}{Design matrix for repeated measurement analysis, where multlevel decomposition is required. For a one factor decomposition, the repeated measures on each individual, i.e. the individuals ID is input as the first column. For a 2 level factor decomposition then 2nd AND 3rd columns indicate those factors. See examples.}
 }
 
 \details{
@@ -66,7 +66,13 @@ values are handled by casewise deletion in the \code{spls} function without havi
 delete the rows with missing data.
 
 logratio transform and multilevel analysis are performed sequentially as internal pre-processing step, through \code{\link{logratio.transfo}} and \code{\link{withinVariation}} respectively.
+
+Multilevel sPLS enables the integration of data measured on two different data sets 
+on the same individuals. This approach differs from multilevel sPLS-DA as the aim is 
+to select subsets of variables from both data sets that are highly positively or negatively correlated across samples. The approach is unsupervised, i.e. no prior knowledge about the sample groups is included.
 }
+
+
 
 \value{
 \code{spls} returns an object of class \code{"spls"}, a list 
@@ -105,6 +111,15 @@ Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Edit
 
 Wold H. (1966). Estimation of principal components and related models by iterative least squares. 
 In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
+
+On multilevel analysis:
+
+Liquet, B., Le Cao, K.-A., Hocini, H. and Thiebaut, R. (2012) A novel approach for
+biomarker selection and the integration of repeated measures experiments from two
+platforms. \emph{BMC Bioinformatics} \bold{13}:325.
+
+Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010). Multivariate paired data analysis: multilevel PLSDA versus OPLSDA. \emph{Metabolomics},
+\bold{6}(1), 119-128.
 }
 
 \author{Sebastien Dejean, Ignacio Gonzalez and Kim-Anh Le Cao.}
@@ -121,7 +136,7 @@ Y <- liver.toxicity$clinic
 toxicity.spls <- spls(X, Y, ncomp = 2, keepX = c(50, 50), 
                       keepY = c(10, 10))
 
-## Second example: one-factor analysis with sPLS, selecting a subset of variables
+## Second example: one-factor multilevel analysis with sPLS, selecting a subset of variables
 #--------------------------------------------------------------
 \dontrun{
 data(liver.toxicity)
@@ -148,19 +163,39 @@ col.stimu <- 1:nlevels(design$stimu)
 plotIndiv(res.spls.1level, rep.space = 'X-variate', ind.names = FALSE,
 group = liver.toxicity$treatment$Dose.Group,
 pch = 20, main = 'Gene expression subspace',
-add.legend = TRUE)
+legend = TRUE)
 
 
 plotIndiv(res.spls.1level, rep.space = 'Y-variate', ind.names = FALSE,
 group = liver.toxicity$treatment$Dose.Group,
 pch = 20, main = 'Clinical measurements ssubpace',
-add.legend = TRUE)
+legend = TRUE)
 
 plotIndiv(res.spls.1level, rep.space = 'XY-variate', ind.names = FALSE,
 group = liver.toxicity$treatment$Dose.Group,
 pch = 20, main = 'Both Gene expression and Clinical subspaces',
-add.legend = TRUE)
+legend = TRUE)
+}
 
+## Third example: two-factor multilevel analysis with sPLS, selecting a subset of variables
+#--------------------------------------------------------------
+\dontrun{
+  data(liver.toxicity)
+  dose <- as.factor(liver.toxicity$treatment$Dose.Group)
+  time <- as.factor(liver.toxicity$treatment$Time.Group)
+  # note: we made up those data, pretending they are repeated measurements
+  repeat.indiv <- c(1, 2, 1, 2, 1, 2, 1, 2, 3, 3, 4, 3, 4, 3, 4, 4, 5, 6, 5, 5,
+                    6, 5, 6, 7, 7, 8, 6, 7, 8, 7, 8, 8, 9, 10, 9, 10, 11, 9, 9,
+                    10, 11, 12, 12, 10, 11, 12, 11, 12, 13, 14, 13, 14, 13, 14,
+                    13, 14, 15, 16, 15, 16, 15, 16, 15, 16)
+  summary(as.factor(repeat.indiv)) # 16 rats, 4 measurements each
+  design <- data.frame(sample = repeat.indiv, dose = dose, time = time)
+
+  res.spls.2level = spls(liver.toxicity$gene,
+                    Y = liver.toxicity$clinic,
+                    multilevel = design,
+                    ncomp=2,
+                    keepX = c(10,10), keepY = c(5,5))
 }
 
 

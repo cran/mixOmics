@@ -15,7 +15,7 @@ ncomp = 2,
 scale = TRUE,
 mode = c("regression", "canonical", "invariant", "classic"),
 tol = 1e-06,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE,
 logratio="none",
 multilevel=NULL)  
@@ -35,8 +35,7 @@ to zero means and unit variances (default: TRUE)}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
 \item{logratio}{one of ('none','CLR'). Default to 'none'}
-\item{multilevel}{Design matrix for multilevel anaylis (for repeated measurements). A numeric matrix or data frame. The first column
-indicates the repeated measures on each individual, i.e. the individuals ID. If \code{  method = 'splsda'}, the 2nd and 3rd columns are factors. If \code{method = 'spls'} then you can choose to only input the repeated measures (column 1) or the 2nd AND 3rd columns to split the variation for a 2 level factor. See Details.}
+\item{multilevel}{Design matrix for repeated measurement analysis, where multlevel decomposition is required. For a one factor decomposition, the repeated measures on each individual, i.e. the individuals ID is input as the first column. For a 2 level factor decomposition then 2nd AND 3rd columns indicate those factors. See examples in \code{?spls}).}
 }
 
 \details{

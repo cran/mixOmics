@@ -3,7 +3,7 @@
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 22-04-2015
-# last modified: 24-05-2016
+# last modified: 08-07-2016
 #
 # Copyright (C) 2015
 #
@@ -58,7 +58,7 @@ keepY,
 mode,
 scale = FALSE,
 near.zero.var = FALSE,
-max.iter = 500,
+max.iter = 100,
 tol = 1e-06,
 logratio = "none",   # one of "none", "CLR"
 DA = FALSE,           # indicate whether it's a DA analysis, only used for the multilvel approach with withinVariation
@@ -70,6 +70,19 @@ multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVar
     
     #-- validation des arguments --#
    
+    check = Check.entry.pls(X, Y, ncomp, keepX, keepY, keepX.constraint, keepY.constraint, mode=mode, scale=scale,
+    near.zero.var=near.zero.var, max.iter=max.iter ,tol=tol ,logratio=logratio ,DA=DA, multilevel=multilevel)
+    X = check$X
+    input.X = X # save the checked X, before logratio/multileve/scale
+    Y = check$Y
+    ncomp = check$ncomp
+    mode = check$mode
+    keepX.constraint = check$keepX.constraint
+    keepY.constraint = check$keepY.constraint
+    keepX = check$keepX
+    keepY = check$keepY
+    nzv.A = check$nzv.A
+
     #set the default study factor
     if (missing(study))
     {
@@ -87,29 +100,15 @@ multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVar
     
     design = matrix(c(0,1,1,0), ncol = 2, nrow = 2, byrow = TRUE)
 
-    check = Check.entry.pls(X, Y, ncomp, keepX, keepY, keepX.constraint, keepY.constraint, mode=mode, scale=scale,
-        near.zero.var=near.zero.var, max.iter=max.iter ,tol=tol ,logratio=logratio ,DA=DA, multilevel=multilevel)
-    X = check$X
-    input.X = X # save the checked X, before logratio/multileve/scale
-    Y = check$Y
-    ncomp = check$ncomp
-    mode = check$mode
-    keepX.constraint = check$keepX.constraint
-    keepY.constraint = check$keepY.constraint
-    keepX = check$keepX
-    keepY = check$keepY
-    nzv.A = check$nzv.A
-    
-    
-    
+      
     #-----------------------------#
     #-- logratio transformation --#
     
     X = logratio.transfo(X=X, logratio=logratio)
     
     #as X may have changed
-    if (ncomp >= min(ncol(X), nrow(X)))
-    stop("use smaller 'ncomp'", call. = FALSE)
+    if (ncomp > min(ncol(X), nrow(X)))
+    stop("'ncomp' should be smaller than ", min(ncol(X), nrow(X)), call. = FALSE)
     
     #-- logratio transformation --#
     #-----------------------------#

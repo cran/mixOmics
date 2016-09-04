@@ -18,8 +18,9 @@ ncomp,
 study, # mint.splsda
 test.keepX = c(5, 10, 15), # all but pca, rcc
 test.keepY = NULL, # rcc, multilevel
-already.tested.X = NULL, # all but pca, rcc
-already.tested.Y = NULL, #multilevel
+already.tested.X, # all but pca, rcc
+already.tested.Y, #multilevel
+constraint,
 mode = "regression", # multilevel
 nrepeat = 1, #multilevel, splsda
 grid1 = seq(0.001, 1, length = 5), # rcc
@@ -28,12 +29,13 @@ validation = "Mfold", # all but pca
 folds = 10, # all but pca
 dist = "max.dist", # all but pca, rcc
 measure = c("BER"), # all but pca, rcc
+auc = FALSE,
 progressBar = TRUE, # all but pca, rcc
 near.zero.var = FALSE, # all but pca, rcc
 logratio = "none", # all but pca, rcc
 center = TRUE, # pca
 scale = TRUE, # mint, splsda
-max.iter = 500, #pca
+max.iter = 100, #pca
 tol = 1e-09,
 light.output = TRUE # mint, splsda
 )
@@ -51,8 +53,9 @@ light.output = TRUE # mint, splsda
 \item{study}{grouping factor indicating which samples are from the same study}
 \item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
 \item{test.keepY}{If \code{method = 'spls'}, numeric vector for the different number of variables to test from the \eqn{Y} data set}
-\item{already.tested.X}{if \code{ncomp > 1} numeric vector indicating the number of variables to select from the \eqn{X} data set on the first components}
+\item{already.tested.X}{if \code{ncomp > 1} A list containing which variables of X are to be kept on each of the first PLS-components (if \code{constraint=TRUE}) or a numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components (if \code{constraint = FALSE})}
 \item{already.tested.Y}{if \code{method = 'spls'} and \code{if(ncomp > 1)} numeric vector indicating the number of variables to select from the \eqn{Y} data set on the first components}
+\item{constraint}{Indicate whether the performance of the model is evaluated in regards to the number of variables selected (keepX, constraint = FALSE) or which specific variables are selected (keepX.constraint, constraint = TRUE)}
 \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
 See Details.}
@@ -66,6 +69,7 @@ at which cross-validation score should be computed. Defaults to
 \item{dist}{distance metric to use for \code{splsda} to estimate the classification error rate,
 should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \code{"max.dist"} (see Details).}
 \item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
+\item{auc}{if \code{TRUE} calculate the Area Under the Curve (AUC) performance of the model.}
 \item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Default value is FALSE}
 \item{logratio}{one of ('none','CLR'). Default to 'none'}
@@ -110,20 +114,24 @@ data(breast.tumors)
 X <- breast.tumors$gene.exp
 Y <- as.factor(breast.tumors$sample$treatment)
 tune= tune(method = "splsda", X, Y, ncomp=1, nrepeat=10, logratio="none",
-    test.keepX = c(5, 10, 15), folds=10, dist="max.dist", already.tested.X=NULL, progressBar = TRUE)
+    test.keepX = c(5, 10, 15), folds=10, dist="max.dist", progressBar = TRUE)
 
-
+plot(tune)
 }
 
 
 ## mint.splsda
 \dontrun{
+data(stemcells)
 data = stemcells$gene
 type.id = stemcells$celltype
 exp = stemcells$study
 
 out = tune(method="mint.splsda", X=data,Y=type.id, ncomp=2, study=exp, test.keepX=seq(1,10,1))
-out$choice.keepX
+out$choice.keepX.constraint
+
+plot(out)
+
 }
 
 

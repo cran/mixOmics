@@ -5,7 +5,7 @@
 \title{Within matrix decomposition for repeated measurements (cross-over design)}
 
 \description{
-This function is internally called by \code{pca}, \code{pls}, \code{spls}, \code{plsda} and \code{splsda} functions for cross-over design data, but can be called independently for other types of analyses.
+This function is internally called by \code{pca}, \code{pls}, \code{spls}, \code{plsda} and \code{splsda} functions for cross-over design data, but can be called independently prior to any kind of multivariate analyses.
 }
 
 \usage{
@@ -47,7 +47,7 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
 
 \author{Benoit Liquet, Kim-Anh Le Cao, Benoit Gautier, Ignacio Gonzalez.}
 
-\seealso{\code{\link{multilevel}}, \code{\link{spls}}, \code{\link{splsda}}, 
+\seealso{\code{\link{spls}}, \code{\link{splsda}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 
 \code{\link{cim}}, \code{\link{network}}.}
 

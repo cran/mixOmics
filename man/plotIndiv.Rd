@@ -26,7 +26,8 @@ X.label = NULL, Y.label = NULL, Z.label = NULL, abline = FALSE,
 xlim = NULL, ylim = NULL, col, cex, pch, alpha = 0.2, axes.box = "box", layout = NULL,
 size.title = rel(2), size.subtitle = rel(1.5), size.xlabel = rel(1),
 size.ylabel = rel(1), size.axis = rel(0.8), size.legend = rel(1),
-size.legend.title = rel(1.1), legend.position = "right", point.lwd = 1, ... )
+size.legend.title = rel(1.1), legend.title = "Legend", legend.position = "right",
+point.lwd = 1, ... )
 
 \method{plotIndiv}{mint.spls}(object, comp = NULL, study = "global", rep.space = NULL, group, col.per.group,
 style = "ggplot2", ellipse = FALSE, ellipse.level = 0.95, centroid = FALSE, star = FALSE,
@@ -35,7 +36,8 @@ X.label = NULL, Y.label = NULL, abline = FALSE,
 xlim = NULL, ylim = NULL, col, cex, pch, layout = NULL,
 size.title = rel(2), size.subtitle = rel(1.5), size.xlabel = rel(1),
 size.ylabel = rel(1), size.axis = rel(0.8), size.legend = rel(1),
-size.legend.title = rel(1.1), legend.position = "right", point.lwd = 1, ... )
+size.legend.title = rel(1.1), legend.title = "Legend", legend.position = "right",
+point.lwd = 1, ... )
 
 \method{plotIndiv}{sgcca}(object, comp = NULL, blocks = NULL, ind.names = TRUE, group, col.per.group,
 style = "ggplot2", ellipse = FALSE, ellipse.level = 0.95, centroid = FALSE, star = FALSE,
@@ -44,7 +46,8 @@ X.label = NULL, Y.label = NULL, Z.label = NULL, abline = FALSE,
 xlim = NULL, ylim = NULL, col, cex, pch, alpha = 0.2, axes.box = "box", layout = NULL,
 size.title = rel(2), size.subtitle = rel(1.5), size.xlabel = rel(1),
 size.ylabel = rel(1), size.axis = rel(0.8), size.legend = rel(1),
-size.legend.title = rel(1.1), legend.position = "right", point.lwd = 1, ... )
+size.legend.title = rel(1.1), legend.title = "Legend", legend.position = "right",
+point.lwd = 1, ... )
 
 
 }
@@ -90,6 +93,7 @@ or integers. See \code{\link{points}} for all alternatives.}
 \item{size.axis}{size of the axis}
 \item{size.legend}{size of the legend}
 \item{size.legend.title}{size of the legend title}
+\item{legend.title}{title of the legend}
 \item{legend.position}{position of the legend, one of "bottomright", "bottom", "bottomleft",
 "left", "topleft", "top", "topright", "right" and "center". }
 \item{point.lwd}{\code{lwd} of the points, used when \code{ind.names = FALSE}}
@@ -101,7 +105,8 @@ or integers. See \code{\link{points}} for all alternatives.}
 depending on the subspace of projection. Each point corresponds to an individual.
 
 If \code{ind.names=TRUE} and row names is \code{NULL}, then \code{ind.names=1:n}, where
-\code{n} is the number of individuals.
+\code{n} is the number of individuals. Also, if \code{pch} is an input, then \code{ind.names} is set to FALSE
+as we do not show both names and shapes.
 
 The arguments \code{col}, \code{cex} and \code{pch} can be atomic vectors or vectors of
 length \code{n}. If atomic, this argument value determines the graphical attribute for all the individuals.

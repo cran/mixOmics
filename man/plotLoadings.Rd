@@ -245,7 +245,7 @@ X = liver.toxicity$gene
 Y = liver.toxicity$treatment[, 4]
 
 plsda.liver = plsda(X, Y, ncomp = 2)
-plotIndiv(plsda.liver, ind.names = Y, plot.ellipse = TRUE)
+plotIndiv(plsda.liver, ind.names = Y, ellipse = TRUE)
 
 
 name.var = liver.toxicity$gene.ID[, 'geneBank']

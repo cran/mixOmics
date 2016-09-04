@@ -55,7 +55,7 @@ keepX=rep(ncol(X), ncomp),
 keepY=rep(ncol(Y), ncomp),
 scale = TRUE,
 tol = 1e-06,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE)
 {
 

@@ -34,12 +34,14 @@ test.keepX = c(5, 10, 15),
 test.keepY = NULL,
 already.tested.X = NULL,
 already.tested.Y = NULL,
+constraint = FALSE,
 method, #splsda or spls
 mode = "regression",
 validation = "Mfold",
 folds = 10,
 dist = "max.dist",
 measure = "BER", # one of c("overall","BER")
+auc = FALSE,
 progressBar = TRUE,
 near.zero.var = FALSE,
 logratio = "none",
@@ -99,8 +101,8 @@ light.output = TRUE
         result = tune.splsda(X = X, Y = Y,
         multilevel = multilevel,
         ncomp = ncomp, test.keepX = test.keepX, dist = dist,
-        already.tested.X = already.tested.X, validation = validation, folds = folds,
-        measure = measure, progressBar = progressBar, near.zero.var = near.zero.var,
+        already.tested.X = already.tested.X, constraint = constraint, validation = validation, folds = folds,
+        measure = measure, auc = auc, progressBar = progressBar, near.zero.var = near.zero.var,
         logratio = logratio, nrepeat = nrepeat, light.output = light.output)
         
     } else {
@@ -113,6 +115,7 @@ light.output = TRUE
         ncomp = ncomp, test.keepX = test.keepX, test.keepY = test.keepY,
         already.tested.X = already.tested.X, already.tested.Y = already.tested.Y)
     }
+    result$call = match.call()
     class(result) = paste("tune",method,sep=".")
 
     return(result)

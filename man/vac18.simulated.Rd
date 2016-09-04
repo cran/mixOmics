@@ -8,7 +8,7 @@
 
 \description{
 Simulated data based on the vac18 study to illustrate the use of the multilevel analysis for one and two-factor
-analysis with sPLS-DA. This data set contains the expression simulated of 1000 genes.
+analysis with sPLS-DA. This data set contains the expression simulated of 500 genes.
 }
 
 \usage{data(vac18.simulated)}
@@ -16,7 +16,7 @@ analysis with sPLS-DA. This data set contains the expression simulated of 1000 g
 \format{
 A list containing the following components:
 \describe{
-    \item{\code{genes}}{data frame with 48 rows and 1000 columns. The simulated expression of 1000 genes for 
+    \item{\code{genes}}{data frame with 48 rows and 500 columns. The simulated expression of 500 genes for
     48 subjects.}
     \item{\code{sample}}{a vector indicating the repeated measurements on each unique subject. See Details.}
     \item{\code{stimulation}}{a factor indicating the stimulation condition on each sample.}
@@ -31,7 +31,9 @@ The simulation study was based on a mixed effects model (see reference for detai
 -2 gene clusters discriminate (LIPO5, GAG+) versus (GAG-, NS) \\
 -2 gene clusters discriminate LIPO5 versus GAG+, while GAG+ and  NS have the same effect \\
 -2 gene clusters discriminate GAG- versus NS, while LIPO5 and GAG+ have the same effect \\
--the 4 remaining clusters represent noisy signal (no stimulation effect)
+-the 4 remaining clusters represent noisy signal (no stimulation effect) \\
+
+Only a subset of those genes are presented here (to save memory space).
 }
 
 

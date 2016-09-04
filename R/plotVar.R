@@ -3,11 +3,11 @@
 #   Ignacio Gonzalez, Genopole Toulouse Midi-Pyrenees, France
 #   Benoit Gautier, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #   Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
+#   Florian Rohart, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #   Kim-Anh Le Cao, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 2009
-# last modified: 2015
+# last modified: 24-08-2016
 #
 # Copyright (C) 2009
 #
@@ -362,25 +362,17 @@ label.axes.box = "both"  )
     stop("'Y.label' must be a character.", call. = FALSE)
     
     
-    #-- Function to display an error message (used for the parameters var.names, cex, col, pch and font)
-    stop.message = function(argument, data){
-        if (length(data) == 1) {
-            count.data = sapply(data, length)
-        } else {
-            count.data = paste(paste(sapply(data[-length(data)], length), collapse =  ", "), length(data[[length(data)]]), sep = " and ")
-        }
-        stop(argument, " must be either a vector of length ", length(data),
-        " or a list of ", length(data), " vector components of length ", count.data, " respectively.",call.= FALSE)
-    }
-    
     #-- pch argument
     missing.pch = FALSE
-    if (missing(pch)) {
+    if (missing(pch))
+    {
         missing.pch = TRUE
         if(style=="3d")
-        pch = unlist(lapply(1 : length(cord.X), function(x){rep(c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")[x], sum(sapply(cord.X[x], nrow)))}))
-        else
-        pch = unlist(lapply(1 : length(cord.X), function(x){rep(c(1:20)[x], sum(sapply(cord.X[x], nrow)))}))
+        {
+            pch = unlist(lapply(1 : length(cord.X), function(x){rep(c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")[x], sum(sapply(cord.X[x], nrow)))}))
+        } else {
+            pch = unlist(lapply(1 : length(cord.X), function(x){rep(c(1:20)[x], sum(sapply(cord.X[x], nrow)))}))
+        }
         
     } else if (((is.vector(pch, mode = "double") || is.vector(pch, mode = "integer")) && !(style=="3d"))
     || (is.vector(pch, mode = "character") && style=="3d")) {
@@ -407,7 +399,7 @@ label.axes.box = "both"  )
         if (length(cord.X) < 10) {
             col = unlist(lapply(1 : length(cord.X), function(x){rep(color.mixo(x), sum(sapply(cord.X[x], nrow)))}))
         } else {
-            col = unlist(lapply(1 : length(cord.X), function(x){rep(color.jet(x), sum(sapply(cord.X[x], nrow)))}))
+            col = unlist(lapply(1 : length(cord.X), function(x){rep(color.jet(length(cord.X))[x], sum(sapply(cord.X[x], nrow)))}))
         }
     } else if (is.vector(col, mode = "double") | is.vector(col, mode = "character")) {
         if (length(col) != length(sample.X))
@@ -529,6 +521,21 @@ label.axes.box = "both"  )
     
     df$pch = pch; df$cex = cex; df$col = col; df$font = font
     
+    if(missing.pch)
+    df$pch=1
+    
+    if (overlap)
+    {
+        df$overlap = title
+        df$Block = factor(unlist(lapply(1 : length(cord.X), function(z){rep(blocks[z], nrow(cord.X[[z]]))})))
+        if(style %in%c("ggplot2","lattice"))
+        title=NULL # to avoid double title
+    } else {
+        df$overlap = df$Block
+        if(style %in%c("ggplot2","lattice"))
+        df$Block = factor(unlist(lapply(1 : length(cord.X), function(z){rep(blocks[z], nrow(cord.X[[z]]))})))
+    }
+    
     if (cutoff != 0){
         if(style=="3d")
         df = df[abs(df$x) > cutoff | abs(df$y) > cutoff | abs(df$z) > cutoff, ,drop = FALSE]
@@ -539,26 +546,26 @@ label.axes.box = "both"  )
     
     if (nrow(df) == 0)
     stop("Cutoff value very high for the components ", comp1, " and ", comp2, ".No variable was selected.")
-    
-    if (overlap)
-    {
-        df$Block = title
-        if(style %in%c("ggplot2","lattice"))
-        title=NULL # to avoid double title
-    }
+
+
     #-- End: data set
     
     #-- Start: ggplot2
     if (style == "ggplot2" &  plot)
     {
+        Block = NULL# R check
         # visible variable issues for x, y and Circle
         # according to http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when
         # one hack is to set to NULL first.
         x = y = Circle = NULL
         
         #-- Initialise ggplot2
-        p = ggplot(df, aes(x = x, y = y), main = title, xlab = X.label, ylab = Y.label)+ theme_bw()
+        p = ggplot(df, aes(x = x, y = y, color = Block), main = title, xlab = X.label, ylab = Y.label)+ theme_bw()
         
+        for (i in levels(df$Block))
+        {
+            p = p + geom_point(data = subset(df, df$Block == i), size = 0, shape = 0)
+        }
         
         #-- Display sample or var.names
         for (i in 1 : length(var.names)){
@@ -577,14 +584,20 @@ label.axes.box = "both"  )
         }
         
         #-- Modify scale colour - Change X/Ylabel - split plots into Blocks
+        p = p + scale_colour_manual(values = unique(col)[match(levels(factor(as.character(df$Block))), levels(df$Block))], name = "Block", breaks = levels(df$Block))
         p = p + scale_x_continuous(limits = c(-1, 1)) + scale_y_continuous(limits = c(-1, 1))
-        p = p + labs(list(title = title, x = X.label, y = Y.label)) + facet_wrap(~ Block, ncol = 2, as.table = TRUE)
+        p = p + labs(list(title = title, x = X.label, y = Y.label)) + facet_wrap(~ overlap, ncol = 2, as.table = TRUE)
         
-        #-- Remove Legend
-        # p = p + theme(legend.position="none")
-        p=p+theme(legend.position="right")
+        #-- Legend
+        if (!legend)
+        {
+            p = p + theme(legend.position="none")
+        } else {
+            p = p + guides(colour = guide_legend(override.aes = list(shape = 19, size = unique(df$cex))))
+        }
         
-        
+
+
         #-- abline
         if (abline)
         p = p + geom_vline(aes(xintercept = 0), linetype = 2, colour = "darkgrey") + geom_hline(aes(yintercept = 0),linetype = 2,colour = "darkgrey")
@@ -602,12 +615,12 @@ label.axes.box = "both"  )
     #-- Start: Lattice
     if(style == "lattice" )
     {
-        legend.lattice = list(space = "right", title = "Legend", cex.title = 1.25,
-        points=list(col=unique(col),cex = unique(cex),pch = unique(pch)),
+        legend.lattice = list(space = "right", title = "Block", cex.title = 1.25,
+        points=list(col=unique(df$col),cex = unique(df$cex),pch = unique(df$pch)),
         text = list(blocks))
         
         if (overlap) {
-            p = xyplot(y ~ x | Block, data = df, xlab = X.label, ylab = Y.label, main = title,
+            p = xyplot(y ~ x | overlap, data = df, xlab = X.label, ylab = Y.label, main = title,
             scales = list(x = list(relation = "free", limits = c(-1, 1)),
             y = list(relation = "free", limits = c(-1, 1))),
             key=if (legend) {legend.lattice} else {NULL},
@@ -724,10 +737,10 @@ label.axes.box = "both"  )
             if (legend)
             legend(x = 1.09, y=0.2,
             legend = blocks,
-            title="Legend",
-            col = unique(col),
-            pch = unique(pch),
-            pt.cex = unique(cex),
+            title="Block",
+            col = unique(df$col),
+            pch = unique(df$pch),
+            pt.cex = unique(df$cex),
             bty = "n")
             
             #-- Abline
@@ -796,10 +809,10 @@ label.axes.box = "both"  )
             if (legend)
             legend("center",
             legend = blocks,
-            title="Legend",
-            col = unique(col),
-            pch = unique(pch),
-            cex = unique(cex),
+            title="Block",
+            col = unique(df$col),
+            pch = unique(df$pch),
+            cex = unique(df$cex),
             bty = "n")
             
             par(opar)

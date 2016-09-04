@@ -16,7 +16,7 @@ keepX,
 keepX.constraint=NULL,
 scale = TRUE,
 tol = 1e-06,
-max.iter = 500,
+max.iter = 100,
 near.zero.var = FALSE,
 logratio="none", # one of "none", "CLR"
 multilevel=NULL)
@@ -39,12 +39,17 @@ to zero means and unit variances (default: TRUE)}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
 \item{logratio}{one of ('none','CLR') specifies the log ratio transformation to deal with compositional values that may arise from specific normalisation in sequencing dadta. Default to 'none'}
-\item{multilevel}{sample information for multilevel decomposition for repeated measurements. A numeric matrix or data frame. The first column indicates the repeated measures on each individual, i.e. the individuals ID. If \code{  method = 'splsda'}, the 2nd and 3rd columns are factors. If \code{method = 'spls'} then you can choose to only input the repeated measures (column 1) or the 2nd AND 3rd columns to split the variation for a 2 level factor. See examples.}
+\item{multilevel}{sample information for multilevel decomposition for repeated measurements. A numeric matrix or data frame indicating the repeated measures on each individual, i.e. the individuals ID. See examples.}
 }
+
+
 \details{
-\code{splsda} function fit sPLS models with \eqn{1, \ldots ,}\code{ncomp} components
+\code{splsda} function fits an sPLS model with \eqn{1, \ldots ,}\code{ncomp} components
 to the factor or class vector \code{Y}. The appropriate indicator (dummy)
 matrix is created. Logratio transform and multilevel analysis are performed sequentially as internal pre-processing step, through \code{\link{logratio.transfo}} and \code{\link{withinVariation}} respectively.
+
+Logratio can only be applied if the data do not contain any 0 value (for count data, we thus advise the normalise raw data with a 1 offset).
+
 }
 
 \value{
@@ -75,7 +80,7 @@ On sPLS-DA:
 Le Cao, K.-A., Boitard, S. and Besse, P. (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. \emph{BMC Bioinformatics} \bold{12}:253.
 On log ratio transformations:
 Filzmoser, P., Hron, K., Reimann, C.: Principal component analysis for compositional data with outliers. Environmetrics 20(6), 621-632 (2009)
-Le Cao, K.-A., Costello M.E., Chua X.-Y., Lakis V.A., Bartolo F., Brazeilles R., Rondeau, P. *In revision* MixMC: a multivariate statistical framework to gain insights into Microbial Communities. http://dx.doi.org/10.1101/044206
+K-A. L\^{e} Cao, ME Costello,  VA Lakis, F Bartolo, XY Chua, R Brazeilles, P Rondeau. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
 On multilevel decomposition:
 Westerhuis, J.A., van Velzen, E.J., Hoefsloot, H.C., Smilde, A.K.: Multivariate paired data analysis: multilevel plsda versus oplsda. Metabolomics 6(1), 119-128 (2010)
 Liquet, B., Lê Cao, K.-A., Hocini, H., Thiébaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
@@ -100,7 +105,7 @@ res <- splsda(X, Y, ncomp = 2, keepX = c(25, 25))
 
 
 # individual names appear
-plotIndiv(res, ind.names = Y, add.legend = TRUE, plot.ellipse =TRUE)
+plotIndiv(res, ind.names = Y, legend = TRUE, ellipse =TRUE)
 
 ## Second example: one-factor analysis with sPLS-DA, selecting a subset of variables
 # as in the paper Liquet et al.
@@ -135,7 +140,7 @@ res.2level <- splsda(X, Y = Y, ncomp = 2, multilevel = design,
 keepX = c(200, 200))
 
 plotIndiv(res.2level, group = Y$stimu, ind.names = vac18.simulated$time,
-add.legend = TRUE, style = 'lattice')
+legend = TRUE, style = 'lattice')
 }
 
 
@@ -151,7 +156,7 @@ Y <- as.factor(liver.toxicity$treatment[, 4])
 splsda.liver <- splsda(X, Y, ncomp = 2, keepX = c(20, 20))
 
 # individual name is set to the treatment
-plotIndiv(splsda.liver, ind.names = Y, plot.ellipse = TRUE, add.legend = TRUE)
+plotIndiv(splsda.liver, ind.names = Y, ellipse = TRUE, legend = TRUE)
 }
 
 ## Fifth example: 16S data with multilevel decomposion and log ratio transformation

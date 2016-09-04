@@ -8,7 +8,7 @@
 
 #
 # created: 2009
-# last modified: 12-04-2016
+# last modified: 24-08-2016
 #
 # Copyright (C) 2009
 #
@@ -175,6 +175,7 @@ plot_parameters)
     size.axis = plot_parameters$size.axis
     size.legend = plot_parameters$size.legend
     size.legend.title = plot_parameters$size.legend.title
+    legend.title = plot_parameters$legend.title
     legend.position = plot_parameters$legend.position
     point.lwd = plot_parameters$point.lwd
     
@@ -202,6 +203,9 @@ plot_parameters)
     if (length(legend.position)>1 || !legend.position%in%c("bottom", "left", "right", "top"))
     stop('"legend.position" needs to be one of "bottom", "left", "right" or "top"')
     
+    if (length(legend.title)>1)
+    stop("'legend.title' needs to be a single value (length 1)")
+
     if (!is.numeric(point.lwd) || length(point.lwd)>1 || point.lwd<0)
     stop("'point.lwd' needs to be a non negative number")
     
@@ -529,9 +533,18 @@ display.names)
             cex = rep(cex, ceiling(n/length(cex)))[1 : n]
         }
     }
-    
+
     if (ellipse)
     {
+        # removing calculation for classes with only one sample
+        
+        nlevels.class = 1 : ncol(object$ind.mat)
+        ind.unique = which(apply(object$ind.mat, 2, sum) == 1)
+        if(length(ind.unique) > 0)
+        {
+            nlevels.class = nlevels.class[-ind.unique]
+        }
+       
         #-- Start: Computation ellipse
         min.ellipse = max.ellipse = xlim.min = xlim.max = ylim.min = ylim.max = list()
         ind.gp = matrice = cdg = variance = list()
@@ -539,7 +552,7 @@ display.names)
         matrice = lapply(1 : length(x), function(z1) {lapply(ind.gp, function(z2){matrix(c(x[[z1]][z2], y[[z1]][z2]), ncol = 2)})})
         cdg = lapply(1 : length(x), function(z){ lapply(matrice[[z]], colMeans)})
         variance = lapply(1 : length(x), function(z){lapply(matrice[[z]], var)})
-        coord.ellipse = lapply(1 : length(x), function(z1){ lapply(1 : ncol(object$ind.mat), function(z2){ellipse(variance[[z1]][[z2]],
+        coord.ellipse = lapply(1 : length(x), function(z1){ lapply(nlevels.class, function(z2){ellipse(variance[[z1]][[z2]],
             centre = cdg[[z1]][[z2]],
             level = ellipse.level)})})
         max.ellipse = lapply(1 : length(x), function(z1) {sapply(coord.ellipse[[z1]], function(z2){apply(z2, 2, max)})})
@@ -610,7 +623,13 @@ display.names)
         } else {
             pch = rep(pch, ceiling(n/length(pch)))[1 : n]
         }
+        
+        # if pch is given and ind.names is TRUE, pch takes over
+        if(display.names)
+        warning("'ind.names' is set to FALSE as 'pch' overrides it")
+
         display.names = FALSE
+      
     }
     
     
@@ -660,7 +679,7 @@ display.names)
         df$names = rep(ind.names, length(x))
         
         df$pch = pch; df$cex = cex
-        df$col.per.group = levels.color[group] #FR: don't understand what is that changing as levels.color is already group?
+        df$col.per.group = levels.color#[group] #FR: don't understand what is that changing as levels.color is already group?
         df$col = as.character(col)
         
         
@@ -695,9 +714,13 @@ display.names)
         if (ellipse == TRUE)
         {
             df.ellipse = data.frame(do.call("rbind", lapply(1 : length(x), function(k){do.call("cbind", coord.ellipse[[k]])})), "Block" = paste0("Block: ", rep(blocks, each = 100)))
-            
-            
-            names(df.ellipse)[1 : (2*nlevels(group))] = paste0("Col", 1 : (2*nlevels(group)))
+            if(length(ind.unique) > 0)
+            {
+                names(df.ellipse)[1 : (2*length(nlevels.class))] = paste0("Col", c(1 : (2*nlevels(group)))[-c(2*(ind.unique-1)+1,2*ind.unique)])
+            } else {
+                names(df.ellipse)[1 : (2*nlevels(group))] = paste0("Col", c(1 : (2*nlevels(group))))
+
+            }
             df.ellipse$ellipse.level = ellipse.level
         } else {
             df.ellipse = NULL
@@ -805,4 +828,17 @@ display.names)
 }
 
 
+# --------------------------------------------------------------------------------------
+# Internal helpers functions to run some plots functions
+# --------------------------------------------------------------------------------------
 
+#-- Function to display an error message (used for the parameters var.names, cex, col, pch and font)
+stop.message = function(argument, data){
+    if (length(data) == 1) {
+        count.data = sapply(data, length)
+    } else {
+        count.data = paste(paste(sapply(data[-length(data)], length), collapse =  ", "), length(data[[length(data)]]), sep = " and ")
+    }
+    stop(argument, " must be either a vector of length ", length(data),
+    " or a list of ", length(data), " vector components of length ", count.data, " respectively.",call.= FALSE)
+}
