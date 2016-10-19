@@ -184,8 +184,9 @@ alpha)
             for (i in 1 : nlevels(df$group))
             {
                 p = p + geom_segment(data = subset(df, group == levels(df$group)[i]),
-                aes(x = x0, y = y0, xend = x, yend = y,
-                label = "Block"), color = unique(col.per.group)[i],size = point.lwd)
+                aes(x = x0, y = y0, xend = x, yend = y),
+                #label = "Block"),
+                color = unique(col.per.group)[i],size = point.lwd)
             }
         }
         
@@ -198,7 +199,8 @@ alpha)
                 {
                     p = p + geom_path(data = df.ellipse,
                     aes_string(x = paste0("Col", 2*(i - 1) + 1), y = paste0("Col", 2 * i),
-                    label = "Block", group = NULL), color = unique(col.per.group)[i], size = point.lwd)
+                    #label = "Block",
+                    group = NULL), color = unique(col.per.group)[i], size = point.lwd)
                 }
 
             }
@@ -285,8 +287,9 @@ alpha)
             for (i in 1 : nlevels(df$group))
             {
                 p = p + geom_segment(data = subset(df, group == levels(df$group)[i]),
-                aes(x = x0, y = y0, xend = x, yend = y,
-                label = "Block"), color = unique(col.per.group)[i],size = point.lwd)
+                aes(x = x0, y = y0, xend = x, yend = y),
+                #label = "Block"),
+                color = unique(col.per.group)[i],size = point.lwd)
             }
         }
 
@@ -295,9 +298,12 @@ alpha)
         {
             for (i in 1 : nlevels(df$group))
             {
+
                 p = p + geom_path(data = df.ellipse,
-                aes_string(x = paste0("Col", 2*(i - 1) + 1), y = paste0("Col", 2 * i),
-                label = "Block", group = NULL, shape = NULL), color = unique(col.per.group)[i], size = point.lwd)
+                aes_string(x = paste0("Col", 2*(i - 1) + 1), y = paste0("Col", 2 * i)),
+                #label = "Block",
+                #group = NULL),# shape = NULL),
+                color = unique(col.per.group)[i], size = point.lwd, inherit.aes =FALSE)
             }
         }
 
@@ -641,7 +647,6 @@ alpha)
     }
     #-- End: graphics
     
-    
     #internal_3d=function(df,group,blocks,names,centroid,x0,y0,col.per.group,title,X.label,Y.label,lim.X,xlim,lim.Y,ylim,class.object,
     #col,display.names,legend,abline,pch.legend,cex,star,x,y,ellipse,df.ellipse,axes.box,Z.label,z)
     if (style=="3d")
@@ -712,7 +717,7 @@ alpha)
                         {
                             for (cex_i in unique(df[df$col == i, ]$cex[ind]))
                             {
-                                ind_cex = which(df[df$col[ind] == i, ]$cex == cex_i)
+                                ind_cex = which(df[df$col == i, ]$cex[ind] == cex_i)
                                 points3d(x = df[df$col == i & other, "x"][ind][ind_cex],
                                 y = df[df$col == i & other, "y"][ind][ind_cex],
                                 z = df[df$col == i & other, "z"][ind][ind_cex],

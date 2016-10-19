@@ -195,11 +195,11 @@ data(vac18)
 X = vac18$genes
 Y = vac18$stimulation
 # sample indicates the repeated measurements
-design = data.frame(sample = vac18$sample,
-stimul = vac18$stimulation)
+sample = vac18$sample
+stimul = vac18$stimulation
 
 # multilevel sPLS-DA model
-res.1level = splsda(X, ncomp = 3, multilevel = design,
+res.1level = splsda(X, Y = stimul, ncomp = 3, multilevel = sample,
 keepX = c(30, 137, 123))
 
 
@@ -264,10 +264,10 @@ Y = nutrimouse$diet
 data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid)
 design = matrix(c(0,1,1,1,0,1,1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
 
-nutrimouse.sgccda = wrapper.sgccda(blocks = data,
+nutrimouse.sgccda = wrapper.sgccda(X = data,
 Y = Y,
 design = design,
-keep = list(gene = c(10,10), lipid = c(15,15)),
+keepX = list(gene = c(10,10), lipid = c(15,15)),
 ncomp = 2,
 scheme = "centroid",
 verbose = FALSE,

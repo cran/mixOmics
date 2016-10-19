@@ -15,7 +15,7 @@ tune.splsda(X, Y, ncomp = 1,
 test.keepX = c(5, 10, 15), already.tested.X, constraint = FALSE, validation = "Mfold",
 folds = 10, dist = "max.dist", measure = "BER", auc = FALSE,
 progressBar = TRUE, max.iter = 100, near.zero.var = FALSE, nrepeat = 1,
-logratio = c('none','CLR'), multilevel = NULL, light.output = TRUE)
+logratio = c('none','CLR'), multilevel = NULL, light.output = TRUE, cpus)
 
 }	
 
@@ -25,7 +25,8 @@ logratio = c('none','CLR'), multilevel = NULL, light.output = TRUE)
   \item{ncomp}{the number of components to include in the model.}
   \item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
 \item{already.tested.X}{Optional, if \code{ncomp > 1} A list containing which variables of X are to be kept on each of the first PLS-components (if \code{constraint=TRUE}) or a numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components (if \code{constraint = FALSE})}
-\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see examples. }\item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or
+\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see examples. }
+\item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or
 \code{"loo"} (see below). Default is \code{"Mfold"}.}
 \item{folds}{the folds in the Mfold cross-validation. See Details.}
 \item{dist}{distance metric to use for \code{splsda} to estimate the classification error rate,
@@ -40,6 +41,7 @@ should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \cod
 \item{multilevel}{Design matrix for multilevel analysis (for repeated measurements) that indicates the repeated measures on each individual, i.e. the individuals ID. See Details.}
 
 \item{light.output}{if set to FALSE, the prediction/classification of each sample for each of \code{test.keepX} and each comp is returned.}
+\item{cpus}{Number of cpus to use when running the code in parallel.}
 
 }
 

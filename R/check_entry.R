@@ -239,7 +239,7 @@ match.keepX.constraint=function(names.remove,keepX.constraint)
         
         if (sum(!is.na(unlist(ind.match))) > 0)
         {
-            warning("at least one variable was removed from keepX.constraint because of a null variance. Please check object$keepX.constraint to see which variables are used.")
+            warning("at least one variable was removed from keepX.constraint because of a null variance.")# Please check object$keepX.constraint to see which variables are used.")
             #remove from keepX.constraint
             keepX.constraint = lapply(keepX.constraint, function(x)
             {
@@ -258,7 +258,7 @@ match.keepX.constraint=function(names.remove,keepX.constraint)
         {
             ind.min = min(which(keepX == 0))
             ncomp = ind.min - 1
-            stop(paste("keepX.constraint was reduced from", length(keepX.constraint), " components to", ncomp, " components. Please change keepX.constraint or put near.zero.var=FALSE and restart the function"))
+            stop(paste("keepX.constraint was reduced from", length(keepX.constraint), " components to", ncomp, " components. Please change keepX.constraint or put near.zero.var=FALSE if it was set to TRUE."))# and restart the function"))
             #construction of the new keepX.constraint, using ncomp components
             keepX.constraint.temp = keepX.constraint
             for (i in (ncomp + 1) : length(keepX.constraint))
@@ -740,7 +740,7 @@ verbose)
         {
             design = 1 - diag(length(A)+1)
             rownames(design) = colnames(design) = c(names(A), "Y")
-        } else if (ncol(design) != nrow(design) || ncol(design) < length(X) || ncol(design) > (length(X) + 1) || any(!design %in% c(0,1))) {
+        } else if (ncol(design) != nrow(design) || ncol(design) < length(X) || ncol(design) > (length(X) + 1) ){#|| any(!design %in% c(0,1))) {
             stop(paste0("'design' must be a square matrix with ", length(X), "columns."))
         } else if (ncol(design) == length(X)) {
             message("Design matrix has changed to include Y; each block will be linked to Y.")
@@ -775,7 +775,7 @@ verbose)
         if (missing(design))
         {
             design = 1 - diag(length(A))
-        } else if (ncol(design) != nrow(design) || ncol(design) < length(A) || ncol(design) > (length(A) + 1) || any( !design %in% c(0,1)))
+        } else if (ncol(design) != nrow(design) || ncol(design) < length(A) || ncol(design) > (length(A) + 1) )#|| any( !design %in% c(0,1)))
         {
             stop(paste0("'design' must be a square matrix with ", length(A), "columns."))
         }
@@ -815,7 +815,7 @@ verbose)
     warning("At least one study has less than 5 samples, mean centering might not do as expected")
     
     if (missing(init))
-    init = "svd"
+    init = "svd.single"
     
     if (!init%in%c("svd","svd.single"))
     stop("init should be one of 'svd' or 'svd.single'")
@@ -990,7 +990,7 @@ keepX.constraint)
     
     #check scheme
     if (missing(scheme))
-    scheme= "centroid"
+    scheme= "horst"
     
     if (!(scheme %in% c("horst", "factorial","centroid")))
     {
@@ -1189,7 +1189,7 @@ keepX.constraint)
     stop("init should be 'svd.single'.")
     
     # check scheme
-    if(missing(scheme)) scheme = "centroid"
+    if(missing(scheme)) scheme = "horst"
     if (!(scheme %in% c("horst", "factorial", "centroid")))
     {
         stop("Choose one of the three following schemes: horst, centroid or factorial")

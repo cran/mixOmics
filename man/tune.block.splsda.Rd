@@ -21,6 +21,7 @@ validation = "Mfold",
 folds = 10,
 dist = "max.dist",
 measure = "BER",
+weighted = TRUE,
 progressBar = TRUE,
 max.iter = 100,
 near.zero.var = FALSE,
@@ -33,7 +34,9 @@ bias,
 init ,
 tol = 1e-06,
 verbose,
-light.output = TRUE
+light.output = TRUE,
+cpus,
+name.save=NULL
 )
 }
 
@@ -54,6 +57,8 @@ light.output = TRUE
 \item{dist}{distance metric to use for \code{splsda} to estimate the classification error rate,
 should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \code{"max.dist"} (see Details).}
 \item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
+\item{weighted}{tune using either the performance of the Majority vote or the Weighted vote.}
+
 \item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Default value is FALSE}
@@ -71,6 +76,8 @@ to zero means and unit variances. Default = \code{TRUE}.}
 \item{verbose}{if set to \code{TRUE}, reports progress on computing.}
 
 \item{light.output}{if set to FALSE, the prediction/classification of each sample for each of \code{test.keepX} and each comp is returned.}
+\item{cpus}{Number of cpus to use when running the code in parallel.}
+\item{name.save}{character string for the name of the file to be saved.}
 
 }
 
@@ -86,7 +93,7 @@ The number of folds to generate is to be specified in the argument \code{folds}.
 
 If \code{validation = "loo"}, leave-one-out cross-validation is performed. By default \code{folds} is set to the number of unique individuals.
 
-All combination of test.keepX values are tested. A message infoms how many will be fitted on each component for a given test.keepX.
+All combination of test.keepX values are tested. A message informs how many will be fitted on each component for a given test.keepX.
 
 }
 

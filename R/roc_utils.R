@@ -75,7 +75,6 @@ statauc <- function(data = NULL, plot = FALSE, title = NULL){
   df$Specificity = 100 - 100*as.numeric(df$Specificity)
   df$Sensitivity = 100*as.numeric(df$Sensitivity)
   
-  
   if(plot)
   {
       Sensitivity = Specificity = Outcome = NULL #R check
@@ -84,7 +83,7 @@ statauc <- function(data = NULL, plot = FALSE, title = NULL){
     else
       title=title
     p = ggplot(df, aes(x=Specificity, y=Sensitivity, group = Outcome, colour = Outcome)) + xlab("100 - Specificity (%)") + ylab("Sensitivity (%)") + geom_line(size = 1.5) + scale_x_continuous(breaks=seq(0, 100, by = 10)) + scale_y_continuous(breaks=seq(0, 100, by = 10))
-    p = p + geom_abline(intercept = 1) + theme(legend.key.size = unit(1.5, "cm"), plot.title = element_text(lineheight=.8, face="bold"), legend.title = element_text(size=14, face="bold")) + ggtitle(title)   
+    p = p + geom_abline(intercept = 1) + theme(legend.key.size = unit(1.5, "cm"), plot.title = element_text(lineheight=.8, face="bold"), legend.title = element_text(size=14, face="bold")) + ggtitle(title) + theme(plot.title = element_text(hjust = 0.5))
     
     plot(p)
   }

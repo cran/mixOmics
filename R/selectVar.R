@@ -113,12 +113,14 @@ function(object, comp =1, block=NULL, ...)
         }else if (any(class(object)%in%c("mint.plsda","mint.splsda","plsda","splsda"))) {
             # Y is always in second position
             out=out[[1]]
+        }else if (any(class(object)%in%c("pca"))) { #keep the result as a list
+            out=out[[1]]
         }
 
+    } else {
+        if (length(grep("pca",class(object)))>0)
+        out=out
     }
-    
-    if (length(grep("pca",class(object)))>0)
-    out=out[[1]]
     
     #we add comp as an output
     out$comp=comp

@@ -331,7 +331,7 @@ progressBar = TRUE,
     } else if (any(class(object) == "pls")) {
         method = "pls.mthd"
     } else {
-        warnings("Something that should not happen happened. Please contact us.")
+        warning("Something that should not happen happened. Please contact us.")
     }
     class(result) = c("perf",paste(c("perf", method), collapse ="."))
     result$call = match.call()
@@ -351,6 +351,7 @@ folds = 10,
 nrepeat = 1,
 auc = FALSE,
 progressBar = TRUE,
+cpus,
 ...)
 {
     
@@ -424,7 +425,7 @@ progressBar = TRUE,
     if (validation == "loo")
     {
         if (nrepeat != 1)
-        warnings("Leave-One-Out validation does not need to be repeated: 'nrepeat' is set to '1'.")
+        warning("Leave-One-Out validation does not need to be repeated: 'nrepeat' is set to '1'.")
         nrepeat = 1
     }
     
@@ -436,8 +437,20 @@ progressBar = TRUE,
     
     if (!(logratio %in% c("none", "CLR")))
     stop("Choose one of the two following logratio transformation: 'none' or 'CLR'")
-    
     #fold is checked in 'MCVfold'
+
+    if(!missing(cpus))
+    {
+        if(!is.numeric(cpus) | length(cpus)!=1)
+        stop("'cpus' must be a numerical value")
+        
+        parallel = TRUE
+        cl = makeCluster(cpus, type = "SOCK")
+        clusterExport(cl, c("splsda","selectVar"))
+    } else {
+        parallel = FALSE
+        cl = NULL
+    }
     
     
     #---------------------------------------------------------------------------#
@@ -546,8 +559,8 @@ progressBar = TRUE,
         choice.keepX = if(constraint){NULL}else{choice.keepX},
         choice.keepX.constraint = if(constraint){choice.keepX.constraint}else{NULL},
         test.keepX = test.keepX, measure = measure, dist = dist, near.zero.var = near.zero.var,
-        auc = auc, progressBar = progressBar, class.object = class(object))
-                
+        auc = auc, progressBar = progressBar, class.object = class(object), cl = cl)
+
         # ---- extract stability of features ----- # NEW
         if (any(class(object) == "splsda"))
         list.features[[comp]] = result$features$stable
@@ -571,14 +584,18 @@ progressBar = TRUE,
             #prediction of each samples for each fold and each repeat, on each comp
             class.all[[ijk]][, , comp] = result$class.comp[[ijk]][,,1]
         }
-        prediction.all[[comp]] = result$prediction.comp[[1]][, , 1] #take only one component [[1]] and one of test.keepX [,,1]
+        prediction.all[[comp]] = array(unlist(result$prediction.comp),c(nrow(result$prediction.comp[[1]]), ncol(result$prediction.comp[[1]]), nrepeat),
+        dimnames = c(dimnames(result$prediction.comp[[1]])[1:2], list(paste0("nrep",1:nrepeat))))#[[1]][, , 1] #take only one component [[1]] and one of test.keepX [,,1]
         
         if(auc == TRUE)
         {
-            auc.all[[comp]] = result$auc.all
-            auc.mean[[comp]] = result$auc
+            auc.all[[comp]] = lapply(result$auc.all, function(x) x[,,1])
+            auc.mean[[comp]] = result$auc[, , 1]
         }
     }
+    if (parallel == TRUE)
+    stopCluster(cl)
+
     names(prediction.all) = paste('comp', 1:ncomp)
     
     result = list(error.rate = mat.mean.error,
@@ -616,7 +633,7 @@ progressBar = TRUE,
     } else if (any(class(object) == "plsda")) {
         method = "plsda.mthd"
     } else {
-        warnings("Something that should not happen happened. Please contact us.")
+        warning("Something that should not happen happened. Please contact us.")
     }
     class(result) = c("perf",paste(c("perf", method), collapse ="."))
     result$call = match.call()

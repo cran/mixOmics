@@ -87,7 +87,7 @@ border = NA,
         
         # -- input checks
         check = check.input.plotLoadings(object = object, block = "X", size.name = size.name, size.legend = size.legend,
-        title = title, col = NULL, name.var = name.var)
+        title = title, col = NULL, name.var = name.var, contrib = contrib)
 
         size.name = check$size.name
         size.legend = check$size.legend

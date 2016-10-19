@@ -223,7 +223,7 @@ plotVar(nutrimouse.rgcca, comp = c(1,2), block = c(1,2), cex = c(1.5, 1.5))
 
 
     # set up the data as list
-    data = list(nutrimouse$gene, nutrimouse$lipid,Y)
+data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid, Y =Y)
     # with this design, gene expression and lipids are connected to the diet factor
     # design = matrix(c(0,0,1,
     #                   0,0,1,

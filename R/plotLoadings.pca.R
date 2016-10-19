@@ -29,16 +29,9 @@
 #----------------------------------------------------------------------------------------------------------#
 
 
-plotLoadings.pls =
-#plotLoadings.mlpls =      # because pls too
-plotLoadings.spls =
-#plotLoadings.mlspls =     # because spls too
-plotLoadings.rcc =
-plotLoadings.sgcca =
-plotLoadings.rgcca =
+plotLoadings.pca =
 
-
-function(object, block, #single value
+function(object,
 comp = 1,
 col = NULL,
 ndisplay = NULL,
@@ -46,20 +39,20 @@ size.name = 0.7,
 name.var = NULL,
 name.var.complete = FALSE, #name.var.complete
 title = NULL,
-subtitle,
 size.title = rel(2),
-size.subtitle = rel(1.5),
 layout = NULL,
 border = NA,
 ...)
 {
     
     # -- input checks
-    check = check.input.plotLoadings(object = object, block = block, subtitle = subtitle, size.name = size.name, title = title, col = col, name.var = name.var)
+    object$names$blocks = "X"
+    check = check.input.plotLoadings(object = object, block = "X", size.name = size.name, title = title, col = col, name.var = name.var)
     
     col = check$col
     size.name = check$size.name
-    block = check$block
+    block = 1
+    object$X = list(X=object$X)
 
 
     # -- layout
@@ -68,42 +61,26 @@ border = NA,
     opar = res$opar
     omar = par("mar") #reset mar at the end
 
-    if (length(block) == 1 & !is.null(name.var))
-    name.var = list(name.var = name.var)
+    res = get.loadings.ndisplay(object = object, comp = comp, block = block, name.var = name.var, name.var.complete = name.var.complete, ndisplay = ndisplay)
+    X = res$X
+    names.block = res$names.block
+    colnames.X = res$colnames.X
+    value.selected.var = res$value.selected.var
+
+    df = data.frame(importance = value.selected.var) # contribution of the loading
     
-    for (i in 1 : length(block))
+    # barplot with contributions
+    par(mar = c(4, max(7, max(sapply(colnames.X, nchar),na.rm = TRUE)/3), 4, 2))
+
+    mp = barplot(df$importance, horiz = T, las = 1, col = col, axisnames = TRUE, names.arg = colnames.X, #names.arg = row.names(df),
+    cex.names = size.name, cex.axis = 0.7, beside = TRUE, border = border)
+    
+    if (is.null(title))
     {
-        res = get.loadings.ndisplay(object = object, comp = comp, block = block[i], name.var = name.var[[i]], name.var.complete = name.var.complete, ndisplay = ndisplay)
-        X = res$X
-        names.block = res$names.block
-        colnames.X = res$colnames.X
-        value.selected.var = res$value.selected.var
-
-        df = data.frame(importance = value.selected.var) # contribution of the loading
-        
-        # barplot with contributions
-        if (!is.null(title) & length(block) > 1)
-        {
-            par(mar = c(4, max(7, max(sapply(colnames.X, nchar),na.rm = TRUE)/3), 6, 2))
-        } else {
-            par(mar = c(4, max(7, max(sapply(colnames.X, nchar),na.rm = TRUE)/3), 4, 2))
-        }
-
-        mp = barplot(df$importance, horiz = T, las = 1, col = col, axisnames = TRUE, names.arg = colnames.X, #names.arg = row.names(df),
-        cex.names = size.name, cex.axis = 0.7, beside = TRUE, border = border)
-        
-        if ( (length(block) == 1 & is.null(title)) | (length(block) > 1 & missing(subtitle)))
-        {
-            title(paste0('Loadings on comp ', comp, "\nBlock '", names.block,"'"), line=0, cex.main = size.title)
-        } else if (length(block) == 1) {
-            title(paste(title), line=0, cex.main = size.title)
-        } else if (length(block) > 1 & !missing(subtitle)) {
-            title(paste(subtitle[i]), line=0, cex.main = size.subtitle)
-        }
+        title(paste0('Loadings on comp ', comp), cex.main = size.title)
+    } else {
+        title(paste(title), cex.main = size.title)
     }
-    
-    if (length(block) > 1 & !is.null(title))
-    title(title, outer=TRUE, line = -2, cex.main = size.title)
     
     if (reset.mfrow)
     par(opar)#par(mfrow = c(1,1))

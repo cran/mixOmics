@@ -10,14 +10,16 @@ Function to plot performance criteria, such as classification error rate or bala
 }
 
 \usage{
-\method{plot}{tune.splsda}(x, optimal = TRUE, sd = TRUE, \dots)
+\method{plot}{tune.splsda}(x, optimal = TRUE, sd = TRUE, legend.position = "topright", col, \dots)
 }
 
 \arguments{
   \item{x}{an \code{tune.splsda} object.}
 \item{optimal}{If TRUE, highlights the optimal keepX per component}
 \item{sd}{If 'nrepeat' was used in the call to 'tune.splsda', error bar shows the standard deviation if sd=TRUE}
-
+\item{legend.position}{position of the legend, one of "bottomright", "bottom", "bottomleft",
+-"left", "topleft", "top", "topright", "right" and "center". }
+\item{col}{character (or symbol) color to be used, possibly vector. One color per component.}
   \item{\dots}{Further arguments sent to \code{\link{xyplot}} function.}
 }
 

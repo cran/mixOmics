@@ -86,7 +86,7 @@ data(nutrimouse)
 
 # ! need to unmap the Y factor
 Y = unmap(nutrimouse$diet)
-data = list(nutrimouse$gene, nutrimouse$lipid,Y)
+data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid,Y)
 # in this design, gene expression and lipids are connected to the diet factor
 # and gene expression and lipids are also connected
 design = matrix(c(0,1,1,
@@ -95,21 +95,21 @@ design = matrix(c(0,1,1,
 #note: the penalty parameters need to be tuned
 wrap.result.sgcca = wrapper.sgcca(X = data, design = design, penalty = c(.3,.3, 1),
                                   ncomp = 2,
-                                  scheme = "centroid", verbose = FALSE)
+                                  scheme = "horst", verbose = FALSE)
 
 #variables selected and loadings values on component 1 for the two blocs
 selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))
 
 #variables selected on component 1 for each block
-selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'block1'$name
-selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'block2'$name
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'gene'$name
+selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))$'lipid'$name
 
 #variables selected on component 2 for each block 
-selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'block1'$name
-selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'block2'$name
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'gene'$name
+selectVar(wrap.result.sgcca, comp = 2, block = c(1,2))$'lipid'$name
 
 # loading value of the variables selected on the first block
-selectVar(wrap.result.sgcca, comp = 1, block = 1)$'block1'$value
+selectVar(wrap.result.sgcca, comp = 1, block = 1)$'gene'$value
 }
 
 }

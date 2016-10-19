@@ -116,7 +116,7 @@ multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVar
         nzv = result$nzv,
         scale = scale,
         logratio = logratio,
-        explained_variance = result$explained_variance[-result$indY],
+        explained_variance = result$explained_variance,#[-result$indY],
         input.X = result$input.X
         )
     

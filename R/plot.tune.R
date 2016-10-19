@@ -26,7 +26,7 @@
 
 
 plot.tune.splsda = #plot.spca <- plot.ipca <- plot.sipca <-
-function(x, optimal = TRUE, sd = TRUE, ...)
+function(x, optimal = TRUE, sd = TRUE, legend.position = "topright", col, ...)
 {
     
     if (!is.logical(optimal))
@@ -52,12 +52,16 @@ function(x, optimal = TRUE, sd = TRUE, ...)
     if (length(select.keepX) < 10)
     {
         #only 10 colors in color.mixo
-        col.per.comp = color.mixo(1:comp.tuned)
+        if(missing(col))
+        col = color.mixo(1:comp.tuned)
     } else {
         #use color.jet
-        col.per.comp = color.jet(comp.tuned)
+        if(missing(col))
+        col = color.jet(comp.tuned)
     }
-    
+    if(length(col) != comp.tuned)
+    stop("'col' should be a vector of length ", comp.tuned,".")
+
     if(measure == "overall")
     {
          ylab = "Classification error rate"
@@ -65,11 +69,10 @@ function(x, optimal = TRUE, sd = TRUE, ...)
     {
         ylab = "Balanced error rate"
     }
-   
 
     matplot(rownames(error),error, type = "l", axes = TRUE, lwd = 2, lty = 1, log = "x",
     xlab = "Number of selected genes", ylab = ylab,
-    col = col.per.comp, ylim = ylim)
+    col = col, ylim = ylim)
     
     if(optimal)
     {
@@ -78,14 +81,14 @@ function(x, optimal = TRUE, sd = TRUE, ...)
             # store coordinates of chosen keepX
             index = which(rownames(error) == select.keepX[i])
             # choseen keepX:
-            points(rownames(error)[index], error[index,i], col = col.per.comp[i], lwd=2, cex=3, pch = 18)
+            points(rownames(error)[index], error[index,i], col = col[i], lwd=2, cex=3, pch = 18)
         }
     }
     
     if(!is.null(error.rate.sd))
     {
         for(j in 1:ncol(error))
-        plot_error_bar(x = as.numeric(names(error[, j])), y =error[, j] , uiw=error.rate.sd[, j], add=T, col = color.mixo(rep(j,each=nrow(error))))#, ...)
+        plot_error_bar(x = as.numeric(names(error[, j])), y =error[, j] , uiw=error.rate.sd[, j], add=T, col = rep(col[j],each=nrow(error)))#, ...)
     }
 
 
@@ -100,7 +103,7 @@ function(x, optimal = TRUE, sd = TRUE, ...)
         legend = paste("comp1 to", colnames(error))
     }
 
-    legend("topright", lty = 1, lwd = 2, horiz = FALSE, col = col.per.comp,
+    legend(legend.position, lty = 1, lwd = 2, horiz = FALSE, col = col,
     legend = legend)
     
 }

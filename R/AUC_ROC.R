@@ -33,7 +33,7 @@ UseMethod("auroc")
 # ----------------------
 auroc.plsda = auroc.splsda = function(
 object,
-newdata = object$X,
+newdata = object$input.X,
 outcome.test = as.factor(object$Y),
 multilevel = NULL,
 plot = TRUE,

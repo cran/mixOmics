@@ -55,7 +55,7 @@ max.iter = 100,
 near.zero.var = FALSE)
 {
     if (missing(scheme))
-    scheme= "centroid"
+    scheme= "horst"
     
     if (missing(bias))
     bias= FALSE

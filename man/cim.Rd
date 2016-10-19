@@ -113,7 +113,7 @@ name.save = NULL)
     \item{legend}{A list indicating the legend for each group, the color vector,  title of the legend and cex.}
     
   \item{save}{should the plot be saved? If so, argument to be set to either  \code{'jpeg'}, \code{'tiff'}, \code{'png'} or \code{'pdf'}.}
-  \item{name.save}{character string for the name of the saved file.}
+    \item{name.save}{character string for the name of the file to be saved.}
 }
 
 \details{ 

@@ -61,7 +61,7 @@ check.input.plotLoadings = function(object, block, study, subtitle, size.name, s
     if (any(class(object) %in% c("plsda", "splsda")) & (!all(block %in% c(1,"X")) | length(block) > 1 ))
     stop("'block' can only be 'X' or '1' for plsda and splsda object")
     
-    if (any(class(object) %in% c("plsda", "splsda")))
+    if (any(class(object) %in% c("plsda", "splsda","pca")))
     {
         object$indY = 2
     } else if (any(class(object) %in% c("pls", "spls"))) {

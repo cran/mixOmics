@@ -111,6 +111,8 @@ near.zero.var = FALSE)
     keepX.constraint=keepX.constraint, keepX=keepX, design=design, scheme=scheme, mode=mode, scale=scale,
     bias=bias, init=init, tol=tol, verbose=verbose, max.iter=max.iter, near.zero.var=near.zero.var)
     
+    # calculate weights for each dataset
+    weights = get.weights(result$variates, indY = result$indY)
 
     # choose the desired output from 'result'
     out=list(call=match.call(),
@@ -125,6 +127,7 @@ near.zero.var = FALSE)
         keepY.constraint = result$keepA.constraint[result$indY][[1]],
         variates = result$variates,
         loadings = result$loadings,
+        crit = result$crit,
         names = result$names,
         init = result$init,
         bias = result$bias,
@@ -136,7 +139,8 @@ near.zero.var = FALSE)
         design = result$design,
         scheme = result$scheme,
         indY = result$indY,
-        explained_variance = result$explained_variance[-result$indY])
+        weights = weights,
+        explained_variance = result$explained_variance)#[-result$indY])
     
     # give a class
     class(out) = c("block.splsda","block.spls","sgccda","sgcca","DA")

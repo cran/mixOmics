@@ -62,7 +62,8 @@ near.zero.var = FALSE,
 nrepeat = 1,
 logratio = c('none','CLR'),
 multilevel = NULL,
-light.output = TRUE # if FALSE, output the prediction and classification of each sample during each folds, on each comp, for each repeat
+light.output = TRUE, # if FALSE, output the prediction and classification of each sample during each folds, on each comp, for each repeat
+cpus
 )
 {    #-- checking general input parameters --------------------------------------#
     #---------------------------------------------------------------------------#
@@ -128,7 +129,7 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     if (validation == 'loo')
     {
         if (nrepeat != 1)
-        warnings("Leave-One-Out validation does not need to be repeated: 'nrepeat' is set to '1'.")
+        warning("Leave-One-Out validation does not need to be repeated: 'nrepeat' is set to '1'.")
         nrepeat = 1
     }
     
@@ -177,6 +178,22 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     if (is.null(test.keepX) | length(test.keepX) == 1 | !is.numeric(test.keepX))
     stop("'test.keepX' must be a numeric vector with more than two entries", call. = FALSE)
     
+    if(!missing(cpus))
+    {
+        if(!is.numeric(cpus) | length(cpus)!=1)
+        stop("'cpus' must be a numerical value")
+        
+        parallel = TRUE
+        cl = makeCluster(cpus, type = "SOCK")
+        clusterExport(cl, c("splsda","selectVar"))
+        
+        if(progressBar == TRUE)
+        message(paste("As code is running in parallel, the progressBar will only show 100% upon completion of each component.",sep=""))
+
+    } else {
+        parallel = FALSE
+        cl = NULL
+    }
     #-- end checking --#
     #------------------#
     
@@ -285,7 +302,7 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
             choice.keepX = if(constraint){NULL}else{already.tested.X},
             choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
             test.keepX = test.keepX, measure = measure, dist = dist,
-            near.zero.var = near.zero.var, progressBar = progressBar, class.object = "splsda", max.iter = max.iter, auc = auc)
+            near.zero.var = near.zero.var, progressBar = progressBar, class.object = "splsda", max.iter = max.iter, auc = auc, cl = cl)
             
             # in the following, there is [[1]] because 'tune' is working with only 1 distance and 'MCVfold.splsda' can work with multiple distances
             mat.error.rate[[comp]] = result[[measure]]$mat.error.rate[[1]]
@@ -322,6 +339,9 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
             }
             
         } # end comp
+        if (parallel == TRUE)
+        stopCluster(cl)
+        
         names(mat.error.rate) = c(paste('comp', comp.real, sep=''))
         names(error.per.class.keepX.opt) = c(paste('comp', comp.real, sep=''))
         names(already.tested.X) = c(paste('comp', 1:ncomp, sep=''))

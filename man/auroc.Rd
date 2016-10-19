@@ -15,10 +15,10 @@ Calculates the AUC and plots ROC for supervised objects from s/plsda, mint.s/pls
 }
 
 \usage{
-\method{auroc}{plsda}(object, newdata = object$X, outcome.test = as.factor(object$Y),
+\method{auroc}{plsda}(object, newdata = object$input.X, outcome.test = as.factor(object$Y),
 multilevel = NULL, plot = TRUE, roc.comp = 1, ...)
 
-\method{auroc}{splsda}(object, newdata = object$X, outcome.test = as.factor(object$Y),
+\method{auroc}{splsda}(object, newdata = object$input.X, outcome.test = as.factor(object$Y),
 multilevel = NULL, plot = TRUE, roc.comp = 1, ...)
 
 \method{auroc}{mint.plsda}(object, newdata = object$X, outcome.test = as.factor(object$Y),
@@ -90,6 +90,7 @@ Y <- as.factor(liver.toxicity$treatment[, 4])
 splsda.liver <- splsda(X, Y, ncomp = 2, keepX = c(20, 20))
 auc.splsda.liver = auroc(splsda.liver, ncomp = 1)
 
+\dontrun{
 
 ## example with mint.plsda
 # -----------------
@@ -122,6 +123,7 @@ auc.block.plsda.nutri = auroc(block.plsda.nutri, block = 'lipid')
 list.keepX = list(gene = rep(10, 2), lipid = rep(5,2))
 block.splsda.nutri = block.splsda(X = data, Y = nutrimouse$diet, keepX = list.keepX)
 auc.block.splsda.nutri = auroc(block.splsda.nutri, block = 1)
+}
 }
 
 \keyword{regression}

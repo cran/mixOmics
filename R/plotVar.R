@@ -133,7 +133,7 @@ label.axes.box = "both"  )
             stop(paste("The number of components for one selected block '", paste(blocks, collapse = " - "),"' is 1. The number of components must be superior or equal to 2."), call. = FALSE)
         }
         ncomp = object$ncomp[blocks]
-    } else if (any(class.object %in% c("rcc", "pls", "spls", "mlspls"))) {
+    } else if (any(class.object %in% c("rcc", "pls", "spls", "mlspls")) & all(class.object !="DA")) {
         blocks = c("X", "Y")
     } else {
         blocks = "X"
@@ -346,6 +346,15 @@ label.axes.box = "both"  )
             }
         }}
     
+    # output a message if some variates are anti correlated among blocks
+    if (any(class.object %in%  object.blocks))
+    {
+        VarX = do.call(cbind, lapply(object$variates, function(i) i[, ncomp]))
+        corX = cor(VarX)
+        if(any(corX < 0))
+        warning("There is negative correlation between the variates of some blocks, be careful with the interpretation of the correlation circle.")
+    }
+    
     if (any(sapply(cord.X, nrow) == 0))
     stop("No variable selected on at least one block")
     
@@ -526,12 +535,12 @@ label.axes.box = "both"  )
     
     if (overlap)
     {
-        df$overlap = title
+        df$Overlap = title
         df$Block = factor(unlist(lapply(1 : length(cord.X), function(z){rep(blocks[z], nrow(cord.X[[z]]))})))
         if(style %in%c("ggplot2","lattice"))
         title=NULL # to avoid double title
     } else {
-        df$overlap = df$Block
+        df$Overlap = df$Block
         if(style %in%c("ggplot2","lattice"))
         df$Block = factor(unlist(lapply(1 : length(cord.X), function(z){rep(blocks[z], nrow(cord.X[[z]]))})))
     }
@@ -549,7 +558,7 @@ label.axes.box = "both"  )
 
 
     #-- End: data set
-    
+    #save(list=ls(),file="temp.Rdata")
     #-- Start: ggplot2
     if (style == "ggplot2" &  plot)
     {
@@ -586,7 +595,7 @@ label.axes.box = "both"  )
         #-- Modify scale colour - Change X/Ylabel - split plots into Blocks
         p = p + scale_colour_manual(values = unique(col)[match(levels(factor(as.character(df$Block))), levels(df$Block))], name = "Block", breaks = levels(df$Block))
         p = p + scale_x_continuous(limits = c(-1, 1)) + scale_y_continuous(limits = c(-1, 1))
-        p = p + labs(list(title = title, x = X.label, y = Y.label)) + facet_wrap(~ overlap, ncol = 2, as.table = TRUE)
+        p = p + labs(list(title = title, x = X.label, y = Y.label)) + facet_wrap(~ Overlap, ncol = 2, as.table = TRUE)
         
         #-- Legend
         if (!legend)
@@ -620,7 +629,7 @@ label.axes.box = "both"  )
         text = list(blocks))
         
         if (overlap) {
-            p = xyplot(y ~ x | overlap, data = df, xlab = X.label, ylab = Y.label, main = title,
+            p = xyplot(y ~ x | Overlap, data = df, xlab = X.label, ylab = Y.label, main = title,
             scales = list(x = list(relation = "free", limits = c(-1, 1)),
             y = list(relation = "free", limits = c(-1, 1))),
             key=if (legend) {legend.lattice} else {NULL},
@@ -754,7 +763,7 @@ label.axes.box = "both"  )
             
             title(title)#, outer = TRUE, line = -1)
             
-            if (legend) par(opar)
+            if (legend) par(mai = opar$mai, xpd = opar$xpd)
             
         } else {
             opar <- par()[! names(par()) %in% c("cin", "cra", "csi", "cxy", "din", "page")]

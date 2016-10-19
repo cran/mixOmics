@@ -135,7 +135,7 @@ point.lwd = 1,
     out = shape.input.plotIndiv(object = object, n = n, blocks = blocks, x = x, y = y, z = z, ind.names = ind.names, group = group,
     col.per.group = col.per.group, style = style, study = "global", ellipse = ellipse, ellipse.level = ellipse.level,
     centroid = centroid, star = star, title = title, xlim = xlim, ylim = ylim, 
-    col = col, cex = cex, pch = pch, display.names = display.names)
+    col = col, cex = cex, pch = pch, display.names = display.names, plot_parameters = plot_parameters)
     #-- retrieve outputs
     df = out$df
     df.ellipse = out$df.ellipse
@@ -148,6 +148,7 @@ point.lwd = 1,
     ellipse = out$ellipse
     centroid = out$centroid
     star = out$star
+    plot_parameters = out$plot_parameters
     
     #call plot module (ggplot2, lattice, graphics, 3d)
     res = internal_graphicModule(df = df, centroid = centroid, col.per.group = col.per.group, title = title,

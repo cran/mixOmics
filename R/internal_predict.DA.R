@@ -40,7 +40,7 @@
 #Y
 
 
-internal_predict.DA = function(object, out, q, dist)
+internal_predict.DA = function(object, out, q, dist, weights)
 {
     
     if (length(grep("plsda",class(object)))==0) # a DA analysis (mint).(block).(s)plsda
@@ -157,17 +157,6 @@ internal_predict.DA = function(object, out, q, dist)
     
     out.DA$class = cls
     
-    if (length(grep("block",class(object)))!=0 & J>1) # a block
-    {
-        out.DA$centroids = G
-    }else{ #not a block
-        out.DA$centroids = G[[1]]
-        out.DA$class = lapply(out.DA$class,function(x){x[[1]]})
-    }
-    if (any(dist == "all"))
-    dist = "all"
-    
-    out.DA$dist = dist
     ### End if discriminant analysis is performed
     
     # at this stage, we have the classification of each sample for each dataset of object$X
@@ -187,12 +176,52 @@ internal_predict.DA = function(object, out, q, dist)
             table.temp = apply(temp,c(1,2), function(x){a=table(x); if (length(which(a==max(a)))==1) {b=names(which.max(a))}else{b=NA}; b})
             colnames(table.temp) = colnames(out.DA$class[[ijk]][[i]])[1:min(ncomp)]
             rownames(table.temp) = rownames(out.DA$class[[ijk]][[i]])
-            out.DA$vote[[ijk]] = table.temp
+            out.DA$MajorityVote[[ijk]] = table.temp
         }
-        names(out.DA$vote) = names(out.DA$class)
+        names(out.DA$MajorityVote) = names(out.DA$class)
+        
+        # weighted vote for each distance, each comp
+        if(!is.null(weights))
+        {
+            out.DA$WeightedVote = lapply(out.DA$class, function(x){ # x is a distance
+                class.per.comp = lapply(1:min(ncomp), function(y) {matrix(sapply(x, function(z)  z[,y, drop = FALSE]),ncol=J)}) # combine the results per component
+                names(class.per.comp) = paste0("comp",1:min(ncomp))
+                class.per.comp = lapply(class.per.comp, function(y){rownames(y) = rownames(out.DA$vote[[1]]); y})
+                class.weighted.per.comp = sapply(class.per.comp, function(y){ # for each component
+                    apply(y,1,function(z){  # we aggregate the results of each individuals using the 'weights'
+                        temp = aggregate(weights,list(z),sum)
+                        ind = which(temp[,2]== max (temp[,2]))# if two max, then NA
+                        if(length(ind) == 1)
+                        {
+                            res = temp[ind, 1]
+                        } else {
+                            res = NA
+                        }
+                        res
+                        
+                    })
+                })
+
+            })
+            out.DA$weights = weights
+            
+        }
     }else{
-        out.DA$vote = out.DA$class
+        out.DA$MajorityVote = lapply(out.DA$class,function(x){x[[1]]})
     }
+    
+    if (length(grep("block",class(object)))!=0 & J>1) # a block
+    {
+        out.DA$centroids = G
+    }else{ #not a block
+        out.DA$centroids = G[[1]]
+        out.DA$class = out.DA$MajorityVote
+    }
+    if (any(dist == "all"))
+    dist = "all"
+    
+    out.DA$dist = dist
+
     out.DA
     
 }

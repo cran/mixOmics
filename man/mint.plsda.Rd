@@ -40,7 +40,7 @@ to zero means and unit variances. Default = \code{TRUE}.}
 \details{
 \code{mint.plsda} function fits a vertical PLS-DA models with \code{ncomp} components in which several independent studies measured on the same variables are integrated. The aim is to classify the discrete outcome \code{Y}. The \code{study} factor indicates the membership of each sample in each study. We advise to only combine studies with more than 3 samples as the function performs internal scaling per study, and where all outcome categories are represented.
 
-\code{X} can contain missing values. Missing values are handled by being disregarded during the cross product computations in the algorithm \code{block.pls} without having to delete rows with missing data. Alternatively, missing data can be imputed prior using the  \code{nipals} function.
+\code{X} can contain missing values. Missing values are handled by being disregarded during the cross product computations in the algorithm \code{mint.plsda} without having to delete rows with missing data. Alternatively, missing data can be imputed prior using the  \code{nipals} function.
 
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis

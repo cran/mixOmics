@@ -42,7 +42,6 @@ size.labels=1)
 
 
     options(stringsAsFactors = FALSE)
-    set.seed(1234)
     figSize = 800
     segmentWidth = 25
     linePlotWidth = 90
@@ -106,7 +105,7 @@ size.labels=1)
     keepA = lapply(object$loadings, function(i) apply(abs(i)[, comp, drop = FALSE], 1, sum) > 0)
     cord = mapply(function(x, y, keep){
         cor(x[, keep], y[, comp], use = "pairwise")
-    }, x=object$X, y=object$variates[-length(object$variates)], keep = keepA[-length(keepA)])
+    }, x=object$X, y=object$variates[-length(object$variates)], keep = keepA[-length(keepA)],SIMPLIFY = FALSE)
     
     simMatList = vector("list", length(X))
     for(i in 1:length(cord))

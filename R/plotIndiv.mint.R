@@ -106,12 +106,6 @@ point.lwd = 1,
         stop("'star' must be FALSE when study is different from 'global'")
     }
 
-    if (!missing(subtitle))
-    {
-        if (length(subtitle)!=length(study) | length(subtitle)!=length(unique(subtitle)))
-        stop("'subtitle' indicates the subtitle of the plot for each study; it needs to be the same length as 'study' and duplicate are not allowed.")
-    }
-
 
     #LOOP ON STUDY, to get a plot with every single one, could be a mixed of numbers and "global", only if there is both "global" and something else.
     
@@ -139,7 +133,13 @@ point.lwd = 1,
     }
     
     study.init = unique(study.init) #once again cause we added studies if "all.partial"
-
+    
+    if (!missing(subtitle))
+    {
+        if (length(subtitle)!=length(study.init)| length(subtitle)!=length(unique(subtitle)))
+        stop("'subtitle' indicates the subtitle of the plot for each study and it needs to be the same length as 'study' (", length(study.init),") and duplicate are not allowed. 'study' includes: ", paste(study.init, collapse = ", "))
+    }
+    
     df.final = data.frame()
     
     indice.all = grep("global", study.init) # can go faster before and after "global"
@@ -303,7 +303,7 @@ point.lwd = 1,
         out = shape.input.plotIndiv(object = object, n = n, blocks = blocks, x = x, y = y, z = z, ind.names = ind.names, group = group,
         col.per.group = col.per.group, style = style, study = study, ellipse = ellipse, ellipse.level = ellipse.level,
         centroid = centroid, star = star, title = title, xlim = xlim, ylim = ylim, 
-        col = col, cex = cex, pch = pch, display.names = display.names)
+        col = col, cex = cex, pch = pch, display.names = display.names, plot_parameters = plot_parameters)
         #-- retrieve outputs
         df = out$df
         df.ellipse = out$df.ellipse
@@ -313,6 +313,7 @@ point.lwd = 1,
         xlim = out$xlim
         ylim = out$ylim
         missing.col = out$missing.col
+        plot_parameters = out$plot_parameters
 
 
         # concatenate results

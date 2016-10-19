@@ -77,7 +77,9 @@ near.zero.var = FALSE)
     design=design, scheme=scheme, mode=mode, scale=scale,
     bias=bias, init=init, tol=tol, verbose=verbose, max.iter=max.iter, near.zero.var=near.zero.var)
     
-    
+    # calculate weights for each dataset
+    weights = get.weights(result$variates, indY = result$indY)
+
     # choose the desired output from 'result'
     out=list(call = match.call(),
         X = result$X,
@@ -90,6 +92,7 @@ near.zero.var = FALSE)
         keepY.constraint = result$keepA.constraint[result$indY][[1]],
         variates = result$variates,
         loadings = result$loadings,
+        crit = result$crit,
         names = result$names,
         init = result$init,
         bias = result$bias,
@@ -100,6 +103,7 @@ near.zero.var = FALSE)
         scale = result$scale,
         design = result$design,
         scheme = result$scheme,
+        weights = weights,
         explained_variance = result$explained_variance)
 
     # give a class

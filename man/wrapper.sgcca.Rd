@@ -14,11 +14,11 @@ penalty = NULL,
 ncomp = 1,
 keepX.constraint,
 keepX,
-scheme = "centroid",
+scheme = "horst",
 mode="canonical",
 scale = TRUE,
 bias = TRUE,
-init = "svd",
+init = "svd.single",
 tol = .Machine$double.eps,
 verbose = FALSE,
 max.iter=1000,
@@ -33,14 +33,14 @@ near.zero.var = FALSE)
 \item{keepX.constraint}{A list of same length as X. Each entry keepX.constraint[[i]] is a list containing which variables of X[[i]] are to be kept on each of the first PLS-components}
 \item{keepX}{ A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model on the last components (once all keepX.constraint[[i]] are used).}
 \item{scheme}{Either "horst", "factorial" or "centroid"
-  (Default: "centroid").}
+  (Default: "horst").}
 \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
 See Details.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances (default: TRUE)}
 \item{bias}{boleean. A logical value for biaised or unbiaised estimator of the var/cov (defaults to FALSE).}
-\item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single") . Default to "svd".}
+\item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single") . Default to "svd.single".}
 \item{tol}{Convergence stopping value.}
 \item{verbose}{if set to \code{TRUE}, reports progress on computing.}
 \item{max.iter}{integer, the maximum number of iterations.}

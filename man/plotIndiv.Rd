@@ -53,7 +53,7 @@ point.lwd = 1, ... )
 }
 
 \arguments{
-\item{object}{object of class inheriting from any \pkg{mixOmics}:  \code{PLS, sPLS, PLS-DA, SPLS-DA, rCC, PCA, sPCA, IPCA, sIPCA, rGCCA, sGCCA, sGCCDA}},
+\item{object}{object of class inheriting from any \pkg{mixOmics}:  \code{PLS, sPLS, PLS-DA, SPLS-DA, rCC, PCA, sPCA, IPCA, sIPCA, rGCCA, sGCCA, sGCCDA}}
 \item{comp}{integer vector of length two (or three to 3d). The components that will be used on the horizontal
 and the vertical axis respectively to project the individuals.}
 \item{rep.space}{For objects of class \code{"rcc"}, \code{"pls"}, \code{"spls"}, character string, (partially) matching one of \code{"X-variate"}, \code{"Y-variate"} ,or \code{"XY-variate"}, determining the subspace to project the individuals. Defaults to \code{"X-variate"} \code{"pca"} object and for \code{"plsda"} objects. For objects of class \code{"pls"} and \code{"rcc"},defaults, the tree subspaces  represent the individuals. For objects of class \code{"rgcca"} and \code{"sgcca"}, numerical value indicating the block data set form which to represent the individuals.}
@@ -94,8 +94,8 @@ or integers. See \code{\link{points}} for all alternatives.}
 \item{size.legend}{size of the legend}
 \item{size.legend.title}{size of the legend title}
 \item{legend.title}{title of the legend}
-\item{legend.position}{position of the legend, one of "bottomright", "bottom", "bottomleft",
-"left", "topleft", "top", "topright", "right" and "center". }
+\item{legend.position}{position of the legend, one of "bottom",
+"left", "top" and "right". }
 \item{point.lwd}{\code{lwd} of the points, used when \code{ind.names = FALSE}}
 \item{...}{external arguments or type par can be added with \code{style = 'graphics'}}
 }
@@ -244,7 +244,7 @@ nutrimouse.sgcca <- wrapper.sgcca(X = data,
 design = design1,
 penalty = c(0.3, 0.5, 1),
 ncomp = 3,
-scheme = "centroid",
+scheme = "horst",
 verbose = FALSE,
 bias = FALSE)
 

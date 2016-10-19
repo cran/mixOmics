@@ -30,6 +30,7 @@ layout = NULL,
 \method{plot}{perf.splsda.mthd}(x,
 dist = c("all","max.dist","centroids.dist","mahalanobis.dist"),
 measure = c("all","overall","BER"),
+col,
 xlab = NULL,
 ylab = NULL,
 overlay=c("all", "measure", "dist"),
@@ -40,6 +41,7 @@ sd = TRUE,
 \method{plot}{perf.mint.splsda.mthd}(x,
 dist = c("all","max.dist","centroids.dist","mahalanobis.dist"),
 measure = c("all","overall","BER"),
+col,
 xlab = NULL,
 ylab = NULL,
 study = "global",
@@ -50,6 +52,8 @@ legend.position=c("vertical", "horizontal"),
 \method{plot}{perf.sgccda.mthd}(x,
 dist = c("all","max.dist","centroids.dist","mahalanobis.dist"),
 measure = c("all","overall","BER"),
+col,
+weighted = TRUE,
 xlab = NULL,
 ylab = NULL,
 overlay= c("all", "measure", "dist"),
@@ -65,6 +69,8 @@ legend.position=c("vertical","horizontal"),
   \item{dist}{prediction method applied in \code{perf} for \code{plsda} or \code{splsda}. 
 	See \code{\link{perf}}.}
 \item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
+\item{col}{character (or symbol) color to be used, possibly vector. One color per distance \code{dist}.}
+\item{weighted}{plot either the performance of the Majority vote or the Weighted vote.}
 \item{study}{Indicates which study-specific outputs to plot. A character vector containing some levels of \code{object$study}, "all.partial" to plot all studies or "global" is expected. Default to "global".}
 \item{overlay}{parameter to overlay graphs; if 'all', only one graph is shown with all outputs; if 'measure', a graph is shown per distance; if 'dist', a graph is shown per measure.}
 \item{legend.position}{position of the legend, one of "vertical" (only one column) or "horizontal" (two columns). }
@@ -110,6 +116,23 @@ liver.pls <- pls(X, Y, ncomp = 3)
 liver.perf <- perf(liver.pls, validation = "Mfold")
 				   
 plot(liver.perf, criterion = "R2", layout = c(2, 2))
+}
+
+## validation for objects of class 'plsda' or 'splsda'
+\dontrun{
+data(breast.tumors)
+X <- breast.tumors$gene.exp
+# Y will be transformed as a factor in the function,
+# but we set it as a factor to set up the colors.
+Y <- as.factor(breast.tumors$sample$treatment)
+
+res <- splsda(X, Y, ncomp = 2, keepX = c(25, 25))
+breast.perf <- perf(res, nrepeat = 5)
+
+plot(breast.perf)
+plot(breast.perf, col=1:3)
+plot(breast.perf, col=1:3, sd=FALSE)
+
 }
 }
 

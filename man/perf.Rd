@@ -26,12 +26,12 @@ PLS-DA, sparse PLS-DA, MINT (mint.splsda) and DIABLO (block.splsda) models using
 \method{perf}{plsda}(object,
           dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
           constraint = FALSE, validation = c("Mfold", "loo"), 
-          folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, \ldots)
+          folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, cpus, \ldots)
 
 \method{perf}{splsda}(object, 
 dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"), constraint = FALSE,
 validation = c("Mfold", "loo"),
-folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, \ldots)
+folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, cpus, \ldots)
 
 \method{perf}{mint.splsda}(object,
             dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
@@ -40,7 +40,7 @@ folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, \ldots)
 \method{perf}{sgccda}(object,
             dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
             validation = c("Mfold", "loo"),
-            folds = 10, \ldots)
+            folds = 10, nrepeat =1, cpus, \ldots)
 
 }
 
@@ -48,13 +48,14 @@ folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, \ldots)
   \item{object}{object of class inheriting from \code{"pls"}, \code{"plsda"},
     \code{"spls"}, \code{"splsda"} or  \code{"mint.splsda"}. The function will retrieve some key parameters stored in that object.}
 \item{dist}{only applies to an object inheriting from \code{"plsda"}, \code{"splsda"} or \code{"mint.splsda"} to evaluate the classification performance of the model. Should be a subset of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. Default is \code{"all"}. See \code{\link{predict}}.}
-\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see examples. }
+\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE). }
 \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or
     \code{"loo"} (see below). Default is \code{"Mfold"}.}
   \item{folds}{the folds in the Mfold cross-validation. See Details.}
 \item{nrepeat}{Number of times the Cross-Validation process is repeated.}
 \item{auc}{if \code{TRUE} calculate the Area Under the Curve (AUC) performance of the model.}
   \item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
+\item{cpus}{Number of cpus to use when running the code in parallel.}
 \item{...}{not used}
 }
 
@@ -111,14 +112,19 @@ For mint.splsda models, \code{perf} produces the following outputs:
 
 For sgccda models, \code{perf} produces the following outputs:
 \item{error.rate}{Prediction error rate for each block of \code{object$X} and each \code{dist}}
-\item{error.rate.class}{Prediction error rate for each block of \code{object$X}, each \code{dist} and each class}
+\item{error.rate.per.class}{Prediction error rate for each block of \code{object$X}, each \code{dist} and each class}
 \item{predict}{Predicted values of each sample for each class, each block and each component}
-\item{class}{Predicted class of each sample for each block, each \code{dist} and each component}
+\item{class}{Predicted class of each sample for each block, each \code{dist}, each component and each nrepeat}
 \item{features}{a list of features selected across the folds (\code{$stable.X} and \code{$stable.Y}) for the \code{keepX} and \code{keepY} parameters from the input object.}
-\item{AveragePredict.class}{if more than one block, returns the average predicted class over the blocks}
-\item{AveragePredict.error.rate}{if more than one block, returns the average predicted error rate over the blocks}
-\item{MajorityClass}{if more than one block, returns the majority class over the blocks. NA for a sample means that there is no consensus on the predicted class for this particular sample over the blocks.}
-\item{MajorityClass.error.rate}{if more than one block, returns the error rate of the MajorityClass output}
+\item{AveragedPredict.class}{if more than one block, returns the average predicted class over the blocks (averaged of the \code{Predict} output and prediction using the \code{max.dist} distance)}
+\item{AveragedPredict.error.rate}{if more than one block, returns the average predicted error rate over the blocks (using the \code{AveragedPredict.class} output)}
+\item{WeightedPredict.class}{if more than one block, returns the weighted predicted class over the blocks (weighted average of the \code{Predict} output and prediction using the \code{max.dist} distance)}
+\item{WeightedPredict.error.rate}{if more than one block, returns the weighted average predicted error rate over the blocks (using the \code{WeightedPredict.class} output)}
+\item{MajorityVote}{if more than one block, returns the majority class over the blocks. NA for a sample means that there is no consensus on the predicted class for this particular sample over the blocks.}
+\item{MajorityVote.error.rate}{if more than one block, returns the error rate of the \code{MajorityVote} output}
+\item{WeightedVote}{if more than one block, returns the weighted majority class over the blocks. NA for a sample means that there is no consensus on the predicted class for this particular sample over the blocks.}
+\item{WeightedVote.error.rate}{if more than one block, returns the error rate of the \code{WeightedVote} output}
+\item{weights}{Returns the weights of each block used for the weighted predictions, for each nrepeat and each fold}
 }
 
 \references{
@@ -228,6 +234,11 @@ error$auc
 
 plot(error, type = "l")
 
+# parallel code
+set.seed(45)
+error <- perf(srbct.splsda, validation = "Mfold", folds = 8,
+dist = "all", auc = TRUE, cpus =2)
+
 
 ## validation for objects of class 'mint.splsda' (classification)
 # ----------------------------------------
@@ -256,14 +267,13 @@ Y = Y,
 design = design,
 keepX = list(gene=c(10,10), lipid=c(15,15)),
 ncomp = 2,
-scheme = "centroid",
+scheme = "horst",
 verbose = FALSE,
-bias = FALSE,
-auc = TRUE)
+bias = FALSE)
 
 perf = perf(nutrimouse.sgccda)
 perf
-perf$auc
+perf$WeightedVote.error.rate
 }
 
 }

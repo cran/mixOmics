@@ -1,3 +1,26 @@
+
+Changes in 6.1.1 (patch)
+================
+
+New features:
+-------------
+1 - mint.pca function to perform unsupervised integration of independent data sets
+2 - new weighted prediction for block approaches for both unsupervised and supervised analyses, see ?predict.spls and ?predict.splsda. 
+3 - 'cpus' parameter for sPLS-DA perf/tune and block.splsda perf/tune added to run the code in parallel
+
+Enhancements:
+-------------
+1 - 'constraint' parameter for sPLS-DA perf and tune functions added.
+2 - plotLoading for PCA object
+3 - color arugment in plot.tune and plot.perf added
+
+Bug fixes:
+----------
+- predict with logratio (the logratio transform is now performed inside the predict function)
+- in block methods, scheme = 'horst' set by default instead of centroid
+- in block methods, initialisation set to svd.single by default
+
+
 Changes in 6.1.0 (improvements and bug fixes)
 ================
 In short,

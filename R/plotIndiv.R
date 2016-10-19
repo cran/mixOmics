@@ -226,37 +226,52 @@ plot_parameters)
     #           need blocks
     # --------------------------------------------------------------------------------------
     #-- xlim, ylim
-    if (!is.null(xlim))
+    if(style %in% c("lattice", "graphics"))
     {
-        if (length(blocks) == 1) # a single graph is plotted, xlim needs to be a vector of length 2
+        if (!is.null(xlim))
         {
-            if (!is.numeric(xlim) || length(xlim) !=  2)
-            stop("'xlim' must be a vector of length 2.", call. = FALSE)
-            
-            xlim = list(xlim)
-            
-        } else { # multiple graphs are plotted, xlim needs to be a list of vectors of length 2
-            
-            if (!is.list(xlim) || length(xlim) !=  length(blocks) || length(unlist(xlim)) !=  2 * length(blocks))
-            stop("'xlim' must be a list of ", length(blocks), " vectors of length 2.", call. = FALSE)
+            if (length(blocks) == 1) # a single graph is plotted, xlim needs to be a vector of length 2
+            {
+                if (!is.numeric(xlim) || length(xlim) !=  2)
+                stop("'xlim' must be a vector of length 2.", call. = FALSE)
+                
+                xlim = list(xlim)
+                
+            } else { # multiple graphs are plotted, xlim needs to be a list of vectors of length 2
+                
+                if (!is.list(xlim) || length(xlim) !=  length(blocks) || length(unlist(xlim)) !=  2 * length(blocks))
+                stop("'xlim' must be a list of ", length(blocks), " vectors of length 2.", call. = FALSE)
+            }
         }
-    }
-    
-    if (!is.null(ylim))
-    {
-        if (length(blocks) == 1) # a single graph is plotted, ylim needs to be a vector of length 2
+        
+        if (!is.null(ylim))
         {
-            if (!is.numeric(ylim) || length(ylim) !=  2)
-            stop("'ylim' must be a vector of length 2.", call. = FALSE)
-            
-            ylim = list(ylim)
-            
-        } else { # multiple graphs are plotted, ylim needs to be a list of vectors of length 2
-            
-            if (!is.list(ylim) || length(ylim) !=  length(blocks) || length(unlist(ylim)) !=  2 * length(blocks))
-            stop("'ylim' must be a list of ", length(blocks), " vectors of length 2.", call. = FALSE)
+            if (length(blocks) == 1) # a single graph is plotted, ylim needs to be a vector of length 2
+            {
+                if (!is.numeric(ylim) || length(ylim) !=  2)
+                stop("'ylim' must be a vector of length 2.", call. = FALSE)
+                
+                ylim = list(ylim)
+                
+            } else { # multiple graphs are plotted, ylim needs to be a list of vectors of length 2
+                
+                if (!is.list(ylim) || length(ylim) !=  length(blocks) || length(unlist(ylim)) !=  2 * length(blocks))
+                stop("'ylim' must be a list of ", length(blocks), " vectors of length 2.", call. = FALSE)
+            }
         }
-    }
+    }else if(style =="ggplot2") { #xlim/ylim needs to be a vector: same limits for all graphs
+        if (!is.null(xlim))
+        {
+                if (!is.numeric(xlim) || length(xlim) !=  2)
+                stop("'xlim' must be a vector of length 2.", call. = FALSE)
+        }
+        if (!is.null(ylim))
+        {
+                if (!is.numeric(ylim) || length(ylim) !=  2)
+                stop("'ylim' must be a vector of length 2.", call. = FALSE)
+        }
+        
+    }# for style = 3d, no xlim, ylim used
     
     out = list(axes.box = axes.box, comp = c(comp1, comp2, comp3), xlim = xlim, ylim = ylim, ind.names = ind.names, display.names = display.names)
     
@@ -419,12 +434,24 @@ ylim = NULL,
 col,
 cex,
 pch,
-display.names)
+display.names,
+plot_parameters)
 {
     
     class.object = class(object)
     object.mint = c("mint.pls", "mint.spls", "mint.plsda", "mint.splsda")
     
+    size.title = plot_parameters$size.title
+    size.subtitle = plot_parameters$size.subtitle
+    size.xlabel = plot_parameters$size.xlabel
+    size.ylabel = plot_parameters$size.ylabel
+    size.axis = plot_parameters$size.axis
+    size.legend = plot_parameters$size.legend
+    size.legend.title = plot_parameters$size.legend.title
+    legend.title = plot_parameters$legend.title
+    legend.position = plot_parameters$legend.position
+    point.lwd = plot_parameters$point.lwd
+
     # --------------------------------------------------------------------------------------
     #           need class.object whether it's DA
     # --------------------------------------------------------------------------------------
@@ -558,10 +585,18 @@ display.names)
         max.ellipse = lapply(1 : length(x), function(z1) {sapply(coord.ellipse[[z1]], function(z2){apply(z2, 2, max)})})
         min.ellipse = lapply(1 : length(x), function(z1) {sapply(coord.ellipse[[z1]], function(z2){apply(z2, 2, min)})})
         #-- End: Computation ellipse
+        
         if (is.null(xlim))
         xlim = lapply(1 : length(x), function(z) {c(min(x[[z]], min.ellipse[[z]][1, ]), max(x[[z]], max.ellipse[[z]][1, ]))})
         if (is.null(ylim))
         ylim = lapply(1 : length(x), function(z) {c(min(y[[z]], min.ellipse[[z]][2, ]), max(y[[z]], max.ellipse[[z]][2, ]))})
+        if(style == "ggplot2") # no lists, a single vector of two values is expected
+        {
+            temp = matrix(unlist(xlim),ncol=2,byrow=T)
+            xlim = c(min(temp[,1]),max(temp[,2]))
+            temp = matrix(unlist(ylim),ncol=2,byrow=T)
+            ylim = c(min(temp[,1]),max(temp[,2]))
+        }
         
     }
     # no need for xlim and ylim as ggplot2, lattice and graphics are good without by default
@@ -661,7 +696,14 @@ display.names)
                 df = data.frame(do.call(rbind, df), "Block" = title)
                 if (style %in%c("ggplot2", "lattice"))
                 title = NULL # to avoid double title
+                
             }
+            
+            # no subtitle with these objects
+            if(size.title != rel(2)) # rel(2) is the default
+            size.subtitle = size.title
+
+
             df$Block = as.factor(df$Block)
         } else {
             df = data.frame(do.call(rbind, df), "Block" = paste0("Block: ", unlist(lapply(1 : length(df), function(z){rep(blocks[z], nrow(df[[z]]))}))))
@@ -823,8 +865,11 @@ display.names)
     study.ind = match(study, levels(object$study))
     
     #print(df)
+    plot_parameters = list(size.title = size.title, size.subtitle = size.subtitle, size.xlabel = size.xlabel, size.ylabel = size.ylabel,
+    size.axis = size.axis, size.legend = size.legend, size.legend.title = size.legend.title, legend.title = legend.title,
+    legend.position = legend.position, point.lwd = point.lwd)
     
-    out = list(df = df, study.ind = study.ind, df.ellipse = df.ellipse, col.per.group = col.per.group, title = title, display.names = display.names, xlim = xlim, ylim = ylim, missing.col = missing.col, ellipse = ellipse, centroid = centroid, star = star)
+    out = list(df = df, study.ind = study.ind, df.ellipse = df.ellipse, col.per.group = col.per.group, title = title, display.names = display.names, xlim = xlim, ylim = ylim, missing.col = missing.col, ellipse = ellipse, centroid = centroid, star = star, plot_parameters = plot_parameters)
 }
 
 

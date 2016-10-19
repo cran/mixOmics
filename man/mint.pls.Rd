@@ -40,7 +40,7 @@ to zero means and unit variances. Default = \code{TRUE}.}
 \details{
 \code{mint.pls} fits a vertical PLS-DA models with \code{ncomp} components in which several independent studies measured on the same variables are integrated. The aim is to explain the continuous outcome \code{Y}. The \code{study} factor indicates the membership of each sample in each study. We advise to only combine studies with more than 3 samples as the function performs internal scaling per study.
 
-Multi (continuous)response are supported. \code{X} and \code{Y} can contain missing values. Missing values are handled by being disregarded during the cross product computations in the algorithm \code{block.pls} without having to delete rows with missing data. Alternatively, missing data can be imputed prior using the  \code{nipals} function.
+Multi (continuous)response are supported. \code{X} and \code{Y} can contain missing values. Missing values are handled by being disregarded during the cross product computations in the algorithm \code{mint.pls} without having to delete rows with missing data. Alternatively, missing data can be imputed prior using the  \code{nipals} function.
 
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis

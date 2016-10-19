@@ -36,14 +36,14 @@ near.zero.var = FALSE)
 \item{keepX.constraint}{A list of same length as X. Each entry indicates specific variables to be selected in each of the blocks of X for the first PLS-components. See example.}
 \item{keepX}{A list of same length as X.  Each entry is the number of variables to select in each of the blocks of X for each component. In the case where keepX.constraint is specified it should indicate the number of variables to select on the remaining components. By default all variables are kept in the model.}
 \item{design}{numeric matrix of size (number of blocks in X) x (number of blocks in X) with 0 or 1 values. A value of 1 (0) indicates a relationship (no relationship) between the blocks to be modelled. If \code{Y} is provided instead of \code{indY}, the \code{design} matrix is changed to include relationships to \code{Y}. }
-\item{scheme}{Either "horst", "factorial" or "centroid". Default = \code{centroid}, see reference.}
+\item{scheme}{Either "horst", "factorial" or "centroid". Default = \code{horst}, see reference.}
 \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
 See Details. Default = \code{regression}.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances. Default = \code{TRUE}.}
 \item{bias}{boleean. A logical value for biaised or unbiaised estimator of the var/cov. Default = \code{FALSE}.}
-\item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single"). Default = \code{svd}.}
+\item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single"). Default = \code{svd.single}.}
 \item{tol}{Convergence stopping value.}
 \item{verbose}{if set to \code{TRUE}, reports progress on computing.}
 \item{max.iter}{integer, the maximum number of iterations.}
@@ -86,8 +86,8 @@ that contains the following components:
 \item{names}{list containing the names to be used for individuals and variables.}
 \item{nzv}{list containing the zero- or near-zero predictors information.}
 \item{iter}{Number of iterations of the algorthm for each component}
+\item{weights}{Correlation between the variate of each block and the variate of the outcome. Used to weight predictions.}
 \item{explained_variance}{Percentage of explained variance for each component and each block}
-
 }
 
 
@@ -110,7 +110,7 @@ Gunther O., Shin H., Ng R. T. , McMaster W. R., McManus B. M. , Keown P. A. , Te
 # block.splsda
 # -------------
 data("breast.TCGA")
-# this is the X data as a list of mRNA and miRNA; the Y data set is a single data set of proteins
+# this is the X data as a list of mRNA, miRNA and proteins
 data = list(mrna = breast.TCGA$data.train$mrna, mirna = breast.TCGA$data.train$mirna,
 protein = breast.TCGA$data.train$protein)
 # set up a full design where every block is connected
