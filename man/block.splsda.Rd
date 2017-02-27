@@ -29,9 +29,9 @@ near.zero.var = FALSE)
 }
 
 \arguments{
-\item{X}{A list of data sets (called 'blocks') measured on the same samples. Data in the list should be arranged in samples x variables, with samples order matching in all data sets.}
+\item{X}{A list of data sets (called 'blocks') measured on the same samples. Data in the list should be arranged in matrices, samples x variables, with samples order matching in all data sets.}
 \item{Y}{A factor or a class vector indicating the discrete outcome of each sample.}
-\item{indY}{To be supplied if Y is missing, indicates the position of the matrix / vector response in the list \code{X}}
+\item{indY}{To be supplied if Y is missing, indicates the position of the factor / class vector outcome in the list \code{X}}
 \item{ncomp}{the number of components to include in the model. Default to 2. Applies to all blocks.}
 \item{keepX.constraint}{A list of same length as X. Each entry indicates specific variables to be selected in each of the blocks of X for the first PLS-components. See example.}
 \item{keepX}{A list of same length as X.  Each entry is the number of variables to select in each of the blocks of X for each component. In the case where keepX.constraint is specified it should indicate the number of variables to select on the remaining components. By default all variables are kept in the model.}

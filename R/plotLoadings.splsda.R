@@ -60,17 +60,19 @@ legend.color = NULL,
 legend.title = 'Outcome',
 layout = NULL,
 border = NA,
+xlim = NULL,
 ...
 ) {
     
     # -- input checks
     check = check.input.plotLoadings(object = object, block = block, subtitle = subtitle, size.name = size.name, size.legend = size.legend,
-    title = title, col = NULL, contrib = contrib, name.var = name.var)
+    title = title, col = NULL, contrib = contrib, name.var = name.var, xlim = xlim)
     
     size.name = check$size.name
     size.legend = check$size.legend
     block = check$block
-    
+    xlim = check$xlim
+
     # contrib
     # --
     
@@ -162,7 +164,7 @@ border = NA,
                 }
                 
                 mp = barplot(df$importance, horiz = T, las = 1, col = df$color, axisnames = TRUE, names.arg = colnames.X, #names.arg = row.names(df),
-                cex.names = size.name, cex.axis = 0.7, beside = TRUE, border = border)
+                cex.names = size.name, cex.axis = 0.7, beside = TRUE, border = border, xlim = xlim[i, ])
                 
                 if ( length(block) == 1 & is.null(title) )
                 {

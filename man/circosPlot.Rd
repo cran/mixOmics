@@ -11,6 +11,9 @@
 circosPlot(object,
 comp = 1 : min(object$ncomp),
 cutoff,
+color.Y,
+color.blocks,
+color.cor,
 var.names = NULL,
 showIntraLinks = FALSE,
 line = TRUE,
@@ -24,6 +27,9 @@ size.labels = 1)
 \item{object}{An object of class inheriting from \code{"block.splsda"}.}
 \item{comp}{Numeric vector indicating which component to plot. Default to all}
 \item{cutoff}{Only shows links with a correlation higher than \code{cutoff}}
+\item{color.Y}{a character vector of colors to be used for the levels of the outcome}
+\item{color.blocks}{a character vector of colors to be used for the blocks}
+\item{color.cor}{a character vector of two colors. First one is for the negative correlation, second one is for the positive correlation}
 \item{var.names}{Optional parameter. A list of length the number of blocks in \code{object$X}, containing the names of the variables of each block.
 If \code{NULL}, the colnames of the data matrix are used.}
 \item{showIntraLinks}{if TRUE, shows the correlation higher than the threshold inside each block.}
@@ -73,6 +79,9 @@ verbose = FALSE,
 bias = FALSE)
 
 circosPlot(nutrimouse.sgccda, cutoff = 0.7, ncol.legend = 2, size.legend = 1.1)
+
+circosPlot(nutrimouse.sgccda, cutoff = 0.7, ncol.legend = 2, size.legend = 1.1,
+color.Y = 1:5, color.blocks = c("green","brown"), color.cor = c("magenta", "purple"))
 
 par(mfrow=c(2,2))
 circosPlot(nutrimouse.sgccda, cutoff = 0.7, ncol.legend = 2,

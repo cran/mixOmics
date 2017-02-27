@@ -24,9 +24,9 @@ near.zero.var = FALSE)
 }
 
 \arguments{
-\item{X}{A list of data sets (called 'blocks') measured on the same samples. Data in the list should be arranged in samples x variables, with samples order matching in all data sets.}
-\item{Y}{Matrix or vector response for a multivariate regression framework. Data should be continuous variables (see \code{block.splsda} for supervised classification and factor reponse)}
-\item{indY}{To be supplied if Y is missing, indicates the position of the matrix / vector response in the list \code{X}}
+\item{X}{A list of data sets (called 'blocks') measured on the same samples. Data in the list should be arranged in matrices, samples x variables, with samples order matching in all data sets.}
+\item{Y}{Matrix response for a multivariate regression framework. Data should be continuous variables (see block.splsda for supervised classification and factor reponse)}
+\item{indY}{To supply if Y is missing, indicates the position of the matrix response in the list \code{X}}
 \item{ncomp}{the number of components to include in the model. Default to 2. Applies to all blocks.}
 \item{design}{numeric matrix of size (number of blocks in X) x (number of blocks in X) with 0 or 1 values. A value of 1 (0) indicates a relationship (no relationship) between the blocks to be modelled. If \code{Y} is provided instead of \code{indY}, the \code{design} matrix is changed to include relationships to \code{Y}. }
 \item{scheme}{Either "horst", "factorial" or "centroid". Default = \code{horst}, see reference.}

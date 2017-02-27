@@ -266,8 +266,10 @@ name.save = NULL)
     
     
     if (parallel == TRUE)
-    cl <- makeCluster(cpus, type = "SOCK")
-    
+    {
+        cl <- makeCluster(cpus, type = "SOCK")
+        clusterEvalQ(cl, library(mixOmics))
+    }
     
     fonction.indice.grid = function(indice.grid, mode, design, scheme, bias, init, verbose){
         test.keepX.comp = grid[indice.grid,]
@@ -323,7 +325,7 @@ name.save = NULL)
         cat("\ncomp",comp.real[comp], "\n")
         
         #-- set up a progress bar --#
-        if (progressBar ==  TRUE & comp == 1)
+        if (progressBar ==  TRUE)# & comp == 1)
         {
             pb = txtProgressBar(style = 3)
             nBar = 1

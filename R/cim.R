@@ -43,6 +43,7 @@ cut.tree = c(0, 0),
 transpose = FALSE,
 symkey = TRUE,
 keysize = c(1, 1),
+keysize.label = 1,
 zoom = FALSE,
 title = NULL,
 xlab = NULL,
@@ -187,6 +188,11 @@ name.save = NULL)
     #-- keysize
     if (length(keysize) != 2 || any(!is.finite(keysize)))
     stop("'keysize' must be a numeric vector of length 2.",
+    call. = FALSE)
+    
+    #-- keysize.label
+    if (length(keysize.label) != 1 || any(!is.finite(keysize)))
+    stop("'keysize' must be a numeric vector of length 1.",
     call. = FALSE)
     
     #-- zoom
@@ -1237,7 +1243,8 @@ name.save = NULL)
     cut.tree = cut.tree,
     transpose = transpose,
     symkey = symkey, 
-    keysize = keysize,            
+    keysize = keysize,
+    keysize.label = keysize.label,
     zoom = zoom, 
     title = title,
     xlab = xlab,

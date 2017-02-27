@@ -71,7 +71,7 @@ function(x, optimal = TRUE, sd = TRUE, legend.position = "topright", col, ...)
     }
 
     matplot(rownames(error),error, type = "l", axes = TRUE, lwd = 2, lty = 1, log = "x",
-    xlab = "Number of selected genes", ylab = ylab,
+    xlab = "Number of selected features", ylab = ylab,
     col = col, ylim = ylim)
     
     if(optimal)

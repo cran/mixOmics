@@ -85,7 +85,7 @@ near.zero.var = FALSE
     scheme = result.sgcca$scheme,
     ncomp = result.sgcca$ncomp,
     crit = result.sgcca$crit,
-    AVE = list(AVE.X = result.sgcca$AVE$AVE_X, result.sgcca$AVE$AVE_outer, result.sgcca$AVE$AVE_inner), #rename?
+    AVE = result.sgcca$AVE,
     names = result.sgcca$names,#names = list(indiv = rownames(X[[1]]), var = sapply(X, colnames)),
     init = result.sgcca$init,
     bias = result.sgcca$bias,

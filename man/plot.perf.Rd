@@ -58,6 +58,7 @@ xlab = NULL,
 ylab = NULL,
 overlay= c("all", "measure", "dist"),
 legend.position=c("vertical","horizontal"),
+sd = TRUE,
 \dots)
 }
 

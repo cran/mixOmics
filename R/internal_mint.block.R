@@ -205,6 +205,7 @@ keepA.constraint = NULL, penalty = NULL)
     variates.A = shave.matlist(variates.A, ncomp)
     AVE_X = shave.veclist(AVE_X, ncomp)
     AVE = list(AVE_X = AVE_X, AVE_outer = AVE_outer, AVE_inner = AVE_inner)
+    names(AVE$AVE_X) = names(A)
     
     #calcul explained variance
     A_split=lapply(A, study_split, study) #split the data per study

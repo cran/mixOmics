@@ -176,6 +176,7 @@ plot_parameters)
     size.legend = plot_parameters$size.legend
     size.legend.title = plot_parameters$size.legend.title
     legend.title = plot_parameters$legend.title
+    legend.title.pch = plot_parameters$legend.title.pch
     legend.position = plot_parameters$legend.position
     point.lwd = plot_parameters$point.lwd
     
@@ -205,6 +206,9 @@ plot_parameters)
     
     if (length(legend.title)>1)
     stop("'legend.title' needs to be a single value (length 1)")
+
+    if (length(legend.title.pch)>1)
+    stop("'legend.title.pch' needs to be a single value (length 1)")
 
     if (!is.numeric(point.lwd) || length(point.lwd)>1 || point.lwd<0)
     stop("'point.lwd' needs to be a non negative number")
@@ -434,6 +438,7 @@ ylim = NULL,
 col,
 cex,
 pch,
+pch.levels,
 display.names,
 plot_parameters)
 {
@@ -449,6 +454,7 @@ plot_parameters)
     size.legend = plot_parameters$size.legend
     size.legend.title = plot_parameters$size.legend.title
     legend.title = plot_parameters$legend.title
+    legend.title.pch = plot_parameters$legend.title.pch
     legend.position = plot_parameters$legend.position
     point.lwd = plot_parameters$point.lwd
 
@@ -457,13 +463,14 @@ plot_parameters)
     # --------------------------------------------------------------------------------------
     
     #-- Define group
-    missing.group = FALSE
+    missing.group = TRUE
     if (missing(group) & any(class(object) == "DA"))
     {
         group = object$Y#factor(map(object$ind.mat), labels = object$names$colnames$Y)
         object$ind.mat = unmap(group) # added in v6 cause $ind.mat is the scaled (if scale = TRUE) version of ind.mat( = unmap(Y))
+        missing.group = FALSE #not user defined
     } else if (!missing(group)) {
-        missing.group = TRUE
+        missing.group = FALSE
         if (!is.factor(group))
         group = as.factor(group)
 
@@ -485,57 +492,76 @@ plot_parameters)
     #           independent from class.object
     # --------------------------------------------------------------------------------------
     
-    #-- col.per.group argument
-    if (missing(col.per.group))
-    {
-        if (nlevels(group) < 10)
-        {
-            #only 10 colors in color.mixo
-            col.per.group = color.mixo(1:nlevels(group))
-        } else {
-            #use color.jet
-            col.per.group = color.jet(nlevels(group))
-        }
-    } else {
-        if (length(col.per.group) == 1)
-        {
-            col.per.group = rep(col.per.group, nlevels(group))
-        } else if (length(col.per.group) !=  n & length(col.per.group) !=  nlevels(group)) {
-            stop("Length of 'col.per.group' should be either of length 1 or of length ", nlevels(group), " (the number of groups) or of length ", n, " (the sample size or your data).
-            Alternatively, use the argument 'col' to give one color per sample")
-        }
-        missing.group = TRUE
-    }
+    #at this stage, we have a 'group' - user defined or DA, or by default 1 single group
     
-    levels.color = vector(, n)
-    if (length(col.per.group) !=  n)
+    # col and col.per.group
+    if(!missing.group) # group is user defined or DA; we require a col.per.group input, if only a 'col' input: we use it as col.per.group
     {
-        for (i in 1 : nlevels(group))
-        levels.color[group == levels(group)[i]] = col.per.group[i]
-    } else {
-        levels.color = col.per.group
-    }
-    
-    #-- col argument
-    missing.col = FALSE
-    if (!missing(col))
-    {
-        if (length(col) > n)
-        stop("Length of 'col' should be of length inferior or equal to ", n, ".")
+        if(missing(col.per.group) & !missing(col))  # we use col as a col.per.group
+        {
+            if(length(col) !=  nlevels(group))
+            stop("Length of 'col' should be of length ", nlevels(group), " (the number of groups).")
+            col.per.group = col
+
+        } else if (missing(col.per.group) & missing(col)) { # we create a col.per.group
+            
+            if (nlevels(group) < 10)
+            {
+                #only 10 colors in color.mixo
+                col.per.group = color.mixo(1:nlevels(group))
+            } else {
+                #use color.jet
+                col.per.group = color.jet(nlevels(group))
+            }
+
+            
+        } else if (!missing(col.per.group) & !missing(col)) { # we ignore 'col'
+            warning("'col' is ignored as 'group' has been set.")
+
+        } else if (!missing(col.per.group) & missing(col)) {# all good
+            
+        }
         
-        col = factor(rep(col, ceiling(n/length(col)))[1 : n])
-        if (!missing.group)
+        if(length(col.per.group) !=  nlevels(group))
+        stop("Length of 'col.per.group' should be of length ", nlevels(group), " (the number of groups).")
+
+
+        # make a vector of one color per sample from col.per.group
+        levels.color = vector(, n)
+        if (length(col.per.group) !=  n)
         {
-            group = col
-            levels.color = col
-            col.per.group = levels(col)
-            object$ind.mat = unmap(group)
+            for (i in 1 : nlevels(group))
+            levels.color[group == levels(group)[i]] = col.per.group[i]
+        } else {
+            levels.color = col.per.group
         }
-        missing.col = TRUE
-    } else {
-        col = levels.color
+        
+    } else { #missing group, we require a 'col' of length n (or repeated to length n) and not a 'col.per.group'
+        # col creates a group argument, which creates a col.per.group (levels from 'col')
+        if(!missing(col.per.group))
+        warning("'col.per.group' is ignored as 'group' has not been set.")
+        
+        if(!missing(col))
+        {
+            if (length(col) > n)
+            stop("Length of 'col' should be of length inferior or equal to ", n, ".")
+
+            col = rep(col, ceiling(n/length(col)))[1 : n]
+            group = factor(col)
+            levels.color = col
+            col.per.group = levels(group)
+            object$ind.mat = unmap(group)
+        } else { # no group, no color => a single color by default
+            col.per.group = color.mixo(1)
+            levels.color = rep(col.per.group, n)
+            col = levels.color
+        }
+
     }
+    # 'group' and 'col' are always the same factor, but different values
+    # here we have a group, a col.per.group (length nlevels(group)) and a levels.color (length n)
     
+
     #-- cex argument
     if (missing(cex))
     {
@@ -552,12 +578,16 @@ plot_parameters)
         {
             cex = rep(cex, n)
             cex = cex[as.factor(group)]
-        } else if (length(cex) > n) {
-            stop("Length of 'cex' should be of length inferior or equal to ", n, ".")
         } else if (length(cex) == length(unique(group))) {
             cex = cex[as.factor(group)]
-        }else {
-            cex = rep(cex, ceiling(n/length(cex)))[1 : n]
+        } else {
+            if(length(unique(group))>1)
+            {
+                stop("Length of 'cex' should be either 1 or ",length(unique(group)), ".")
+            }else{ # one group
+                stop("Length of 'cex' should be 1.")
+            }
+            #cex = rep(cex, ceiling(n/length(cex)))[1 : n]
         }
     }
 
@@ -615,23 +645,16 @@ plot_parameters)
     #-- pch argument
     if (missing(pch) & !any(class.object%in%object.mint))
     {
-        if (missing.col)
+      
+        if (style == "3d")
         {
-            if (style == "3d")
-            {
-                pch = unlist(lapply(1 : length(length(levels(col))), function(x){rep(c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")[x], length(col == x))}))
-            } else {
-                pch = as.numeric(col)
-            }
+            pch = unlist(lapply(1 : length(length(levels(group))), function(x){rep(c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")[x], length(group == x))}))
+            
         } else {
-            if (style == "3d")
-            {
-                pch = unlist(lapply(1 : length(length(levels(group))), function(x){rep(c("sphere", "tetra", "cube", "octa", "icosa", "dodeca")[x], length(group == x))}))
-                
-            } else {
-                pch = as.numeric(group)
-            }
+            pch = as.numeric(group)
         }
+        pch.levels = pch
+
     }else if (any(class.object%in%object.mint)) {
         if (missing(pch))
         {
@@ -641,6 +664,8 @@ plot_parameters)
             if (length(pch)!= length(object$study))
             stop("'pch' needs to be of length 'object$study' as each of 'pch' represents a specific study", call. = FALSE)
         }
+        pch.levels = pch
+
     } else {
         if (style == "3d")
         {
@@ -648,15 +673,29 @@ plot_parameters)
             stop("pch' must be a simple character or character vector from {'sphere', 'tetra', 'cube', 'octa', 'icosa', 'dodeca'}.",
             call. = FALSE)
         }
+        
+        if(!missing(pch.levels))
+        {
+            if(length(pch.levels) != length(pch))
+            stop("'pch.levels' needs to be a vector of the same length as 'pch': ", length(pch))
+        } else {
+            pch.levels = pch
+        }
+        
         if (length(pch) == 1)
         {
             pch = rep(pch, n)
+            pch.levels = rep(pch.levels, n)
+
         } else if (length(pch) > n) {
-            stop("Length of 'pch' should be of length inferior or equal to ", length(group), ".")
+            stop("Length of 'pch' should be of length inferior or equal to ", n, ".")
         } else if (length(pch) == length(unique(group))) {
             pch = pch[as.factor(group)]
+            pch.levels = pch.levels[as.factor(group)]
+
         } else {
             pch = rep(pch, ceiling(n/length(pch)))[1 : n]
+            pch.levels = rep(pch.levels, ceiling(n/length(pch.levels)))[1 : n]
         }
         
         # if pch is given and ind.names is TRUE, pch takes over
@@ -684,7 +723,8 @@ plot_parameters)
         }
         
         title.save = title # to use for ellipse
-        if (any(class.object %in% c("ipca", "sipca", "pca", "spca", "prcomp", "splsda", "plsda")) & length(blocks) == 1 & !any(class(object)%in%object.mint)) # add blocks == 1 to allow "multi" with plsda
+        #if (any(class.object %in% c("ipca", "sipca", "pca", "spca", "prcomp", "splsda", "plsda")) &
+        if(length(blocks) == 1 & !any(class(object)%in%c(object.mint, "sgcca", "rgcca"))) # add blocks == 1 to allow "multi" with plsda
         {
             if (is.null(title))
             {
@@ -720,9 +760,10 @@ plot_parameters)
         if (display.names)
         df$names = rep(ind.names, length(x))
         
-        df$pch = pch; df$cex = cex
-        df$col.per.group = levels.color#[group] #FR: don't understand what is that changing as levels.color is already group?
-        df$col = as.character(col)
+        df$pch = pch; df$pch.levels = pch.levels
+        df$cex = cex
+        #df$col.per.group = levels.color#[group] #FR: don't understand what is that changing as levels.color is already group?
+        df$col = levels.color#as.character(col)
         
         
         if (centroid == TRUE || star == TRUE)
@@ -768,7 +809,8 @@ plot_parameters)
             df.ellipse = NULL
         }
         
-        if (ellipse == TRUE && any(class.object %in% c("ipca", "sipca", "pca", "spca", "prcomp", "splsda", "plsda"))& length(blocks) == 1& !any(class(object)%in%object.mint))
+        if(ellipse == TRUE && length(blocks) == 1 & !any(class(object)%in%c(object.mint, "sgcca", "rgcca"))) # add blocks == 1 to allow "multi" with plsda
+        #if (ellipse == TRUE && any(class.object %in% c("ipca", "sipca", "pca", "spca", "prcomp", "splsda", "plsda"))& length(blocks) == 1& !any(class(object)%in%object.mint))
         {
             if (is.null(title.save))
             {
@@ -781,17 +823,9 @@ plot_parameters)
         
         
         pch.legend = NULL
-        if (missing.col)
+        for (i in 1:nlevels(group))
         {
-            
-            for (i in 1:nlevels(factor(col)))
-            {
-                pch.legend = c(pch.legend, df[df$col == levels(factor(col))[i], ]$pch)}
-        } else {
-            for (i in 1:nlevels(group))
-            {
-                pch.legend = c(pch.legend, df[df$group == levels(group)[i], ]$pch)
-            }
+            pch.legend = c(pch.legend, df[df$group == levels(group)[i], ]$pch)
         }
         df$pch.legend = pch.legend
         
@@ -803,9 +837,9 @@ plot_parameters)
         group = as.factor(unlist(group.mint))
         pch = as.vector(unlist(split(pch, object$study)[study]))
         cex = as.vector(unlist(split(cex, object$study)[study]))
-        
+        pch.levels = as.vector(unlist(split(pch.levels, object$study)[study]))
         col.per.group.mint = as.vector(unlist(split(levels.color, object$study)[study]))
-        col = as.vector(unlist(split(col, object$study)[study]))
+        #col = as.vector(unlist(split(col, object$study)[study]))
         
         
         
@@ -840,19 +874,15 @@ plot_parameters)
         #if (display.names)
         #df$names = rep(ind.names, length(x))
         
-        df$pch = pch; df$cex = cex; df$col.per.group = col.per.group.mint; df$col = as.character(col)
+        df$pch = pch; df$pch.levels = pch.levels
+        df$cex = cex
+        #df$col.per.group = col.per.group.mint;
+        df$col = col.per.group.mint#as.character(col)
         
         
         pch.legend = NULL
-        if (missing.col)
-        {
-            
-            for (i in 1:nlevels(factor(col)))
-            pch.legend = c(pch.legend, df[df$col == levels(factor(col))[i], ]$pch)
-        } else {
-            for (i in 1:nlevels(group))
-            pch.legend = c(pch.legend, df[df$group == levels(group)[i], ]$pch)
-        }
+        for (i in 1:nlevels(group))
+        pch.legend = c(pch.legend, df[df$group == levels(group)[i], ]$pch)
         
         df$pch.legend = pch.legend
         df.ellipse = NULL # no ellipse so far
@@ -867,9 +897,9 @@ plot_parameters)
     #print(df)
     plot_parameters = list(size.title = size.title, size.subtitle = size.subtitle, size.xlabel = size.xlabel, size.ylabel = size.ylabel,
     size.axis = size.axis, size.legend = size.legend, size.legend.title = size.legend.title, legend.title = legend.title,
-    legend.position = legend.position, point.lwd = point.lwd)
+    legend.title.pch = legend.title.pch, legend.position = legend.position, point.lwd = point.lwd)
     
-    out = list(df = df, study.ind = study.ind, df.ellipse = df.ellipse, col.per.group = col.per.group, title = title, display.names = display.names, xlim = xlim, ylim = ylim, missing.col = missing.col, ellipse = ellipse, centroid = centroid, star = star, plot_parameters = plot_parameters)
+    out = list(df = df, study.ind = study.ind, df.ellipse = df.ellipse, col.per.group = col.per.group, title = title, display.names = display.names, xlim = xlim, ylim = ylim, ellipse = ellipse, centroid = centroid, star = star, plot_parameters = plot_parameters)
 }
 
 

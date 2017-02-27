@@ -23,10 +23,12 @@ representation in (sparse)(I)PCA, (regularized)CCA, (sparse)PLS(DA) and (sparse)
 style = "ggplot2", ellipse = FALSE, ellipse.level = 0.95, centroid = FALSE, star = FALSE,
 title = NULL, subtitle, legend = FALSE,
 X.label = NULL, Y.label = NULL, Z.label = NULL, abline = FALSE,
-xlim = NULL, ylim = NULL, col, cex, pch, alpha = 0.2, axes.box = "box", layout = NULL,
+xlim = NULL, ylim = NULL, col, cex, pch, pch.levels, alpha = 0.2, axes.box = "box",
+layout = NULL,
 size.title = rel(2), size.subtitle = rel(1.5), size.xlabel = rel(1),
 size.ylabel = rel(1), size.axis = rel(0.8), size.legend = rel(1),
-size.legend.title = rel(1.1), legend.title = "Legend", legend.position = "right",
+size.legend.title = rel(1.1), legend.title = "Legend", legend.title.pch = "Legend",
+legend.position = "right",
 point.lwd = 1, ... )
 
 \method{plotIndiv}{mint.spls}(object, comp = NULL, study = "global", rep.space = NULL, group, col.per.group,
@@ -43,10 +45,12 @@ point.lwd = 1, ... )
 style = "ggplot2", ellipse = FALSE, ellipse.level = 0.95, centroid = FALSE, star = FALSE,
 title = NULL, subtitle, legend = FALSE,
 X.label = NULL, Y.label = NULL, Z.label = NULL, abline = FALSE,
-xlim = NULL, ylim = NULL, col, cex, pch, alpha = 0.2, axes.box = "box", layout = NULL,
+xlim = NULL, ylim = NULL, col, cex, pch, pch.levels,
+alpha = 0.2, axes.box = "box", layout = NULL,
 size.title = rel(2), size.subtitle = rel(1.5), size.xlabel = rel(1),
 size.ylabel = rel(1), size.axis = rel(0.8), size.legend = rel(1),
-size.legend.title = rel(1.1), legend.title = "Legend", legend.position = "right",
+size.legend.title = rel(1.1), legend.title = "Legend", legend.title.pch = "Legend",
+legend.position = "right",
 point.lwd = 1, ... )
 
 
@@ -83,6 +87,7 @@ data matrix is used as names (see Details).}
 \item{cex}{numeric character (or symbol) expansion, possibly vector.}
 \item{pch}{plot character. A character string or a vector of single characters
 or integers. See \code{\link{points}} for all alternatives.}
+\item{pch.levels}{Only used when \code{pch} is different from \code{col} or \code{col.per.group}, ie when \code{pch} creates a second factor. Only used for the legend.}
 \item{alpha}{Semi-transparent colors (0 < \code{'alpha'} < 1) }
 \item{axes.box}{for style '3d', argument to be set to either \code{'axes'}, \code{'box'}, \code{'bbox'} or \code{'all'}, defining the shape of the box.}
 \item{layout}{layout parameter passed to mfrow. Only used when \code{study} is not "global"}
@@ -94,6 +99,7 @@ or integers. See \code{\link{points}} for all alternatives.}
 \item{size.legend}{size of the legend}
 \item{size.legend.title}{size of the legend title}
 \item{legend.title}{title of the legend}
+\item{legend.title.pch}{title of the second legend created by \code{pch}, if any.}
 \item{legend.position}{position of the legend, one of "bottom",
 "left", "top" and "right". }
 \item{point.lwd}{\code{lwd} of the points, used when \code{ind.names = FALSE}}
@@ -166,6 +172,12 @@ keepY = c(10, 10, 10))
 #default
 plotIndiv(toxicity.spls)
 
+# created a first grouping with Time.Group and 'group' and a second with Dose.Group and 'pch'
+plotIndiv(toxicity.spls, rep.space="X-variate", ind.name = FALSE,
+group = liver.toxicity$treatment[, 'Time.Group'], # first factor
+pch = as.numeric(factor(liver.toxicity$treatment$Dose.Group)), #second factor
+pch.levels =liver.toxicity$treatment$Dose.Group, #levels of the second factor, for the legend
+legend = TRUE)
 
 \dontrun{
 # indicating the centroid
@@ -201,6 +213,7 @@ splsda.breast <- splsda(X, Y,keepX=c(10,10),ncomp=2)
 
 # default option: note the outcome color is included by default!
 plotIndiv(splsda.breast)
+
 
 \dontrun{
     # default option with no ind name: pch and color are set automatically

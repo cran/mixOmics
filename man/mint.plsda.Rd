@@ -73,7 +73,8 @@ that contains the following components:
 }
 
 \references{
-F Rohart, A Eslami, S Bougeard and K-A. Lê Cao. MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. Submitted.
+F Rohart, N Matigian, A Eslami, S Bougeard and K-A. Lê Cao. MINT: A multivariate integrative approach to identify a reproducible biomarker
+signature across multiple experiments and platforms. Accepted in BMC BIoinformatics.
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
 }
@@ -97,7 +98,7 @@ plotIndiv(res)
 plotIndiv(res, study = "all.partial")
 
 #plot study-specific outputs for study "2"
-plotIndiv(res, study = "2", col = as.numeric(stemcells$celltype))
+plotIndiv(res, study = "2", col = 1:3, legend = TRUE)
 
 }
 

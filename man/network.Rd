@@ -17,7 +17,7 @@ and (sparse) PLS regression.
 network(mat,
 comp = NULL,
 blocks = c(1,2),
-threshold = NULL,
+cutoff = NULL,
 row.names = TRUE,
 col.names = TRUE,
 block.var.names = TRUE,
@@ -32,6 +32,7 @@ cex.edge.label = 1,
 show.color.key = TRUE,
 symkey = TRUE,
 keysize = c(1, 1),
+keysize.label = 1,
 breaks,
 interactive = FALSE,
 layout.fun = NULL,
@@ -43,7 +44,7 @@ name.save = NULL)
 \item{mat}{numeric matrix of values to be represented.}
 \item{comp}{atomic or vector of positive integers. The components to adequately account
 for the data association. Defaults to \code{comp = 1}.}
-\item{threshold}{numeric value between \code{0} and \code{1}. The tuning
+\item{cutoff}{numeric value between \code{0} and \code{1}. The tuning
 threshold for the relevant associations network (see Details).}
 \item{row.names, col.names}{character vector containing the names of \eqn{X}- and
 \eqn{Y}-variables.}
@@ -61,12 +62,13 @@ labels (defaults to \code{FALSE}).}
 \item{symkey}{boolean indicating whether the color key should be made symmetric about 0.
 Defaults to \code{TRUE}.}
 \item{keysize}{numeric value indicating the size of the color key.}
+\item{keysize.label}{vector of length 1, indicating the size of the labels and title of the color key.}
 \item{breaks}{(optional) either a numeric vector indicating the splitting points for
 binning \code{mat} into colors, or a integer number of break points to be used, in
 which case the break points will be spaced equally between \code{min(mat)}
 and \code{max(mat)}.}
 \item{interactive}{logical. If \code{TRUE}, a scrollbar is created to change the
-threshold value interactively (defaults to \code{FALSE}). See Details.}
+cutoff value interactively (defaults to \code{FALSE}). See Details.}
 \item{save}{should the plot be saved ? If so, argument to be set either to \code{'jpeg'}, \code{'tiff'}, \code{'png'} or \code{'pdf'}.}
 \item{name.save}{character string giving the name of the saved file.}
 \item{cex.edge.label}{the font size for the edge labels.}
@@ -96,13 +98,13 @@ In \code{spls}, if \code{object$mode} is \code{regression}, the similarity measu
 respectively.
 
 Variable pairs with a high similarity measure (in absolute value) are considered as relevant.
-By changing the threshold, one can tune the relevance of the associations to include or
+By changing the cutoff, one can tune the relevance of the associations to include or
 exclude relationships in the network.
 
 \code{interactive=TRUE} open two device, one for association network, one for scrollbar,
 and define an interactive process: by clicking either at each end
 (`\eqn{-}' or `\eqn{+}') of the scrollbar or
-at middle portion of this. The position of the slider indicate which is the `threshold' value
+at middle portion of this. The position of the slider indicate which is the `cutoff' value
 associated to the display network.
 
 The interactive process is terminated by clicking the second button and selecting `Stop'
@@ -175,7 +177,7 @@ nutri.res <- rcc(X, Y, ncomp = 3, lambda1 = 0.064, lambda2 = 0.008)
 # sometimes with Rstudio might not work because of margin issues,
 # in that case save it as an image
 jpeg('example1-network.jpeg', res = 600, width = 4000, height = 4000)
-network(nutri.res, comp = 1:3, threshold = 0.6)
+network(nutri.res, comp = 1:3, cutoff = 0.6)
 dev.off()
 }
 
@@ -184,7 +186,7 @@ dev.off()
 # sometimes with Rstudio might not work because of margin issues,
 # in that case save it as an image
 jpeg('example2-network.jpeg')
-network(nutri.res, comp = 1:3, threshold = 0.45,
+network(nutri.res, comp = 1:3, cutoff = 0.45,
 color.node = c("mistyrose", "lightcyan"),
 shape.node = c("circle", "rectangle"),
 color.edge = color.jet(100),
@@ -193,10 +195,10 @@ show.edge.labels = FALSE)
 dev.off()
 }
 
-## interactive 'threshold'
+## interactive 'cutoff'
 \dontrun{
-network(nutri.res, comp = 1:3, threshold = 0.55, interactive = TRUE)
-## select the 'threshold' and "see" the new network
+network(nutri.res, comp = 1:3, cutoff = 0.55, interactive = TRUE)
+## select the 'cutoff' and "see" the new network
 }
 
 ## network representation for objects of class 'spls'
@@ -209,7 +211,7 @@ keepY = c(10, 10, 10))
 # sometimes with Rstudio might not work because of margin issues,
 # in that case save it as an image
 jpeg('example3-network.jpeg')
-network(toxicity.spls, comp = 1:3, threshold = 0.8,
+network(toxicity.spls, comp = 1:3, cutoff = 0.8,
 color.node = c("mistyrose", "lightcyan"),
 shape.node = c("rectangle", "circle"),
 color.edge = color.spectral(100),

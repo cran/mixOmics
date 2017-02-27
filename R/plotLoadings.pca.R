@@ -42,17 +42,19 @@ title = NULL,
 size.title = rel(2),
 layout = NULL,
 border = NA,
+xlim = NULL,
 ...)
 {
     
     # -- input checks
     object$names$blocks = "X"
-    check = check.input.plotLoadings(object = object, block = "X", size.name = size.name, title = title, col = col, name.var = name.var)
+    check = check.input.plotLoadings(object = object, block = "X", size.name = size.name, title = title, col = col, name.var = name.var, xlim = xlim)
     
     col = check$col
     size.name = check$size.name
     block = 1
     object$X = list(X=object$X)
+    xlim = check$xlim
 
 
     # -- layout
@@ -73,7 +75,7 @@ border = NA,
     par(mar = c(4, max(7, max(sapply(colnames.X, nchar),na.rm = TRUE)/3), 4, 2))
 
     mp = barplot(df$importance, horiz = T, las = 1, col = col, axisnames = TRUE, names.arg = colnames.X, #names.arg = row.names(df),
-    cex.names = size.name, cex.axis = 0.7, beside = TRUE, border = border)
+    cex.names = size.name, cex.axis = 0.7, beside = TRUE, border = border, xlim = xlim)
     
     if (is.null(title))
     {

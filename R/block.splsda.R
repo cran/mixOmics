@@ -128,6 +128,7 @@ near.zero.var = FALSE)
         variates = result$variates,
         loadings = result$loadings,
         crit = result$crit,
+        AVE = result$AVE,
         names = result$names,
         init = result$init,
         bias = result$bias,

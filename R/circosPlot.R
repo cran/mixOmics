@@ -29,6 +29,9 @@
 circosPlot = function(object,
 comp = 1 : min(object$ncomp),
 cutoff,
+color.Y,
+color.blocks,
+color.cor,
 var.names = NULL,
 showIntraLinks = FALSE,
 line=TRUE,
@@ -64,7 +67,36 @@ size.labels=1)
     
     if (missing(cutoff))
     stop("'cutoff' is missing", call.=FALSE) # so 2 blocks in X + the outcome Y
+    
+    if(missing(color.Y))
+    {
+        color.Y = color.mixo(1:nlevels(object$Y))
+    } else {
+        if(length(color.Y) != nlevels(object$Y))
+        stop("'color.Y' must be of length ", nlevels(object$Y))
 
+    }
+    
+    if(missing(color.blocks))
+    {
+        color.blocks = brewer.pal(n = 12, name = 'Paired') #why 12??
+    } else {
+        if(length(color.blocks) != length(object$X))
+        stop("'color.blocks' must be of length ", length(object$X))
+        
+        color.blocks.adj = adjustcolor(color.blocks, alpha.f = 0.5) #to get two shades of the same color per block
+        
+        color.blocks = c(rbind(color.blocks, color.blocks.adj)) # to put the color next to its shaded color
+    }
+
+    if(missing(color.cor))
+    {
+        color.cor = c(colors()[134],  # blue, negative correlation
+                colors()[128])  # pale red, positive correlation
+    } else {
+        if(length(color.cor) != 2)
+        stop("'color.cor' must be of length 2")
+    }
 
     X = object$X
     Y = object$Y
@@ -140,7 +172,7 @@ size.labels=1)
     
 
     # 1) Generate karyotype data
-    chr = genChr(featExp)
+    chr = genChr(featExp, color.blocks = color.blocks)
     chr.names = unique(chr$chrom) # paste("chr", 1:seg.num, sep="") 
     # Calculate angles and band positions
     db = segAnglePo(chr, seg=chr.names)
@@ -169,16 +201,16 @@ size.labels=1)
     plot(c(1,figSize), c(1,figSize), type="n", axes=FALSE, xlab="", ylab="", main="")
     
     # Plot ideogram
-    drawIdeogram(R=circleR, cir=db, W=segmentWidth,  show.band.labels=TRUE, show.chr.labels=TRUE, chr.labels.R= chrLabelsR, chrData=chr, size.variables = size.variables, size.labels=size.labels)
+    drawIdeogram(R=circleR, cir=db, W=segmentWidth,  show.band.labels=TRUE, show.chr.labels=TRUE, chr.labels.R= chrLabelsR, chrData=chr, size.variables = size.variables, size.labels=size.labels, color.blocks = color.blocks)
     
     # Plot links
     if(nrow(links)>0)
-    drawLinks(R=linksR, cir=db,   mapping=links,   col=linkColors, drawIntraChr=showIntraLinks)
+    drawLinks(R=linksR, cir=db,   mapping=links,   col=linkColors, drawIntraChr=showIntraLinks, color.cor = color.cor)
     
     # Plot expression values
     cTypes = levels(Y)#unique(featExp[,1]) #Get the different disease/cancer types (lines)
-    #lineCols = rainbow(nrow(cTypes), alpha=0.5) 
-    lineCols = color.mixo(1:nlevels(Y))#color.mixo(match(levels(Y), levels(Y)))
+    #lineCols = rainbow(nrow(cTypes), alpha=0.5)
+    lineCols = color.Y#color.mixo(1:nlevels(Y))#color.mixo(match(levels(Y), levels(Y)))
     
     # Fixme: remove this loop and send the whole expr dframe to drawLinePlot
     if(line==TRUE)
@@ -208,7 +240,7 @@ size.labels=1)
     # Plot legend
     # First legeng bottom left corner
     legend(x=5, y = (circleR/4), title="Correlations", c("Positive Correlation", "Negative Correlation"),
-    col = c(colors()[134], colors()[128]), pch = 19, cex=size.legend, bty = "n")
+    col = color.cor, pch = 19, cex=size.legend, bty = "n")
     # Second legend bottom righ corner
     if(line==TRUE)
     legend(x=figSize-(circleR/3), y = (circleR/3), title="Expression", legend=levels(Y),  ## changed PAM50 to Y
@@ -220,7 +252,6 @@ size.labels=1)
     legend(x=-circleR/4, y = figSize, legend=paste("Comp",paste(comp,collapse="-")),
     col = "black", cex=size.legend, bty = "n")
 
-
     par(xpd=opar,mar=opar1)# put the previous defaut parameter for xpd
     return(invisible(corMat))
 }
@@ -230,7 +261,8 @@ show.band.labels = FALSE,
 show.chr.labels = FALSE, chr.labels.R = 0,
 chrData,
 size.variables,
-size.labels)
+size.labels,
+color.blocks)
 {
     # Draw the main circular plot: segments, bands and labels
     chr.po    = cir 
@@ -254,7 +286,7 @@ size.labels)
             
             #col.v = which(colors()==dat.v[i,5])  #get color index
             #col = colors()[col.v]
-            dark.clear = brewer.pal(n = 12, name = 'Paired')
+            dark.clear = color.blocks#brewer.pal(n = 12, name = 'Paired')
             col.v = which(dark.clear==dat.v[i,5])  #get color index
             col = dark.clear[col.v]
             
@@ -282,7 +314,7 @@ size.labels)
 
 drawLinks = function(R, xc=400, yc=400, cir, W,
 mapping=mapping,
-lineWidth=1, col=rainbow(10, alpha=0.8)[7],  drawIntraChr=FALSE)
+lineWidth=1, col=rainbow(10, alpha=0.8)[7],  drawIntraChr=FALSE, color.cor = color.cor)
 {
     # Draw the links (computed correlation) between features
     chr.po    = cir 
@@ -323,9 +355,9 @@ lineWidth=1, col=rainbow(10, alpha=0.8)[7],  drawIntraChr=FALSE)
         
         # Set link color
         if (as.numeric(dat[i,7]) < 0.0){
-            linkCol = colors()[128]  #pale red
+            linkCol = color.cor[2]#colors()[128]  #pale red
         } else {
-            linkCol = colors()[134]  # blue
+            linkCol = color.cor[1]#colors()[134]  # blue
         }
         linkCol = add.alpha(linkCol, alpha=0.4) 
         
@@ -445,7 +477,7 @@ background.lines=FALSE,axis.width=1)
     }     # end the chr/segment
 }
 
-genChr =function (expr, bandWidth = 1.0)
+genChr =function (expr, bandWidth = 1.0, color.blocks)
 {
     # Generate the segments and calculate the
     # unique positions of the bands
@@ -473,13 +505,13 @@ genChr =function (expr, bandWidth = 1.0)
     # Create a color scheme
     #dark = c("brown3","darkgoldenrod","antiquewhite3","steelblue3")
     #clear = c("brown1","darkgoldenrod1","antiquewhite1","steelblue1")
-    dark.clear = brewer.pal(n = 12, name = 'Paired')
+    dark.clear = color.blocks#brewer.pal(n = 12, name = 'Paired')
     dark = dark.clear[seq(2, 12, by = 2)]
     clear = dark.clear[seq(1, 12, by = 2)]
     chrColScheme = data.frame(dark, clear)
     n_datasets = length(unique(expr$Dataset))
     chrColScheme = chrColScheme[c(1:n_datasets),]
-    rownames(chrColScheme) = unique(expr$Dataset)
+    rownames(chrColScheme) = levels(factor(expr$Dataset))#alphabetical order
     
     seg.out = c() 
     for (i in 1:nrow(expr)){

@@ -379,10 +379,12 @@ cpus,
     if(constraint)
     {
         keepX.constraint = apply(object$loadings$X, 2, function(x){names(which(x!=0))})
-        # gives a matrix of ncomp columns, I want a list of length ncomp
-        keepX.constraint = split(keepX.constraint, rep(1:ncol(keepX.constraint), each = nrow(keepX.constraint)))
-        names(keepX.constraint) = paste("comp",1:length(keepX.constraint),sep="")
-        
+        # gives a matrix of ncomp columns if same number of selected variables on each comp, I want a list of length ncomp
+        if(is.matrix(keepX.constraint))
+        {
+            keepX.constraint = split(keepX.constraint, rep(1:ncol(keepX.constraint), each = nrow(keepX.constraint)))
+            names(keepX.constraint) = paste("comp",1:length(keepX.constraint),sep="")
+        }
         #keepX = NULL
     } else {
         #keepX.constraint = NULL
@@ -490,7 +492,7 @@ cpus,
     
     list.features = list()
 
-    mat.error.rate = mat.sd.error = mat.mean.error = error.per.class.keepX.opt = list()
+    mat.error.rate = mat.sd.error = mat.mean.error = error.per.class.keepX.opt = error.per.class.keepX.opt.mean = list()
     error.per.class = list()
     final=list()
     
@@ -501,13 +503,17 @@ cpus,
         mat.mean.error[[measure_i]] = matrix(0,nrow = ncomp, ncol = length(dist),
         dimnames = list(c(paste('comp', 1 : ncomp)), dist))
         error.per.class.keepX.opt[[measure_i]] = list()
+        error.per.class.keepX.opt.mean[[measure_i]] = list()
         mat.error.rate[[measure_i]]=list()
         for(ijk in dist)
         {
-            mat.error.rate[[measure_i]][[ijk]] = array(0, c(nlevels(Y),  nrepeat ,ncomp),
-            dimnames = list(c(levels(Y)),c(paste('nrep', 1 : nrepeat)),c(paste('comp', 1 : ncomp))))
+            mat.error.rate[[measure_i]][[ijk]] = matrix(0, nrow = ncomp, ncol = nrepeat,
+            dimnames = list(c(paste('comp', 1 : ncomp)), c(paste('nrep', 1 : nrepeat))))
 
-            error.per.class.keepX.opt[[measure_i]][[ijk]] = matrix(nrow = nlevels(Y), ncol = ncomp,
+            error.per.class.keepX.opt[[measure_i]][[ijk]] = array(0, c(nlevels(Y), nrepeat, ncomp),
+            dimnames = list(c(levels(Y)), c(paste('nrep', 1 : nrepeat)), c(paste('comp', 1:ncomp, sep=''))))
+
+            error.per.class.keepX.opt.mean[[measure_i]][[ijk]] = matrix(nrow = nlevels(Y), ncol = ncomp,
             dimnames = list(c(levels(Y)), c(paste('comp', 1 : ncomp))))
         }
     }
@@ -564,12 +570,12 @@ cpus,
         # ---- extract stability of features ----- # NEW
         if (any(class(object) == "splsda"))
         list.features[[comp]] = result$features$stable
-       
+        
         for (ijk in dist)
         {
             for (measure_i in measure)
             {
-                mat.error.rate[[measure_i]][[ijk]][ ,,comp] = result[[measure_i]]$mat.error.rate[[ijk]][,1]
+                mat.error.rate[[measure_i]][[ijk]][comp,] = result[[measure_i]]$mat.error.rate[[ijk]][1,]
                 mat.mean.error[[measure_i]][comp, ijk]=result[[measure_i]]$error.rate.mean[[ijk]]
                 if (!is.null(result[[measure_i]]$error.rate.sd))
                 {
@@ -577,8 +583,11 @@ cpus,
                 } else {
                     mat.sd.error= NULL
                 }
-                # confusion matrix for keepX.opt
-                error.per.class.keepX.opt[[measure_i]][[ijk]][ ,comp]=result[[measure_i]]$confusion[[ijk]][,1]
+                # confusion matrix for keepX.opt, for each nrep
+                error.per.class.keepX.opt[[measure_i]][[ijk]][ , ,comp] = result[[measure_i]]$confusion[[ijk]]
+
+                # confusion matrix for keepX.opt, averaged over all nrep
+                error.per.class.keepX.opt.mean[[measure_i]][[ijk]][ ,comp] = apply(result[[measure_i]]$confusion[[ijk]],1 , mean)
             }
             
             #prediction of each samples for each fold and each repeat, on each comp
@@ -601,7 +610,8 @@ cpus,
     result = list(error.rate = mat.mean.error,
     error.rate.sd = mat.sd.error,
     error.rate.all = mat.error.rate,
-    error.rate.class = error.per.class.keepX.opt[[1]],
+    error.rate.class = error.per.class.keepX.opt.mean[[1]],
+    error.rate.class.all = error.per.class.keepX.opt[[1]],
     predict = prediction.all,
     class = class.all)
     

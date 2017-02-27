@@ -312,10 +312,10 @@ point.lwd = 1,
         display.names = out$display.names
         xlim = out$xlim
         ylim = out$ylim
-        missing.col = out$missing.col
+        #missing.col = out$missing.col
         plot_parameters = out$plot_parameters
 
-
+        #save(list=ls(),file="temp.Rdata")
         # concatenate results
         df.final = rbind(df.final, df)
     }
@@ -327,19 +327,23 @@ point.lwd = 1,
     
     # change the levels of df.final$Block to "subtitle"
     if (!missing(subtitle))
-    df.final$Block = factor(df.final$Block, labels = subtitle)
+    {
+        df.final$Block = factor(df.final$Block, labels = subtitle)
 
+        if(ellipse)
+        df.ellipse$Block = factor(df.ellipse$Block, labels = subtitle)
+    }
     df = df.final
         
     if (style == "ggplot2")
     style = "ggplot2-MINT"
-
+        
     #call plot module (ggplot2, lattice, graphics, 3d)
     res = internal_graphicModule(df = df, centroid = centroid, col.per.group = col.per.group, title = title,
     X.label = X.label, Y.label = Y.label, xlim = xlim, ylim = ylim, class.object = class(object),
     display.names = display.names, legend = legend, abline = abline,
     star = star, ellipse = ellipse, df.ellipse = df.ellipse, style = style, layout = layout,
-    missing.col = missing.col,
+    #missing.col = missing.col,
     #for ggplot2-MINT
     study.levels = study.levels, plot_parameters = plot_parameters
     )

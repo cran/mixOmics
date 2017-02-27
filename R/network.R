@@ -29,7 +29,7 @@ network =
 function(mat,
 comp = NULL,
 blocks = c(1,2),
-threshold = NULL,
+cutoff = NULL,
 row.names = TRUE,
 col.names = TRUE,
 block.var.names = TRUE,
@@ -44,6 +44,7 @@ cex.edge.label = 1,
 show.color.key = TRUE,
 symkey = TRUE,
 keysize = c(1, 1),
+keysize.label = 1,
 breaks,
 interactive = FALSE,
 layout.fun = NULL,
@@ -586,6 +587,11 @@ name.save = NULL)
     stop("'keysize' must be a numeric vector of length 2.",
     call. = FALSE)
     
+    #-- keysize.label
+    if (length(keysize.label) != 1 || any(!is.finite(keysize)))
+    stop("'keysize' must be a numeric vector of length 1.",
+    call. = FALSE)
+    
     #-- interactive
     if (!is.logical(interactive))
     stop("'interactive' must be a logical constant (TRUE or FALSE).",
@@ -604,30 +610,30 @@ name.save = NULL)
     if (!(any(class.object %in% object.blocks)))
     w = as.vector(t(mat))
     
-    #-- check threshold
+    #-- check cutoff
     if (round(max(abs(w)), 2) == 0)
     stop("There is no correlation between these blocks whith these components. Try a different value of 'comp'.", call. = FALSE)
-    if (is.null(threshold))
+    if (is.null(cutoff))
     {
         if (interactive)
         {
-            threshold = 0
+            cutoff = 0
         } else {
             if (length(w)<=20)
             {
-                threshold = 0
+                cutoff = 0
             } else if (length(w)>20 & length(w)<=40) {
-                threshold = unname(quantile(abs(w))[3])
+                cutoff = unname(quantile(abs(w))[3])
             } else {
-                threshold = unname(quantile(abs(w))[4])
+                cutoff = unname(quantile(abs(w))[4])
             }
         }
     }
-    if (!is.finite(threshold) || threshold < 0 )
-    stop("invalid value for 'threshold', it must be a positive numeric value >= ",
+    if (!is.finite(cutoff) || cutoff < 0 )
+    stop("invalid value for 'cutoff', it must be a positive numeric value >= ",
     0, call. = FALSE)
-    if(threshold > max(abs(w)))
-    stop("invalid value for 'threshold'", threshold, " > ",
+    if(cutoff > max(abs(w)))
+    stop("invalid value for 'cutoff'", cutoff, " > ",
     round(max(abs(w)), 2), call. = FALSE)
     
     
@@ -676,14 +682,14 @@ name.save = NULL)
     
     # edges colors #
     #--------------#
-    id = bin.color(w, threshold = threshold, breaks = breaks,
+    id = bin.color(w, cutoff = cutoff, breaks = breaks,
     col = color.edge, symkey = symkey)
     col.id = id$bin
     color.edge = id$col[col.id]
     
     # selection of the edges to incluir in the network #
     #--------------------------------------------------#
-    idx = (abs(w) >= threshold)
+    idx = (abs(w) >= cutoff)
     relations = relations[idx, ]
     color.edge = color.edge[idx]
     
@@ -744,26 +750,26 @@ name.save = NULL)
     z.mat = seq(0, 1, length = nc + 1)
     z.mat = matrix(z.mat, ncol = 1)
     
-    if ((id$lim[1] < -threshold) & (id$lim[2] < threshold))
+    if ((id$lim[1] < -cutoff) & (id$lim[2] < cutoff))
     {
         xv = c(0, x[nc + 1])
-        lv = round(c(id$lim[1], -threshold), 2)
+        lv = round(c(id$lim[1], -cutoff), 2)
         col = c(id$col, "white")
     }
     
-    if ((id$lim[1] > -threshold) & (id$lim[2] > threshold))
+    if ((id$lim[1] > -cutoff) & (id$lim[2] > cutoff))
     {
         xv = c(x[2], 1)
-        lv = round(c(threshold, id$lim[2]), 2)
+        lv = round(c(cutoff, id$lim[2]), 2)
         col = c("white", id$col)
     }
     
-    if ((id$lim[1] < -threshold) & (id$lim[2] > threshold))
+    if ((id$lim[1] < -cutoff) & (id$lim[2] > cutoff))
     {
         idn = max(which(id$breaks < 0))
         idp = min(which(id$breaks > 0))
         xv = c(0, x[idn + 1], x[idp], 1)
-        lv = round(c(id$lim[1], -threshold, threshold, id$lim[2]), 2)
+        lv = round(c(id$lim[1], -cutoff, cutoff, id$lim[2]), 2)
         col = c(id$col[1:idn], "white", id$col[(idn + 1):nc])
     }
     
@@ -805,8 +811,8 @@ name.save = NULL)
             image(z.mat, col = col, xaxt = "n", yaxt = "n")
             box()
             par(usr = c(0, 1, 0, 1))
-            axis(1, at = xv, labels = lv)
-            title("Color key", font.main = 1)
+            axis(1, at = xv, labels = lv, cex.axis = keysize.label)
+            title("Color key", font.main = 1, cex.main = keysize.label)
             par(def.par)
             par(new = TRUE)
         }
@@ -823,12 +829,12 @@ name.save = NULL)
     if (isTRUE(interactive))
     {
         
-        # threshold control bar #
+        # cutoff control bar #
         #-----------------------#
-        min.cut = threshold
+        min.cut = cutoff
         max.cut = max(abs(w))
         
-        threshold.old = threshold
+        cutoff.old = cutoff
         
         dev.new("width" = 5, "height" = 2.7, xpos = -1)
         def.par = par(no.readonly = TRUE)
@@ -840,7 +846,7 @@ name.save = NULL)
         
         plot(cuts, type = "n", rep(0, 21), xlab = "", ylab = "",
         xlim = c(-0.10, 1.10), axes = FALSE)
-        title("threshold control", cex.main = 1.9, font.main = 1)
+        title("cutoff control", cex.main = 1.9, font.main = 1)
         text(0.5, -0.6, "value", cex = 1.5)
         text(0, -0.6, round(min.cut, 2), cex = 1.4)
         text(1, -0.6, round(max.cut, 2), cex = 1.4)
@@ -872,8 +878,8 @@ name.save = NULL)
             image(z.mat, col = col, xaxt = "n", yaxt = "n")
             box()
             par(usr = c(0, 1, 0, 1))
-            axis(1, at = xv, labels = lv)
-            title("Color key", font.main = 1)
+            axis(1, at = xv, labels = lv, cex.axis = keysize.label)
+            title("Color key", font.main = 1, cex.main = keysize.label)
             par(def.par)
             par(new = TRUE)
         }
@@ -924,20 +930,20 @@ name.save = NULL)
             {
                 old.pos = pos
                 rect(0.4, -0.8, 0.6, -1.5, col = gray(0.95), border = NA)
-                threshold = (max.cut - min.cut) * pos + min.cut
-                mtext(round(threshold, 3), side = 1, line = -1, cex = 0.9)
+                cutoff = (max.cut - min.cut) * pos + min.cut
+                mtext(round(cutoff, 3), side = 1, line = -1, cex = 0.9)
                 
                 
                 # new graph plot #
                 #----------------#
                 dev.set(net.dev)
                 
-                if (threshold >= threshold.old)
+                if (cutoff >= cutoff.old)
                 {
                     
                     # selection of the edges to remove of the network #
                     #-------------------------------------------------#
-                    supp.edge = E(gR)[abs(E(gR)$weight) < threshold]
+                    supp.edge = E(gR)[abs(E(gR)$weight) < cutoff]
                     
                     # Generation of the graph with all the significant edges #
                     #--------------------------------------------------------#
@@ -979,8 +985,8 @@ name.save = NULL)
                         image(z.mat, col = col, xaxt = "n", yaxt = "n")
                         box()
                         par(usr = c(0, 1, 0, 1))
-                        axis(1, at = xv, labels = lv)
-                        title("Color key", font.main = 1)
+                        axis(1, at = xv, labels = lv, cex.axis = keysize.label)
+                        title("Color key", font.main = 1, cex.main = keysize.label)
                         par(def.par)
                         par(new = TRUE)
                     }
@@ -989,11 +995,11 @@ name.save = NULL)
                     plot(gE, layout = l)
                     par(def.par)
                     
-                    threshold.old = threshold
+                    cutoff.old = cutoff
                 } else {
                     # selection of the edges to incluir in the network #
                     #--------------------------------------------------#
-                    supp.edge = E(gR)[abs(E(gR)$weight) < threshold]
+                    supp.edge = E(gR)[abs(E(gR)$weight) < cutoff]
                     
                     # generation of the graph with all the significant edges #
                     #--------------------------------------------------------#
@@ -1035,8 +1041,8 @@ name.save = NULL)
                         image(z.mat, col = col, xaxt = "n", yaxt = "n")
                         box()
                         par(usr = c(0, 1, 0, 1))						
-                        axis(1, at = xv, labels = lv)
-                        title("Color key", font.main = 1)
+                        axis(1, at = xv, labels = lv, cex.axis = keysize.label)
+                        title("Color key", font.main = 1, cex.main = keysize.label)
                         par(def.par)
                         par(new = TRUE)
                     }
@@ -1045,7 +1051,7 @@ name.save = NULL)
                     plot(gE, layout = l)
                     par(def.par)
                     
-                    threshold.old = threshold
+                    cutoff.old = cutoff
                 }
                 
                 gE.none = TRUE
@@ -1066,17 +1072,17 @@ name.save = NULL)
         {
             for (j in (i + 1):length(blocks))
             {
-                M_block[[l]][abs(M_block[[l]]) < threshold] = 0
+                M_block[[l]][abs(M_block[[l]]) < cutoff] = 0
                 res[paste("M",blocks[i],blocks[j],sep="_")] = list(M_block[[l]])
                 l = l + 1
             }
         }
     } else {
-        mat[abs(mat) < threshold] = 0
+        mat[abs(mat) < cutoff] = 0
         res$M=mat
     }
     
-    res$threshold = threshold
+    res$cutoff = cutoff
     
     if (!is.null(save))
     dev.off()

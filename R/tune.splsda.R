@@ -290,7 +290,9 @@ cpus
             auc.all=list()
         }
         
-        error.per.class.keepX.opt=list()
+        error.per.class.keepX.opt = list()
+        error.per.class.keepX.opt.mean = matrix(0, nrow = nlevels(Y), ncol = length(comp.real),
+        dimnames = list(c(levels(Y)), c(paste('comp', comp.real, sep=''))))
         # successively tune the components until ncomp: comp1, then comp2, ...
         for(comp in 1:length(comp.real))
         {
@@ -312,6 +314,8 @@ cpus
             
             # confusion matrix for keepX.opt
             error.per.class.keepX.opt[[comp]]=result[[measure]]$confusion[[1]]
+            error.per.class.keepX.opt.mean[, comp]=apply(result[[measure]]$confusion[[1]], 1, mean)
+
 
             # best keepX
             if(!constraint)
@@ -349,13 +353,53 @@ cpus
         if (progressBar == TRUE)
         cat('\n')
         
+        #save(list=ls(),file="temp.Rdata")
+        # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
+        if(nrepeat > 2 & length(comp.real) >1)
+        {
+            keepX = if(constraint){lapply(already.tested.X, length)}else{already.tested.X}
+            error.keepX = NULL
+            for(comp in 1:length(comp.real))
+            {
+                ind.row = match(keepX[[comp.real[comp]]],test.keepX)
+                error.keepX = cbind(error.keepX, mat.error.rate[[comp]][ind.row,])
+            }
+            colnames(error.keepX) = c(paste('comp', comp.real, sep=''))
+            
+            max = length(comp.real) #number max of components included
+            pval = NULL
+            opt = 1 #initialise the first optimal number of genes
+            alpha = 0.01
+            for(j in 2:max)
+            {
+                pval[j] = NA
+                temp = try(t.test(error.keepX[,opt],error.keepX[,j],alternative="greater")$p.value, silent=T) #t.test of "is adding X comp improves the overall results"
+                if(any(class(temp) == "try-error"))
+                {
+                    ncomp_opt = NULL
+                    break
+                } else {
+                    pval[j] = temp #had to be two steps (temp then pval =temp) otherwise the class is lost
+                }
+                if( (pval[j]< (alpha)))
+                opt=j #if the p-value is lower than 0.05, the optimal number of comp is updated
+            }
+            if(all(class(temp) != "try-error"))
+            ncomp_opt = comp.real[opt]
+        } else {
+            ncomp_opt = error.keepX = NULL
+        }
+        
+        
         result = list(
         error.rate = mat.mean.error,
         error.rate.sd = mat.sd.error,
         error.rate.all = mat.error.rate,
-        choice.keepX = if(constraint){lapply(already.tested.X, length)}else{already.tested.X},
+        choice.keepX = if(constraint){sapply(already.tested.X, length)}else{already.tested.X},
         choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
-        error.rate.class = error.per.class.keepX.opt)
+        choice.ncomp = list(ncomp = ncomp_opt, values = error.keepX),
+        error.rate.class = error.per.class.keepX.opt.mean,
+        error.rate.class.all = error.per.class.keepX.opt)
         
         if(light.output == FALSE)
         {

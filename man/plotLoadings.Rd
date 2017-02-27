@@ -29,26 +29,28 @@ This function provides a horizontal bar plot to visualise loading vectors. For d
 
 \usage{
 \S3method{plotLoadings}{pls}(object, block, comp = 1, col = NULL, ndisplay = NULL,
-size.name = 0.7, name.var = NULL, name.var.complete = FALSE, title = NULL,
-subtitle, size.title = rel(2), size.subtitle = rel(1.5), layout = NULL, border = NA, ... )
+size.name = 0.7, name.var = NULL, name.var.complete = FALSE, title = NULL, subtitle,
+size.title = rel(2), size.subtitle = rel(1.5), layout = NULL, border = NA,
+xlim = NULL, ... )
 
 \method{plotLoadings}{mint.pls}(object, study = "global", comp = 1, col = NULL, ndisplay = NULL,
 size.name = 0.7, name.var = NULL, name.var.complete = FALSE, title = NULL, subtitle,
-size.title = rel(1.8), size.subtitle = rel(1.4), layout = NULL, border = NA, ... )
+size.title = rel(1.8), size.subtitle = rel(1.4), layout = NULL, border = NA,
+xlim = NULL, ... )
 
 \method{plotLoadings}{plsda}(object, contrib, method = "mean", block, comp = 1,
 plot = TRUE, show.ties = TRUE, col.ties="white", ndisplay = NULL, size.name = 0.7,
 size.legend = 0.8, name.var=NULL, name.var.complete=FALSE, title = NULL,
 subtitle, size.title = rel(1.8), size.subtitle = rel(1.4),
 legend = TRUE, legend.color = NULL, legend.title = 'Outcome',
-layout = NULL, border = NA, ... )
+layout = NULL, border = NA, xlim = NULL, ... )
 
 \method{plotLoadings}{mint.plsda}(object, contrib = NULL, method = "mean",
 study = "global", comp = 1, plot = TRUE, show.ties = TRUE, col.ties = "white",
 ndisplay = NULL, size.name = 0.7, size.legend = 0.8, name.var = NULL,
 name.var.complete = FALSE, title = NULL, subtitle, size.title = rel(1.8),
 size.subtitle = rel(1.4), legend = TRUE, legend.color = NULL,
-legend.title = 'Outcome', layout = NULL, border = NA, ... )
+legend.title = 'Outcome', layout = NULL, border = NA, xlim = NULL, ... )
 
 }
 
@@ -79,6 +81,7 @@ legend.title = 'Outcome', layout = NULL, border = NA, ... )
   \item{legend.title}{A set of characters to indicate the title of the legend. Default value is NULL.}
 \item{layout}{Vector of two values (rows,cols) that indicates the layout of the plot. If \code{layout} is provided, the remaining empty subplots are still active}
 \item{border}{Argument from \code{\link{barplot}}: indicates whether to draw a border on the barplot.}
+\item{xlim}{Argument from \code{\link{barplot}}: limit of the x-axis. When plotting several \code{block}, a matrix is expected where each row is the \code{xlim} used for each of the blocks.}
 \item{\dots}{not used.}
 }
 
@@ -130,6 +133,10 @@ toxicity.spls = spls(X, Y, ncomp = 2, keepX = c(50, 50),
 keepY = c(10, 10))
 
 plotLoadings(toxicity.spls)
+
+# with xlim
+xlim = matrix(c(-0.1,0.3, -0.4,0.6), nrow = 2, byrow = TRUE)
+plotLoadings(toxicity.spls, xlim = xlim)
 
 
 ## object of class 'splsda'

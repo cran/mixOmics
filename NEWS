@@ -1,4 +1,24 @@
 
+Changes in 6.1.2 (patch)
+================
+
+New features:
+-------------
+1 - tune.splsda now returns a 'choice.ncomp' which indicates the number of components to choose (only if nrepeat > 2, criterion based on t-tests)
+2 - plotIndiv now enables two legends based on color, as well as pch, when pch is a factor different from what is indicated in group (use arguments pch and pch.levels, see ?plotIndiv)
+
+Enhancements:
+-------------
+1 - argument 'cutoff' now replaces 'threshold' in network for consistency with plotVar and circosPlot 
+2 - new argument 'sd' in plot.perf for block.splsda method
+3 - new arguments "color.Y" and "color.blocks" in cimDiablo
+4 - new argument 'xlim' in plotLoadings
+
+Bug fixes:
+----------
+- directionality is now enforced in AUROC (results lower than 0.5 can be obtained, which would indicate a very poor model performance)
+
+
 Changes in 6.1.1 (patch)
 ================
 

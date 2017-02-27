@@ -154,18 +154,22 @@ light.output = TRUE # mint, splsda
         }
         
     } else if (method == "spls") {
-        
-        message("Calling 'tune.multilevel' with method = 'spls'")
+        if(missing(multilevel))
+        {
+            stop("Only a multilevel spls can be tuned")
+        } else {
+            message("Calling 'tune.multilevel' with method = 'spls'")
 
-        if (missing(ncomp))
-        ncomp = 1
-        if (missing(already.tested.Y))
-        already.tested.Y = NULL
-        result = tune.multilevel(X = X, Y = Y,
-        multilevel = multilevel,
-        mode = mode,
-        ncomp = ncomp, test.keepX = test.keepX, test.keepY = test.keepY,
-        already.tested.X = already.tested.X, already.tested.Y = already.tested.Y)
+            if (missing(ncomp))
+            ncomp = 1
+            if (missing(already.tested.Y))
+            already.tested.Y = NULL
+            result = tune.multilevel(X = X, Y = Y,
+            multilevel = multilevel,
+            mode = mode,
+            ncomp = ncomp, test.keepX = test.keepX, test.keepY = test.keepY,
+            already.tested.X = already.tested.X, already.tested.Y = already.tested.Y)
+        }
     }
     
     result$call = match.call()

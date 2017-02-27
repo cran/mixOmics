@@ -29,9 +29,9 @@ near.zero.var = FALSE)
 }
 
 \arguments{
-\item{X}{A list of data sets (called 'blocks') measured on the same samples. Data in the list should be arranged in samples x variables, with samples order matching in all data sets.}
-\item{Y}{Matrix or vector response for a multivariate regression framework. Data should be continuous variables (see block.splsda for supervised classification and factor reponse)}
-\item{indY}{To supply if Y is missing, indicates the position of the matrix / vector response in the list \code{X}}
+\item{X}{A list of data sets (called 'blocks') measured on the same samples. Data in the list should be arranged in matrices, samples x variables, with samples order matching in all data sets.}
+\item{Y}{Matrix response for a multivariate regression framework. Data should be continuous variables (see block.splsda for supervised classification and factor reponse)}
+\item{indY}{To supply if Y is missing, indicates the position of the matrix response in the list \code{X}}
 \item{ncomp}{the number of components to include in the model. Default to 2. Applies to all blocks.}
 \item{keepX.constraint}{A list of same length as X. Each entry indicates specific variables to be selected in each of the blocks of X for the first PLS-components. See example.}
 \item{keepY.constraint}{Only if Y is provided, otherwise extracted from \code{keepX.constraint} (see details). Each entry indicates specific variables to be selected in Y for the first PLS-components. See example.}

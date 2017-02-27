@@ -652,8 +652,23 @@ verbose)
     if (!is.list(X))
     stop("X must be a list")
     
+    # check names on X are unique
+    if (length(unique(names(X))) != length(X))
+    stop("Each block of 'X' must have a unique name.")
+    #names(X)=paste0("block", 1:length(X)) #add names to the blocks if no names or not unique name for each block
+
     if (length(unique(unlist(lapply(X, nrow)))) != 1)
     stop("Unequal number of rows among the blocks of 'X'")
+    
+    #check for numeric vector instead of matrix
+    if (length(unlist(lapply(X, nrow))) != length(X)) #means there is at least one NULL
+    {
+        nrow.all = unlist(lapply(X, nrow)) # could be NULL
+        ind.null = which(is.na(match(names(X), names(nrow.all)))) #gives the vectors
+        
+        # we need matrices with rownames and colnames
+        stop("At least one block of 'X' is not a matrix")
+    }
     
     if ((missing(indY) & missing(Y)))
     stop("Either 'Y' or 'indY' is needed")
@@ -667,11 +682,6 @@ verbose)
     
     # transform ncomp to length(X)
     ncomp = rep(ncomp, length(X))
-
-    # check names on X are unique
-    if (length(unique(names(X))) != length(X))
-    stop("Each block of 'X' must have a unique name.")
-    #names(X)=paste0("block", 1:length(X)) #add names to the blocks if no names or not unique name for each block
 
 
     #check dimnames and ncomp per block of A
@@ -704,13 +714,9 @@ verbose)
         if (!missing(indY))
         warning("'Y' and 'indY' are provided, 'Y' is used.")
         
-        if (is.list(Y))
-        stop("Y must be a matrix")
-        
-        Y = as.matrix(Y)
-        if (!is.numeric(Y) )
+        if (is.list(Y) | length(dim(Y)) != 2 | !is.numeric(Y))
         stop("'Y' must be a numeric matrix.")
-        
+
         #check dimnames and ncomp per block of A
         check = Check.entry.single(Y, max(ncomp), q=1)
         Y = check$X

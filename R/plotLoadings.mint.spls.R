@@ -47,6 +47,7 @@ size.title = rel(1.8),
 size.subtitle = rel(1.4),
 layout = NULL,
 border = NA,
+xlim = NULL,
 ...
 ) {
     
@@ -62,11 +63,11 @@ border = NA,
         name.var.complete = name.var.complete,
         title = title,
         subtitle = subtitle,
-        xlim = xlim,
         layout = layout,
         size.title = size.title,
         size.subtitle = size.subtitle,
         border = border,
+        xlim = xlim,
         col = col)
         
     } else {
@@ -116,6 +117,34 @@ border = NA,
         # swap block for study
         block = study
         
+        # check xlim, has to be a matrix with number of rows=number of studies, or a vector of two values
+        if(length(study) == 1 & !is.null(xlim))
+        {
+            if(length(xlim) !=2)
+            stop("'xlim' must be a vector of length 2")
+            
+            xlim = matrix(xlim, nrow = 1)
+        }
+        
+        
+        if(length(study)>1 & !is.null(xlim))
+        {
+            if(is.matrix(xlim) && ( !nrow(xlim) %in%c(1, length(study))  | ncol(xlim) != 2 ))
+            stop("'xlim' must be a matrix with ",length(study)," rows (length(study)) and 2 columns")
+            
+            if(is.vector(xlim))
+            {
+                if(length(xlim) !=2)
+                stop("'xlim' must be a matrix with ",length(study)," rows (length(study)) and 2 columns")
+                
+                xlim = matrix(xlim, nrow = 1)
+            }
+            
+            if(nrow(xlim) != length(study)) # we complete xlim to have one xlim per block
+            xlim = matrix(rep(xlim, length(study)), nrow = length(study), byrow=T)
+        }
+        
+        
         # -- layout
         res = layout.plotLoadings(layout = layout, plot = TRUE, legend = FALSE, block = block)
         reset.mfrow = res$reset.mfrow
@@ -152,7 +181,7 @@ border = NA,
             }
 
             mp = barplot(df$importance, horiz = T, las = 1, col = df$color, axisnames = TRUE, names.arg = colnames.X, #names.arg = row.names(df),
-            cex.names = size.name, cex.axis = 0.7, beside = TRUE, border = border)
+            cex.names = size.name, cex.axis = 0.7, beside = TRUE, border = border, xlim = xlim)
             
             if ( length(block) == 1 & is.null(title) )
             {

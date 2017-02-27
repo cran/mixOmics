@@ -46,6 +46,7 @@ cut.tree = c(0, 0),
 transpose = FALSE,
 symkey = TRUE,
 keysize = c(1, 1),
+keysize.label,
 zoom = FALSE,
 title = NULL,
 xlab = NULL,
@@ -160,8 +161,8 @@ lwid = NULL)
     lv = c(min.breaks, (3*min.breaks + max.breaks)/4, (min.breaks + max.breaks)/2,
     (3*max.breaks + min.breaks)/4, max.breaks)
     xv = (as.numeric(lv) - min.mat) / (max.mat - min.mat)
-    axis(1, at = xv, labels = round(lv, 2))
-    title("Color key", font.main = 1)
+    axis(1, at = xv, labels = round(lv, 2), cex.axis = keysize.label)
+    title("Color key", font.main = 1, cex.main = keysize.label)
     
     #-- layout 2 --#
     par(mar = c(ifelse(cut.tree[2] != 0, 0.5, 0), 0, ifelse(!is.null(title), 5, 0), margins[2]))

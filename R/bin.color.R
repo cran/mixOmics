@@ -23,7 +23,7 @@
 #############################################################################################################
 
 bin.color =
-function(mat, threshold, breaks, col, symkey) 
+function(mat, cutoff, breaks, col, symkey) 
 {
     if (isTRUE(symkey)) {
         max.mat = max(abs(mat))
@@ -44,11 +44,11 @@ function(mat, threshold, breaks, col, symkey)
 				if ((breaks/2) - trunc(breaks/2) != 0) 
 					stop("'breaks' must be a even number if 'symkey = TRUE'", call. = FALSE)
 			
-			if (threshold == 0) breaks = c(seq(min.mat, max.mat, length = breaks + 1))
+			if (cutoff == 0) breaks = c(seq(min.mat, max.mat, length = breaks + 1))
 			else {			
 				nb = breaks/2
-				breaks = c(seq(min.mat, -threshold, length = nb + 1), 0, 
-						   seq(threshold, max.mat, length = nb + 1))					   
+				breaks = c(seq(min.mat, -cutoff, length = nb + 1), 0, 
+						   seq(cutoff, max.mat, length = nb + 1))					   
 				id = which(breaks == 0)
 				breaks = breaks[-c(id - 1, id + 1)]			
 			}
@@ -56,20 +56,20 @@ function(mat, threshold, breaks, col, symkey)
 		else { 
 			breaks = breaks + 1
 			
-			if ((min.mat < -threshold) & (max.mat < threshold))
-				breaks = seq(min.mat, -threshold, length = breaks)
+			if ((min.mat < -cutoff) & (max.mat < cutoff))
+				breaks = seq(min.mat, -cutoff, length = breaks)
 				
-			if ((min.mat > -threshold) & (max.mat > threshold))
-				breaks = seq(threshold, max.mat, length = breaks)
+			if ((min.mat > -cutoff) & (max.mat > cutoff))
+				breaks = seq(cutoff, max.mat, length = breaks)
 				
-			if ((min.mat < -threshold) & (max.mat > threshold)) {
-				if (threshold == 0) breaks = c(seq(min.mat, max.mat, length = breaks))
+			if ((min.mat < -cutoff) & (max.mat > cutoff)) {
+				if (cutoff == 0) breaks = c(seq(min.mat, max.mat, length = breaks))
 				else {
-					long = max.mat - min.mat - 2*threshold
+					long = max.mat - min.mat - 2*cutoff
 					bin = long/breaks
-					breaks = seq(threshold, -min.mat, by = bin)
+					breaks = seq(cutoff, -min.mat, by = bin)
 					o = order(breaks, decreasing = TRUE)
-					breaks = c(-breaks[o], 0, seq(threshold, max.mat, by = bin))
+					breaks = c(-breaks[o], 0, seq(cutoff, max.mat, by = bin))
 					id = which(breaks == 0)				
 					breaks = breaks[-c(id - 1, id + 1)]
 				}

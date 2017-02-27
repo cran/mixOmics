@@ -26,6 +26,7 @@ cut.tree = c(0, 0),
 transpose = FALSE,
 symkey = TRUE,
 keysize = c(1, 1),
+keysize.label = 1,
 zoom = FALSE,
 title = NULL,
 xlab = NULL,
@@ -98,7 +99,9 @@ name.save = NULL)
 	Defaults to \code{TRUE}.}
   
   \item{keysize}{vector of length two, indicating the size of the color key.}	
-  
+
+\item{keysize.label}{vector of length 1, indicating the size of the labels and title of the color key.}
+
   \item{zoom}{logical. Whether to use zoom for interactive zoom. See Details.}
   
   \item{title, xlab, ylab}{title, \eqn{x}- and \eqn{y}-axis titles; default to none.}

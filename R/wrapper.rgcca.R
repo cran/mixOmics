@@ -82,7 +82,7 @@ near.zero.var = FALSE)
     scheme = result.rgcca$scheme,
     ncomp = result.rgcca$ncomp,
     crit = result.rgcca$crit,
-    AVE = list(AVE.X = result.rgcca$AVE$AVE_X, result.rgcca$AVE$AVE_outer, result.rgcca$AVE$AVE_inner), #rename?
+    AVE = result.rgcca$AVE,
     names = result.rgcca$names,#names = list(indiv = rownames(X[[1]]), var = sapply(X, colnames)),
     init = result.rgcca$init,
     bias = result.rgcca$bias,

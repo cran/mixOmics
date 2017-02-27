@@ -25,9 +25,9 @@ near.zero.var = FALSE)
 }
 
 \arguments{
-\item{X}{A list of data sets (called 'blocks') measured on the same samples. Data in the list should be arranged in samples x variables, with samples order matching in all data sets.}
+\item{X}{A list of data sets (called 'blocks') measured on the same samples. Data in the list should be arranged in matrices, samples x variables, with samples order matching in all data sets.}
 \item{Y}{A factor or a class vector indicating the discrete outcome of each sample.}
-\item{indY}{To be supplied if Y is missing, indicates the position of the matrix / vector response in the list \code{X}}
+\item{indY}{To be supplied if Y is missing, indicates the position of the factor / class vector outcome in the list \code{X}}
 \item{ncomp}{the number of components to include in the model. Default to 2. Applies to all blocks.}
 \item{design}{numeric matrix of size (number of blocks in X) x (number of blocks in X) with 0 or 1 values. A value of 1 (0) indicates a relationship (no relationship) between the blocks to be modelled. If \code{Y} is provided instead of \code{indY}, the \code{design} matrix is changed to include relationships to \code{Y}. }
 \item{scheme}{Either "horst", "factorial" or "centroid". Default = \code{horst}, see reference.}
@@ -114,11 +114,13 @@ res = block.plsda(X = data, indY = 3) # indY indicates where the outcome Y is in
 plotIndiv(res, ind.names = FALSE, legend = TRUE)
 plotVar(res)
 
+\dontrun{
 # when Y is provided
 res2 = block.plsda(list(gene = nutrimouse$gene, lipid = nutrimouse$lipid),
     Y = nutrimouse$diet, ncomp = 2)
 plotIndiv(res2)
 plotVar(res2)
+}
 }
 
 \keyword{regression}

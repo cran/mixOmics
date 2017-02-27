@@ -30,7 +30,9 @@ logratio.transfo = function(X,
 logratio = "none", # one of ('none','CLR','ILR')
 offset = 0)
 {
-    
+    if (!(logratio %in% c("none", "CLR", "ILR")))
+    stop("Choose one of the three following logratio transformation: 'none', 'CLR' or 'ILR'")
+ 
     if (logratio == 'ILR')
     {
         if (any(class(X) != 'ilr'))

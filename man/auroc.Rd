@@ -47,7 +47,7 @@ multilevel = NULL,plot = TRUE, roc.block = 1, roc.comp = 1, ...)
 \details{
 For more than two classes in the categorical outcome Y, the AUC is calculated as one class vs. the other and the ROC curves one class vs. the others are output.
 
-The ROC and AUC are calculated based on the predicted scores obtained from the multivariate methods. Oour multivariate supervised methods already use a prediction threshold based on distances (see \code{predict}) that optimally determine class membership of the samples tested. As such AUC and ROC are not needed to estimate the performance of the model (see \code{perf}, \code{tune} that report classification error rates). We provide those outputs as complementary performance measures. 
+The ROC and AUC are calculated based on the predicted scores obtained from the multivariate methods. Our multivariate supervised methods already use a prediction threshold based on distances (see \code{predict}) that optimally determine class membership of the samples tested. As such AUC and ROC are not needed to estimate the performance of the model (see \code{perf}, \code{tune} that report classification error rates). We provide those outputs as complementary performance measures. 
 
 The pvalue is from a Wilcoxon test between the predicted scores between one class vs the others. 
 
@@ -79,6 +79,8 @@ auc.plsda.breast = auroc(plsda.breast, ncomp = 1)
 splsda.breast <- splsda(X, Y, ncomp = 2, keepX = c(25, 25))
 auroc(plsda.breast, plot = FALSE)
 
+\dontrun{
+
 ## example with sPLSDA with 4 classes
 # -----------------
 data(liver.toxicity)
@@ -90,7 +92,6 @@ Y <- as.factor(liver.toxicity$treatment[, 4])
 splsda.liver <- splsda(X, Y, ncomp = 2, keepX = c(20, 20))
 auc.splsda.liver = auroc(splsda.liver, ncomp = 1)
 
-\dontrun{
 
 ## example with mint.plsda
 # -----------------

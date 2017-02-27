@@ -82,7 +82,7 @@ Note that for PLS-DA and sPLS-DA objects, perf is performed on the original data
 
 The mint.sPLS-DA function estimates errors based on Leave-one-group-out cross validation (where each levels of object$study is left out (and predicted) once) and provides study-specific outputs (\code{study.specific.error}) as well as global outputs (\code{global.error}).
 
-For PLS-DA, sPLS-DA, mint.PLS-DA and mint.sPLS-DA methods: if \code{auc=TRUE}, Area Under the Curve (AUC) values are calculated from the predicted values obtained from the cross-validation process, either for all samples or for study-specific samples (for mint models).
+For PLS-DA, sPLS-DA, mint.PLS-DA and mint.sPLS-DA methods: if \code{auc=TRUE}, Area Under the Curve (AUC) values are calculated from the predicted values obtained from the cross-validation process, either for all samples or for study-specific samples (for mint models). See \code{\link{auroc}} for more details.
 
 }
 
@@ -148,7 +148,7 @@ Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of C
 
 \author{Ignacio Gonzalez, Amrit Singh, Kim-Anh Le Cao, Benoit Gautier, Florian Rohart.}
 
-\seealso{\code{\link{predict}}, \code{\link{nipals}}, \code{\link{plot.perf}} and \url{www.mixOmics.org} for more details.}
+\seealso{\code{\link{predict}}, \code{\link{nipals}}, \code{\link{plot.perf}}, \code{\link{auroc}} and \url{www.mixOmics.org} for more details.}
 
 \examples{
 \dontrun{

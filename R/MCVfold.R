@@ -351,7 +351,7 @@ cl
                 # note: if plsda, 'features' includes everything: to optimise computational time, we don't evaluate for plsda object
                 features.j = selectVar(object.res, comp = ncomp)$name
                 
-                test.predict.sw <- predict(object.res, newdata = X.test, method = dist)
+                test.predict.sw <- predict(object.res, newdata = X.test, dist = dist)
                 prediction.comp.j[, , i] =  test.predict.sw$predict[, , ncomp]
                 
                 for(ijk in dist)
@@ -407,7 +407,7 @@ cl
         }
         
     } #end nrep 1:nrepeat
-    
+
     names(prediction.comp) = names (auc.all) = paste0("nrep.", 1:nrepeat)
     # class.comp[[ijk]] is a matrix containing all prediction for test.keepX, all nrepeat and all distance, at comp fixed
     

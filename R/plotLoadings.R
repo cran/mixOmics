@@ -33,7 +33,7 @@ function(object, ...) UseMethod("plotLoadings")
 # --------------------------------------------------------------------------------------
 
 
-check.input.plotLoadings = function(object, block, study, subtitle, size.name, size.legend, title, col, contrib, name.var)
+check.input.plotLoadings = function(object, block, study, subtitle, size.name, size.legend, title, col, contrib, name.var, xlim)
 {
     
     if (is.null(object$loadings))
@@ -119,6 +119,40 @@ check.input.plotLoadings = function(object, block, study, subtitle, size.name, s
         
     }
     
+    # xlim
+    #---
+    if(!missing(xlim))
+    {
+        # check xlim, has to be a matrix with number of rows=number of blocks, or a vector of two values
+        if(length(block) == 1 & !is.null(xlim))
+        {
+            if(length(xlim) !=2)
+            stop("'xlim' must be a vector of length 2")
+            
+            xlim = matrix(xlim, nrow = 1)
+        }
+
+        if(length(block)>1 & !is.null(xlim))
+        {
+            if(is.matrix(xlim) && ( !nrow(xlim) %in%c(1, length(block))  | ncol(xlim) != 2 ))
+            stop("'xlim' must be a matrix with ",length(block)," rows (length(block)) and 2 columns")
+            
+            if(is.vector(xlim))
+            {
+                if(length(xlim) !=2)
+                stop("'xlim' must be a matrix with ",length(block)," rows (length(block)) and 2 columns")
+
+                xlim = matrix(xlim, nrow = 1)
+            }
+            
+            if(nrow(xlim) != length(block)) # we complete xlim to have one xlim per block
+            xlim = matrix(rep(xlim, length(block)), nrow = length(block), byrow=T)
+        }
+        
+    } else {
+        xlim = NULL
+    }
+    
     #names.var
     #-----
     if(!is.null(name.var))
@@ -155,7 +189,7 @@ check.input.plotLoadings = function(object, block, study, subtitle, size.name, s
     col = color.mixo(1) # by default set to the colors in color.mixo (10 colors)
 
 
-    return(list(col = col, size.name = size.name, size.legend = size.legend, block = block))
+    return(list(col = col, size.name = size.name, size.legend = size.legend, block = block, xlim = xlim))
 }
 
 layout.plotLoadings = function(layout, plot, legend, block)

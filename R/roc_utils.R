@@ -131,9 +131,13 @@ roc.default <- function(response, predictor,
       predictor <- predictor[patients.in.levels]
     }
     
-  if (median(controls) <= median(cases))
-    direction <- "<"
-  else if (median(controls) > median(cases))
+    # update 13/01/17: first level as control to force directionality:
+    # > : if the predictor values for the control group are higher than the values of
+    #the case group (controls > t >= cases)
+    
+    #if (median(controls) <= median(cases))
+    #direction <- "<"
+    #else if (median(controls) > median(cases))
     direction <- ">"
   
   
