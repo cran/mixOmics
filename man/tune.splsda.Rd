@@ -25,7 +25,7 @@ logratio = c('none','CLR'), multilevel = NULL, light.output = TRUE, cpus)
   \item{ncomp}{the number of components to include in the model.}
   \item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
 \item{already.tested.X}{Optional, if \code{ncomp > 1} A list containing which variables of X are to be kept on each of the first PLS-components (if \code{constraint=TRUE}) or a numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components (if \code{constraint = FALSE})}
-\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see examples. }
+\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see details and examples. }
 \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or
 \code{"loo"} (see below). Default is \code{"Mfold"}.}
 \item{folds}{the folds in the Mfold cross-validation. See Details.}
@@ -47,9 +47,14 @@ should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \cod
 
 \details{
 
-This tuning function should be used to tune the parameters in the \code{splsda} function.
+This tuning function should be used to tune the parameters in the \code{splsda} function (number of components and number of variables in \code{keepX} to select).
 
 For a sPLS-DA, M-fold or LOO cross-validation is performed with stratified subsampling where all classes are represented in each fold.
+
+If \code{validation = "loo"}, leave-one-out cross-validation is performed. By default \code{folds} is set to the number of unique individuals.
+
+The function outputs the optimal number of components that achieve the best performance based on the overall error rate or BER. The assessment is data-driven and similar to the process detailed in (Rohart et al., 2016), where one-sided t-tests assess whether there is a gain in performance when adding a component to the model. Our experience has shown that in most case, the optimal number of components is the number of categories in \code{Y} - 1.
+
 
 For sPLS-DA multilevel one-factor analysis, M-fold or LOO cross-validation is performed where all repeated measurements of one sample are in the same fold. Note that logratio transform and the multilevel analysis are performed internally and independently on the training and test set.
 
@@ -60,29 +65,40 @@ For a sPLS two-factor analysis a sPLS canonical mode is run, and the correlation
 If \code{validation = "Mfold"}, M-fold cross-validation is performed. 
 How many folds to generate is selected by specifying the number of folds in \code{folds}.
 
-If \code{validation = "loo"}, leave-one-out cross-validation is performed. By default \code{folds} is set to the number of unique individuals.
 
+If \code{auc = TRUE} and there are more than 2 categories in \code{Y}, the Area Under the Curve is averaged using one-vs-all comparison. Note however that the AUC criteria may not be particularly insightful as the prediction threshold we use in sPLS-DA differs from an AUC threshold (sPLS-DA relies on prediction distances for predictions, see \code{?predict.splsda}).
+
+Constraint model. To improve performance, a constraint model is now implemented (\code{constraint=TRUE)}. The performance is assessed on same list of selected features from the previous components in the different CV folds, as opposed to considering only the number of features. Our experience has shown that the constraint model can improve the performance of the methods.
 
 }
 
 \value{
 Depending on the type of analysis performed, a list that contains:
-\item{error.rate}{returns the prediction error for each \code{test.keepX} on each component}
+\item{error.rate}{returns the prediction error for each \code{test.keepX} on each component, averaged across all repeats and subsampling folds. Standard deviation is also output. All error rates are also available as a list.}
 \item{choice.keepX}{returns the number of variables selected (optimal keepX) on each component.}
 \item{choice.keepX.constraint}{returns the variables selected by the optimal keepX on each component. only if constraint=TRUE.}
+\item{choice.nconp}{returns the optimal number of components in the sPLS-DA model}
 \item{error.rate.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX}
 
 \item{predict}{Prediction values for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
 \item{class}{Predicted class for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
 
-\item{cor.value}{compute the correlation between latent variables for two-factor sPLS-DA analysis.}
+\item{auc}{AUC mean and standard deviation if the number of categories in \code{Y} is greater than 2, see details above. Only if auc = TRUE}
+
+\item{cor.value}{only if multilevel analysis with 2 factors: correlation between latent variables.}
+
+}
+
+\references{
+mixOmics manuscript: Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
 
 }
 
 
+
 \author{Kim-Anh Le Cao, Benoit Gautier, Francois Bartolo, Florian Rohart.}
 
-\seealso{\code{\link{splsda}} and http://www.mixOmics.org for more details.}
+\seealso{\code{\link{splsda}}, \code{\link{predict.splsda}} and http://www.mixOmics.org for more details.}
 
 \examples{
 ## First example: analysis with sPLS-DA

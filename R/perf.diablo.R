@@ -35,6 +35,7 @@
 
 perf.sgccda = function (object,
 dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
+constraint = FALSE,
 validation = c("Mfold", "loo"),
 folds = 10,
 nrepeat = 1,
@@ -76,6 +77,28 @@ cpus,
         
     }
     
+    #-- tells which variables are selected in the blocks --#
+    if(constraint)
+    {
+        loadingsX = object$loadings[-object$indY]
+        keepX.constraint = lapply(loadingsX, function(x){apply(x, 2, function(y){names(which(y!=0))})})
+        
+        
+        # gives a matrix of ncomp columns if same number of selected variables on each comp, I want a list of length ncomp
+        for(i in 1:length(keepX.constraint))
+        {
+            if(is.matrix(keepX.constraint[[i]]))
+            {
+                keepX.constraint[[i]] = split(keepX.constraint[[i]], rep(1:ncol(keepX.constraint[[i]]), each = nrow(keepX.constraint[[i]])))
+                names(keepX.constraint[[i]]) = paste("comp",1:length(keepX.constraint[[i]]),sep="")
+            }
+        }
+
+        
+    } else {
+        keepX = object$keepX
+    }
+
     error.mat = error.mat.class = Y.all = predict.all = Y.predict = list.features = final.features = weights = crit = list()
     if (length(X) > 1)
     Y.mean = Y.mean.res = Y.weighted.vote = Y.weighted.vote.res = Y.vote = Y.vote.res = Y.WeightedPredict = Y.WeightedPredict.res = list()
@@ -127,14 +150,18 @@ cpus,
         ### Estimation models
         if(missing(cpus))
         {
-            model = lapply(1 : M, function(x) {block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]), keepX = object$keepX,
+            model = lapply(1 : M, function(x) {block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]),
+                keepX = if(!constraint) {keepX} else {NULL},
+                keepX.constraint = if(constraint){keepX.constraint} else{list()},
                 design = object$design, max.iter = object$max.iter, tol = object$tol, init = object$init, scheme = object$scheme,
                 bias = object$bias, mode = object$mode)})
         } else {
             cl <- makeCluster(cpus, type = "SOCK")
             clusterExport(cl, c("block.splsda"))
             
-            model = parLapply(cl, 1 : M, function(x) {block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]), keepX = object$keepX,
+            model = parLapply(cl, 1 : M, function(x) {block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]),
+                keepX = if(!constraint) {keepX} else {NULL},
+                keepX.constraint = if(constraint){keepX.constraint} else{list()},
                 design = object$design, max.iter = object$max.iter, tol = object$tol, init = object$init, scheme = object$scheme,
                 bias = object$bias, mode = object$mode)})
             
@@ -202,7 +229,7 @@ cpus,
         
         ### Start: Prediction (score / class) sample test
         # Prediction model on test dataset
-        predict.all[[nrep]] = lapply(1 : M, function(x) {predict(model[[x]], X.test[[x]], method = "all")})
+        predict.all[[nrep]] = lapply(1 : M, function(x) {predict(model[[x]], X.test[[x]], dist = "all")})
         
         # Retrieve class prediction
         Y.predict[[nrep]] = lapply(1 : M, function(x) {predict.all[[nrep]][[x]]$class})

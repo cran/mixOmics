@@ -22,7 +22,7 @@ scale = TRUE, tol = 1e-06, max.iter = 100, near.zero.var = FALSE, light.output =
 \item{study}{grouping factor indicating which samples are from the same study}
 \item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
 \item{already.tested.X}{if \code{ncomp > 1} A list containing which variables of X are to be kept on each of the first PLS-components (if \code{constraint=TRUE}) or a numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components (if \code{constraint = FALSE})}
-\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see examples. }
+\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see details and examples. }
 \item{dist}{only applies to an object inheriting from \code{"plsda"} or \code{"splsda"} to evaluate the classification performance of the model. Should be a subset of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. Default is \code{"all"}. See \code{\link{predict}}.}
 \item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
 \item{auc}{if \code{TRUE} calculate the Area Under the Curve (AUC) performance of the model.}
@@ -42,12 +42,13 @@ Then, a \code{\link{mint.splsda}} can be performed with \code{keepX.constraint} 
 
 All component \eqn{1:\code{ncomp}} are tuned, except the first ones for which a \code{already.tested.X} is provided. See examples below.
 
+Constraint model. To improve performance, a constraint model is now implemented (\code{constraint=TRUE)}. The performance is assessed on same list of selected features from the previous components in the different CV folds, as opposed to considering only the number of features. Such strategy was implemented in the sister package bootPLS and successfully applied in our recent integrative study (Rohart et al., 2016).Our experience has shown that the constraint model can improve the performance of the methods.
 
 }
 
 \value{
 The returned value is a list with components: 
-\item{error.rate}{returns the prediction error for each \code{test.keepX} on each component}
+\item{error.rate}{returns the prediction error for each \code{test.keepX} on each component, averaged across all repeats and subsampling folds. Standard deviation is also output. All error rates are also available as a list.}
 \item{choice.keepX.constraint}{returns the variables selected by the optimal keepX on each component.}
 \item{error.rate.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX.constraint}
 
@@ -56,7 +57,10 @@ The returned value is a list with components:
 }
 
 \references{
-Rohart F. et al (2016, submitted). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
+
+mixOmics manuscript: Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+
 }
 
 

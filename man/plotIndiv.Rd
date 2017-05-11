@@ -29,7 +29,7 @@ size.title = rel(2), size.subtitle = rel(1.5), size.xlabel = rel(1),
 size.ylabel = rel(1), size.axis = rel(0.8), size.legend = rel(1),
 size.legend.title = rel(1.1), legend.title = "Legend", legend.title.pch = "Legend",
 legend.position = "right",
-point.lwd = 1, ... )
+point.lwd = 1, background = NULL, ... )
 
 \method{plotIndiv}{mint.spls}(object, comp = NULL, study = "global", rep.space = NULL, group, col.per.group,
 style = "ggplot2", ellipse = FALSE, ellipse.level = 0.95, centroid = FALSE, star = FALSE,
@@ -103,6 +103,7 @@ or integers. See \code{\link{points}} for all alternatives.}
 \item{legend.position}{position of the legend, one of "bottom",
 "left", "top" and "right". }
 \item{point.lwd}{\code{lwd} of the points, used when \code{ind.names = FALSE}}
+\item{background}{color the background by the predicted class, see \code{\link{background.predict}}}
 \item{...}{external arguments or type par can be added with \code{style = 'graphics'}}
 }
 
@@ -114,10 +115,17 @@ If \code{ind.names=TRUE} and row names is \code{NULL}, then \code{ind.names=1:n}
 \code{n} is the number of individuals. Also, if \code{pch} is an input, then \code{ind.names} is set to FALSE
 as we do not show both names and shapes.
 
-The arguments \code{col}, \code{cex} and \code{pch} can be atomic vectors or vectors of
-length \code{n}. If atomic, this argument value determines the graphical attribute for all the individuals.
-In the last case, multiple arguments values can be specified so that each point (individual)
-can be given its own graphic attributes (see \code{\link{par}}). Default values exist for this arguments.
+
+\code{plotIndiv} can have a two layers legend. This is especially convenient when you have two grouping factors, such as a gender effect and a study effect, and you want to highlight both simulatenously on the graphical output.
+A first layer is coded by the \code{group} factor, the second by the \code{pch} argument. When \code{pch} is missing, a single layer legend is shown.
+If the \code{group} factor is missing, the \code{col} argument is used to create the grouping factor \code{group}.
+When a second grouping factor is needed and added via \code{pch}, \code{pch} needs to be a vector of length the number of samples.
+In the case where \code{pch} is a vector or length the number of groups, then we consider that the user wants a different \code{pch} for each level of \code{group}. This leads to a single layer legend and we merge \code{col} and \code{pch}.
+In the similar case where \code{pch} is a single value, then this value is used to represent all samples. See examples below for object of class plsda and splsda.
+
+In the specific case of a single `omics supervised model (\code{\link{plsda}}, \code{\link{splsda}}), users can overlay prediction results to sample plots in order to visualise the prediction areas of each class, via the \code{background} input parameter.
+Note that this functionality is only available for models with less than 2 components as the surfaces obtained for higher order components cannot be projected onto a 2D representation in a meaningful way. For more details, see \code{\link{background.predict}}
+
 
 For customized plots (i.e. adding points, text), use the style = 'graphics' (default is ggplot2).
 
@@ -126,7 +134,7 @@ Note: the ellipse options were borrowed from the \pkg{ellipse}.
 
 \author{Ignacio Gonzalez, Benoit Gautier, Francois Bartolo, Florian Rohart}
 
-\seealso{\code{\link{text}}, \code{\link{points}} and http://mixOmics.org/graphics for more details.}
+\seealso{\code{\link{text}}, \code{\link{background.predict}}, \code{\link{points}} and http://mixOmics.org/graphics for more details.}
 
 
 \examples{
@@ -172,14 +180,17 @@ keepY = c(10, 10, 10))
 #default
 plotIndiv(toxicity.spls)
 
-# created a first grouping with Time.Group and 'group' and a second with Dose.Group and 'pch'
+\dontrun{
+# two layers legend: a first grouping with Time.Group and 'group'
+# and a second with Dose.Group and 'pch'
 plotIndiv(toxicity.spls, rep.space="X-variate", ind.name = FALSE,
 group = liver.toxicity$treatment[, 'Time.Group'], # first factor
 pch = as.numeric(factor(liver.toxicity$treatment$Dose.Group)), #second factor
 pch.levels =liver.toxicity$treatment$Dose.Group, #levels of the second factor, for the legend
 legend = TRUE)
+}
 
-\dontrun{
+
 # indicating the centroid
 plotIndiv(toxicity.spls, rep.space= 'X-variate', ind.names = FALSE,
           group = liver.toxicity$treatment[, 'Time.Group'], centroid = TRUE)
@@ -201,7 +212,7 @@ plotIndiv(toxicity.spls, rep.space= 'X-variate', ind.names = FALSE,
     group = liver.toxicity$treatment[, 'Time.Group'],
     ind.names = liver.toxicity$treatment[, 'Dose.Group'],
     legend = TRUE)
-}
+
 
 ## plot of individuals for objects of class 'plsda' or 'splsda'
 # ----------------------------------------------------
@@ -213,6 +224,9 @@ splsda.breast <- splsda(X, Y,keepX=c(10,10),ncomp=2)
 
 # default option: note the outcome color is included by default!
 plotIndiv(splsda.breast)
+
+# also check ?background.predict for to visualise the prediction
+# area with a plsda or splsda object!
 
 
 \dontrun{
@@ -227,6 +241,25 @@ plotIndiv(splsda.breast)
     ellipse = TRUE, style = "ggplot2", cex = c(1, 1))
     plotIndiv(splsda.breast, ind.names = TRUE, comp = c(1, 2),
     ellipse = TRUE, style = "lattice", cex = c(1, 1))
+
+    # changing pch of the two groups
+    plotIndiv(splsda.breast, ind.names = FALSE, comp = c(1, 2),
+    pch = c(15,16), legend = TRUE)
+
+    # creating a second grouping factor with a pch of length 3,
+    #  which is recycled to obtain a vector of length n
+    plotIndiv(splsda.breast, ind.names = FALSE, comp = c(1, 2),
+    pch = c(15,16,17), legend = TRUE)
+
+    #same thing as
+    pch.indiv = c(rep(15:17,15), 15, 16) # length n
+    plotIndiv(splsda.breast, ind.names = FALSE, comp = c(1, 2),
+    pch = pch.indiv, legend = TRUE)
+
+    # change the names of the second legend with pch.levels
+    plotIndiv(splsda.breast, ind.names = FALSE, comp = c(1, 2),
+    pch = 15:17, pch.levels = c("a","b","c"),legend = TRUE)
+
 }
 
 

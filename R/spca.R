@@ -29,14 +29,13 @@
 
 spca <- 
 function(X, 
-         ncomp = 3, 
+         ncomp = 2,
          center = TRUE, 
          scale = TRUE,
          keepX = rep(ncol(X), ncomp),
          max.iter = 500, 
          tol = 1e-06,
          logratio = 'none',# one of ('none','CLR')
-         ilr.offset = 0.001,
          multilevel = NULL)
 {
 
@@ -131,7 +130,7 @@ function(X,
     
     #-----------------------------#
     #-- logratio transformation --#
-    X = logratio.transfo(X = X, logratio = logratio, offset = if(logratio == "ILR") {ilr.offset} else {0})
+    X = logratio.transfo(X = X, logratio = logratio, offset = 0)#if(logratio == "ILR") {ilr.offset} else {0})
     
     #-- logratio transformation --#
     #-----------------------------#
@@ -181,80 +180,86 @@ function(X,
     if (is.null(ind.names)) X.names = 1:nrow(X)
 
     vect.varX=vector(length=ncomp)
-    names(vect.varX) = c(1:ncomp)
+    names(vect.varX) = paste("PC", 1:ncomp, sep = "")#c(1:ncomp)
 
     vect.iter=vector(length=ncomp)
-    names(vect.iter) = c(1:ncomp)
+    names(vect.iter) = paste("PC", 1:ncomp, sep = "")#c(1:ncomp)
 
-    vect.keepX=vector(length=ncomp)
-    names(vect.keepX) = c(1:ncomp)
+    vect.keepX = keepX
+    names(vect.keepX) = paste("PC", 1:ncomp, sep = "")#c(1:ncomp)
 
 # KA: to add if biplot function (but to be fixed!)
     #sdev = vector(length = ncomp)
 
     mat.u=matrix(nrow=n, ncol=ncomp)
     mat.v=matrix(nrow=p, ncol=ncomp)
-    colnames(mat.u)=c(1:ncomp)
-    colnames(mat.v)=c(1:ncomp)
+    colnames(mat.u)=paste("PC", 1:ncomp, sep = "")#c(1:ncomp)
+    colnames(mat.v)=paste("PC", 1:ncomp, sep = "")#c(1:ncomp)
     rownames(mat.v)=colnames(X)
 
     #--loop on h--#
     for(h in 1:ncomp){
        
        #--computing the SVD--#
-       svd.X=svd(X.temp)
-       u.new = svd.X$u[,1] 
-       v.new = svd.X$d[1]*svd.X$v[,1]
-       v.stab=FALSE
-       u.stab=FALSE
-       iter=0
+       svd.X = svd(X.temp, nu = 1, nv = 1)
+       u = svd.X$u[,1]
+       loadings = svd.X$v[,1]#svd.X$d[1]*svd.X$v[,1]
+       v.stab = FALSE
+       u.stab = FALSE
+       iter = 0
 
        #--computing nx(degree of sparsity)--#
        nx = p-keepX[h]
-       vect.keepX[h]=keepX[h]
-
+       #vect.keepX[h] = keepX[h]
+       
+       u.old = u
+       loadings.old = loadings
        #--iterations on v and u--#
-       while((v.stab==FALSE) || (u.stab==FALSE)){
-            iter=iter+1
-            u.old=u.new
-            v.temp=t(X.temp)%*%u.old
-            v.old=v.new
+       repeat{
+           
+            iter = iter +1
             
-            if(h>=2){
-               u.new=(lsfit(y=X%*%v.old, x=X%*%mat.v[,1:(h-1)],intercept=FALSE)$res)
-               u.new=u.new/sqrt(drop(crossprod(u.new)))
-            }
+            loadings = t(X.temp) %*% u
             
             #--penalisation on loading vectors--#
-            if(nx!=0){
-               v.new = ifelse(abs(v.temp) > abs(v.temp[order(abs(v.temp))][nx]), 
-               (abs(v.temp) - abs(v.temp[order(abs(v.temp))][nx])) * sign(v.temp), 0)
+            if (nx != 0) {
+                absa = abs(loadings)
+                if(any(rank(absa, ties.method = "max") <= nx)) {
+                    loadings = ifelse(rank(absa, ties.method = "max") <= nx, 0, sign(loadings) * (absa - max(absa[rank(absa, ties.method = "max") <= nx])))
+                }
             }
+            loadings = loadings / drop(sqrt(crossprod(loadings)))
             
-            if(h==1){  
-               u.new = as.vector(X.temp %*% v.new)
-               u.new=u.new/sqrt(drop(crossprod(u.new)))
-            }
-            
-            #--checking convergence--#
-            if(crossprod(u.new-u.old)<tol){u.stab=TRUE}
-            if(crossprod(v.new-v.old)<tol){v.stab=TRUE}
-            
-            if ((is.na(v.stab)) | (is.na(u.stab)) | (iter >= max.iter))
-            {v.stab=TRUE; u.stab=TRUE}
-        
-       }##fin while v
+            u = as.vector(X.temp %*% loadings)
+            #u = u/sqrt(drop(crossprod(u))) # no normalisation on purpose: to get the same $x as in pca when no keepX.
+       
+           #--checking convergence--#
+           if(crossprod(u-u.old)<tol){break}
+           if(crossprod(loadings-loadings.old)<tol){break}
+           
+           if (iter >= max.iter)
+           {
+               warning(paste("Maximum number of iterations reached for the component", h),call. = FALSE)
+               break
+           }
+           
+           u.old = u
+           loadings.old = loadings
+       
+       }
 
 
-       v.final = v.new/sqrt(drop(crossprod(v.new)))
+
+        #v.final = v.new/sqrt(drop(crossprod(v.new)))
              
        #--deflation of data--#
-       X.temp= X.temp - svd.X$d[1] * svd.X$u[,1] %*% t(svd.X$v[,1])
+       c = crossprod(X.temp, u) / drop(crossprod(u))
+       X.temp= X.temp - u %*% t(c)  #svd.X$d[1] * svd.X$u[,1] %*% t(svd.X$v[,1])
        
        
-       vect.iter[h]=iter
-       mat.v[,h]=v.final
-       mat.u[,h]=u.new
+       vect.iter[h] = iter
+       mat.v[,h] = loadings
+       mat.u[,h] = u
        
        #--calculating adjusted variances explained--#
        X.var = X %*% mat.v[,1:h]%*%solve(t(mat.v[,1:h])%*%mat.v[,1:h])%*%t(mat.v[,1:h])
@@ -282,8 +287,8 @@ function(X,
                    rotation = mat.v,
                    x = mat.u,
                    names = list(X = X.names, sample = ind.names),
-                   loadings=list(X=mat.v),
-                   variates=list(X=mat.u)
+                   loadings = list(X = mat.v),
+                   variates = list(X = mat.u)
               ))
 			  
     class(result) = c("spca", "prcomp", "pca")

@@ -689,7 +689,7 @@ plot_parameters)
 
         } else if (length(pch) > n) {
             stop("Length of 'pch' should be of length inferior or equal to ", n, ".")
-        } else if (length(pch) == length(unique(group))) {
+        } else if (length(pch) == length(unique(group)) & length(pch)!=n ) { # prevent from reordering pch when 1 group per sample (length(pch)=length(group)=n)
             pch = pch[as.factor(group)]
             pch.levels = pch.levels[as.factor(group)]
 

@@ -194,6 +194,10 @@ pharmacology of cancer. \emph{Science} \bold{275}, 343-349.
 
 Gonzalez I., Le Cao K.A., Davis M.J., Dejean S. (2012). Visualising associations between
 paired 'omics' data sets. \emph{BioData Mining}; \bold{5}(1).
+
+mixOmics manuscript:
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+
 }
 
 \author{Ignacio Gonzalez, Francois Bartolo, Kim-Anh Le Cao.}

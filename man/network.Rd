@@ -107,6 +107,9 @@ and define an interactive process: by clicking either at each end
 at middle portion of this. The position of the slider indicate which is the `cutoff' value
 associated to the display network.
 
+
+The network can be saved in a .glm format using the \pkg{igraph} package, the function \code{write.graph} and extracting the output \code{gR}.
+
 The interactive process is terminated by clicking the second button and selecting `Stop'
 from the menu, or from the `Stop' menu on the graphics window.
 
@@ -135,18 +138,17 @@ a default of \code{c(1, 1)}.
 }
 
 \section{Warning}{
-If the number of variables is high, the generation of the
-network can take some seconds.
+If the number of variables is high, the generation of the network generation can take some time.
 }
 
 \value{
 \code{network} return a list containing the following components:
 \item{M}{the correlation matrix used by \code{network}.}
-\item{gR}{a \code{graph} object (see the \pkg{igraph} package).}
+\item{gR}{a \code{graph} object to save the graph for cytoscape use (requires to load the \pkg{igraph} package).}
 }
 
 \references{
-Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired ?omics? data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}
+Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}
 
 Butte, A. J., Tamayo, P., Slonim, D., Golub, T. R. and Kohane, I. S. (2000).
 Discovering functional relationships between RNA expression and chemotherapeutic

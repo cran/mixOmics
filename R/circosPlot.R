@@ -38,7 +38,8 @@ line=TRUE,
 size.legend=0.8,
 ncol.legend=1,
 size.variables = 0.25,
-size.labels=1)
+size.labels=1,
+legend = TRUE)
 {
     # to satisfy R CMD check that doesn't recognise x, y and group as variable (in aes)
     Features = Exp = Dataset = Mean = linkColors = chrom = po = NULL
@@ -200,9 +201,9 @@ size.labels=1)
     
     plot(c(1,figSize), c(1,figSize), type="n", axes=FALSE, xlab="", ylab="", main="")
     
+    #save(list=ls(),file="temp.Rdata")
     # Plot ideogram
-    drawIdeogram(R=circleR, cir=db, W=segmentWidth,  show.band.labels=TRUE, show.chr.labels=TRUE, chr.labels.R= chrLabelsR, chrData=chr, size.variables = size.variables, size.labels=size.labels, color.blocks = color.blocks)
-    
+    drawIdeogram(R=circleR, cir=db, W=segmentWidth,  show.band.labels=TRUE, show.chr.labels=TRUE, chr.labels.R= chrLabelsR, chrData=chr, size.variables = size.variables, size.labels=size.labels, color.blocks = color.blocks, line = line)
     # Plot links
     if(nrow(links)>0)
     drawLinks(R=linksR, cir=db,   mapping=links,   col=linkColors, drawIntraChr=showIntraLinks, color.cor = color.cor)
@@ -238,20 +239,22 @@ size.labels=1)
     opar=par("xpd")
     par(xpd=TRUE) # to authorise the legend to be written outside the margin, otherwise it's too small
     # Plot legend
-    # First legeng bottom left corner
-    legend(x=5, y = (circleR/4), title="Correlations", c("Positive Correlation", "Negative Correlation"),
-    col = color.cor, pch = 19, cex=size.legend, bty = "n")
-    # Second legend bottom righ corner
-    if(line==TRUE)
-    legend(x=figSize-(circleR/3), y = (circleR/3), title="Expression", legend=levels(Y),  ## changed PAM50 to Y
-    col = lineCols, pch = 19, cex=size.legend, bty = "n",ncol=ncol.legend)
-    # third legend top left corner
-    legend(x=figSize-(circleR/2), y = figSize, title="Correlation cut-off", legend=paste("r", cutoff, sep = "="),
-    col = "black", cex=size.legend, bty = "n")
+    if(legend == TRUE)
+    {
+        # First legeng bottom left corner
+        legend(x=5, y = (circleR/4), title="Correlations", c("Positive Correlation", "Negative Correlation"),
+        col = color.cor, pch = 19, cex=size.legend, bty = "n")
+        # Second legend bottom righ corner
+        if(line==TRUE)
+        legend(x=figSize-(circleR/3), y = (circleR/3), title="Expression", legend=levels(Y),  ## changed PAM50 to Y
+        col = lineCols, pch = 19, cex=size.legend, bty = "n",ncol=ncol.legend)
+        # third legend top left corner
+        legend(x=figSize-(circleR/2), y = figSize, title="Correlation cut-off", legend=paste("r", cutoff, sep = "="),
+        col = "black", cex=size.legend, bty = "n")
 
-    legend(x=-circleR/4, y = figSize, legend=paste("Comp",paste(comp,collapse="-")),
-    col = "black", cex=size.legend, bty = "n")
-
+        legend(x=-circleR/4, y = figSize, legend=paste("Comp",paste(comp,collapse="-")),
+        col = "black", cex=size.legend, bty = "n")
+    }
     par(xpd=opar,mar=opar1)# put the previous defaut parameter for xpd
     return(invisible(corMat))
 }
@@ -262,7 +265,8 @@ show.chr.labels = FALSE, chr.labels.R = 0,
 chrData,
 size.variables,
 size.labels,
-color.blocks)
+color.blocks,
+line)
 {
     # Draw the main circular plot: segments, bands and labels
     chr.po    = cir 
@@ -306,8 +310,14 @@ color.blocks)
         } #End for row
         if (show.chr.labels){
             w.m = (v1+v2)/2 
-            chr.t = gsub("chr", "", chr.s) 
-            draw.text.rt(xc, yc, chr.labels.R, w.m, chr.t, cex=size.labels, segmentWidth = W, parallel=TRUE) 
+            chr.t = gsub("chr", "", chr.s)
+            if(line == TRUE)
+            {
+                draw.text.rt(xc, yc, chr.labels.R, w.m, chr.t, cex=size.labels, segmentWidth = W, parallel=TRUE)
+            } else {
+                #put the labels closer to the circle
+                draw.text.rt(xc, xc, chr.labels.R, w.m, chr.t, cex=size.labels, segmentWidth = 75, parallel=TRUE)
+            }
         }
     } #End for
 }

@@ -8,10 +8,9 @@
 Performs a sparse principal components analysis to perform variable selection by using singular value decomposition.}
 
 \usage{
-spca(X, ncomp = 3, center = TRUE, scale = TRUE, 
+spca(X, ncomp = 2, center = TRUE, scale = TRUE,
      keepX = rep(ncol(X),ncomp), max.iter = 500,
      tol = 1e-06, logratio = 'none',  # one of ('none','CLR')
-     ilr.offset = 0.001,
      multilevel = NULL)
 }
 
@@ -28,8 +27,7 @@ spca(X, ncomp = 3, center = TRUE, scale = TRUE,
   \item{tol}{a positive real, the tolerance used in the iterative algorithm.} 
   \item{keepX}{numeric vector of length ncomp, the number of variables to keep in loading vectors. By default all 
    variables are kept in the model. See details.}
-\item{logratio}{one of ('none','CLR','ILR'). Specifies the log ratio transformation to deal with compositional values that may arise from specific normalisation in sequencing data. Default to 'none'}
-\item{ilr.offset}{When logratio is set to 'ILR', an offset must be input to avoid infinite value after the logratio transform, default to 0.001.}
+\item{logratio}{one of ('none','CLR'). Specifies the log ratio transformation to deal with compositional values that may arise from specific normalisation in sequencing data. Default to 'none'}
 \item{multilevel}{sample information for multilevel decomposition for repeated measurements.}
 
 }

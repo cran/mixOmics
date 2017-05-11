@@ -32,15 +32,13 @@ multilevel=NULL)
     \code{NA}s are allowed. For multilevel analysis, a data frame of up to two columns is accepted.}
   \item{ncomp}{the number of components to include in the model (see Details). 
     Default is set to from one to the rank of \code{X}.}
-\item{mode}{character string. What type of algorithm to use, (partially) matching
+  \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
 See Details.}
 \item{keepX.constraint}{A list containing which variables of X are to be kept on each of the first PLS-components}
 \item{keepY.constraint}{A list containing which variables of Y are to be kept on each of the first PLS-components}
-\item{keepX}{numeric vector of length \code{ncomp}, the number of variables
-to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
-\item{keepY}{numeric vector of length \code{ncomp}, the number of variables
-to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
+\item{keepX}{numeric vector of length \code{ncomp}, the number of variables to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
+\item{keepY}{numeric vector of length \code{ncomp}, the number of variables to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances (default: TRUE)}
 \item{tol}{Convergence stopping value.}
@@ -84,16 +82,21 @@ that contains the following components:
   \item{mode}{the algorithm used to fit the model.}
   \item{keepX}{number of \eqn{X} variables kept in the model on each component.}
   \item{keepY}{number of \eqn{Y} variables kept in the model on each component.}
-  \item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
+  \item{keepX.constraint}{if a constraint model was chosen, the list of X variables that were constraint to be selected on each of the sPLS components.}
+  \item{keepY.constraint}{if a constraint model was chosen, the list of Y variables that were constraint to be selected on each of the sPLS components.}
+  %\item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
   \item{variates}{list containing the variates.}
   \item{loadings}{list containing the estimated loadings for the \eqn{X} and 
 	\eqn{Y} variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
-  \item{nzv}{list containing the zero- or near-zero predictors information.}
   \item{tol}{the tolerance used in the iterative algorithm, used for subsequent S3 methods}
+  \item{iter}{Number of iterations of the algorthm for each component}
   \item{max.iter}{the maximum number of iterations, used for subsequent S3 methods}
-\item{iter}{Number of iterations of the algorthm for each component}
-
+  \item{nzv}{list containing the zero- or near-zero predictors information.}
+  \item{scale}{whether scaling was applied per predictor.}
+  \item{logratio}{whether log ratio transformation for relative proportion data was applied, and if so, which type of transformation.}
+  \item{explained_variance}{amount of variance explained per component (note that contrary to PCA, this amount may not decrease).}
+  \item{input.X}{numeric matrix of predictors in X that was input, before any saling / logratio / multilevel transformation.}
 }
 
 \references{

@@ -78,7 +78,8 @@ size.legend.title = rel(1.1), #size.legend.title
 legend.title = "Legend",
 legend.title.pch = "Legend",
 legend.position = "right",
-point.lwd = 1, 
+point.lwd = 1,
+background = NULL,
 ...
 )
 {
@@ -132,7 +133,9 @@ point.lwd = 1,
         if (length(subtitle)!= length(blocks) | length(subtitle)!= length(unique(subtitle)))
         stop("'subtitle' indicates the subtitle of the plot for each 'blocks'; it needs to be the same length as 'blocks' and duplicate are not allowed.")
     }
-
+    
+    if(!is.null(background) && class(background)!="background.predict")
+    stop("'background' must have been obtained with the 'background.predict' function")
 
     #-- check inputs
     check  = check.input.plotIndiv(object = object, comp  = comp , blocks  = blocks, ind.names  = ind.names, 
@@ -186,6 +189,14 @@ point.lwd = 1,
         if (ellipse)
         df.ellipse$Block = factor(df.ellipse$Block, labels = subtitle)
     }
+    
+    # match background color to col.per.group, the color of the groups
+    if(!is.null(background))
+    {
+        ind.match = match(names(background), levels(df$group))
+        names(background) = adjustcolor(col.per.group[ind.match],alpha.f=0.1)
+    }
+    
     #save(list = ls(), file = "temp.Rdata")
 
     #call plot module (ggplot2, lattice, graphics, 3d)
@@ -193,7 +204,7 @@ point.lwd = 1,
     X.label = X.label, Y.label = Y.label, Z.label = Z.label, xlim = xlim, ylim = ylim, class.object = class(object),
     display.names = display.names, legend = legend, abline = abline, star = star,
     ellipse = ellipse, df.ellipse = df.ellipse, style = style, layout = layout, #missing.col = missing.col,
-    axes.box = axes.box, plot_parameters = plot_parameters, alpha = alpha)
+    axes.box = axes.box, plot_parameters = plot_parameters, alpha = alpha, background = background)
 
 
     return(invisible(list(df = df, df.ellipse = df.ellipse, graph = res)))

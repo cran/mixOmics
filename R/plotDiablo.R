@@ -38,6 +38,7 @@
 
 plot.sgccda = plotDiablo = function(x,
 ncomp = 1,
+legend = TRUE,
 legend.ncol,
 ...)
 {
@@ -102,6 +103,7 @@ legend.ncol,
     }
     #add legend
     plot(1:3,1:3,type="n",axes=FALSE,xlab="",ylab="")
+    if(legend)
     legend("center",legend=levels(Y), col = color.mixo(1:nlevels(Y)), pch = 19, ncol = legend.ncol, cex = 1.5)
     
     par(opar)

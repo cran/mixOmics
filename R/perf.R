@@ -159,6 +159,7 @@ progressBar = TRUE,
     for(k in 1:ncomp)
     featuresX[[k]] = featuresY[[k]] = NA
     
+    
     #-- loop on h = ncomp --#
     # the loop is only for the calculation of Q2 on each component
     for (h in 1:ncomp)
@@ -199,9 +200,17 @@ progressBar = TRUE,
             if (h == 1)
             {
                 #nzv = (apply(X.train, 2, var) > .Machine$double.eps) # removed in v6.0.0 so that MSEP, R2 and Q2 are obtained with the same data
-                spls.res = spls(X.train, Y.train, ncomp = ncomp, mode = mode, max.iter = max.iter, tol = tol, keepX = keepX, keepY = keepY, near.zero.var = FALSE)
-                Y.hat = predict(spls.res, X.test)$predict
+                # re-added in >6.1.3 to remove constant variables
+                nzv = (apply(X.train, 2, var) > .Machine$double.eps)
                 
+                # creating a keepX.temp that can change for each fold, depending on nzv
+                keepX.temp = keepX
+                if(any(keepX.temp > sum(nzv)))
+                keepX.temp[which(keepX.temp>sum(nzv))] = sum(nzv)
+                
+                spls.res = mixOmics::spls(X.train[,nzv], Y.train, ncomp = ncomp, mode = mode, max.iter = max.iter, tol = tol, keepX = keepX.temp, keepY = keepY, near.zero.var = FALSE)
+                Y.hat = predict(spls.res, X.test[,nzv])$predict
+                if(sum(is.na(Y.hat))>0) break
                 for (k in 1:ncomp)
                 {
                     Ypred[omit, , k] = Y.hat[, , k]

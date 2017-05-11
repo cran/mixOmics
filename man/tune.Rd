@@ -3,10 +3,10 @@
 \alias{tune}
 
 
-\title{Overall tuning function that can be used to tune several methods}
+\title{Generic function to choose the parameters in the different methods in mixOmics}
 
 \description{
-Wrapper of all the tuning functions.
+Wrapper of all tuning functions.
 }
 
 \usage{
@@ -55,7 +55,7 @@ light.output = TRUE # mint, splsda
 \item{test.keepY}{If \code{method = 'spls'}, numeric vector for the different number of variables to test from the \eqn{Y} data set}
 \item{already.tested.X}{if \code{ncomp > 1} A list containing which variables of X are to be kept on each of the first PLS-components (if \code{constraint=TRUE}) or a numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components (if \code{constraint = FALSE})}
 \item{already.tested.Y}{if \code{method = 'spls'} and \code{if(ncomp > 1)} numeric vector indicating the number of variables to select from the \eqn{Y} data set on the first components}
-\item{constraint}{Indicate whether the performance of the model is evaluated in regards to the number of variables selected (keepX, constraint = FALSE) or which specific variables are selected (keepX.constraint, constraint = TRUE)}
+\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see details in the specific tune.model help function. }
 \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
 See Details.}
@@ -88,15 +88,32 @@ columns of \code{X} can be supplied. The value is passed to \code{\link{scale}}.
 }
 
 \details{
-For more details, please see the help file corresponding to your \code{method}.
+For more details, please see the help file corresponding to your \code{method}, e.g. \code{tune.splsda}.
 Note that only the arguments used in the tune function corresponding to \code{method} are passed on.
 }
 
 \value{
-Depending on the type of analysis performed, a list that contains:
-  \item{error}{cross-validation overall error rate when one-factor sPLS-DA analysis is performed.}
-  \item{predict}{cross-validation prediction for all samples and for the LAST keepX tested parameter when one-factor sPLS-DA analysis is performed.}
-  \item{cor.value}{compute the correlation between latent variables for two-factor sPLS-DA analysis or sPLS.}
+Depending on the type of analysis performed and the input arguments, a list that may contain:
+
+\item{error.rate}{returns the prediction error for each \code{test.keepX} on each component, averaged across all repeats and subsampling folds. Standard deviation is also output. All error rates are also available as a list.}
+\item{choice.keepX}{returns the number of variables selected (optimal keepX) on each component.}
+\item{choice.keepX.constraint}{returns the variables selected by the optimal keepX on each component. only if constraint=TRUE.}
+\item{choice.nconp}{returns the optimal number of components in a Discriminant Analysis model}
+\item{error.rate.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX}
+
+\item{predict}{Prediction values for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
+\item{class}{Predicted class for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
+
+\item{auc}{AUC mean and standard deviation if the number of categories in \code{Y} is greater than 2, see details above. Only if auc = TRUE}
+
+\item{cor.value}{only if multilevel analysis with 2 factors: correlation between latent variables.}
+
+
+}
+
+
+\references{
+mixOmics manuscript: Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
 
 }
 

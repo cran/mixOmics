@@ -2,10 +2,10 @@
 \encoding{latin1}
 \alias{mint.block.splsda}
 
-\title{Horizontal and Vertical Discriminant Analysis integration with variable selection}
+\title{NP-integration with Discriminant Analysis and variable selection}
 
 
-\description{Function to integrate data sets measured on the same samples (horizontal integration) and to combine multiple independent studies (vertical integration) using variants of sparse multi-group and generalised PLS-DA for supervised classification and variable selection.
+\description{Function to integrate data sets measured on the same samples (N-integration) and to combine multiple independent studies measured on the same variables or predictors (P-integration) using variants of sparse multi-group and generalised PLS-DA for supervised classification and variable selection.
 }
 
 \usage{
@@ -63,6 +63,8 @@ The type of algorithm to use is specified with the \code{mode} argument. Four PL
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
 algorithm \code{("classic")} (see References).
+
+Constraint model. To improve performance, a new argument was recently added to fit a constraint model (\code{constraint=TRUE)}. The model is run on the optimal list of selected features \code{keepX.constraint} from the previous components, as opposed to considering only a specified number of features \code{keepX}. Such strategy was implemented in the sister package bootPLS and successfully applied in our recent integrative study (Rohart et al., 2016). Our experience has shown that the constraint model can substantially improve the performance of the method ).
 }
 
 \value{
@@ -86,18 +88,23 @@ that contains the following components:
 
 \references{
 On multi-group PLS:
-F Rohart, N Matigian, A Eslami, S Bougeard and K-A. Lê Cao. MINT: A multivariate integrative approach to identify a reproducible biomarker
-signature across multiple experiments and platforms. Accepted in BMC BIoinformatics.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
-On multiple integration with sparse PLSDA:
 
+
+On multiple integration with sparse PLSDA:
 Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
-DIABLO - multi omics integration for biomarker discovery. In preparation.
+DIABLO:  multi omics integration for biomarker discovery. BioRxiv available here: \url{http://biorxiv.org/content/early/2016/08/03/067611}
+
 
 Tenenhaus A., Philippe C., Guillemot V, Le Cao K.A., Grill J, Frouin V. Variable selection for generalized canonical correlation analysis. \emph{Biostatistics}. kxu001
 
 Gunther O., Shin H., Ng R. T. , McMaster W. R., McManus B. M. , Keown P. A. , Tebbutt S.J. , Le Cao K-A. ,  (2014) Novel multivariate methods for integration of genomics and proteomics data: Applications in a kidney transplant rejection study, OMICS: A journal of integrative biology, 18(11), 682-95.
+
+mixOmics manuscript:
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+
 }
 
 \author{Florian Rohart, Benoit Gautier, Kim-Anh Le Cao}

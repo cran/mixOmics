@@ -2,10 +2,10 @@
 \encoding{latin1}
 \alias{mint.pca}
 
-\title{Vertical Principal Component integration}
+\title{P-integration with Principal Component Analysis}
 
 
-\description{Function to integrate and combine multiple independent studies using a multigroup Principal Component Analysis.
+\description{Function to integrate and combine multiple independent studies measured on the same variables or predictors  (P-integration) using a multigroup Principal Component Analysis.
 }
 
 \usage{
@@ -59,8 +59,7 @@ multiplied by the rotation/loadings matrix), also called the principal component
 }
 
 \references{
-F Rohart, N Matigian, A Eslami, S Bougeard and K-A. Lê Cao. MINT: A multivariate integrative approach to identify a reproducible biomarker
-signature across multiple experiments and platforms. Accepted in BMC BIoinformatics.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
 }

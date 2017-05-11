@@ -44,20 +44,25 @@ multilevel, \ldots)
 \code{predict} produces predicted values, obtained by evaluating the PLS-derived methods, returned by \code{(mint).(block).(s)pls(da)} in the frame \code{newdata}.
 Variates for \code{newdata} are also returned. Please note that this method does not perform multilevel decomposition or log ratio transformations, which need to be processed beforehand.
 
-Different class prediction methods are proposed for discriminant analysis: \code{"max.dist"}
-is the naive method to predict the class. It is based on the predicted matrix (\code{object$predict}) 
-which can be seen as a probability matrix to assign each test data to a class. The class with the largest 
-class value is the predicted class. \code{"centroids.dist"} allocates the individual \eqn{x} to the class of 
-\eqn{Y} minimizing \eqn{dist(\code{x-variate}, G_l)}, where \eqn{G_l}, \eqn{l = 1,...,L} are the centroids of 
-the classes calculated on the \eqn{X}-variates of the model. \code{"mahalanobis.dist"} allocates the individual 
-\eqn{x} to the class of \eqn{Y} as in \code{"centroids.dist"} but by using the Mahalanobis metric 
-in the calculation of the distance.
+Different prediction distances are proposed for discriminant analysis. The reason is that our supervised models work with a dummy indicator matrix of \code{Y} to indicate the class membership of each sample and the prediction on a new observation results in a prediction score for each outcome category (see output \code{object$predict}). Therefore, the scores across all classes need to be combined to obtain the final prediction of a given test sample using a distance of some sort. We propose distances such as `maximum distance', `Mahalanobis distance' and `Centroids distance'.
+
+\code{"max.dist"} is the simplest method to predict the class of a test sample. For each new individual, the class with the largest predicted score is the predicted class.
+
+\code{"centroids.dist"}  allocates to the new observation the class that mimimises the distance between the predicted score and the centroids of the classes calculated on the latent components of the trained model.
+
+\code{"mahalanobis.dist"}  allocates the new sample the class defined as the centroid distance, but using the Mahalanobis metric in the calculation of the distance.
+
+For a visualisation of those prediction distances, see \code{background.predict} that overlays the prediction area in \code{plotIndiv} for a sPLS-DA object.
+
+
+%allocates the individual \eqn{x} to the class of \eqn{Y} minimizing \eqn{dist(\code{x-variate}, G_l)}, where \eqn{G_l}, \eqn{l = 1,...,L} are the centroids of the classes calculated on the \eqn{X}-variates of the model. \code{"mahalanobis.dist"} allocates the individual \eqn{x} to the class of \eqn{Y} as in \code{"centroids.dist"} but by using the Mahalanobis metric in the calculation of the distance.
 
 For MINT objects, the \code{study.test} argument is required and provides the grouping factor of \code{newdata}.
 
 For multi block analysis (thus block objects), \code{newdata} is a list of matrices whose names are a subset of \code{names(object$X)} and missing blocks are allowed. Several predictions are returned, either for each block or for all blocks.
 For non discriminant analysis, the predicted values (\code{predict}) are returned for each block and these values are combined by average (\code{AveragedPredict}) or weighted average (\code{WeightedPredict}), using the weights of the blocks that are calculated as the correlation between a block's components and the outcome's components.
-For discriminant analysis, the predicted class is returned for each block (\code{class}) and each distance (\code{dist}) and these predictions are combined by majority vote (\code{MajorityVote}) or weighted majority vote (\code{WeightedVote}), using the weights of the blocks that are calculated as the correlation between a block's components and the outcome's components. NA means that there is no consensus among the block.
+
+For discriminant analysis, the predicted class is returned for each block (\code{class}) and each distance (\code{dist}) and these predictions are combined by majority vote (\code{MajorityVote}) or weighted majority vote (\code{WeightedVote}), using the weights of the blocks that are calculated as the correlation between a block's components and the outcome's components. NA means that there is no consensus among the block. For PLS-DA and sPLS-DA objects, the prediction area can be visualised in plotIndiv via the \code{background.predict} function.
 
 }
 
@@ -93,7 +98,7 @@ Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Edit
 \seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}},
 \code{\link{mint.pls}}, \code{\link{mint.spls}}, \code{\link{mint.plsda}}, \code{\link{mint.splsda}},
 \code{\link{block.pls}}, \code{\link{block.spls}}, \code{\link{block.plsda}}, \code{\link{block.splsda}},
-\code{\link{mint.block.pls}}, \code{\link{mint.block.spls}}, \code{\link{mint.block.plsda}}, \code{\link{mint.block.splsda}}
+\code{\link{mint.block.pls}}, \code{\link{mint.block.spls}}, \code{\link{mint.block.plsda}}, \code{\link{mint.block.splsda}} and visualisation with \code{\link{background.predict}}
 and http://www.mixOmics.org for more details.}
 
 \examples{

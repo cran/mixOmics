@@ -63,7 +63,8 @@ layout=NULL,
 axes.box,
 study.levels,
 plot_parameters,
-alpha)
+alpha,
+background = NULL)
 {
     object.pls = c("pls", "spls", "mlspls", "rcc")
     object.pca = c("ipca", "sipca", "pca", "spca", "prcomp")
@@ -72,7 +73,7 @@ alpha)
     #class.object=class(object)
     
     # to satisfy R CMD check that doesn't recognise x, y and group as variable (in aes)
-    x = y = group = pch = studyname = pch.levels = NULL
+    x = y = group = pch = studyname = pch.levels = Var1 = Var2 = NULL
     
     size.title = plot_parameters$size.title
     size.subtitle = plot_parameters$size.subtitle
@@ -86,7 +87,6 @@ alpha)
     legend.position = plot_parameters$legend.position
     point.lwd = plot_parameters$point.lwd
     
-    #save(list=ls(),file="temp.Rdata")
     # check whether pch and group are the same factors, otherwise we need two legends
     group.pch = "same"
     temp = table(df$group, df$pch)
@@ -127,7 +127,8 @@ alpha)
     if(nlevels(factor(df$pch)) == 1)
     group.pch = "same"
     
-    
+    #save(list=ls(),file="temp.Rdata")
+
     #-- Start: ggplot2
     if (style == "ggplot2")
     {
@@ -151,6 +152,25 @@ alpha)
         main = title, xlab = X.label, ylab = Y.label) +
         theme_bw() + theme(strip.text = element_text(size = size.subtitle, face = "bold"))
         
+        if(!is.null(background))
+        {
+            for(i in 1:length(background))
+            {
+                if(!is.null(background[[i]]))
+                background[[i]]=data.frame(id=i,col=names(background)[i], background[[i]])
+            }
+            
+            background = do.call(rbind,background)
+
+            p = p+geom_polygon(data = background,aes(x=Var1, y=Var2, fill = col),inherit.aes = FALSE, show.legend
+            =FALSE)
+            p = p + scale_fill_manual(values = unique(as.character(background$col)))
+            
+            if(is.null(xlim))# we choose xlim that fits the points, and not the background
+            xlim = range(df$x)
+            if(is.null(ylim))# we choose ylim that fits the points, and not the background
+            ylim = range(df$y)
+        }
         
         #-- Display sample or row.names
         for (i in levels(df$group))
@@ -425,6 +445,13 @@ alpha)
                 panel.abline(h = 0, lty = 2, col = "darkgrey")
             }
             
+            #-- Background
+            if (!is.null(background)) # only first block: plsda and splsda
+            {
+                for (i in 1 : length(background))
+                panel.polygon(background[[i]], col = names(background)[i], border=NA)
+            }
+            
             #-- Display sample or row.names
             for (i in 1 : nlevels(df$group))
             {
@@ -568,8 +595,7 @@ alpha)
             if (nRows * nCols < nResp)
             devAskNewPage(TRUE)
         }
-        
-        
+                
         for (k in 1 : nlevels(df$Block))
         {
             if (legend & group.pch == "same")
@@ -702,6 +728,14 @@ alpha)
                 }
             }
             
+            #-- Background
+            if (!is.null(background)) # only first block: plsda and splsda
+            {
+                for (i in 1 : length(background))
+                polygon(background[[i]], col = names(background)[i], border=NA)
+            }
+
+
             if (nlevels(df$Block) == 1 & !any(class.object%in%c(object.mint, "sgcca", "rgcca"))) # avoid double title when only one block is plotted
             #if (any(class.object %in% c("ipca", "sipca", "pca", "spca", "prcomp", "splsda", "plsda")) & nlevels(df$Block)==1 & !any(class.object %in% object.mint) )
             {

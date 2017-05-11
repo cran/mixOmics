@@ -45,38 +45,6 @@
 # verbose: if TRUE, shows component and nrepeat being tested.
 
 
-get.confusion_matrix = function(Y.learn,Y.test,pred)
-{
-    ClassifResult = array(0,c(nlevels(factor(Y.learn)),nlevels(factor(Y.learn))))
-    rownames(ClassifResult) = levels(factor(Y.learn))
-    colnames(ClassifResult) = paste("predicted.as.",levels(factor(Y.learn)),sep = "")
-    #--------record of the classification accuracy for each level of Y
-    for(i in 1:nlevels(factor(Y.learn)))
-    {
-        ind.i = which(Y.test == levels(factor(Y.learn))[i])
-        for(ij in 1:nlevels(factor(Y.learn)))
-        {
-            ClassifResult[i,ij] = sum(pred[ind.i] == levels(Y.learn)[ij])
-            
-        }
-    }
-    ClassifResult
-}
-
-get.BER = function(X)
-{
-    if(!is.numeric(X)| !is.matrix(X) | length(dim(X)) != 2 | nrow(X)!=ncol(X))
-    stop("'X' must be a square numeric matrix")
-    
-    nlev = nrow(X)
-    #calculation of the BER
-    ClassifResult.temp = X
-    diag(ClassifResult.temp) = 0
-    BER = sum(apply(ClassifResult.temp,1,sum,na.rm = TRUE)/apply(X,1,sum,na.rm = TRUE),na.rm = TRUE)/nlev
-    return(BER)
-}
-
-
 stratified.subsampling = function(Y, folds = 10)
 {
     stop = 0
@@ -341,7 +309,7 @@ cl
                 # if it's from perf, then it's only either keepX or keepX.constraint
                 # if it's from tune, then it's either keepX, or a combination of keepX.constraint and keepX
                 # we know if it's perf+constraint or tune+constraint depending on the test.keepX that is either a vector or a list
-                object.res = splsda(X.train, Y.train, ncomp = ncomp,
+                object.res = mixOmics::splsda(X.train, Y.train, ncomp = ncomp,
                 keepX = if(is.null(choice.keepX.constraint) & !is.list(test.keepX)){c(choice.keepX, test.keepX[i])}else if(!is.list(test.keepX)){test.keepX[i]} else {NULL} ,
                 keepX.constraint = if(is.null(choice.keepX.constraint)& !is.list(test.keepX)){NULL}else if(!is.list(test.keepX)){choice.keepX.constraint} else {c(choice.keepX.constraint, test.keepX)},
                 logratio = "none", near.zero.var = FALSE, mode = "regression", max.iter = max.iter)
@@ -469,7 +437,7 @@ cl
             # confusion matrix for keepX.opt
             error.per.class.keepX.opt.comp[[ijk]] = apply(class.comp[[ijk]][, , keepX.opt[[ijk]], drop = FALSE], 2, function(x)
             {
-                conf = get.confusion_matrix(Y.learn = factor(Y), Y.test = factor(Y), pred = x)
+                conf = get.confusion_matrix(truth = factor(Y), predicted = x)
                 out = (apply(conf, 1, sum) - diag(conf)) / summary(Y)
             })
             
@@ -504,7 +472,7 @@ cl
             
             error = apply(class.comp[[ijk]],c(3,2),function(x)
             {
-                conf = get.confusion_matrix(Y.learn = factor(Y),Y.test = factor(Y),pred = x)
+                conf = get.confusion_matrix(truth = factor(Y),predicted = x)
                 get.BER(conf)
             })
             rownames(error) = names(test.keepX)
@@ -522,7 +490,7 @@ cl
             # confusion matrix for keepX.opt
             error.per.class.keepX.opt.comp[[ijk]] = apply(class.comp[[ijk]][, , keepX.opt[[ijk]], drop = FALSE], 2, function(x)
             {
-                conf = get.confusion_matrix(Y.learn = factor(Y), Y.test = factor(Y), pred = x)
+                conf = get.confusion_matrix(truth = factor(Y), predicted = x)
                 out = (apply(conf, 1, sum) - diag(conf)) / summary(Y)
             })
             

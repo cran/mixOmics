@@ -122,7 +122,7 @@ function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist"
         if(!is.list(newdata))
         stop("'newdata' should be a list")
         
-        if(!is.null(object$indY))
+        if(!is.null(object$indY) && length(grep("DA",class(object)))==0 ) #if DA, object$X is already without Y
         {
             X = object$X[-object$indY]
         }else{
@@ -358,7 +358,7 @@ function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist"
     # Y         # observation
     # newdata   #list of blocks for the prediction, same length as A, scaled
     
-    # replace missing data by 0
+    # replace NA by 0
     concat.newdata = lapply(concat.newdata,function(x)
     {
         ind = which(is.na(x))
@@ -367,7 +367,7 @@ function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist"
         x
     })
     
-    # replace missing data by 0
+    # replace NA by 0
     X = lapply(X,function(x)
     {
         ind = which(is.na(x))
@@ -375,6 +375,9 @@ function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist"
         x[ind] = 0
         x
     })
+    
+    # replace NA by 0 in Y
+    Y[is.na(Y)] = 0
     
     # -----------------------
     #       prediction

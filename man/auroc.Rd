@@ -47,11 +47,15 @@ multilevel = NULL,plot = TRUE, roc.block = 1, roc.comp = 1, ...)
 \details{
 For more than two classes in the categorical outcome Y, the AUC is calculated as one class vs. the other and the ROC curves one class vs. the others are output.
 
-The ROC and AUC are calculated based on the predicted scores obtained from the multivariate methods. Our multivariate supervised methods already use a prediction threshold based on distances (see \code{predict}) that optimally determine class membership of the samples tested. As such AUC and ROC are not needed to estimate the performance of the model (see \code{perf}, \code{tune} that report classification error rates). We provide those outputs as complementary performance measures. 
+The ROC and AUC are calculated based on the predicted scores obtained from the \code{predict} function applied to the multivariate methods (\code{predict(object)$predict}). Our multivariate supervised methods already use a prediction threshold based on distances (see \code{predict}) that optimally determine class membership of the samples tested. As such AUC and ROC are not needed to estimate the performance of the model (see \code{perf}, \code{tune} that report classification error rates). We provide those outputs as complementary performance measures.
 
 The pvalue is from a Wilcoxon test between the predicted scores between one class vs the others. 
 
-External independent data set could be input with the same number of predictors than in the training data set. In that case the multivariate model predicts the predicted scores on the test data (based on the trained model stored in object) and compares the prediction to the available and known outcome vector from the external independent data set
+
+External independent data set (\code{newdata}) and outcome (\code{outcome.test}) can be input to calculate AUROC. The external data set must have the same variables as the training data set (\code{object$X}).
+
+If \code{newdata} is not provided, AUROC is calculated from the training data set, and may result in overfitting (too optimistic results).
+
 }
 
 \value{

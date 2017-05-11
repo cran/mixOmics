@@ -132,15 +132,16 @@ scale)
             if (progressBar ==  TRUE)
             setTxtProgressBar(pb, (study_i-1)/M + (i-1)/length(test.keepX)/M)
             
-            object.res = mint.splsda(X.train, Y.train, study = study.learn.CV, ncomp = ncomp, keepX = c(choice.keepX, test.keepX[i]),
-            keepX.constraint = choice.keepX.constraint, scale = scale, mode = "regression", max.iter = max.iter)
-            
+            object.res = suppressWarnings(mint.splsda(X.train, Y.train, study = study.learn.CV, ncomp = ncomp, keepX = c(choice.keepX, test.keepX[i]),
+            keepX.constraint = choice.keepX.constraint, scale = scale, mode = "regression", max.iter = max.iter)) # suppress NA warnings from explained_variance
+
             # record selected features
             if (length(test.keepX) ==  1) # only done if only one test.keepX as not used if more so far
             features = c(features, selectVar(object.res, comp = ncomp)$name)
             
             test.predict.sw <- predict(object.res, newdata = X.test, method = dist, study.test = study.test.CV)
-            prediction.comp[omit, , i] =  test.predict.sw$predict[, , ncomp]
+            # Y.train can be missing factors, so the prediction 'test.predict.sw' might be missing factors compared to the full prediction.comp
+            prediction.comp[omit, match(levels(Y.train),levels(Y)) , i] =  test.predict.sw$predict[, , ncomp]
             
             for(ijk in dist)
             class.comp[[ijk]][omit,i] =  test.predict.sw$class[[ijk]][, ncomp] #levels(Y)[test.predict.sw$class[[ijk]][, ncomp]]
@@ -191,7 +192,7 @@ scale)
             # confusion matrix for keepX.opt
             error.per.class.keepX.opt.comp[[ijk]] = apply(class.comp[[ijk]][, keepX.opt[[ijk]], drop = FALSE], 2, function(x)
             {
-                conf = get.confusion_matrix(Y.learn = factor(Y), Y.test = factor(Y), pred = x)
+                conf = get.confusion_matrix(truth = factor(Y), predicted = x)
                 out = (apply(conf, 1, sum) - diag(conf)) / summary(Y)
             })
             
@@ -225,7 +226,7 @@ scale)
                 omit = which(study %in% names.study[study_i])
                 error[study_i,] = apply(class.comp[[ijk]][omit,], 2, function(x)
                 {
-                    conf = get.confusion_matrix(Y.learn = factor(Y[-omit]), Y.test = factor(Y[omit]), pred = x)
+                    conf = get.confusion_matrix(truth = factor(Y[omit]), all.levels = levels(factor(Y)), predicted = x)
                     get.BER(conf)
                 })
             }
@@ -237,7 +238,7 @@ scale)
             # confusion matrix for keepX.opt
             error.per.class.keepX.opt.comp[[ijk]] = apply(class.comp[[ijk]][, keepX.opt[[ijk]], drop = FALSE], 2, function(x)
             {
-                conf = get.confusion_matrix(Y.learn = factor(Y), Y.test = factor(Y), pred = x)
+                conf = get.confusion_matrix(truth = factor(Y), predicted = x)
                 out = (apply(conf, 1, sum) - diag(conf)) / summary(Y)
             })
             

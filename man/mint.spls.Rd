@@ -2,10 +2,10 @@
 \encoding{latin1}
 \alias{mint.spls}
 
-\title{Vertical integration with variable selection}
+\title{P-integration with variable selection}
 
 
-\description{Function to integrate and combine multiple independent studies using variants of multi-group sparse PLS for variable selection.
+\description{Function to integrate and combine multiple independent studies measured on the same variables or predictors (P-integration) using variants of multi-group sparse PLS for variable selection (unsupervised analysis).
 }
 
 
@@ -34,8 +34,8 @@ near.zero.var = FALSE)
 one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
 See Details.}
 \item{study}{grouping factor indicating which samples are from the same study}
-\item{keepX.constraint}{A list of vectors. Each vector entry indicates specific variables to be selected in \code{X} for each previous PLS component. }
-\item{keepY.constraint}{A list of vectors. Each vector entry indicates specific variables to be selected  in \code{Y} for each previous PLS component. }
+\item{keepX.constraint}{A list of vectors. Each vector entry indicates specific variables to be selected in \code{X} for each previous PLS component. See details. }
+\item{keepY.constraint}{A list of vectors. Each vector entry indicates specific variables to be selected  in \code{Y} for each previous PLS component. See details. }
 \item{keepX}{numeric vector indicating the number of variables to select in \code{X} on each component, or remaining components should \code{keepX.constraint} be provided. By default all variables are kept in the model.}
 \item{keepY}{numeric vector indicating the number of variables to select in \code{Y} on each component, or remaining components should \code{keepY.constraint} be provided. By default all variables are kept in the model.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
@@ -56,6 +56,9 @@ The type of algorithm to use is specified with the \code{mode} argument. Four PL
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
 algorithm \code{("classic")} (see References).
+
+Constraint model (\code{constraint=TRUE)}. The model is run on the optimal list of selected features \code{keepX.constraint} from the previous components, as opposed to considering only a specified number of features \code{keepX}.
+
 
 Variable selection is performed on each component for each block of \code{X}, and for \code{Y} if specified, via input parameter \code{keepX} and \code{keepY}, and \code{keepX.constraint} and \code{keepY.constraint} for a constraint model. \code{keepX.constraint} and \code{keepY.constraint} specify variable names to be selected in the previous components of the model.
 
@@ -91,8 +94,7 @@ that contains the following components:
 
 
 \references{
-F Rohart, N Matigian, A Eslami, S Bougeard and K-A. Lê Cao. MINT: A multivariate integrative approach to identify a reproducible biomarker
-signature across multiple experiments and platforms. Accepted in BMC BIoinformatics.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
 }

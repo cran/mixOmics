@@ -245,8 +245,9 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
         {
             already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
         } else {
-            fit = mint.splsda(X, Y, ncomp = 1 + length(already.tested.X), study = study,
-            keepX.constraint = already.tested.X, keepX = result[[measure]]$keepX.opt[[1]], near.zero.var = near.zero.var, scale = scale)
+            fit = suppressWarnings(mint.splsda(X, Y, ncomp = 1 + length(already.tested.X), study = study,
+            keepX.constraint = already.tested.X, keepX = result[[measure]]$keepX.opt[[1]],
+            near.zero.var = near.zero.var, scale = scale))# suppress NA warnings from explained_variance
             
             already.tested.X[[comp.real[comp]]] = selectVar(fit, comp = 1 + length(already.tested.X))$name
         }

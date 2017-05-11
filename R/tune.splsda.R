@@ -322,7 +322,7 @@ cpus
             {
                 already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
             } else {
-                fit = splsda(X, Y, ncomp = 1 + length(already.tested.X),
+                fit = mixOmics::splsda(X, Y, ncomp = 1 + length(already.tested.X),
                 keepX.constraint = already.tested.X, keepX = result[[measure]]$keepX.opt[[1]], near.zero.var = near.zero.var, mode = "regression")
                 
                 already.tested.X[[paste("comp",comp.real[comp],sep="")]] = selectVar(fit, comp = 1 + length(already.tested.X))$name
@@ -374,7 +374,7 @@ cpus
             {
                 pval[j] = NA
                 temp = try(t.test(error.keepX[,opt],error.keepX[,j],alternative="greater")$p.value, silent=T) #t.test of "is adding X comp improves the overall results"
-                if(any(class(temp) == "try-error"))
+                if(any(class(temp) == "try-error") || is.na(temp)) # temp can be NaN when error.keepX is constant
                 {
                     ncomp_opt = NULL
                     break
@@ -384,7 +384,7 @@ cpus
                 if( (pval[j]< (alpha)))
                 opt=j #if the p-value is lower than 0.05, the optimal number of comp is updated
             }
-            if(all(class(temp) != "try-error"))
+            if(all(class(temp) != "try-error") & !is.na(temp))
             ncomp_opt = comp.real[opt]
         } else {
             ncomp_opt = error.keepX = NULL
@@ -432,7 +432,7 @@ cpus
 
         for (i in 1:length(test.keepX))
         {
-            spls.train = splsda(X, Y, ncomp = ncomp, keepX = c(already.tested.X, test.keepX[i]), logratio = logratio, near.zero.var = FALSE, mode = "regression")
+            spls.train = mixOmics::splsda(X, Y, ncomp = ncomp, keepX = c(already.tested.X, test.keepX[i]), logratio = logratio, near.zero.var = FALSE, mode = "regression")
             
             # Note: this is performed on the full data set
             # (could be done with resampling (bootstrap) (option 1) and/or prediction (option 2))

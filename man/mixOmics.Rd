@@ -2,7 +2,7 @@
 \encoding{latin1}
 \alias{mixOmics}
 
-\title{PLS-derived methods: one function to rule them all}
+\title{PLS-derived methods: one function to rule them all!}
 
 \description{This function performs one of the PLS derived methods included in the mixOmics package that is the most appropriate for your input data, one of (mint).(block).(s)pls(da) depending on your input data (single data, list of data, discrete outcome, \dots)
 }
@@ -77,17 +77,31 @@ If your input data \code{X} is a list of matrices, then the algorithm is directe
 \code{\link{mint.block.pls}}, \code{\link{mint.block.spls}}, \code{\link{mint.block.plsda}}, \code{\link{mint.block.splsda}}}
 
 \references{
-Rohart F. et al (2016, submitted). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms.
 
+mixOmics manuscript
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+
+
+MINT models:
+Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
+
+Multi-group PLS
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2013). Multi-group PLS Regression: Application to Epidemiology.
 In New Perspectives in Partial Least Squares and Related Methods, pages 243-255. Springer.
 
-Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
-DIABLO - multi omics integration for biomarker discovery.
+Integration of omics data sets
+Singh A, Gautier B, Shannon C, Vacher M, Rohart F, Tebbutt S, Le Cao K-A. DIABLO: an integrative, multi-omics, multivariate method for multi-group classification. \url{http://biorxiv.org/content/early/2016/08/03/067611}
+
 
 Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods
 for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 
+
+PLS-DA
+Le Cao K-A, Boitard S and Besse P (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. BMC Bioinformatics 12:253.
+
+
+PLS
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 
 Wold H. (1966). Estimation of principal components and related models by iterative least squares.

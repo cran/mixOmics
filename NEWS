@@ -1,4 +1,28 @@
 
+
+Changes in 6.1.3 (patch and enhancements)
+================
+
+New features:
+-------------
+1 - Prediction area of a PLS-DA or sPLS-DA model can be not plotted using the background.predict function as an input parameter in plotIndiv. The plot enables to visualise in 2D the effect of the prediction distances.
+2 - Functions get.confusion_matrix and get.BER to calculate a confusion matrix based on class prediction of test samples and their real class, and calculate their Balanced Error Rate, see ?get.BER
+
+
+Enhancements:
+-------------
+1 - perf.sgccda (for DIABLO) now implements a constraint model (see details in ?perf)
+2 - legend = TRUE option in circosPlot and plotDiablo
+
+
+Bug fixes:
+----------
+- tune.splsda had a bug when assessing the 'choice.ncomp' based on ones-sided t-test of the error rate when the error rate was constant.
+- sparse PCA deflation algorithm fixed
+- added add mixOmics:: for pls functions to avoid clash with other packages
+
+
+
 Changes in 6.1.2 (patch)
 ================
 

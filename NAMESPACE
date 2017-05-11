@@ -40,6 +40,7 @@ importFrom("reshape2","melt","dcast")
 
 export(
 auroc,
+background.predict,
 block.pls,
 block.plsda,
 block.spls,
@@ -52,6 +53,8 @@ color.GreenRed,
 color.spectral,
 color.mixo,
 explained_variance,
+get.BER,
+get.confusion_matrix,
 image.tune.rcc, 
 imgCor,
 ipca,

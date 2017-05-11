@@ -65,15 +65,19 @@ that contains the following components:
   \item{Y}{the centered and standardized original response vector or matrix.}
   \item{ncomp}{the number of components included in the model.}
   \item{mode}{the algorithm used to fit the model.}
-  \item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
-  \item{variates}{list containing the \eqn{X} and \eqn{Y} variates.}
-  \item{loadings}{list containing the estimated loadings for the variates.}
+  %\item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
+  \item{variates}{list containing the variates.}
+  \item{loadings}{list containing the estimated loadings for the \eqn{X} and 
+	\eqn{Y} variates.}
   \item{names}{list containing the names to be used for individuals and variables.}
-  \item{nzv}{list containing the zero- or near-zero predictors information.}
-   \item{tol}{the tolerance used in the iterative algorithm, used for subsequent S3 methods}
+  \item{tol}{the tolerance used in the iterative algorithm, used for subsequent S3 methods}
+  \item{iter}{Number of iterations of the algorthm for each component}
   \item{max.iter}{the maximum number of iterations, used for subsequent S3 methods}
-    \item{iter}{Number of iterations of the algorthm for each component}
-
+  \item{nzv}{list containing the zero- or near-zero predictors information.}
+  \item{scale}{whether scaling was applied per predictor.}
+  \item{logratio}{whether log ratio transformation for relative proportion data was applied, and if so, which type of transformation.}
+  \item{explained_variance}{amount of variance explained per component (note that contrary to PCA, this amount may not decrease).}
+  \item{input.X}{numeric matrix of predictors in X that was input, before any saling / logratio / multilevel transformation.}
 }
 
 \references{

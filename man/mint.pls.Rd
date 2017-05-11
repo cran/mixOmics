@@ -2,10 +2,10 @@
 \encoding{latin1}
 \alias{mint.pls}
 
-\title{Vertical integration}
+\title{P-integration}
 
 
-\description{Function to integrate and combine multiple independent studies using variants of multi-group PLS.
+\description{Function to integrate and combine multiple independent studies measured on the same variables or predictors (P-integration) using variants of multi-group PLS (unsupervised analysis).
 }
 
 \usage{
@@ -71,8 +71,7 @@ that contains the following components:
 }
 
 \references{
-F Rohart, N Matigian, A Eslami, S Bougeard and K-A. Lê Cao. MINT: A multivariate integrative approach to identify a reproducible biomarker
-signature across multiple experiments and platforms. Accepted in BMC BIoinformatics.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
 }
