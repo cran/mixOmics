@@ -1,5 +1,5 @@
 \name{print}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{print}
 \alias{print.rcc}
 \alias{print.pls}

@@ -1,5 +1,5 @@
 \name{tune.pca}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{tune.pca}
 
 \title{Tune the number of principal components in PCA}

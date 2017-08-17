@@ -1,5 +1,5 @@
 \name{network}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{network.default}
 \alias{network.rcc}
 \alias{network.pls}
@@ -10,7 +10,7 @@
 
 \description{
 Display relevance associations network for (regularized) canonical correlation analysis
-and (sparse) PLS regression.
+and (sparse) PLS regression. The function avoids the intensive computation of Pearson correlation matrices on large data set by calculating instead a pair-wise similarity matrix directly obtained from the latent components of our integrative approaches (CCA, PLS, block.pls methods). The similarity value between a pair of variables is obtained by calculating the sum of the correlations between the original variables and each of the latent components of the model. The values in the similarity matrix can be seen as a robust approximation of the Pearson correlation (see Gonzalez et al. 2012 for a mathematical demonstration and exact formula). The advantage of relevance networks is their ability to simultaneously represent positive and negative correlations, which are missed by methods based on Euclidian distances or mutual information. Those networks are bipartite and thus only a link between two variables of different types can be represented. The network can be saved in a .glm format using the \code{igraph} package, the function \code{write.graph} and extracting the output \code{object$gR}, see details.
 }
 
 \usage{
@@ -108,7 +108,7 @@ at middle portion of this. The position of the slider indicate which is the `cut
 associated to the display network.
 
 
-The network can be saved in a .glm format using the \pkg{igraph} package, the function \code{write.graph} and extracting the output \code{gR}.
+The network can be saved in a .glm format using the \pkg{igraph} package, the function \code{write.graph} and extracting the output \code{obkect$gR}.
 
 The interactive process is terminated by clicking the second button and selecting `Stop'
 from the menu, or from the `Stop' menu on the graphics window.
@@ -148,7 +148,13 @@ If the number of variables is high, the generation of the network generation can
 }
 
 \references{
+Mathematical definition:
 Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}
+
+Examples and illustrations:
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+
+Relevance networks:
 
 Butte, A. J., Tamayo, P., Slonim, D., Golub, T. R. and Kohane, I. S. (2000).
 Discovering functional relationships between RNA expression and chemotherapeutic
@@ -161,7 +167,7 @@ and Transcriptome in Human Hepatoma Cells. \emph{Molecular Cancer Therapeutics} 
 199-205.
 }
 
-\author{Sebastien Dejean, Ignacio Gonzalez and Kim-Anh Le Cao.}
+\author{Ignacio Gonzalez and Kim-Anh Le Cao.}
 
 \seealso{\code{\link{plotVar}}, \code{\link{cim}}, \code{\link{color.GreenRed}}, \code{\link{color.jet}}, \code{\link{color.spectral}}
 and http: //www.mixOmics.org for more details.}

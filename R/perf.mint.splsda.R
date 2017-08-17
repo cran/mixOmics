@@ -40,7 +40,6 @@ progressBar = TRUE,
 # ---------------------------------------------------
 perf.mint.splsda = perf.mint.plsda = function (object,
 dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-constraint = TRUE,
 auc = FALSE,
 progressBar = TRUE,
 ...
@@ -56,6 +55,7 @@ progressBar = TRUE,
     ncomp = object$ncomp
     scale = object$scale
     
+    constraint = FALSE # kept in the code so far, will probably get removed later on
     if(constraint)
     {
         keepX.constraint = apply(object$loadings$X, 2, function(x){names(which(x!=0))})
@@ -306,6 +306,29 @@ progressBar = TRUE,
     if (progressBar == TRUE)
     cat('\n')
     
+
+    # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
+    if(nlevels(study) > 2 & ncomp >1 & constraint == FALSE)
+    {
+        measure = c("overall","BER")
+        ncomp_opt = matrix(NA, nrow = length(measure), ncol = length(dist),
+        dimnames = list(measure, dist))
+
+        for (measure_i in measure)
+        {
+            for (ijk in dist)
+            {
+                mat.error.rate = sapply(study.specific, function(x){x[[measure_i]][,ijk]})
+                ncomp_opt[measure_i, ijk] = t.test.process(t(mat.error.rate))
+            }
+        }
+    } else {
+        ncomp_opt = NULL
+    }
+
+    result$choice.ncomp = ncomp_opt
+
+
     # added
     if (near.zero.var == TRUE)
     result$nzvX = nzv$Position

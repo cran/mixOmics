@@ -1,4 +1,22 @@
 
+Changes in 6.2.0 (improvements and bug fixes)
+================
+
+New features:
+-------------
+- The constraint argument (version 6.1.0 - 6.1.3) was removed in the functions perf and tune for all supervised objects because of a risk of overfitting
+
+Enhancements:
+-------------
+- AUROC aded for MINT objects mint.plsda and mint.splsda where the study name needs to be specified, e.g. auroc( .., roc.study = "study4"). See ?auroc
+- choice.ncomp output added on all perf and tune functions for all supervised methods.
+- mat.c output for pls and plsda objects (matrix of coefficients from the regression of X / residual matrices X on the X-variates).
+
+
+Bug fixes:
+----------
+- fixed bug when using predict, perf or tune with the error msg: 'Error in predict.spls(spls.res, X.test[, nzv]) : 'newdata' must include all the variables of 'object$X''
+
 
 Changes in 6.1.3 (patch and enhancements)
 ================

@@ -1,5 +1,5 @@
 \name{predict}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{predict.pls}
 \alias{predict.spls}
 \alias{predict.plsda}
@@ -42,15 +42,20 @@ multilevel, \ldots)
 
 \details{
 \code{predict} produces predicted values, obtained by evaluating the PLS-derived methods, returned by \code{(mint).(block).(s)pls(da)} in the frame \code{newdata}.
-Variates for \code{newdata} are also returned. Please note that this method does not perform multilevel decomposition or log ratio transformations, which need to be processed beforehand.
+Variates for \code{newdata} are also returned. Please note that this method performs multilevel decomposition and/or log ratio transformations if needed (\code{multilevel} is an input parameter while \code{logratio} is extracted from \code{object}).
 
-Different prediction distances are proposed for discriminant analysis. The reason is that our supervised models work with a dummy indicator matrix of \code{Y} to indicate the class membership of each sample and the prediction on a new observation results in a prediction score for each outcome category (see output \code{object$predict}). Therefore, the scores across all classes need to be combined to obtain the final prediction of a given test sample using a distance of some sort. We propose distances such as `maximum distance', `Mahalanobis distance' and `Centroids distance'.
+Different prediction distances are proposed for discriminant analysis. The reason is that our supervised models work with a dummy indicator matrix of \code{Y} to indicate the class membership of each sample. The prediction of a new observation results in either a predicted dummy variable (output \code{object$predict}), or a predicted variate (output \code{object$variates}). Therefore, an appropriate distance needs to be applied to those predicted values to assign the predicted class. We propose distances such as `maximum distance' for the predicted dummy variables, `Mahalanobis distance' and `Centroids distance' for the predicted variates.
 
-\code{"max.dist"} is the simplest method to predict the class of a test sample. For each new individual, the class with the largest predicted score is the predicted class.
+\code{"max.dist"} is the simplest method to predict the class of a test sample. For each new individual, the class with the largest predicted dummy variable is the predicted class. This distance performs well in single data set analysis with multiclass problems (PLS-DA).
 
-\code{"centroids.dist"}  allocates to the new observation the class that mimimises the distance between the predicted score and the centroids of the classes calculated on the latent components of the trained model.
+\code{"centroids.dist"}  allocates to the new observation the class that mimimises the distance between the predicted score and the centroids of the classes calculated on the latent components or variates of the trained model.
 
 \code{"mahalanobis.dist"}  allocates the new sample the class defined as the centroid distance, but using the Mahalanobis metric in the calculation of the distance.
+
+In practice we found that the centroid-based distances (\code{"centroids.dist"} and \code{"mahalanobis.dist"}), and specifically the Mahalanobis distance led to more accurate predictions than the maximum distance for complex classification problems and N-integration problems (block.splsda). The centroid distances consider the prediction in dimensional space spanned by the predicted variates, while the maximum distance considers a single point estimate using the predicted scores on the last dimension of the model. The user can assess the different distances, and choose the prediction distance that leads to the best performance of the model, as highlighted from the tune and perf outputs
+
+More (mathematical) details about the prediction distances are available in the supplemental of the mixOmics manuscript.
+
 
 For a visualisation of those prediction distances, see \code{background.predict} that overlays the prediction area in \code{plotIndiv} for a sPLS-DA object.
 
@@ -69,7 +74,7 @@ For discriminant analysis, the predicted class is returned for each block (\code
 \value{
 \code{predict} produces a list with the following components: 
   \item{predict}{predicted response values. The dimensions
-	correspond to the observations, the response variables and the model dimension, respectively.}
+	correspond to the observations, the response variables and the model dimension, respectively. For a supervised model, it corresponds to the predicted dummy variables.}
   \item{variates}{matrix of predicted variates.}
 \item{B.hat}{matrix of regression coefficients (without the intercept).}
 
@@ -89,6 +94,9 @@ For discriminant analysis, the predicted class is returned for each block (\code
 }
 
 \references{
+
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. 
+
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.  
 }
 

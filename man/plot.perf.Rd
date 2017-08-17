@@ -1,4 +1,4 @@
-\encoding{latin1}
+\encoding{UTF-8}
 \name{plot.perf}
 \alias{plot.perf}
 \alias{plot.perf.pls.mthd}
@@ -97,12 +97,23 @@ sd = TRUE,
 \code{plot.perf} creates one plot for each response variable in the
 model, laid out in a multi panel display.  It uses \code{\link{xyplot}} for
 performing the actual plotting.
+
+More details about the prediction distances in \code{?predict} and the referred publication.
 }
+
+
+\references{
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+}
+
+
 
 \author{Ignacio Gonzalez, Florian Rohart, Francois Bartolo, Kim-Anh Le Cao.}
 
 \seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}}, 
 \code{\link{perf}}.}
+
+
 
 \examples{
 require(lattice)

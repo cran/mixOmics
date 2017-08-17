@@ -1,4 +1,4 @@
-\encoding{latin1}
+\encoding{UTF-8}
 \name{plot.tune.splsda}
 \alias{plot.tune.splsda}
 \alias{plot.tune}

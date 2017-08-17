@@ -1,5 +1,5 @@
 \name{plotContrib}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{plotContrib}
 
 \title{Contribution plot of variables}

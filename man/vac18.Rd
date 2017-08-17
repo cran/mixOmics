@@ -1,5 +1,5 @@
 \name{vac18}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{vac18}
 
 \docType{data}

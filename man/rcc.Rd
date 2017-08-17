@@ -1,5 +1,5 @@
 \name{rcc}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{rcc}	
 \alias{rcc.default}
 

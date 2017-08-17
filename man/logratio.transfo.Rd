@@ -1,5 +1,5 @@
 \name{logratio.transfo}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{logratio.transfo}
 
 \title{Log-ratio transformation}

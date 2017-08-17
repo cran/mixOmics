@@ -1,5 +1,5 @@
 \name{pls}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{pls}
 
 \title{Partial Least Squares (PLS) Regression}
@@ -46,7 +46,12 @@ can contain missing values.
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS 
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis 
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS 
-algorithm \code{("classic")} (see References).
+algorithm \code{("classic")} (see References). Different modes relate on how the Y matrix is deflated across the iterations of the algorithms - i.e. the different components.
+- Regression mode: the Y matrix is deflated with respect to the information extracted/modelled from the local regression on X. Here the goal is to predict Y from X (Y and X play an assymetric role). Consequently the latent variables computed to predict Y from X are different from those computed to preict X from Y.
+- Canonical mode: the Y matrix is deflated to the information extracted/modelled from the local regression on Y. Here X and Y play a symetric role and the goal is similar to a Canonical Correlation type of analysis.
+- Invariant mode: the Y matrix is not deflated
+- Classic mode: is similar to a regression mode. It gives identical results for the variates and loadings associated to the X data set, but differences for the loadings vectors associated to the Y data set (different normalisations are used). Classic mode is the PLS2 model as defined by Tenenhaus (1998), Chap 9.
+Note that in all cases the results are the same on the first component as deflation only starts after component 1.
 
 The estimation of the missing values can be performed 
 by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
@@ -65,7 +70,6 @@ that contains the following components:
   \item{Y}{the centered and standardized original response vector or matrix.}
   \item{ncomp}{the number of components included in the model.}
   \item{mode}{the algorithm used to fit the model.}
-  %\item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
   \item{variates}{list containing the variates.}
   \item{loadings}{list containing the estimated loadings for the \eqn{X} and 
 	\eqn{Y} variates.}
@@ -76,15 +80,18 @@ that contains the following components:
   \item{nzv}{list containing the zero- or near-zero predictors information.}
   \item{scale}{whether scaling was applied per predictor.}
   \item{logratio}{whether log ratio transformation for relative proportion data was applied, and if so, which type of transformation.}
-  \item{explained_variance}{amount of variance explained per component (note that contrary to PCA, this amount may not decrease).}
+  \item{explained_variance}{amount of variance explained per component (note that contrary to PCA, this amount may not decrease as the aim of the method is not to maximise the variance, but the covariance between data sets).}
   \item{input.X}{numeric matrix of predictors in X that was input, before any saling / logratio / multilevel transformation.}
+  \item{mat.c}{matrix of coefficients from the regression of X / residual matrices X on the X-variates, to be used internally by \code{predict}.}
+  \item{defl.matrix}{residual matrices X for each dimension.}
 }
 
 \references{
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 
-Wold H. (1966). Estimation of principal components and related models by iterative least squares. 
-In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
+Wold H. (1966). Estimation of principal components and related models by iterative least squares. In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
+
+Abdi H (2010). Partial least squares regression and projection on latent structure regression (PLS Regression). \emph{Wiley Interdisciplinary Reviews: Computational Statistics}, 2(1), 97-106.
 }
 
 \author{Sebastien Dejean and Ignacio Gonzalez and Kim-Anh Le Cao.}

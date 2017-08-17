@@ -1,5 +1,5 @@
 \name{mint.spls}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{mint.spls}
 
 \title{P-integration with variable selection}
@@ -55,7 +55,7 @@ Multi (continuous)response are supported. \code{X} and \code{Y} can contain miss
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
-algorithm \code{("classic")} (see References).
+algorithm \code{("classic")} (see References and more details in \code{?pls}).
 
 Constraint model (\code{constraint=TRUE)}. The model is run on the optimal list of selected features \code{keepX.constraint} from the previous components, as opposed to considering only a specified number of features \code{keepX}.
 
@@ -88,7 +88,7 @@ that contains the following components:
 \item{names}{list containing the names to be used for individuals and variables.}
 \item{nzv}{list containing the zero- or near-zero predictors information.}
 \item{iter}{Number of iterations of the algorthm for each component}
-\item{explained_variance}{Percentage of explained variance for each component and each study}
+\item{explained_variance}{Percentage of explained variance for each component and each study (note that contrary to PCA, this amount may not decrease as the aim of the method is not to maximise the variance, but the covariance between data sets).}
 
 }
 

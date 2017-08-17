@@ -49,7 +49,6 @@ ncomp = 1,
 study,
 test.keepX = c(5, 10, 15),
 already.tested.X,
-constraint = TRUE, #if TRUE, expect a list in already.tested.X, otherwise a number(keepX)
 dist = "max.dist",
 measure = "BER", # one of c("overall","BER")
 auc = FALSE,
@@ -110,7 +109,7 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     
     #if ((!is.null(already.tested.X)) && (length(already.tested.X) != (ncomp - 1)) )
     #stop("The number of already tested parameters should be NULL or ", ncomp - 1, " since you set ncomp = ", ncomp)
-    
+    constraint = FALSE # kept in the code so far, will probably get removed later on
     if (missing(already.tested.X))
     {
         if(constraint == TRUE)
@@ -214,12 +213,17 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     error.per.class.sd = matrix(0,nrow = nlevels(Y), ncol = ncomp-length(already.tested.X),
     dimnames = list(c(levels(Y)), c(paste('comp', comp.real))))
     
+    
+    error.per.study.keepX.opt = matrix(nrow = nlevels(study), ncol = ncomp-length(already.tested.X),
+    dimnames = list(c(levels(study)), c(paste('comp', comp.real))))
+    
     if(light.output == FALSE)
     prediction.all = class.all = list()
     if(auc)
     auc.mean=list()
     
     error.per.class.keepX.opt=list()
+    
     # successively tune the components until ncomp: comp1, then comp2, ...
     for(comp in 1:length(comp.real))
     {
@@ -252,6 +256,8 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
             already.tested.X[[comp.real[comp]]] = selectVar(fit, comp = 1 + length(already.tested.X))$name
         }
 
+        # error per study for keepX.opt
+        error.per.study.keepX.opt[,comp] = result[[measure]]$error.per.study.keepX.opt[[1]]
         
         if(light.output == FALSE)
         {
@@ -269,10 +275,20 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     if (progressBar == TRUE)
     cat('\n')
     
+    # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
+    if(nlevels(study) > 2 & length(comp.real) >1 & constraint == FALSE)
+    {
+        opt = t.test.process(error.per.study.keepX.opt)
+        ncomp_opt = comp.real[opt]
+    } else {
+        ncomp_opt = NULL
+    }
+    
     result = list(
     error.rate = mat.mean.error,
     choice.keepX = if(constraint){lapply(already.tested.X, length)}else{already.tested.X},
-    choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
+    #choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
+    choice.ncomp = list(ncomp = ncomp_opt, values = error.per.study.keepX.opt),
     error.rate.class = error.per.class.keepX.opt)
     
     if(auc)

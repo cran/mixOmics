@@ -1,5 +1,5 @@
 \name{tune.splsda}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{tune.splsda}
 
 
@@ -12,7 +12,7 @@ grid to determine optimal values for the sparsity parameters in \code{splsda}.
 
 \usage{
 tune.splsda(X, Y, ncomp = 1,
-test.keepX = c(5, 10, 15), already.tested.X, constraint = FALSE, validation = "Mfold",
+test.keepX = c(5, 10, 15), already.tested.X, validation = "Mfold",
 folds = 10, dist = "max.dist", measure = "BER", auc = FALSE,
 progressBar = TRUE, max.iter = 100, near.zero.var = FALSE, nrepeat = 1,
 logratio = c('none','CLR'), multilevel = NULL, light.output = TRUE, cpus)
@@ -24,8 +24,7 @@ logratio = c('none','CLR'), multilevel = NULL, light.output = TRUE, cpus)
   \item{Y}{\code{if(method = 'spls')} numeric vector or matrix of continuous responses (for multi-response models) \code{NA}s are allowed.}
   \item{ncomp}{the number of components to include in the model.}
   \item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
-\item{already.tested.X}{Optional, if \code{ncomp > 1} A list containing which variables of X are to be kept on each of the first PLS-components (if \code{constraint=TRUE}) or a numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components (if \code{constraint = FALSE})}
-\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see details and examples. }
+\item{already.tested.X}{Optional, if \code{ncomp > 1} A numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components.}
 \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or
 \code{"loo"} (see below). Default is \code{"Mfold"}.}
 \item{folds}{the folds in the Mfold cross-validation. See Details.}
@@ -66,9 +65,9 @@ If \code{validation = "Mfold"}, M-fold cross-validation is performed.
 How many folds to generate is selected by specifying the number of folds in \code{folds}.
 
 
-If \code{auc = TRUE} and there are more than 2 categories in \code{Y}, the Area Under the Curve is averaged using one-vs-all comparison. Note however that the AUC criteria may not be particularly insightful as the prediction threshold we use in sPLS-DA differs from an AUC threshold (sPLS-DA relies on prediction distances for predictions, see \code{?predict.splsda}).
+If \code{auc = TRUE} and there are more than 2 categories in \code{Y}, the Area Under the Curve is averaged using one-vs-all comparison. Note however that the AUC criteria may not be particularly insightful as the prediction threshold we use in sPLS-DA differs from an AUC threshold (sPLS-DA relies on prediction distances for predictions, see \code{?predict.splsda} for more details).
 
-Constraint model. To improve performance, a constraint model is now implemented (\code{constraint=TRUE)}. The performance is assessed on same list of selected features from the previous components in the different CV folds, as opposed to considering only the number of features. Our experience has shown that the constraint model can improve the performance of the methods.
+More details about the prediction distances in \code{?predict} and the referred publication.
 
 }
 
@@ -76,8 +75,7 @@ Constraint model. To improve performance, a constraint model is now implemented 
 Depending on the type of analysis performed, a list that contains:
 \item{error.rate}{returns the prediction error for each \code{test.keepX} on each component, averaged across all repeats and subsampling folds. Standard deviation is also output. All error rates are also available as a list.}
 \item{choice.keepX}{returns the number of variables selected (optimal keepX) on each component.}
-\item{choice.keepX.constraint}{returns the variables selected by the optimal keepX on each component. only if constraint=TRUE.}
-\item{choice.nconp}{returns the optimal number of components in the sPLS-DA model}
+\item{choice.ncomp}{returns the optimal number of components for the model fitted with \code{$choice.keepX} }
 \item{error.rate.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX}
 
 \item{predict}{Prediction values for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
@@ -90,7 +88,9 @@ Depending on the type of analysis performed, a list that contains:
 }
 
 \references{
-mixOmics manuscript: Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+mixOmics manuscript:
+
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
 
 }
 
@@ -110,20 +110,13 @@ tune = tune.splsda(X, Y, ncomp = 1, nrepeat = 10, logratio = "none",
     test.keepX = c(5, 10, 15), folds = 10, dist = "max.dist",
     progressBar = TRUE)
 
-# 2 components, optimising 'keepX' with 'constraint = FALSE'
-tune = tune.splsda(X, Y, ncomp = 2, test.keepX = c(5, 10, 15),
-folds = 10, dist = "max.dist", constraint = FALSE,
-progressBar = TRUE)
-tune$choice.keepX
-tune$choice.keepX.constraint
+# 5 components, optimising 'keepX' and 'ncomp'
+tune = tune.splsda(X, Y, ncomp = 5, test.keepX = c(5, 10, 15),
+folds = 10, dist = "max.dist", nrepeat = 5, progressBar = TRUE)
 
-# 2 components, optimising 'keepX.constraint' with 'constraint = TRUE'
-tune = tune.splsda(X, Y, ncomp = 2, test.keepX = c(5, 10, 15),
-folds = 10, dist = "max.dist", constraint = TRUE,
-progressBar = TRUE)
+tune$choice.ncomp
 tune$choice.keepX
-tune$choice.keepX.constraint
-
+plot(tune)
 }
 
 ## only tune component 3 and 4
@@ -132,23 +125,6 @@ tune$choice.keepX.constraint
 tune = tune.splsda(X = X,Y = Y, ncomp = 4,
 already.tested.X = c(5,10),
 test.keepX = seq(1,10,2), progressBar = TRUE)
-
-}
-
-## only tune component 3 and 4
-# keeping specific variables on the first two components respectively
-\dontrun{
-keepX.constraint = list(comp1 = c("818", "791", "911", "592"),
-comp2 = c("593", "743", "309")
-)
-# constraint is set to TRUE because we use a keepX.constraint on the first 2 PLS-components
-tune = tune.splsda(X = X,Y = Y, ncomp = 4,
-already.tested.X = keepX.constraint,
-test.keepX = seq(1,10,2), constraint = TRUE, progressBar = TRUE)
-
-tune$choice.keepX.constraint
-
-plot(tune)
 
 }
 

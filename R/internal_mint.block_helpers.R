@@ -383,7 +383,7 @@ defl.select = function(yy, rr, nncomp, nn, nbloc, indY = NULL, mode = "canonical
     resdefl = NULL
     pdefl = NULL
     for (q in 1 : nbloc) {
-        ### Start: insertion of new deflations (See La regression PLS Theorie et pratique (page 139))
+        ### Start: insertion of new deflations (See La regression PLS Theorie et pratique p204 (Chap 11))
         if ( nn <= nncomp[q] ) {
             if ((mode == "canonical") || (q != indY)) { #deflation of each block independently from the others, except indY
                 defltmp = deflation(rr[[q]], yy[ , q])
@@ -399,12 +399,14 @@ defl.select = function(yy, rr, nncomp, nn, nbloc, indY = NULL, mode = "canonical
                 resdefl[[q]] = Reduce("+", lapply(c(1:nbloc)[-q], function(x) {deflation(rr[[q]],yy[, x])$R}))/(nbloc-1)
                 pdefl[[q]]   =  rep(0,NCOL(rr[[q]]))
             }
-            ### End: insertion of new deflations (See La regression PLS Theorie et pratique (page 139))
+            ### End: insertion of new deflations
         } else {
             resdefl[[q]] = rr[[q]]
             pdefl[[q]]   =  rep(0,NCOL(rr[[q]]))
         }
     }
+    names(resdefl) = names(pdefl) = names(rr)
+    
     return(list(resdefl=resdefl,pdefl=pdefl))
 }
 

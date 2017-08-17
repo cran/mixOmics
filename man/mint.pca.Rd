@@ -1,5 +1,5 @@
 \name{mint.pca}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{mint.pca}
 
 \title{P-integration with Principal Component Analysis}

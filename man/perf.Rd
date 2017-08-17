@@ -1,5 +1,5 @@
 \name{perf}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{perf}
 \alias{perf.pls}
 \alias{perf.spls}
@@ -25,21 +25,21 @@ PLS-DA, sparse PLS-DA, MINT (mint.splsda) and DIABLO (block.splsda) models using
 
 \method{perf}{plsda}(object,
           dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-          constraint = FALSE, validation = c("Mfold", "loo"), 
+          validation = c("Mfold", "loo"),
           folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, cpus, \ldots)
 
 \method{perf}{splsda}(object, 
-dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"), constraint = FALSE,
+dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
 validation = c("Mfold", "loo"),
 folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, cpus, \ldots)
 
 \method{perf}{mint.splsda}(object,
             dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-            constraint = TRUE, auc = FALSE, progressBar = TRUE, \ldots)
+            auc = FALSE, progressBar = TRUE, \ldots)
 
 \method{perf}{sgccda}(object,
             dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-            constraint = FALSE, validation = c("Mfold", "loo"),
+            validation = c("Mfold", "loo"),
             folds = 10, nrepeat =1, cpus, \ldots)
 
 }
@@ -48,11 +48,10 @@ folds = 10, nrepeat =1, auc = FALSE, progressBar = TRUE, cpus, \ldots)
   \item{object}{object of class inheriting from \code{"pls"}, \code{"plsda"},
     \code{"spls"}, \code{"splsda"} or  \code{"mint.splsda"}. The function will retrieve some key parameters stored in that object.}
 \item{dist}{only applies to an object inheriting from \code{"plsda"}, \code{"splsda"} or \code{"mint.splsda"} to evaluate the classification performance of the model. Should be a subset of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. Default is \code{"all"}. See \code{\link{predict}}.}
-\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE). See details. }
 \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or
     \code{"loo"} (see below). Default is \code{"Mfold"}.}
   \item{folds}{the folds in the Mfold cross-validation. See Details.}
-\item{nrepeat}{Number of times the Cross-Validation process is repeated.}
+\item{nrepeat}{Number of times the Cross-Validation process is repeated. This is an important argument to ensure the estimation of the performance to be as accurate as possible.}
 \item{auc}{if \code{TRUE} calculate the Area Under the Curve (AUC) performance of the model.}
   \item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
 \item{cpus}{Number of cpus to use when running the code in parallel.}
@@ -81,13 +80,17 @@ Sparse methods. The sPLS, sPLS-DA and sgccda functions are run on several and di
 Note that for PLS-DA and sPLS-DA objects, perf is performed on the original data, i.e. before the pre-processing step of the log ratio transform and multilevel analysis, if any. In addition for these methods, the classification error rate is averaged across all folds.
 
 
-Constraint model. To improve performance, a constraint model is now implemented (\code{constraint=TRUE)}. The performance is assessed on same list of selected features from the previous components in the different CV folds, as opposed to considering only the number of features. Our experience has shown that the constraint model can improve the performance of the methods.
-
-
 The mint.sPLS-DA function estimates errors based on Leave-one-group-out cross validation (where each levels of object$study is left out (and predicted) once) and provides study-specific outputs (\code{study.specific.error}) as well as global outputs (\code{global.error}).
 
 
-AUROC. For PLS-DA, sPLS-DA, mint.PLS-DA and mint.sPLS-DA methods: if \code{auc=TRUE}, Area Under the Curve (AUC) values are calculated from the predicted scores obtained from the \code{predict} function applied to the internal test sets in the cross-validation process, either for all samples or for study-specific samples (for mint models). Therefore we minimise the risk of overfitting. See \code{\link{auroc}} for more details. Our multivariate supervised methods already use a prediction threshold based on distances (see \code{predict}) that optimally determine class membership of the samples tested. As such AUC and ROC are not needed to estimate the performance of the model. We provide those outputs as complementary performance measures.
+AUROC. For PLS-DA, sPLS-DA, mint.PLS-DA and mint.sPLS-DA methods: if \code{auc=TRUE}, Area Under the Curve (AUC) values are calculated from the predicted scores obtained from the \code{predict} function applied to the internal test sets in the cross-validation process, either for all samples or for study-specific samples (for mint models). Therefore we minimise the risk of overfitting. See \code{\link{auroc}} for more details. Our multivariate supervised methods already use a prediction threshold based on distances (see \code{predict}) that optimally determine class membership of the samples tested. As such AUC and ROC are not needed to estimate the performance of the model. We provide those outputs as complementary performance measures. See more details in our mixOmics article.
+
+Prediction distances. See details from \code{?predict}.
+
+Repeats of the CV-folds. Repeated cross-validation implies that the whole CV process is repeated a number of times (\code{nrepeat}) to reduce variability across the different subset partitions. In the case of Leave-One-Out CV (\code{validation = 'loo'}), each sample is left out once (\code{folds = N} is set internally) and therefore nrepeat is by default 1.
+
+More details about the PLS modes in \code{?pls}.
+
 }
 
 \value{
@@ -129,25 +132,40 @@ For sgccda models, \code{perf} produces the following outputs:
 \item{WeightedVote}{if more than one block, returns the weighted majority class over the blocks. NA for a sample means that there is no consensus on the predicted class for this particular sample over the blocks.}
 \item{WeightedVote.error.rate}{if more than one block, returns the error rate of the \code{WeightedVote} output}
 \item{weights}{Returns the weights of each block used for the weighted predictions, for each nrepeat and each fold}
+\item{choice.ncomp}{For supervised models; returns the optimal number of components for the model for each prediction distance using one-sided t-tests that test for a significant difference in the mean error rate (gain in prediction) when components are added to the model. See more details in Rohart et al 2016 Suppl. For more than one block, an optimal ncomp is returned for each prediction framework.}
 }
 
 \references{
+DIABLO:
+
 Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
 DIABLO - multi omics integration for biomarker discovery.
 
-Rohart F. et al (2016, submitted). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms.
+mixOmics main publication:
 
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+
+MINT:
+
+Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
+
+PLS and PLS citeria for PLS regression:
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 
 Chavent, Marie and Patouille, Brigitte (2003). Calcul des coefficients de r{e}gression et du PRESS en r{e}gression PLS1. \emph{Modulad n}, \bold{30} 1-11. (this is the formula we use to calculate the Q2 in perf.pls and perf.spls)
+
+Mevik, B.-H., Cederkvist, H. R. (2004). Mean Squared Error of Prediction (MSEP) Estimates for Principal Component
+Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of Chemometrics} \bold{18}(9), 422-429.
+
+sparse PLS regression mode:
 
 Le Cao, K. A., Rossouw D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable 
 selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular 
 Biology} \bold{7}, article 35.
 
-Mevik, B.-H., Cederkvist, H. R. (2004). Mean Squared Error of Prediction (MSEP) Estimates for Principal Component 
-Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of Chemometrics} \bold{18}(9), 422-429.
+One-sided t-tests (suppl material):
 
+Rohart F, Mason EA, Matigian N, Mosbergen R, Korn O, Chen T, Butcher S, Patel J, Atkinson K, Khosrotehrani K, Fisk NM, Le Cao K-A&, Wells CA& (2016). A Molecular Classification of Human Mesenchymal Stromal Cells. PeerJ 4:e1845.
 }
 
 \author{Ignacio Gonzalez, Amrit Singh, Kim-Anh Le Cao, Benoit Gautier, Florian Rohart.}
@@ -224,7 +242,7 @@ data(srbct)
 X <- srbct$gene
 Y <- srbct$class
 
-ncomp = 5
+ncomp = 2
 
 srbct.splsda <- splsda(X, Y, ncomp = ncomp, keepX = rep(10, ncomp))
 
@@ -236,7 +254,7 @@ dist = "all", auc = TRUE)
 error
 error$auc
 
-plot(error, type = "l")
+plot(error)
 
 # parallel code
 set.seed(45)
@@ -244,14 +262,35 @@ error <- perf(srbct.splsda, validation = "Mfold", folds = 8,
 dist = "all", auc = TRUE, cpus =2)
 
 
+
+
+\dontrun{
+# with 5 components and nrepeat =5, to get a $choice.ncomp
+ncomp = 5
+srbct.splsda <- splsda(X, Y, ncomp = ncomp, keepX = rep(10, ncomp))
+
+set.seed(45)
+error <- perf(srbct.splsda, validation = "Mfold", folds = 8,
+dist = "all", nrepeat =5)
+error
+
+plot(error)
+
+# parallel code
+set.seed(45)
+error <- perf(srbct.splsda, validation = "Mfold", folds = 8,
+dist = "all", auc = TRUE, cpus =2)
+
+}
+
 ## validation for objects of class 'mint.splsda' (classification)
 # ----------------------------------------
 
 data(stemcells)
 res = mint.splsda(X = stemcells$gene, Y = stemcells$celltype, ncomp = 3, keepX = c(10, 5, 15),
-study = stemcells$study, auc = TRUE)
+study = stemcells$study)
 
-out = perf(res)
+out = perf(res, auc = TRUE)
 out
 
 out$auc
@@ -265,7 +304,6 @@ Y = nutrimouse$diet
 data = list(gene = nutrimouse$gene, lipid = nutrimouse$lipid)
 design = matrix(c(0,1,1,1,0,1,1,1,0), ncol = 3, nrow = 3, byrow = TRUE)
 
-
 nutrimouse.sgccda <- block.splsda(X=data,
 Y = Y,
 design = design,
@@ -277,7 +315,24 @@ bias = FALSE)
 
 perf = perf(nutrimouse.sgccda)
 perf
-perf$WeightedVote.error.rate
+
+
+\dontrun{
+#with 5 components and nrepeat=5 to get $choice.ncomp
+nutrimouse.sgccda <- block.splsda(X=data,
+Y = Y,
+design = design,
+keepX = list(gene=c(10,10), lipid=c(15,15)),
+ncomp = 5,
+scheme = "horst",
+verbose = FALSE,
+bias = FALSE)
+
+perf = perf(nutrimouse.sgccda, folds = 5, nrepeat = 5)
+perf
+
+perf$choice.ncomp
+}
 }
 
 }

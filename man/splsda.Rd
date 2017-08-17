@@ -1,5 +1,5 @@
 \name{splsda}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{splsda}
 
 \title{Sparse Partial Least Squares Discriminant Analysis (sPLS-DA)}
@@ -50,6 +50,8 @@ matrix is created. Logratio transform and multilevel analysis are performed sequ
 
 Logratio can only be applied if the data do not contain any 0 value (for count data, we thus advise the normalise raw data with a 1 offset).
 
+More details about the PLS modes in \code{?pls}.
+
 }
 
 \value{
@@ -61,7 +63,6 @@ that contains the following components:
   \item{ind.mat}{the indicator matrix.}
   \item{ncomp}{the number of components included in the model.}
   \item{keepX}{number of \eqn{X} variables kept in the model on each component.}
-  \item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
   \item{variates}{list containing the variates.}
   \item{loadings}{list containing the estimated loadings for the \code{X} and 
 	\code{Y} variates.}
@@ -72,7 +73,9 @@ that contains the following components:
     \item{max.iter}{the maximum number of iterations, used for subsequent S3 methods}
     \item{scale}{boolean indicating whether the data were scaled in MINT S3 methods}
     \item{logratio}{whether logratio transformations were used for compositional data}
-    \item{explained_variance}{explained variance from the multivariate model, used for plotIndiv}
+  \item{explained_variance}{amount of variance explained per component (note that contrary to PCA, this amount may not decrease as the aim of the method is not to maximise the variance, but the covariance between X and the dummy matrix Y).}
+\item{mat.c}{matrix of coefficients from the regression of X / residual matrices X on the X-variates, to be used internally by \code{predict}.}
+\item{defl.matrix}{residual matrices X for each dimension.}
 }
 
 \references{
@@ -80,10 +83,10 @@ On sPLS-DA:
 Le Cao, K.-A., Boitard, S. and Besse, P. (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. \emph{BMC Bioinformatics} \bold{12}:253.
 On log ratio transformations:
 Filzmoser, P., Hron, K., Reimann, C.: Principal component analysis for compositional data with outliers. Environmetrics 20(6), 621-632 (2009)
-K-A. L\^{e} Cao, ME Costello,  VA Lakis, F Bartolo, XY Chua, R Brazeilles, P Rondeau. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
+L\^{e} Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
 On multilevel decomposition:
 Westerhuis, J.A., van Velzen, E.J., Hoefsloot, H.C., Smilde, A.K.: Multivariate paired data analysis: multilevel plsda versus oplsda. Metabolomics 6(1), 119-128 (2010)
-Liquet, B., Lê Cao, K.-A., Hocini, H., Thiébaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
+Liquet, B., L\^{e} Cao K.-A., Hocini, H., Thiebaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
 }
 
 \author{Florian Rohart, Ignacio Gonzalez, Kim-Anh Le Cao.}

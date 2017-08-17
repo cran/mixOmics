@@ -1,5 +1,5 @@
 \name{diverse.16S}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{diverse.16S}
 
 \docType{data}
@@ -39,7 +39,7 @@ The raw data were downloaded from \url{http://hmpdacc.org/HMQCP/all/}.
 Filtering and normalisation described in our website \url{ www.mixOmics.org/mixMC}}
 
 \references{
-K-A. L\^{e} Cao, ME Costello,  VA Lakis, F Bartolo, XY Chua, R Brazeilles, P Rondeau. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
+L\^{e} Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
 }
 
 \keyword{datasets}

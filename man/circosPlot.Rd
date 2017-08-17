@@ -1,5 +1,5 @@
 \name{circosPlot}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{circosPlot}
 
 \title{circosPlot for DIABLO}
@@ -61,6 +61,7 @@ Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.
 DIABLO:  multi omics integration for biomarker discovery. BioRxiv available here: \url{http://biorxiv.org/content/early/2016/08/03/067611}
 
 mixOmics manuscript:
+
 Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
 
 

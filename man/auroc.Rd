@@ -1,5 +1,5 @@
 \name{auroc}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{auroc}
 \alias{auroc.plsda}
 \alias{auroc.splsda}
@@ -22,10 +22,12 @@ multilevel = NULL, plot = TRUE, roc.comp = 1, ...)
 multilevel = NULL, plot = TRUE, roc.comp = 1, ...)
 
 \method{auroc}{mint.plsda}(object, newdata = object$X, outcome.test = as.factor(object$Y),
-study.test = object$study, multilevel = NULL,plot = TRUE, roc.comp = 1, ...)
+study.test = object$study, multilevel = NULL,plot = TRUE, roc.comp = 1,
+roc.study = "global", ...)
 
 \method{auroc}{mint.splsda}(object, newdata = object$X, outcome.test = as.factor(object$Y),
-study.test = object$study, multilevel = NULL,plot = TRUE, roc.comp = 1, ...)
+study.test = object$study, multilevel = NULL,plot = TRUE, roc.comp = 1,
+roc.study = "global", ...)
 
 \method{auroc}{sgccda}(object, newdata = object$X, outcome.test = as.factor(object$Y),
 multilevel = NULL,plot = TRUE, roc.block = 1, roc.comp = 1, ...)
@@ -41,6 +43,7 @@ multilevel = NULL,plot = TRUE, roc.block = 1, roc.comp = 1, ...)
 \item{plot}{Whether the ROC curves should be plotted, by default set to TRUE (see details).}
 \item{roc.comp}{Specify the component (integer) for which the ROC will be plotted from the multivariate model, default to 1.}
 \item{roc.block}{Specify the block number (integer) or the name of the block (set of characters) for which the ROC will be plotted for a block.plsda or block.splsda object, default to 1.}
+\item{roc.study}{Specify the study for which the ROC will be plotted for a mint.plsda or mint.splsda object, default to "global".}
 \item{...}{external optional arguments for plotting}
 }
 
@@ -55,6 +58,8 @@ The pvalue is from a Wilcoxon test between the predicted scores between one clas
 External independent data set (\code{newdata}) and outcome (\code{outcome.test}) can be input to calculate AUROC. The external data set must have the same variables as the training data set (\code{object$X}).
 
 If \code{newdata} is not provided, AUROC is calculated from the training data set, and may result in overfitting (too optimistic results).
+
+Note that for mint.plsda and mint.splsda objects, if \code{roc.study} is different from "global", then \code{newdata}), \code{outcome.test} and \code{sstudy.test} are not used.
 
 }
 

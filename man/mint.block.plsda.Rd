@@ -1,5 +1,5 @@
 \name{mint.block.plsda}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{mint.block.plsda}
 
 \title{NP-integration with Discriminant Analysis}
@@ -59,7 +59,7 @@ A factor indicating the discrete outcome needs to be provided, either by \code{Y
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
-algorithm \code{("classic")} (see References).
+algorithm \code{("classic")} (see References and more details in \code{?pls}).
 
 }
 
@@ -71,7 +71,7 @@ that contains the following components:
 \item{Y}{the centered and standardized original response vector or matrix.}
 \item{ncomp}{the number of components included in the model for each block.}
 \item{mode}{the algorithm used to fit the model.}
-\item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
+\item{mat.c}{matrix of coefficients from the regression of X / residual matrices X on the X-variates, to be used internally by \code{predict}.}
 \item{variates}{list containing the \eqn{X} and \eqn{Y} variates.}
 \item{loadings}{list containing the estimated loadings for the variates.}
 \item{names}{list containing the names to be used for individuals and variables.}
@@ -84,6 +84,7 @@ that contains the following components:
 
 \references{
 On multi-group PLS:
+
 Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
@@ -97,6 +98,7 @@ Tenenhaus A., Philippe C., Guillemot V, Le Cao K.A., Grill J, Frouin V. Variable
 Gunther O., Shin H., Ng R. T. , McMaster W. R., McManus B. M. , Keown P. A. , Tebbutt S.J. , Le Cao K-A. ,  (2014) Novel multivariate methods for integration of genomics and proteomics data: Applications in a kidney transplant rejection study, OMICS: A journal of integrative biology, 18(11), 682-95.
 
 mixOmics manuscript:
+
 Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
 
 

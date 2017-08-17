@@ -1,5 +1,5 @@
 \name{tune.block.splsda}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{tune.block.splsda}
 
 
@@ -16,7 +16,6 @@ indY,
 ncomp = 2,
 test.keepX,
 already.tested.X,
-constraint = FALSE,
 validation = "Mfold",
 folds = 10,
 dist = "max.dist",
@@ -48,9 +47,8 @@ name.save=NULL
 \item{ncomp}{the number of components to include in the model.}
 \item{test.keepX}{A list of length the number of blocks in X (without the outcome). Each entry of this list is a numeric vector for the different keepX values to test for that specific block.}
 
-\item{already.tested.X}{Optional, only if \code{ncomp > 1}. A list of length the number of blocks in X (without the outcome). Each entry contains a list of which variables of X are to be kept on each of the first PLS-components (if \code{constraint=TRUE}) or a numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components (if \code{constraint = FALSE}), see examples.}
+\item{already.tested.X}{Optional, if \code{ncomp > 1} A numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components.}
 
-\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see details and examples. }
 \item{validation}{character.  What kind of (internal) validation to use, matching one of \code{"Mfold"} or
 \code{"loo"} (see below). Default is \code{"Mfold"}.}
 \item{folds}{the folds in the Mfold cross-validation. See Details.}
@@ -95,17 +93,14 @@ If \code{validation = "loo"}, leave-one-out cross-validation is performed. By de
 
 All combination of test.keepX values are tested. A message informs how many will be fitted on each component for a given test.keepX.
 
-Constraint model. To improve performance, a new variant in all tuning functions was recently added to fit a constraint model (\code{constraint=TRUE)}. The tuning is performed on the optimal list of selected features \code{keepX.constraint} from the previous components, as opposed to considering only the number of features \code{keepX}. Such strategy was implemented in the sister package bootPLS and successfully applied in our recent integrative study (Rohart et al., 2016). Our experience has shown that the constraint tuning and models can substantially improve the performance of the methods.
-
-Constraint model. To improve performance, a constraint model is now implemented (\code{constraint=TRUE)}. The performance is assessed on same list of selected features from the previous components in the different CV folds, as opposed to considering only the number of features. Our experience has shown that the constraint model can improve the performance of the methods.
-
+More details about the prediction distances in \code{?predict}. More details about the PLS modes in \code{?pls}.
 }
 
 \value{
 A list that contains:
 \item{error.rate}{returns the prediction error for each \code{test.keepX} on each component, averaged across all repeats and subsampling folds. Standard deviation is also output. All error rates are also available as a list.}
 \item{choice.keepX}{returns the number of variables selected (optimal keepX) on each component, for each block.}
-\item{choice.keepX.constraint}{returns the variables selected by the optimal keepX on each component, for each block. only if constraint=TRUE.}
+\item{choice.ncomp}{returns the optimal number of components for the model fitted with \code{$choice.keepX}. }
 \item{error.rate.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX}
 
 \item{predict}{Prediction values for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
@@ -117,12 +112,14 @@ A list that contains:
 
 
 \references{
-Method: Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
-DIABLO:  multi omics integration for biomarker discovery. BioRxiv available here: \url{http://biorxiv.org/content/early/2016/08/03/067611}
+Method:
 
-mixOmics manuscript: Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016). DIABLO:  multi omics integration for biomarker discovery.
 
-Use of a constraint model: Rohart, F., Mason, E. A., Matigian, N., Mosbergen, R., Korn, O., Chen, T., Butcher, S., Patel, J., Atkinson, K., Khosrotehrani, K., Fisk, N. M., Le Cao, K., and Wells, C. A. (2016). A molecular classification of human mesenchymal stromal cells. PeerJ, 4:e1845.
+
+mixOmics manuscript:
+
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
 }
 
 
@@ -144,7 +141,7 @@ design = matrix(1, ncol = length(data), nrow = length(data),
 diag(design) =  0
 design
 # set number of component per data set
-ncomp = 2
+ncomp = 5
 
 # Tuning the first two components
 # -------------
@@ -156,52 +153,25 @@ test.keepX = list(mrna = seq(10,40,20), mirna = seq(10,30,10), protein = seq(1,1
 # the following may take some time to run, note that for through tuning
 # nrepeat should be > 1
 tune = tune.block.splsda(X = data, Y = breast.TCGA$data.train$subtype,
-ncomp = ncomp, test.keepX = test.keepX, design = design, nrepeat = 1)
+ncomp = ncomp, test.keepX = test.keepX, design = design, nrepeat = 3)
 
-tune$choice.keepX.constraint # NULL as constraint = FALSE per default
-tune$choice.keepX
-
-# using constraint = TRUE
-tune = tune.block.splsda(X = data, Y = breast.TCGA$data.train$subtype,
-ncomp = ncomp, test.keepX = test.keepX, design = design, constraint = TRUE)
-
-tune$choice.keepX.constraint
+tune$choice.ncomp
 tune$choice.keepX
 
 
 # Only tuning the second component
 # -------------
 
-constraint.mrna = 4 # 4 variables selected on comp1 for mrna
-constraint.mirna  = 2 # 2 variables selected on comp1 for mirna
-constraint.prot  = 1 # 1 variables selected on comp1 for protein
+already.mrna = 4 # 4 variables selected on comp1 for mrna
+already.mirna  = 2 # 2 variables selected on comp1 for mirna
+already.prot  = 1 # 1 variables selected on comp1 for protein
 
-already.tested.X = list(mrna = constraint.mrna, mirna = constraint.mirna, prot = constraint.prot)
-
-tune = tune.block.splsda(X = data, Y = breast.TCGA$data.train$subtype,
-ncomp = ncomp, test.keepX = test.keepX, design = design,
-already.tested.X = already.tested.X, constraint = FALSE)
-
-tune$choice.keepX.constraint # NULL as constraint = FALSE
-tune$choice.keepX
-
-
-
-# with constraint
-## we force the first PLS-component of each block to be built with only a few specific variables
-
-constraint.mrna = list(comp1 = c("EPHB3", "CBR1", "BSPRY"))
-constraint.mirna  = list(comp1 = c("hsa-mir-128-2", "hsa-mir-196b"))
-constraint.prot  = list(comp1 = c("Paxillin"))
-
-# names of already.tested.X must match the names of 'data'
-already.tested.X = list(mrna = constraint.mrna, mirna = constraint.mirna, protein = constraint.prot)
+already.tested.X = list(mrna = already.mrna, mirna = already.mirna, prot = already.prot)
 
 tune = tune.block.splsda(X = data, Y = breast.TCGA$data.train$subtype,
-ncomp = ncomp, test.keepX = test.keepX, design = design,
-already.tested.X = already.tested.X, constraint = TRUE)
+ncomp = 2, test.keepX = test.keepX, design = design,
+already.tested.X = already.tested.X)
 
-tune$choice.keepX.constraint
 tune$choice.keepX
 
 

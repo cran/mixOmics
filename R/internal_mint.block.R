@@ -223,7 +223,7 @@ keepA.constraint = NULL, penalty = NULL)
         temp
         })
     names(expl.A) = names(A)
-    
+    names(defl.matrix) = paste0("comp ", 1:max(ncomp))
     ### Start: output
     names(loadings.A) = names(variates.A) = names(A)
     

@@ -157,6 +157,36 @@ multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVar
     #-- pls approach ----------------------------------------------------#
     #---------------------------------------------------------------------------#
 
+    # calculating mat.c
+    R = lapply(result$defl.matrix, function(x){x$X}) # list of length ncomp, containing the deflated blocks
+    variates = result$variates$X
+    
+    is.na.X = is.na(X)
+    if(sum(is.na.X)>0)
+    {
+        p.ones = rep(1, ncol(X))
+
+        mat.c = matrix(0, nrow = ncol(X), ncol = ncomp)
+        for(comp in 1:ncomp)
+        {
+            R.temp = R[[comp]]
+            R.temp[is.na.X] = 0
+            c = crossprod(R.temp, variates[,comp])
+            T = drop(variates[,comp]) %o% p.ones
+            T[is.na.X] = 0
+            t.norm = crossprod(T)
+            c = c / diag(t.norm)
+            mat.c[,comp] = c
+        }
+    } else {
+        mat.c = sapply(1:ncol(variates), function(x){crossprod(R[[x]], variates[,x]) / drop(crossprod (variates[,x]))})
+
+    }
+
+    rownames(mat.c) = colnames(X)
+    colnames(mat.c) = paste0("comp ", 1:max(ncomp))
+    result$mat.c = mat.c
+
     result$ncomp = ncomp
     if(near.zero.var)
     result$nzv = nzv.A

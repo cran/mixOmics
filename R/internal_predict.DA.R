@@ -66,6 +66,7 @@ internal_predict.DA = function(object, out, q, dist, weights)
         else
         G[[i]] = t(G[[i]])
         colnames(G[[i]]) = paste("dim", c(1:ncomp[i]), sep = " ")
+        rownames(G[[i]]) = colnames(object$ind.mat)
         
     }
     names(G)=names(object$X)

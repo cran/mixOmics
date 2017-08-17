@@ -1,5 +1,5 @@
 \name{srbct}
-\encoding{latin1}
+\encoding{UTF-8}
 \docType{data}
 \alias{srbct}
 

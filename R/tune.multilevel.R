@@ -34,7 +34,6 @@ test.keepX = c(5, 10, 15),
 test.keepY = NULL,
 already.tested.X = NULL,
 already.tested.Y = NULL,
-constraint = FALSE,
 method, #splsda or spls
 mode = "regression",
 validation = "Mfold",
@@ -101,7 +100,7 @@ light.output = TRUE
         result = tune.splsda(X = X, Y = Y,
         multilevel = multilevel,
         ncomp = ncomp, test.keepX = test.keepX, dist = dist,
-        already.tested.X = already.tested.X, constraint = constraint, validation = validation, folds = folds,
+        already.tested.X = already.tested.X, validation = validation, folds = folds,
         measure = measure, auc = auc, progressBar = progressBar, near.zero.var = near.zero.var,
         logratio = logratio, nrepeat = nrepeat, light.output = light.output)
         

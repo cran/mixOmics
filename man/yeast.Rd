@@ -33,7 +33,7 @@ which include 13 MT-AER, 14 MT-ANA, 15 WT-AER and 13 WT-ANA samples
 
 
 \references{
-Villas-Boas S, Moxley J, Akesson M, Stephanopoulos G, Nielsen J: High-throughput metabolic state analysis (2005). The missing link in integrated functional genomics. \emph{Biochemical Journal}, bold{388}:669–677.
+Villas-Boas S, Moxley J, Akesson M, Stephanopoulos G, Nielsen J: High-throughput metabolic state analysis (2005). The missing link in integrated functional genomics. \emph{Biochemical Journal}, \bold{388}:669–677.
 }
 
 \keyword{datasets}

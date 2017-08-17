@@ -1,5 +1,5 @@
 \name{image.estim.regul}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{image.estim.regul}
 
 \title{Plot the cross-validation score.}

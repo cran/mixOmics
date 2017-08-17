@@ -1,5 +1,5 @@
 \name{plotLoadings}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{plotLoadings}
 \alias{plotLoadings.pls}
 \alias{plotLoadings.spls}

@@ -1,5 +1,5 @@
 \name{wrapper.rgcca}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{wrapper.rgcca}
 
 \title{mixOmics wrapper for Regularised Generalised Canonical Correlation Analysis (rgcca)}

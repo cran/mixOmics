@@ -1,5 +1,5 @@
 \name{breast.TCGA}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{breast.TCGA}
 
 \docType{data}

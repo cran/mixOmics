@@ -1,5 +1,5 @@
 \name{spca}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{spca}
 
 \title{Sparse Principal Components Analysis}

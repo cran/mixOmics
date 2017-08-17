@@ -97,7 +97,8 @@ point.lwd = 1,
     } else {
         stop("Incorrect value for 'blocks'", call. = FALSE)
     }
-    object$variates = object$variates[names(object$variates) %in% blocks] # reduce the variate to the 'blocks' we are looking at
+    #object$variates = object$variates[names(object$variates) %in% blocks] # reduce the variate to the 'blocks' we are looking at
+    object$variates = object$variates[match(blocks, names(object$variates))] # reduce the variate to the 'blocks' we are looking at
     
     if (any(object$ncomp[blocks] ==  1))
     stop(paste("The number of components for one selected block '", paste(blocks, collapse = " - "), "' is 1. The number of components must be superior or equal to 2."), call. = FALSE)

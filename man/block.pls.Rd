@@ -1,5 +1,5 @@
 \name{block.pls}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{block.pls}
 
 \title{N-integration with Projection to Latent Structures models (PLS)}
@@ -53,7 +53,10 @@ Multi (continuous)response are supported. \code{X} and \code{Y} can contain miss
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
-algorithm \code{("classic")} (see References).
+algorithm \code{("classic")} (see References and \code{?pls} for more details).
+
+Note that our method is partly based on Generalised Canonical Correlation Analysis and differs from the MB-PLS approaches proposed by Kowalski et al., 1989, J Chemom 3(1) and Westerhuis et al., 1998, J Chemom, 12(5).
+
 }
 
 \value{

@@ -1,5 +1,5 @@
 \name{tune.rcc}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{tune.rcc}
 \alias{tune.rcc.default}
 

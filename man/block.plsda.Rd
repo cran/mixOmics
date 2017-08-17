@@ -1,5 +1,5 @@
 \name{block.plsda}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{block.plsda}
 
 \title{N-integration with Projection to Latent Structures models (PLS) with Discriminant Analysis}
@@ -58,7 +58,9 @@ A factor indicating the discrete outcome needs to be provided, either by \code{Y
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
-algorithm \code{("classic")} (see References).
+algorithm \code{("classic")} (see References and \code{?pls} for more details).
+
+Note that our method is partly based on Generalised Canonical Correlation Analysis and differs from the MB-PLS approaches proposed by Kowalski et al., 1989, J Chemom 3(1) and Westerhuis et al., 1998, J Chemom, 12(5).
 
 }
 
@@ -81,6 +83,7 @@ that contains the following components:
 
 \references{
 On PLSDA:
+
 Barker M and Rayens W (2003). Partial least squares for discrimination. \emph{Journal of Chemometrics} \bold{17}(3), 166-173.
 Perez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data:
 a partial least squares discriminant analysis (PLS-DA) approach. \emph{Human Genetics}
@@ -89,14 +92,16 @@ Nguyen, D. V. and Rocke, D. M. (2002). Tumor classification by partial
 least squares using microarray gene expression data. \emph{Bioinformatics}
 \bold{18}, 39-50.
 
-On multiple integration with PLS-DA
+On multiple integration with PLS-DA:
 Gunther O., Shin H., Ng R. T. , McMaster W. R., McManus B. M. , Keown P. A. , Tebbutt S.J. , Le Cao K-A. ,  (2014) Novel multivariate methods for integration of genomics and proteomics data: Applications in a kidney transplant rejection study, OMICS: A journal of integrative biology, 18(11), 682-95.
 
-On multiple integration with sPLS-DA and 4 data blocks
+On multiple integration with sPLS-DA and 4 data blocks:
+
 Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
 DIABLO:  multi omics integration for biomarker discovery. BioRxiv available here: \url{http://biorxiv.org/content/early/2016/08/03/067611}
 
-mixOmics manuscript
+mixOmics manuscript:
+
 Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
 
 

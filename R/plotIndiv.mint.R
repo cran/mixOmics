@@ -97,7 +97,7 @@ point.lwd = 1,
     if (length(study)!=length(unique(study)))
     stop("Duplicate in 'study' not allowed")
     
-    if (length(study) > 1 & any(study != "global"))
+    if (any(study != "global"))
     {
         if (ellipse == TRUE)
         stop("'ellipse' must be FALSE when study is different from 'global'")

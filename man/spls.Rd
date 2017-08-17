@@ -1,5 +1,5 @@
 \name{spls}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{spls}
 
 \title{Sparse Partial Least Squares (sPLS)}
@@ -56,7 +56,7 @@ can contain missing values.
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
-algorithm \code{("classic")} (see References).
+algorithm \code{("classic")} (see References and \code{?pls} for more details).
 
 The estimation of the missing values can be performed 
 by the reconstitution of the data matrix using the \code{nipals} function. Otherwise, missing 
@@ -84,7 +84,6 @@ that contains the following components:
   \item{keepY}{number of \eqn{Y} variables kept in the model on each component.}
   \item{keepX.constraint}{if a constraint model was chosen, the list of X variables that were constraint to be selected on each of the sPLS components.}
   \item{keepY.constraint}{if a constraint model was chosen, the list of Y variables that were constraint to be selected on each of the sPLS components.}
-  %\item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
   \item{variates}{list containing the variates.}
   \item{loadings}{list containing the estimated loadings for the \eqn{X} and 
 	\eqn{Y} variates.}
@@ -95,11 +94,14 @@ that contains the following components:
   \item{nzv}{list containing the zero- or near-zero predictors information.}
   \item{scale}{whether scaling was applied per predictor.}
   \item{logratio}{whether log ratio transformation for relative proportion data was applied, and if so, which type of transformation.}
-  \item{explained_variance}{amount of variance explained per component (note that contrary to PCA, this amount may not decrease).}
+  \item{explained_variance}{amount of variance explained per component (note that contrary to PCA, this amount may not decrease as the aim of the method is not to maximise the variance, but the covariance between data sets).}
   \item{input.X}{numeric matrix of predictors in X that was input, before any saling / logratio / multilevel transformation.}
+\item{mat.c}{matrix of coefficients from the regression of X / residual matrices X on the X-variates, to be used internally by \code{predict}.}
+\item{defl.matrix}{residual matrices X for each dimension.}
 }
 
 \references{
+Sparse PLS: canonical and regression modes:
 
 Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 
@@ -107,13 +109,16 @@ Le Cao, K.-A., Rossouw, D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS
 selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular 
 Biology} \bold{7}, article 35.
 
+Sparse SVD:
 Shen, H. and Huang, J. Z. (2008). Sparse principal component analysis via regularized 
 low rank matrix approximation. \emph{Journal of Multivariate Analysis} \bold{99}, 1015-1034.    
 
-Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
+PLS methods:
+Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic. Chapters 9 and 11.
 
-Wold H. (1966). Estimation of principal components and related models by iterative least squares. 
-In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
+Abdi H (2010). Partial least squares regression and projection on latent structure regression (PLS Regression). \emph{Wiley Interdisciplinary Reviews: Computational Statistics}, 2(1), 97-106.
+
+Wold H. (1966). Estimation of principal components and related models by iterative least squares. In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
 
 On multilevel analysis:
 

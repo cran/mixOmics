@@ -1,5 +1,5 @@
 \name{background.predict}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{background.predict}
 
 \title{Calculate prediction areas}
@@ -30,6 +30,8 @@ Note that by default xlim and ylim will create a rectangle of simulated data tha
 
 Also note that the white frontier that defines the predicted areas when plotting with \code{plotIndiv} can be reduced by increasing \code{resolution}.
 
+More details about the prediction distances in \code{?predict} and the referred publication.
+
 }
 
 \value{
@@ -39,9 +41,7 @@ Also note that the white frontier that defines the predicted areas when plotting
 
 
 \references{
-
-mixOmics manuscript
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
 }
 
 

@@ -1,5 +1,5 @@
 \name{stemcells}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{stemcells}
 
 \docType{data}

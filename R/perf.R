@@ -209,7 +209,7 @@ progressBar = TRUE,
                 keepX.temp[which(keepX.temp>sum(nzv))] = sum(nzv)
                 
                 spls.res = mixOmics::spls(X.train[,nzv], Y.train, ncomp = ncomp, mode = mode, max.iter = max.iter, tol = tol, keepX = keepX.temp, keepY = keepY, near.zero.var = FALSE)
-                Y.hat = predict(spls.res, X.test[,nzv])$predict
+                Y.hat = predict(spls.res, X.test[,nzv, drop = FALSE])$predict
                 if(sum(is.na(Y.hat))>0) break
                 for (k in 1:ncomp)
                 {
@@ -354,7 +354,6 @@ progressBar = TRUE,
 # ---------------------------------------------------
 perf.splsda = perf.plsda = function(object,
 dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-constraint = FALSE,
 validation = c("Mfold", "loo"),
 folds = 10,
 nrepeat = 1,
@@ -379,6 +378,7 @@ cpus,
     multilevel = object$multilevel # repeated measurement and Y
     near.zero.var = !is.null(object$nzv) # if near.zero.var was used, we set it to TRUE. if not used, object$nzv is NULL
     
+    constraint = FALSE # kept in the code so far, will probably get remove later on
     if(any(class(object) == "plsda") & constraint == TRUE)
     {
         constraint = FALSE #no need as all variable will be included
@@ -572,7 +572,7 @@ cpus,
         # estimate performance of the model for each component
         result = MCVfold.splsda (X, Y, multilevel = multilevel, validation = validation, folds = folds, nrepeat = nrepeat, ncomp = comp,
         choice.keepX = if(constraint){NULL}else{choice.keepX},
-        choice.keepX.constraint = if(constraint){choice.keepX.constraint}else{NULL},
+        #choice.keepX.constraint = if(constraint){choice.keepX.constraint}else{NULL},
         test.keepX = test.keepX, measure = measure, dist = dist, near.zero.var = near.zero.var,
         auc = auc, progressBar = progressBar, class.object = class(object), cl = cl)
 
@@ -616,14 +616,28 @@ cpus,
 
     names(prediction.all) = paste('comp', 1:ncomp)
     
+    
+    # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
+    ncomp_opt = matrix(NA, nrow = length(measure), ncol = length(dist),
+    dimnames = list(measure, dist))
+    if(nrepeat > 2 & ncomp >1)
+    {
+        for (measure_i in measure)
+        {
+            for (ijk in dist)
+            ncomp_opt[measure, ijk] = t.test.process(t(mat.error.rate[[measure_i]][[ijk]]))
+        }
+    }
+
     result = list(error.rate = mat.mean.error,
     error.rate.sd = mat.sd.error,
     error.rate.all = mat.error.rate,
     error.rate.class = error.per.class.keepX.opt.mean[[1]],
     error.rate.class.all = error.per.class.keepX.opt[[1]],
     predict = prediction.all,
-    class = class.all)
-    
+    class = class.all,
+    choice.ncomp = ncomp_opt)
+
     if(auc)
     {
         names(auc.mean) = c(paste('comp', 1:ncomp))

@@ -1,5 +1,5 @@
 \name{plot.rcc}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{plot.rcc}
 
 \title{Canonical Correlations Plot}

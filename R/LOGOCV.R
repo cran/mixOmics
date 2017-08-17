@@ -154,7 +154,7 @@ scale)
     
     result = list()
     
-    auc.mean = error.mean = error.sd = error.per.class.keepX.opt.comp = keepX.opt = test.keepX.out = choice.keepX.out = list()
+    auc.mean = error.mean = error.sd = error.per.class.keepX.opt.comp = keepX.opt = test.keepX.out = choice.keepX.out = error.per.study.keepX.opt = list()
     
     if(auc)
     {
@@ -185,9 +185,21 @@ scale)
                 sum(as.character(Y) != x)
             })
             
-            # we average the error per keepX over nrepeat and choose the minimum error
+            # we divide the error by the number of samples and choose the minimum error
             error.mean[[ijk]] = error/length(Y)
             keepX.opt[[ijk]] = which(error.mean[[ijk]] ==  min(error.mean[[ijk]]))[1] # chose the lowest keepX if several minimum
+            
+            # overall error per study
+            temp = matrix(0, ncol = length(test.keepX), nrow = nlevels(study))
+            for (study_i in 1:M) #LOO on the study factor
+            {
+                omit = which(study %in% names.study[study_i])
+                temp[study_i,] = apply(class.comp[[ijk]][omit,], 2, function(x)
+                {
+                    sum(as.character(Y)[omit] != x)/length(omit)
+                })
+            }
+            error.per.study.keepX.opt[[ijk]] = temp[,keepX.opt[[ijk]]]
             
             # confusion matrix for keepX.opt
             error.per.class.keepX.opt.comp[[ijk]] = apply(class.comp[[ijk]][, keepX.opt[[ijk]], drop = FALSE], 2, function(x)
@@ -207,6 +219,7 @@ scale)
                 choice.keepX.out[[ijk]] = c(choice.keepX, test.keepX.out)
             }
             result$"overall"$error.rate.mean = error.mean
+            result$"overall"$error.per.study.keepX.opt = error.per.study.keepX.opt
             result$"overall"$confusion = error.per.class.keepX.opt.comp
             result$"overall"$keepX.opt = test.keepX.out
         }
@@ -235,6 +248,9 @@ scale)
             error.mean[[ijk]] = apply(error, 2, mean)
             keepX.opt[[ijk]] = which(error.mean[[ijk]] ==  min(error.mean[[ijk]]))[1]
             
+            # error per study
+            error.per.study.keepX.opt[[ijk]] = error[,keepX.opt[[ijk]]]
+            
             # confusion matrix for keepX.opt
             error.per.class.keepX.opt.comp[[ijk]] = apply(class.comp[[ijk]][, keepX.opt[[ijk]], drop = FALSE], 2, function(x)
             {
@@ -254,13 +270,13 @@ scale)
             }
 
             result$"BER"$error.rate.mean = error.mean
+            result$"BER"$error.per.study.keepX.opt = error.per.study.keepX.opt
             result$"BER"$confusion = error.per.class.keepX.opt.comp
             result$"BER"$keepX.opt = test.keepX.out
         }
         
     }
-    
-    
+
     result$prediction.comp = prediction.comp
     result$class.comp = class.comp
     result$auc = auc.mean

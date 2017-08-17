@@ -1,5 +1,5 @@
 \name{vip}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{vip}
 
 \title{Variable Importance in the Projection (VIP)}

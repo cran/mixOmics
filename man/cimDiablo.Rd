@@ -1,5 +1,5 @@
 \name{cimDiablo}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{cimDiablo}
 
 \title{Clustered Image Maps (CIMs) ("heat maps") for DIABLO}
@@ -67,6 +67,7 @@ Gonzalez I., Le Cao K.A., Davis M.J., Dejean S. (2012). Visualising associations
 paired 'omics' data sets. \emph{BioData Mining}; \bold{5}(1).
 
 mixOmics manuscript:
+
 Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
 
 }

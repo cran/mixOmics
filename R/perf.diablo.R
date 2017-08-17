@@ -35,7 +35,6 @@
 
 perf.sgccda = function (object,
 dist = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"),
-constraint = FALSE,
 validation = c("Mfold", "loo"),
 folds = 10,
 nrepeat = 1,
@@ -77,7 +76,10 @@ cpus,
         
     }
     
+    
     #-- tells which variables are selected in the blocks --#
+    
+    constraint = FALSE # kept in the code so far, will probably get remove later on
     if(constraint)
     {
         loadingsX = object$loadings[-object$indY]
@@ -761,11 +763,53 @@ cpus,
         
     }
     
+
+    # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
+    # one ncomp_opt for each dist, each overall/BER and each prediction framework (AveragePredict, WeightedPredict, MajorityVote, WeightedVote
+    
+    measure = c("Overall.ER","Overall.BER") # one of c("overall","BER")
+    
+    ncomp_opt = vector("list", length = 4)
+    names(ncomp_opt) = c("AveragedPredict", "WeightedPredict", "MajorityVote", "WeightedVote")
+    
+    if(nrepeat > 2 & min(object$ncomp) >1)
+    {
+        for(prediction_framework in names(ncomp_opt))
+        {
+            if(prediction_framework %in% c("AveragedPredict", "WeightedPredict"))
+            {
+                ncomp_opt[[prediction_framework]] = matrix(NA, nrow = length(measure), ncol = 1,
+                dimnames = list(measure))
+                
+                for (measure_i in measure)
+                {
+                    mat.error.rate = sapply(get(paste0(prediction_framework, ".error.rate.all")), function(x){x[measure_i,]})
+                    ncomp_opt[[prediction_framework]][measure_i,] = t.test.process(t(mat.error.rate))
+                }
+
+            } else {
+                ncomp_opt[[prediction_framework]] = matrix(NA, nrow = length(measure), ncol = length(dist.select),
+                dimnames = list(measure, dist.select))
+
+                for (measure_i in measure)
+                {
+                    for (ijk in dist.select)
+                    {
+                        mat.error.rate = sapply(get(paste0(prediction_framework, ".error.rate.all")), function(x){x[[ijk]][measure_i,]})
+                        ncomp_opt[[prediction_framework]][measure_i, ijk] = t.test.process(t(mat.error.rate))
+                    }
+                }
+            }
+        }
+    }
+
+
     method = "sgccda.mthd"
     result$meth = "sgccda.mthd"
     class(result) = "perf.sgccda.mthd"
     result$call = match.call()
     result$crit = crit
+    result$choice.ncomp = ncomp_opt
     
     return(invisible(result))
 }

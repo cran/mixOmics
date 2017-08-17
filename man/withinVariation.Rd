@@ -1,5 +1,5 @@
 \name{withinVariation}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{withinVariation}
 
 \title{Within matrix decomposition for repeated measurements (cross-over design)}

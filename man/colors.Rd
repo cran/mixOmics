@@ -1,5 +1,5 @@
 \name{color.jet}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{color.jet}
 \alias{color.spectral}
 \alias{color.GreenRed}

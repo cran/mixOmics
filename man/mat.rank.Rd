@@ -1,5 +1,5 @@
 \name{mat.rank}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{mat.rank}
 
 \title{Matrix Rank}

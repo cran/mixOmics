@@ -1,5 +1,5 @@
 \name{plotVar}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{plotVar}
 \alias{plotVar.rcc}
 \alias{plotVar.pls}
@@ -101,8 +101,10 @@ the \eqn{Y} attributs. Default values exist for this arguments.
 
 \value{
 A list containing the following components:
-  \item{coord.X}{matrix of \eqn{X}-variables coordinates.}
-  \item{coord.Y}{matrix of \eqn{Y}-variables coordinates.}
+  \item{x}{a vector of coordinates of the variables on the x-axis.}
+  \item{y}{a vector of coordinates of the variables on the y-axis.}
+  \item{Block}{the data block name each variable belongs to.}
+  \item{names}{the name of each variable, matching their coordinates values.}
 }
 
 \author{Ignacio Gonzalez, Kim-Anh Le Cao, Benoit Gautier, Florian Rohart, Francois Bartolo.}

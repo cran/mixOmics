@@ -1,5 +1,5 @@
 \name{cim}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{cim}
 
 \title{Clustered Image Maps (CIMs) ("heat maps")}

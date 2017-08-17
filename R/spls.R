@@ -85,7 +85,9 @@ multilevel = NULL)    # multilevel is passed to multilevel(design = ) in withinV
         scale = scale,
         logratio = logratio,
         explained_variance = result$explained_variance,
-        input.X = result$input.X
+        input.X = result$input.X,
+        mat.c = result$mat.c,
+        defl.matrix = result$defl.matrix
         )
     
    

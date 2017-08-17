@@ -70,15 +70,34 @@ study.test = object$study,
 multilevel = NULL,
 plot = TRUE,
 roc.comp = 1,
+roc.study = "global",
 ...)
 {
+    if(length(roc.study) != 1) stop("`roc.study' must be a single entry, either `global' or one of levels(object$study)")
     
-    if(dim(newdata)[[1]]!=length(outcome.test))
-    stop("Factor outcome.test must be a factor with ",dim(newdata)[[1]], " elements.",call. = FALSE)
-    
-    if(dim(newdata)[[1]]!=length(study.test))
-    stop("Factor study.test must be a factor with ",dim(newdata)[[1]], " elements.",call. = FALSE)
-    study.test=factor(study.test)
+    if(roc.study == "global")
+    {
+        if(dim(newdata)[[1]]!=length(outcome.test))
+        stop("Factor outcome.test must be a factor with ",dim(newdata)[[1]], " elements.",call. = FALSE)
+        
+        if(dim(newdata)[[1]]!=length(study.test))
+        stop("Factor study.test must be a factor with ",dim(newdata)[[1]], " elements.",call. = FALSE)
+        study.test=factor(study.test)
+        title.temp = NULL
+        
+    } else {
+        
+        # check study
+        if (!roc.study%in%c(levels(object$study)))
+        stop("'roc.study' must be one of 'levels(object$study)'")
+        
+        ind.study = object$study == roc.study
+        newdata = object$X[ind.study, ]
+        outcome.test = as.factor(object$Y[ind.study])
+        study.test = factor(object$study[ind.study])
+        title.temp = paste0(", Study ", roc.study)
+
+    }
     
     data=list()
     statauc=list()
@@ -90,10 +109,13 @@ roc.comp = 1,
     for (i in 1:object$ncomp)
     {
         data$data=res.predict[,,i]
-        title=paste("ROC Curve Comp",i)
+        title=paste0("ROC Curve Comp ",i, title.temp)
         statauc[[paste("Comp", i, sep = "")]]=statauc(data, plot = ifelse(i%in%roc.comp,plot,FALSE), title = title)
     }
     return(statauc)
+    
+    
+
 }
 
 

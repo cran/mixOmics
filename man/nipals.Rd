@@ -1,5 +1,5 @@
 \name{nipals}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{nipals}
 
 \title{Non-linear Iterative Partial Least Squares (NIPALS) algorithm}

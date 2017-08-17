@@ -1,5 +1,5 @@
 \name{image}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{image.tune.rcc}
 
 \title{Plot the cross-validation score.}

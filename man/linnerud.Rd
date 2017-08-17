@@ -1,5 +1,5 @@
 \name{linnerud}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{linnerud}
 
 \docType{data}

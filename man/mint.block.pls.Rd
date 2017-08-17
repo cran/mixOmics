@@ -1,5 +1,5 @@
 \name{mint.block.pls}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{mint.block.pls}
 
 \title{NP-integration}
@@ -57,7 +57,7 @@ Multi (continuous)response are supported. \code{X} and \code{Y} can contain miss
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
-algorithm \code{("classic")} (see References).
+algorithm \code{("classic")} (see References and more details in \code{?pls}).
 }
 
 \value{
@@ -68,7 +68,7 @@ that contains the following components:
 \item{Y}{the centered and standardized original response vector or matrix.}
 \item{ncomp}{the number of components included in the model for each block.}
 \item{mode}{the algorithm used to fit the model.}
-\item{mat.c}{matrix of coefficients to be used internally by \code{predict}.}
+\item{mat.c}{matrix of coefficients from the regression of X / residual matrices X on the X-variates, to be used internally by \code{predict}.}
 \item{variates}{list containing the \eqn{X} and \eqn{Y} variates.}
 \item{loadings}{list containing the estimated loadings for the variates.}
 \item{names}{list containing the names to be used for individuals and variables.}

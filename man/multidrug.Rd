@@ -1,5 +1,5 @@
 \name{multidrug}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{multidrug}
 
 \docType{data}

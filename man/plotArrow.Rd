@@ -1,5 +1,5 @@
 \name{plotArrow}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{plotArrow}
 
 \title{Arrow sample plot}

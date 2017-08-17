@@ -345,14 +345,14 @@ label.axes.box = "both"  )
                 ind.var.sel[[1]] = sample.X[[1]] = 1 : length(colnames(object$X))
             }
         }}
-    
+
     # output a message if some variates are anti correlated among blocks
     if (any(class.object %in%  object.blocks))
     {
-        VarX = do.call(cbind, lapply(object$variates, function(i) i[, ncomp]))
-        corX = cor(VarX)
-        if(any(corX < 0))
-        warning("There is negative correlation between the variates of some blocks, be careful with the interpretation of the correlation circle.")
+        VarX = lapply(1:2, function(j){do.call(cbind, lapply(object$variates, function(i) i[, comp[j]]))})
+        corX = lapply(VarX, cor)
+        if(any(sapply(corX, function(j){any(j < 0)})))
+        warning("We detected negative correlation between the variates of some blocks, which means that some clusters of variables observed on the correlation circle plot are not necessarily positively correlated.")
     }
     
     if (any(sapply(cord.X, nrow) == 0))
@@ -550,7 +550,7 @@ label.axes.box = "both"  )
         df = df[abs(df$x) > cutoff | abs(df$y) > cutoff | abs(df$z) > cutoff, ,drop = FALSE]
         else
         df = df[abs(df$x) > cutoff | abs(df$y) > cutoff, ,drop = FALSE]
-        ind.group = c(0, cumsum(table(df$Block)))
+        ind.group = c(0, cumsum(table(df$Block)[unique(df$Block)])) # add unique to have names of cumsum matching the order of the blocks in df
     }
     
     if (nrow(df) == 0)

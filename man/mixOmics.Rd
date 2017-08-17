@@ -1,5 +1,5 @@
 \name{mixOmics}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{mixOmics}
 
 \title{PLS-derived methods: one function to rule them all!}
@@ -66,6 +66,7 @@ If your input data \code{X} is a matrix, then the algorithm is directed towards 
 
 If your input data \code{X} is a list of matrices, then the algorithm is directed towards one of (mint).block.(s)pls(da) depending on your input data \code{Y} (factor for the discrete outcome directs the algorithm to DA analysis) and whether you input a \code{study} parameter (MINT analysis) or a \code{keepX}/\code{keepX.constraint} parameter (sparse analysis).
 
+More details about the PLS modes in \code{?pls}.
 
 }
 
@@ -78,35 +79,62 @@ If your input data \code{X} is a list of matrices, then the algorithm is directe
 
 \references{
 
-mixOmics manuscript
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+mixOmics manuscript:
+
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. 
 
 
 MINT models:
+
 Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
-Multi-group PLS
-Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2013). Multi-group PLS Regression: Application to Epidemiology.
-In New Perspectives in Partial Least Squares and Related Methods, pages 243-255. Springer.
+Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2013). Multi-group PLS Regression: Application to Epidemiology. In New Perspectives in Partial Least Squares and Related Methods, pages 243-255. Springer.
 
-Integration of omics data sets
+
+Integration of omics data sets:
+
 Singh A, Gautier B, Shannon C, Vacher M, Rohart F, Tebbutt S, Le Cao K-A. DIABLO: an integrative, multi-omics, multivariate method for multi-group classification. \url{http://biorxiv.org/content/early/2016/08/03/067611}
-
 
 Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods
 for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 
+Le Cao, K.-A., Rossouw, D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable
+selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular
+Biology} \bold{7}, article 35.
 
-PLS-DA
+Tenenhaus A., Phillipe C., Guillemot V., Le Cao K-A. , Grill J. , Frouin V.  (2014), Variable selection for generalized canonical correlation analysis, \emph{Biostatistics}, doi: 10.1093/biostatistics. PMID: 24550197.
+
+Sparse SVD:
+
+Shen, H. and Huang, J. Z. (2008). Sparse principal component analysis via regularized
+low rank matrix approximation. \emph{Journal of Multivariate Analysis} \bold{99}, 1015-1034.
+
+
+PLS-DA:
+
 Le Cao K-A, Boitard S and Besse P (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. BMC Bioinformatics 12:253.
 
 
-PLS
+PLS:
+
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
 
-Wold H. (1966). Estimation of principal components and related models by iterative least squares.
-In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
+Wold H. (1966). Estimation of principal components and related models by iterative least squares. In: Krishnaiah, P. R. (editors), \emph{Multivariate Analysis}. Academic Press, N.Y., 391-420.
 
+Abdi H (2010). Partial least squares regression and projection on latent structure regression (PLS Regression). \emph{Wiley Interdisciplinary Reviews: Computational Statistics}, 2(1), 97-106.
+
+On multilevel analysis:
+
+Liquet, B., Le Cao, K.-A., Hocini, H. and Thiebaut, R. (2012) A novel approach for
+biomarker selection and the integration of repeated measures experiments from two
+platforms. \emph{BMC Bioinformatics} \bold{13}:325.
+
+Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010). Multivariate paired data analysis: multilevel PLSDA versus OPLSDA. \emph{Metabolomics},
+\bold{6}(1), 119-128.
+
+Visualisations:
+
+Gonzalez I., Le Cao K.-A., Davis, M.D. and Dejean S. (2013) Insightful graphical outputs to explore relationships between two omics data sets. BioData Mining 5:19.
 }
 
 \examples{

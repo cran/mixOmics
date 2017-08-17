@@ -1,5 +1,5 @@
 \name{Koren.16S}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{Koren.16S}
 
 \docType{data}
@@ -39,7 +39,7 @@ Filtering and normalisation described in our website \url{ www.mixOmics.org/mixM
 
 
 \references{
-K-A. L\^{e} Cao, ME Costello,  VA Lakis, F Bartolo, XY Chua, R Brazeilles, P Rondeau. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
+L\^{e} Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
 
 Koren, O., Spor, A., Felin, J., Fak, F., Stombaugh, J., Tremaroli, V., et al.: Human oral, gut, and plaque microbiota in patients with atherosclerosis. Proceedings of the National Academy of Sciences 108(Supplement 1), 4592-4598 (2011)
 }

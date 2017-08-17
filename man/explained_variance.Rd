@@ -1,5 +1,5 @@
 \name{explained_variance}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{explained_variance}
 
 \title{Calculation of explained variance}

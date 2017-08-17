@@ -1,5 +1,5 @@
 \name{mint.plsda}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{mint.plsda}
 
 \title{P-integration with Projection to Latent Structures models (PLS) with Discriminant Analysis}
@@ -45,7 +45,7 @@ to zero means and unit variances. Default = \code{TRUE}.}
 The type of algorithm to use is specified with the \code{mode} argument. Four PLS
 algorithms are available: PLS regression \code{("regression")}, PLS canonical analysis
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
-algorithm \code{("classic")} (see References).
+algorithm \code{("classic")} (see References and more details in \code{?pls}).
 
 Useful graphical outputs are available, e.g. \code{\link{plotIndiv}}, \code{\link{plotLoadings}}, \code{\link{plotVar}}.
 
@@ -68,7 +68,7 @@ that contains the following components:
 \item{names}{list containing the names to be used for individuals and variables.}
 \item{nzv}{list containing the zero- or near-zero predictors information.}
 \item{iter}{Number of iterations of the algorthm for each component}
-\item{explained_variance}{Percentage of explained variance for each component and each study}
+\item{explained_variance}{Percentage of explained variance for each component and each study (note that contrary to PCA, this amount may not decrease as the aim of the method is not to maximise the variance, but the covariance between X and the dummy matrix Y).}
 
 }
 
@@ -77,7 +77,8 @@ Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivar
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
 
-mixOmics manuscript
+mixOmics manuscript:
+
 Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
 
 }

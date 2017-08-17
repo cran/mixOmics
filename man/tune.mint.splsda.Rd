@@ -1,5 +1,5 @@
 \name{tune.mint.splsda}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{tune.mint.splsda}
 
 \title{Estimate the parameters of mint.splsda method}
@@ -11,7 +11,7 @@ grid to determine optimal values for the sparsity parameters in \code{mint.splsd
 
 \usage{
 tune.mint.splsda(X, Y, ncomp = 1, study, test.keepX = c(5, 10, 15), already.tested.X,
-constraint = TRUE, dist = "max.dist", measure = "BER", auc = FALSE, progressBar = TRUE,
+dist = "max.dist", measure = "BER", auc = FALSE, progressBar = TRUE,
 scale = TRUE, tol = 1e-06, max.iter = 100, near.zero.var = FALSE, light.output = TRUE )
 }
 
@@ -21,8 +21,7 @@ scale = TRUE, tol = 1e-06, max.iter = 100, near.zero.var = FALSE, light.output =
 \item{ncomp}{Number of components to include in the model (see Details). Default to 1}
 \item{study}{grouping factor indicating which samples are from the same study}
 \item{test.keepX}{numeric vector for the different number of variables to test from the \eqn{X} data set}
-\item{already.tested.X}{if \code{ncomp > 1} A list containing which variables of X are to be kept on each of the first PLS-components (if \code{constraint=TRUE}) or a numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components (if \code{constraint = FALSE})}
-\item{constraint}{Indicate whether the performance of the model should be evaluated w.r.t the number of variables selected (keepX, default constraint = FALSE) or w.r.t the specific variables selected by the model (keepX.constraint, constraint = TRUE), see details and examples. }
+\item{already.tested.X}{if \code{ncomp > 1} Numeric vector indicating the number of variables to select from the \eqn{X} data set on the firsts components }
 \item{dist}{only applies to an object inheriting from \code{"plsda"} or \code{"splsda"} to evaluate the classification performance of the model. Should be a subset of \code{"max.dist"}, \code{"centroids.dist"}, \code{"mahalanobis.dist"}. Default is \code{"all"}. See \code{\link{predict}}.}
 \item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
 \item{auc}{if \code{TRUE} calculate the Area Under the Curve (AUC) performance of the model.}
@@ -38,19 +37,22 @@ to zero means and unit variances (default: TRUE)}
 
 \details{
 This function performs a Leave-One-Group-Out-Cross-Validation (LOGOCV), where each of \code{study} is left out once. It returns a list of variables of \code{X} that were selected on each of the \code{ncomp} components.
-Then, a \code{\link{mint.splsda}} can be performed with \code{keepX.constraint} set as the output \code{choice.keepX.constraint}.
+Then, a \code{\link{mint.splsda}} can be performed with \code{keepX} set as the output \code{choice.keepX}.
 
 All component \eqn{1:\code{ncomp}} are tuned, except the first ones for which a \code{already.tested.X} is provided. See examples below.
 
-Constraint model. To improve performance, a constraint model is now implemented (\code{constraint=TRUE)}. The performance is assessed on same list of selected features from the previous components in the different CV folds, as opposed to considering only the number of features. Such strategy was implemented in the sister package bootPLS and successfully applied in our recent integrative study (Rohart et al., 2016).Our experience has shown that the constraint model can improve the performance of the methods.
 
+The function outputs the optimal number of components that achieve the best performance based on the overall error rate or BER. The assessment is data-driven and similar to the process detailed in (Rohart et al., 2016), where one-sided t-tests assess whether there is a gain in performance when adding a component to the model. Our experience has shown that in most case, the optimal number of components is the number of categories in \code{Y} - 1.
+
+More details about the prediction distances in \code{?predict} and the referred publication.
 }
 
 \value{
 The returned value is a list with components: 
 \item{error.rate}{returns the prediction error for each \code{test.keepX} on each component, averaged across all repeats and subsampling folds. Standard deviation is also output. All error rates are also available as a list.}
-\item{choice.keepX.constraint}{returns the variables selected by the optimal keepX on each component.}
-\item{error.rate.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX.constraint}
+\item{choice.keepX}{returns the number of variables selected (optimal keepX) on each component.}
+\item{choice.ncomp}{returns the optimal number of components for the model fitted with \code{$choice.keepX} }
+\item{error.rate.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX}
 
   \item{predict}{Prediction values for each sample, each \code{test.keepX} and each comp.}
   \item{class}{Predicted class for each sample, each \code{test.keepX} and each comp.}
@@ -59,8 +61,9 @@ The returned value is a list with components:
 \references{
 Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
-mixOmics manuscript: Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+mixOmics manuscript:
 
+Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
 }
 
 
@@ -75,18 +78,21 @@ type.id = stemcells$celltype
 exp = stemcells$study
 
 res = mint.splsda(X=data,Y=type.id,ncomp=3,keepX=c(10,5,15),study=exp)
+out = tune.mint.splsda(X=data,Y=type.id,ncomp=2,near.zero.var=FALSE,
+study=exp,test.keepX=seq(1,10,1))
+
+out$choice.ncomp
+out$choice.keepX
 
 \dontrun{
 out = tune.mint.splsda(X=data,Y=type.id,ncomp=2,near.zero.var=FALSE,
-    study=exp,test.keepX=seq(1,10,1), constraint = TRUE)
-out$choice.keepX.constraint
+    study=exp,test.keepX=seq(1,10,1))
+out$choice.keepX
 
-## only tune component 2 and keeping
-# "ENSG00000159199" "ENSG00000106012" "ENSG00000129317" on the first component
+## only tune component 2 and keeping 10 genes on comp1
 out = tune.mint.splsda(X=data,Y=type.id,ncomp=2, study=exp,
-already.tested.X = list(comp1 = c("ENSG00000159199", "ENSG00000106012", "ENSG00000129317")),
-test.keepX=seq(1,10,1), constraint = TRUE)
-out$choice.keepX.constraint
+already.tested.X = c(10),
+test.keepX=seq(1,10,1))
 out$choice.keepX
 # gives the number of variables selected (which comes from out$choice.keepX.constraint)
 

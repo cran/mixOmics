@@ -1,5 +1,5 @@
 \name{breast.tumors}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{breast.tumors}
 
 \docType{data}

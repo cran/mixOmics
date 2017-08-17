@@ -1,5 +1,5 @@
 \name{nearZeroVar}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{nearZeroVar}
 
 \title{Identification of zero- or near-zero variance predictors}

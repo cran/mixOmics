@@ -1,5 +1,5 @@
 \name{study_split}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{study_split}
 
 \title{divides a data matrix in a list of matrices defined by a factor}

@@ -1,5 +1,5 @@
 \name{sipca}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{sipca}
 
 \title{Independent Principal Component Analysis}

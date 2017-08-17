@@ -1,5 +1,5 @@
 \name{plotDiablo}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{plotDiablo}
 
 \title{Graphical output for the DIABLO framework}

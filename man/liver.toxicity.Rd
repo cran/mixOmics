@@ -1,5 +1,5 @@
 \name{liver.toxicity}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{liver.toxicity}
 
 \docType{data}

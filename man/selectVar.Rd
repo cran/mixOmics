@@ -1,5 +1,5 @@
 \name{selectVar}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{selectVar}
 \alias{selectVar.pls}
 \alias{selectVar.spls}

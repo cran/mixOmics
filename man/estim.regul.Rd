@@ -1,5 +1,5 @@
 \name{estim.regul}
-\encoding{latin1}
+\encoding{UTF-8}
 \alias{estim.regul}
 \alias{estim.regul.default}
 
