@@ -121,9 +121,7 @@ nutrimouse.sgcca <- wrapper.sgcca(X = data,
 design = design1,
 penalty = c(0.3, 0.5, 1),
 ncomp = 3,
-scheme = "centroid",
-verbose = FALSE,
-bias = FALSE)
+scheme = "centroid")
 
 # default style: same color for all samples
 plotArrow(nutrimouse.sgcca)
@@ -169,9 +167,7 @@ Y = Y,
 design = design1,
 ncomp = 2,
 keepX = list(gene = c(10,10), lipid = c(15,15)),
-scheme = "centroid",
-verbose = FALSE,
-bias = FALSE)
+scheme = "centroid")
 
 
 #  default colors correspond to outcome Y

@@ -5,7 +5,7 @@
 #   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 2013
-# last modified: 01-03-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2013
 #
@@ -25,28 +25,25 @@
 #############################################################################################################
 
 
-
 wrapper.sgcca = function(
 X,
 design = 1 - diag(length(X)),
 penalty = NULL,
 ncomp = 1,
-keepX.constraint,
 keepX,
 scheme = "horst",
 mode = "canonical",
 scale = TRUE,
-bias = TRUE,
 init = "svd.single",
 tol = .Machine$double.eps,
-verbose = FALSE,
 max.iter = 1000,
-near.zero.var = FALSE
+near.zero.var = FALSE,
+all.outputs = TRUE
 ){
     
     
-    check=Check.entry.sgcca(X = X, design = design ,ncomp = ncomp , scheme = scheme , scale = scale ,  bias = bias,
-    init = init , tol = tol , verbose = verbose,mode = mode, max.iter = max.iter,near.zero.var = near.zero.var,keepX = keepX,keepX.constraint = keepX.constraint)
+    check=Check.entry.sgcca(X = X, design = design ,ncomp = ncomp , scheme = scheme , scale = scale,
+    init = init , tol = tol, mode = mode, max.iter = max.iter,near.zero.var = near.zero.var,keepX = keepX)
     
     
     A = check$A
@@ -54,29 +51,32 @@ near.zero.var = FALSE
     ncomp = check$ncomp
     init = check$init
     scheme = check$scheme
-    verbose = check$verbose
-    bias = check$bias
     near.zero.var = check$near.zero.var
-    keepA.constraint = check$keepA.constraint
     keepA = check$keepA
     nzv.A = check$nzv.A
     
+    keepAA = vector("list", length = max(ncomp)) # one keepA per comp
+    names(keepAA) = paste0("comp",1:max(ncomp))
+    for(comp in 1:max(ncomp)) # keepA[[block]] [1:ncomp]
+    keepAA[[comp]] = lapply(keepA, function(x) x[comp])
     
+    keepA = lapply(keepAA, expand.grid)
+   
     result.sgcca = internal_mint.block(A = A, design = design, tau = NULL,
     ncomp = ncomp,
     scheme = scheme, scale = scale,
-    init = init, bias = bias, tol = tol, verbose = verbose,
-    keepA.constraint = keepA.constraint,
+    init = init, tol = tol,
     keepA = keepA,
     max.iter = max.iter,
     study = factor(rep(1,nrow(A[[1]]))),#mint.sgcca not coded yet
-    mode = mode,penalty = penalty
+    mode = mode,penalty = penalty,
+    all.outputs = all.outputs
     )
     
    
     out = list(
     call = match.call(),
-    X = result.sgcca$X,
+    X = result.sgcca$A,
     variates = result.sgcca$variates,
     loadings = result.sgcca$loadings,
     loadings.star = result.sgcca$loadings.star,
@@ -88,7 +88,6 @@ near.zero.var = FALSE
     AVE = result.sgcca$AVE,
     names = result.sgcca$names,#names = list(indiv = rownames(X[[1]]), var = sapply(X, colnames)),
     init = result.sgcca$init,
-    bias = result.sgcca$bias,
     tol = result.sgcca$tol,
     iter = result.sgcca$iter,
     max.iter = result.sgcca$max.iter,

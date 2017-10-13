@@ -55,15 +55,7 @@ progressBar = TRUE,
     ncomp = object$ncomp
     scale = object$scale
     
-    constraint = FALSE # kept in the code so far, will probably get removed later on
-    if(constraint)
-    {
-        keepX.constraint = apply(object$loadings$X, 2, function(x){names(which(x!=0))})
-        #keepX = NULL
-    } else {
-        #keepX.constraint = NULL
-        keepX = apply(object$loadings$X, 2, function(x){sum(x!=0)})
-    }
+    keepX = apply(object$loadings$X, 2, function(x){sum(x!=0)})
     
     tol = object$tol
     max.iter = object$max.iter
@@ -136,12 +128,8 @@ progressBar = TRUE,
     # successively tune the components until ncomp: comp1, then comp2, ...
     for(comp in 1 : ncomp)
     {
-        if(constraint)
-        {
-            already.tested.X = keepX.constraint[1:comp]
-        } else {
-            already.tested.X = keepX[1:comp]
-        }
+
+        already.tested.X = keepX[1:comp]
         
         
         if (progressBar == TRUE)
@@ -201,8 +189,7 @@ progressBar = TRUE,
             setTxtProgressBar(pb, (study_i-1)/M)
             
             object.res = mint.splsda(X.train, Y.train, study = study.learn.CV, ncomp = comp,
-            keepX = if(constraint){NULL}else{already.tested.X},
-            keepX.constraint = if(constraint){already.tested.X}else{NULL},
+            keepX = already.tested.X,
             scale = scale, mode = "regression")
             
             test.predict.sw <- predict(object.res, newdata = X.test, dist = dist, study.test = study.test.CV)
@@ -308,7 +295,7 @@ progressBar = TRUE,
     
 
     # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
-    if(nlevels(study) > 2 & ncomp >1 & constraint == FALSE)
+    if(nlevels(study) > 2 & ncomp >1)
     {
         measure = c("overall","BER")
         ncomp_opt = matrix(NA, nrow = length(measure), ncol = length(dist),

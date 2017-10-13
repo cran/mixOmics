@@ -151,7 +151,7 @@ Rohart F, Mason EA, Matigian N, Mosbergen R, Korn O, Chen T, Butcher S, Patel J,
 \author{Florian Rohart}
 
 \seealso{\code{\link{tune.rcc}}, \code{\link{tune.mint.splsda}},
-\code{\link{tune.pca}}, \code{\link{tune.multilevel}},
+\code{\link{tune.pca}}, 
 \code{\link{tune.splsda}}, \code{\link{tune.splslevel}} and http://www.mixOmics.org for more details.}
 
 \examples{

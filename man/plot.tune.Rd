@@ -1,5 +1,6 @@
 \encoding{UTF-8}
-\name{plot.tune.splsda}
+\name{plot.tune}
+\alias{plot.tune.block.splsda}
 \alias{plot.tune.splsda}
 \alias{plot.tune}
 
@@ -11,7 +12,10 @@ Function to plot performance criteria, such as classification error rate or bala
 
 \usage{
 \method{plot}{tune.splsda}(x, optimal = TRUE, sd = TRUE, legend.position = "topright", col, \dots)
+
+\method{plot}{tune.block.splsda}(x, sd = TRUE, col, \dots)
 }
+
 
 \arguments{
   \item{x}{an \code{tune.splsda} object.}
@@ -27,11 +31,15 @@ Function to plot performance criteria, such as classification error rate or bala
 \code{plot.tune.splsda} plots the classification error rate or the balanced error rate from x$error.rate, for each component of the model.
 A circle highlights the optimal number of variables oneach component.
 
+\code{plot.tune.block.splsda} plots the classification error rate or the balanced error rate from x$error.rate, for each component of the model. The error rate is ordered by increasing value, the yaxis shows the optimal combination of keepX at the top (e.g. `keepX on block 1'_`keepX on block 2'_`keepX on block 3')
+
+
+
 }
 
 \author{Kim-Anh Le Cao, Florian Rohart, Francois Bartolo.}
 
-\seealso{ \code{\link{tune.mint.splsda}}, \code{\link{tune.splsda}} and http://www.mixOmics.org for more details.}
+\seealso{ \code{\link{tune.mint.splsda}}, \code{\link{tune.splsda}} \code{\link{tune.block.splsda}} and http://www.mixOmics.org for more details.}
 
 \examples{
 
@@ -62,6 +70,40 @@ out$choice.keepX.constraint
 plot(out)
 
 }
+
+## validation for objects of class 'mint.splsda'
+\dontrun{
+data("breast.TCGA")
+# this is the X data as a list of mRNA and miRNA; the Y data set is a single data set of proteins
+data = list(mrna = breast.TCGA$data.train$mrna, mirna = breast.TCGA$data.train$mirna,
+protein = breast.TCGA$data.train$protein)
+# set up a full design where every block is connected
+# could also consider other weights, see our mixOmics manuscript
+design = matrix(1, ncol = length(data), nrow = length(data),
+dimnames = list(names(data), names(data)))
+diag(design) =  0
+design
+# set number of component per data set
+ncomp = 5
+
+# Tuning the first two components
+# -------------
+
+# definition of the keepX value to be tested for each block mRNA miRNA and protein
+# names of test.keepX must match the names of 'data'
+test.keepX = list(mrna = seq(10,40,20), mirna = seq(10,30,10), protein = seq(1,10,5))
+
+# the following may take some time to run, note that for through tuning
+# nrepeat should be > 1
+tune = tune.block.splsda(X = data, Y = breast.TCGA$data.train$subtype,
+ncomp = ncomp, test.keepX = test.keepX, design = design, nrepeat = 3)
+
+tune$choice.ncomp
+tune$choice.keepX
+
+plot(tune)
+}
+
 }
 
 \keyword{regression}

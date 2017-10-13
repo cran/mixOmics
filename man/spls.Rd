@@ -14,8 +14,6 @@ spls(X,
 Y,
 ncomp = 2,
 mode = c("regression", "canonical", "invariant", "classic"),
-keepX.constraint=NULL,
-keepY.constraint=NULL,
 keepX,
 keepY,
 scale = TRUE,
@@ -23,7 +21,8 @@ tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
 logratio="none", 
-multilevel=NULL)
+multilevel=NULL,
+all.outputs = TRUE)
 }	
 
 \arguments{
@@ -35,8 +34,6 @@ multilevel=NULL)
   \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
 See Details.}
-\item{keepX.constraint}{A list containing which variables of X are to be kept on each of the first PLS-components}
-\item{keepY.constraint}{A list containing which variables of Y are to be kept on each of the first PLS-components}
 \item{keepX}{numeric vector of length \code{ncomp}, the number of variables to keep in \eqn{X}-loadings. By default all variables are kept in the model.}
 \item{keepY}{numeric vector of length \code{ncomp}, the number of variables to keep in \eqn{Y}-loadings. By default all variables are kept in the model.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
@@ -46,6 +43,7 @@ to zero means and unit variances (default: TRUE)}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
 \item{logratio}{one of ('none','CLR'). Default to 'none'}
 \item{multilevel}{Design matrix for repeated measurement analysis, where multlevel decomposition is required. For a one factor decomposition, the repeated measures on each individual, i.e. the individuals ID is input as the first column. For a 2 level factor decomposition then 2nd AND 3rd columns indicate those factors. See examples.}
+\item{all.outputs}{boolean. Computation can be faster when some specific (and non-essential) outputs are not calculated. Default = \code{TRUE}.}
 }
 
 \details{
@@ -82,8 +80,6 @@ that contains the following components:
   \item{mode}{the algorithm used to fit the model.}
   \item{keepX}{number of \eqn{X} variables kept in the model on each component.}
   \item{keepY}{number of \eqn{Y} variables kept in the model on each component.}
-  \item{keepX.constraint}{if a constraint model was chosen, the list of X variables that were constraint to be selected on each of the sPLS components.}
-  \item{keepY.constraint}{if a constraint model was chosen, the list of Y variables that were constraint to be selected on each of the sPLS components.}
   \item{variates}{list containing the variates.}
   \item{loadings}{list containing the estimated loadings for the \eqn{X} and 
 	\eqn{Y} variates.}
@@ -143,6 +139,8 @@ Y <- liver.toxicity$clinic
 
 toxicity.spls <- spls(X, Y, ncomp = 2, keepX = c(50, 50), 
                       keepY = c(10, 10))
+
+toxicity.spls <- spls(X, Y[,1:2,drop=FALSE], ncomp = 5, keepX = c(50, 50))#,  mode="canonical")
 
 ## Second example: one-factor multilevel analysis with sPLS, selecting a subset of variables
 #--------------------------------------------------------------

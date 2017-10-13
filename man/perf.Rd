@@ -309,9 +309,7 @@ Y = Y,
 design = design,
 keepX = list(gene=c(10,10), lipid=c(15,15)),
 ncomp = 2,
-scheme = "horst",
-verbose = FALSE,
-bias = FALSE)
+scheme = "horst")
 
 perf = perf(nutrimouse.sgccda)
 perf
@@ -324,9 +322,7 @@ Y = Y,
 design = design,
 keepX = list(gene=c(10,10), lipid=c(15,15)),
 ncomp = 5,
-scheme = "horst",
-verbose = FALSE,
-bias = FALSE)
+scheme = "horst")
 
 perf = perf(nutrimouse.sgccda, folds = 5, nrepeat = 5)
 perf

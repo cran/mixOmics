@@ -5,7 +5,7 @@
 #   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 22-04-2015
-# last modified: 13-04-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2015
 #
@@ -40,12 +40,11 @@
 # scheme: the input scheme, one of "horst", "factorial" or ""centroid". Default to "centroid"
 # mode: input mode, one of "canonical", "classic", "invariant" or "regression". Default to "regression"
 # scale: boleean. If scale = TRUE, each block is standardized to zero means and unit variances (default: TRUE).
-# bias: boleean. A logical value for biaised or unbiaised estimator of the var/cov (defaults to FALSE).
 # init: intialisation of the algorithm, one of "svd" or "svd.single". Default to "svd"
 # tol: Convergence stopping value.
-# verbose: if set to \code{TRUE}, reports progress on computing.
 # max.iter: integer, the maximum number of iterations.
 # near.zero.var: boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations
+# all.outputs: calculation of non-essential outputs (e.g. explained variance, loadings.Astar, etc)
 
 
 mint.block.pls = function(X,
@@ -57,22 +56,21 @@ design,
 scheme,
 mode,
 scale = TRUE,
-bias,
 init ,
 tol = 1e-06,
-verbose,
 max.iter = 100,
-near.zero.var = FALSE)
+near.zero.var = FALSE,
+all.outputs = TRUE)
 {
     # call to 'internal_wrapper.mint.block'
     result = internal_wrapper.mint.block(X=X, Y=Y, indY=indY, study=study, ncomp=ncomp, design=design, scheme=scheme, mode=mode, scale=scale,
-    bias=bias, init=init, tol=tol, verbose=verbose, max.iter=max.iter, near.zero.var=near.zero.var)
+    init=init, tol=tol, max.iter=max.iter, near.zero.var=near.zero.var, all.outputs = all.outputs)
    
     # choose the desired output from 'result'
     out=list(
         call = match.call(),
-        X = result$X,
-        Y = result$Y[[1]],
+        X = result$A,
+        Y = result$A[[1]],
         ncomp = result$ncomp,
         mode = result$mode,
         study = result$study,
@@ -82,7 +80,6 @@ near.zero.var = FALSE)
         loadings.partial = result$loadings.partial,
         names = result$names,
         init = result$init,
-        bias = result$bias,
         tol = result$tol,
         iter = result$iter,
         max.iter = result$max.iter,

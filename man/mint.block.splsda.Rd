@@ -14,18 +14,16 @@ Y,
 indY,
 study,
 ncomp = 2,
-keepX.constraint,
 keepX,
 design,
 scheme,
 mode,
 scale = TRUE,
-bias,
 init ,
 tol = 1e-06,
-verbose,
 max.iter = 100,
-near.zero.var = FALSE)
+near.zero.var = FALSE,
+all.outputs = TRUE)
 
 }
 
@@ -35,7 +33,6 @@ near.zero.var = FALSE)
 \item{indY}{To be supplied if Y is missing, indicates the position of the matrix / vector response in the list \code{X}}
 \item{study}{factor indicating the membership of each sample to each of the studies being combined}
 \item{ncomp}{Number of components to include in the model (see Details). Default to 2. }
-\item{keepX.constraint}{A list of same length as X. Each entry indicates specific variables to be selected in each of the blocks of X for the first PLS-components.}
 \item{keepX}{A list of same length as X.  Each entry is the number of variables to select in each of the blocks of X for each component. In the case where keepX.constraint is specified it should indicate the number of variables to select on the remaining components. By default all variables are kept in the model.}
 \item{design}{numeric matrix of size (number of blocks in X) x (number of blocks in X) with 0 or 1 values. A value of 1 (0) indicates a relationship (no relationship) between the blocks to be modelled. If \code{Y} is provided instead of \code{indY}, the \code{design} matrix is changed to include relationships to \code{Y}. }
 \item{scheme}{Either "horst", "factorial" or "centroid". Default = \code{horst}, see reference.}
@@ -44,12 +41,11 @@ one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"cla
 See Details.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances (default: TRUE)}
-\item{bias}{boleean. A logical value for biaised or unbiaised estimator of the var/cov (defaults to FALSE).}
 \item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single"). Default = \code{svd.single}.}
 \item{tol}{Convergence stopping value.}
-\item{verbose}{if set to \code{TRUE}, reports progress on computing.}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
+\item{all.outputs}{boolean. Computation can be faster when some specific (and non-essential) outputs are not calculated. Default = \code{TRUE}.}
 }
 
 

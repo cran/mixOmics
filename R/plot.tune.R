@@ -109,3 +109,104 @@ function(x, optimal = TRUE, sd = TRUE, legend.position = "topright", col, ...)
 }
 
 
+plot.tune.block.splsda =
+function(x, sd = TRUE, col, ...)
+{
+    
+    # R check
+    error.sd=NULL
+    
+    error <- x$error.rate
+    if(sd & !is.null(x$error.rate.sd))
+    {
+        error.rate.sd = x$error.rate.sd
+        ylim = range(c(error + error.rate.sd), c(error - error.rate.sd))
+    } else {
+        error.rate.sd = NULL
+        ylim = range(error)
+    }
+    select.keepX <- x$choice.keepX
+    comp.tuned = length(select.keepX[[1]])
+    
+    if (length(select.keepX) < 10)
+    {
+        #only 10 colors in color.mixo
+        if(missing(col))
+        col = color.mixo(1:comp.tuned)
+    } else {
+        #use color.jet
+        if(missing(col))
+        col = color.jet(comp.tuned)
+    }
+    if(length(col) != comp.tuned)
+    stop("'col' should be a vector of length ", comp.tuned,".")
+    
+    legend=NULL
+    measure = x$measure
+
+
+    if(measure == "overall")
+    {
+        ylab = "Classification error rate"
+    } else if (measure == "BER")
+    {
+        ylab = "Balanced error rate"
+    }
+
+    if(FALSE)
+    {
+    # not ordered graph
+    
+    # creating one dataframe with all the comp
+    error.plot = data.frame(comp = rep(colnames(error), each = nrow(error)), names = do.call("rbind", as.list(rownames(error))), error = do.call("rbind", as.list(error)), error.sd = do.call("rbind", as.list(error.rate.sd)), color = rep(col, each = nrow(error)))
+    
+    #    p = ggplot(error.plot, aes(x=reorder(names, -error), y=error)) +
+    p = ggplot(error.plot, aes(x=names, y=error)) +
+    geom_bar(stat="identity", fill = error.plot$color)
+    if(sd) p = p + geom_errorbar(aes(ymin=error-error.sd, ymax = error+error.sd), width=0.2)
+    
+    p= p +
+    ylab(ylab)+
+    xlab("Number of selected features for each block")+
+    coord_flip()+
+    facet_grid(~comp,scales='free')
+    p
+    }
+    
+    pp=list()
+    for(comp in 1:comp.tuned)
+    {
+        # order error per comp
+        so = sort(error[,comp], index.return=TRUE, decreasing = TRUE)
+        
+        error.ordered = so$x
+        error.sd.ordered = error.rate.sd[so$ix,comp]
+        
+        error.plot = data.frame (names = names(error.ordered), error = error.ordered, error.sd = error.sd.ordered, color = col[comp])
+        
+        ## ggplot
+        p = ggplot(error.plot, aes(x=reorder(names, -error), y=error)) +
+        geom_bar(stat="identity", fill = error.plot$color)
+        if(sd) p = p + geom_errorbar(aes(ymin=error-error.sd, ymax = error+error.sd), width=0.2)
+        
+        p= p +
+        ylab(ylab)+
+        xlab("Number of selected features for each block")+
+        ggtitle(colnames(error)[comp])+
+        coord_flip()
+        
+        
+        if(comp==1)
+        p1=p
+        if(comp==2)
+        p2=p
+        #+theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        
+        pp[[comp]] = p#assign(paste0("p", colnames(error)[comp]), p)
+        
+    }
+    
+    do.call("grid.arrange", c(pp, nrow=ceiling(comp.tuned/3)))
+    
+    
+}

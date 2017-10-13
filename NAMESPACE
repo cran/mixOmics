@@ -36,7 +36,13 @@ importFrom("dplyr","group_by")
 
 importFrom("tidyr","gather")
 
+importFrom("matrixStats","colSds")
+
 importFrom("reshape2","melt","dcast")
+
+importFrom("rARPACK","svds")
+
+importFrom("gridExtra", "grid.arrange")
 
 export(
 auroc,
@@ -95,7 +101,6 @@ tune,
 tune.mint.splsda,
 tune.splsda,
 tune.block.splsda,
-tune.multilevel,
 tune.splslevel,
 tune.pca,
 tune.rcc,
@@ -135,6 +140,7 @@ S3method(plot, rcc)
 S3method(plot, pca)
 S3method(plot, sgccda)
 S3method(plot, tune.splsda)
+S3method(plot, tune.block.splsda)
 
 
 S3method(plotIndiv, pls)

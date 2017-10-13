@@ -94,7 +94,6 @@ out = tune.mint.splsda(X=data,Y=type.id,ncomp=2, study=exp,
 already.tested.X = c(10),
 test.keepX=seq(1,10,1))
 out$choice.keepX
-# gives the number of variables selected (which comes from out$choice.keepX.constraint)
 
 }
 

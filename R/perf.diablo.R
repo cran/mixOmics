@@ -58,11 +58,10 @@ cpus,
     }
     ### End: Initialization parameters
     
-    dist = match.arg(dist, choices = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"), several.ok = TRUE)
+    dist = match.arg(dist.select, choices = c("all", "max.dist", "centroids.dist", "mahalanobis.dist"), several.ok = TRUE)
     
     ### Start: Check parameter validation / set up sample
-    
-    
+        
     if (length(validation) > 1 )
     validation = validation [1]
     
@@ -79,27 +78,7 @@ cpus,
     
     #-- tells which variables are selected in the blocks --#
     
-    constraint = FALSE # kept in the code so far, will probably get remove later on
-    if(constraint)
-    {
-        loadingsX = object$loadings[-object$indY]
-        keepX.constraint = lapply(loadingsX, function(x){apply(x, 2, function(y){names(which(y!=0))})})
-        
-        
-        # gives a matrix of ncomp columns if same number of selected variables on each comp, I want a list of length ncomp
-        for(i in 1:length(keepX.constraint))
-        {
-            if(is.matrix(keepX.constraint[[i]]))
-            {
-                keepX.constraint[[i]] = split(keepX.constraint[[i]], rep(1:ncol(keepX.constraint[[i]]), each = nrow(keepX.constraint[[i]])))
-                names(keepX.constraint[[i]]) = paste("comp",1:length(keepX.constraint[[i]]),sep="")
-            }
-        }
-
-        
-    } else {
-        keepX = object$keepX
-    }
+    keepX = object$keepX
 
     error.mat = error.mat.class = Y.all = predict.all = Y.predict = list.features = final.features = weights = crit = list()
     if (length(X) > 1)
@@ -153,19 +132,17 @@ cpus,
         if(missing(cpus))
         {
             model = lapply(1 : M, function(x) {block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]),
-                keepX = if(!constraint) {keepX} else {NULL},
-                keepX.constraint = if(constraint){keepX.constraint} else{list()},
+                keepX = keepX,
                 design = object$design, max.iter = object$max.iter, tol = object$tol, init = object$init, scheme = object$scheme,
-                bias = object$bias, mode = object$mode)})
+                mode = object$mode)})
         } else {
             cl <- makeCluster(cpus, type = "SOCK")
             clusterExport(cl, c("block.splsda"))
             
             model = parLapply(cl, 1 : M, function(x) {block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]),
-                keepX = if(!constraint) {keepX} else {NULL},
-                keepX.constraint = if(constraint){keepX.constraint} else{list()},
+                keepX = keepX,
                 design = object$design, max.iter = object$max.iter, tol = object$tol, init = object$init, scheme = object$scheme,
-                bias = object$bias, mode = object$mode)})
+                mode = object$mode)})
             
             stopCluster(cl)
         }
@@ -282,6 +259,8 @@ cpus,
             return(Y.all[[nrep]][[x]])
         })
         ## End: retrieve score for each component
+        
+        #save(list=ls(),file="temp.Rdata")
         
         ## Start: retrieve class for each component
         # Reorganization input data / folds / dist.select
@@ -474,7 +453,7 @@ cpus,
             ###------------------------------------------------------------###
             ## Start: retrieve (weighted) vote for each component
             # Reorganization dist.select / folds
-            Y.weighted.vote[[nrep]] = lapply(1 : length(dist.select), function(x)
+            Y.weighted.vote[[nrep]] = lapply(dist.select, function(x)
             {
                 lapply(1 : M, function(y)
                 {
@@ -527,7 +506,7 @@ cpus,
             ###------------------------------------------------------------###
             ## Start: retrieve Majority Vote (non weighted) for each component
             # Reorganization dist.select / folds
-            Y.vote[[nrep]] = lapply(1 : length(dist.select), function(x)
+            Y.vote[[nrep]] = lapply(dist.select, function(x)
             {
                 lapply(1 : M, function(y)
                 {

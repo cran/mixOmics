@@ -12,17 +12,15 @@ wrapper.sgcca(X,
 design = 1 - diag(length(X)),
 penalty = NULL,
 ncomp = 1,
-keepX.constraint,
 keepX,
 scheme = "horst",
 mode="canonical",
 scale = TRUE,
-bias = TRUE,
 init = "svd.single",
 tol = .Machine$double.eps,
-verbose = FALSE,
 max.iter=1000,
-near.zero.var = FALSE)
+near.zero.var = FALSE,
+all.outputs = TRUE)
 }
 
 \arguments{
@@ -30,7 +28,6 @@ near.zero.var = FALSE)
 \item{design}{numeric matrix of size (number of blocks in X) x (number of blocks in X) with values between 0 and 1. Each value indicates the strenght of the relationship to be modelled between two blocks using sGCCA; a value of 0 indicates no relationship, 1 is the maximum value. If \code{Y} is provided instead of \code{indY}, the \code{design} matrix is changed to include relationships to \code{Y}. }
   \item{penalty}{numeric vector of length the number of blocks in \code{X}. Each penalty parameter will be applied on each block and takes the value between 0 (no variable selected) and 1 (all variables included).}
 \item{ncomp}{the number of components to include in the model. Default to 1.}
-\item{keepX.constraint}{A list of same length as X. Each entry keepX.constraint[[i]] is a list containing which variables of X[[i]] are to be kept on each of the first PLS-components}
 \item{keepX}{ A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model on the last components (once all keepX.constraint[[i]] are used).}
 \item{scheme}{Either "horst", "factorial" or "centroid"
   (Default: "horst").}
@@ -39,12 +36,11 @@ one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"cla
 See Details.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances (default: TRUE)}
-\item{bias}{boleean. A logical value for biaised or unbiaised estimator of the var/cov (defaults to FALSE).}
 \item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single") . Default to "svd.single".}
 \item{tol}{Convergence stopping value.}
-\item{verbose}{if set to \code{TRUE}, reports progress on computing.}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
+\item{all.outputs}{boolean. Computation can be faster when some specific (and non-essential) outputs are not calculated. Default = \code{TRUE}.}
 
 }
 
@@ -114,7 +110,7 @@ design = matrix(c(0,1,1,
 #note: the penalty parameters will need to be tuned
 wrap.result.sgcca = wrapper.sgcca(X = data, design = design, penalty = c(.3,.5, 1),
                                   ncomp = 2,
-                                  scheme = "centroid", verbose = FALSE)
+                                  scheme = "centroid")
 wrap.result.sgcca
 #did the algo converge?
 wrap.result.sgcca$crit  # yes

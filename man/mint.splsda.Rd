@@ -15,12 +15,12 @@ Y,
 ncomp = 2,
 mode = c("regression", "canonical", "invariant", "classic"),
 study,
-keepX.constraint = NULL,
 keepX = rep(ncol(X), ncomp),
 scale = TRUE,
 tol = 1e-06,
 max.iter = 100,
-near.zero.var = FALSE)
+near.zero.var = FALSE,
+all.outputs = TRUE)
 
 }
 
@@ -31,13 +31,13 @@ near.zero.var = FALSE)
 \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"} or \code{"canonical"}. See Details.}
 \item{study}{factor indicating the membership of each sample to each of the studies being combined}
-\item{keepX.constraint}{A list of vectors. Each vector entry indicates specific variables to be selected in \code{X} for each previous PLS component. See details.}
 \item{keepX}{numeric vector indicating the number of variables to select in \code{X} on each component, or remaining components should \code{keepX.constraint} be provided. By default all variables are kept in the model.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances. Default = \code{TRUE}.}
 \item{tol}{Convergence stopping value.}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Default = \code{FALSE}.}
+\item{all.outputs}{boolean. Computation can be faster when some specific (and non-essential) outputs are not calculated. Default = \code{TRUE}.}
 
 }
 
@@ -72,7 +72,6 @@ that contains the following components:
 \item{study}{The study grouping factor}
 \item{mode}{the algorithm used to fit the model.}
 \item{keepX}{Number of variables used to build each component of X}
-\item{keepX.constraint}{list indicating which variables where constrained to be used to build the first component of X}
 \item{variates}{list containing the variates of X - global variates.}
 \item{loadings}{list containing the estimated loadings for the variates - global loadings.}
 \item{variates.partial}{list containing the variates of X relative to each study - partial variates.}
@@ -105,7 +104,7 @@ Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feat
 \examples{
 data(stemcells)
 
-# -- feature selection with keepX
+# -- feature selection
 res = mint.splsda(X = stemcells$gene, Y = stemcells$celltype, ncomp = 3, keepX = c(10, 5, 15),
 study = stemcells$study)
 
@@ -116,18 +115,8 @@ plotIndiv(res, study = "all.partial")
 #plot study-specific outputs for study "2"
 plotIndiv(res, study = "2")
 
-# -- feature selection with keepX.constraint and keepX
-# we force mint.spls to build the PLS-component 1 and 2 with only specific genes
-keepX.constraint = list(comp1 = c("ENSG00000138756", "ENSG00000101470"),
-comp2 = c("ENSG00000120049", "ENSG00000138685", "ENSG00000204248", "ENSG00000103260"))
-
-# we select 10 and 15 variables on component 3 and 4
-res = mint.splsda(X = stemcells$gene, Y = stemcells$celltype, ncomp = 4, study = stemcells$study,
-keepX.constraint = keepX.constraint, keepX = c(10, 15))
-
 #plot study-specific outputs for study "2", "3" and "4"
 plotIndiv(res, study = c(2, 3, 4))
-# poor results as the genes constraint on comp 1 and 2 were not relevant
 
 }
 

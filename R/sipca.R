@@ -92,7 +92,7 @@ function (X, ncomp  = 3, mode = c("deflation","parallel"),
                }
            for(i in 1:ncomp){
                independent_mat.new[i,] <- independent_mat[order(kurt,decreasing=TRUE)[i],]
-               independent_mat.new[i,] <- independent_mat.new[i,]/crossprod(independent_mat.new[i,]) 
+               independent_mat.new[i,] <- independent_mat.new[i,]/as.vector(crossprod(independent_mat.new[i,]))
                }
 
         #== variable selection==#  
@@ -113,7 +113,7 @@ function (X, ncomp  = 3, mode = c("deflation","parallel"),
           for(h in 1:ncomp){
               if(h==1){ipc_mat[,h]=X %*% (t(independent_mat.new)[,h])}
               if(h>1){ipc_mat[,h]=(lsfit(y=X%*%(t(independent_mat.new)[,h]), ipc_mat[,1:(h-1)],intercept=FALSE)$res)}
-              ipc_mat[,h]=ipc_mat[,h]/sqrt(crossprod(ipc_mat[,h]))
+              ipc_mat[,h]=ipc_mat[,h]/as.vector(sqrt(crossprod(ipc_mat[,h])))
               }
         ##== force over ==##          
 # put rownames of loading vectors

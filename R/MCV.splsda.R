@@ -4,8 +4,8 @@
 #   Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
-# created: 2015
-# last modified: 24-08-2016
+# created: 24-08-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2015
 #
@@ -31,19 +31,27 @@
 
 # X: numeric matrix of predictors
 # Y: a factor or a class vector for the discrete outcome
-# ncomp: the number of components to include in the model. Default to 1.
-# test.keepX: grid of keepX among which to chose the optimal one
-# already.tested.X: a vector giving keepX on the components that were already tuned
+# multilevel: repeated measurement only
 # validation: Mfold or loo cross validation
 # folds: if validation = Mfold, how many folds?
-# dist: distance to classify samples. see predict
-# measure: one of c("overall","BER"). Accuracy measure used in the cross validation processs
-# progressBar: show progress,
-# near.zero.var: boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations
 # nrepeat: number of replication of the Mfold process
-# logratio = c('none','CLR'). see splsda
-# verbose: if TRUE, shows component and nrepeat being tested.
-
+# ncomp: the number of components to include in the model. Default to 1.
+# choice.keepX: a vector giving keepX on the components that were already tuned
+# test.keepX: grid of keepX among which to chose the optimal one
+# measure: one of c("overall","BER"). Accuracy measure used in the cross validation processs
+# dist: distance to classify samples. see predict
+# auc:
+# tol: Convergence stopping value.
+# max.iter: integer, the maximum number of iterations.
+# near.zero.var: boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations
+# progressBar: show progress,
+# class.object
+# cl: if parallel, the clusters
+# scale: boleean. If scale = TRUE, each block is standardized to zero means and unit variances (default: TRUE).
+# misdata: optional. any missing values in the data? list, misdata[[q]] for each data set
+# is.na.A: optional. where are the missing values? list, is.na.A[[q]] for each data set (if misdata[[q]] == TRUE)
+# ind.NA: optional. which rows have missing values? list, ind.NA[[q]] for each data set.
+# parallel: logical.
 
 stratified.subsampling = function(Y, folds = 10)
 {
@@ -91,17 +99,22 @@ validation,
 folds,
 nrepeat = 1,
 ncomp,
-choice.keepX = NULL, #either choice.keepX or choice.keepX.constraint, not both
-choice.keepX.constraint = NULL,
-test.keepX, # can be either a vector of names (keepX.constraint) or a value(keepX). In case of a value, there needs to be names(test.keepX)
+choice.keepX = NULL, # keepX chosen on the first components
+test.keepX, # a vector of value(keepX) to test on the last component. There needs to be names(test.keepX)
 measure = c("overall"), # one of c("overall","BER")
 dist = "max.dist",
 auc = FALSE,
+tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
 progressBar = TRUE,
-class.object = NULL,
-cl
+class.object,
+cl,
+scale,
+misdata,
+is.na.A,
+ind.NA,
+parallel
 )
 {    #-- checking general input parameters --------------------------------------#
     #---------------------------------------------------------------------------#
@@ -114,7 +127,12 @@ cl
         pb = FALSE
     }
     
-
+    design = matrix(c(0,1,1,0), ncol = 2, nrow = 2, byrow = TRUE)
+    
+    if(ncomp>1)
+    {
+        keepY = rep(nlevels(Y), ncomp-1)
+    } else {keepY = NULL}
     
     M = length(folds)
     features = features.j = NULL
@@ -183,21 +201,47 @@ cl
         stop.user = FALSE
 
         # function instead of a loop so we can use lapply and parLapply. Can't manage to put it outside without adding all the arguments
+        
+        #result.all=list()
         fonction.j.folds = function(j)#for (j in 1:M)
         {
             if (progressBar ==  TRUE)
             setTxtProgressBar(pb, (M*(nrep-1)+j-1)/(M*nrepeat))
             
             #print(j)
-            #set up leave out samples.
+            #---------------------------------------#
+            #-- set up leave out samples. ----------#
+
             omit = which(repeated.measure %in% folds[[j]] == TRUE)
             
             # get training and test set
             X.train = X[-omit, ]
             Y.train = Y[-omit]
+            Y.train.mat = unmap(Y.train)
+            q = ncol(Y.train.mat)
+            colnames(Y.train.mat) = levels(Y.train)
             X.test = X[omit, , drop = FALSE]#matrix(X[omit, ], nrow = length(omit)) #removed to keep the colnames in X.test
             Y.test = Y[omit]
-            
+            #-- set up leave out samples. ----------#
+            #---------------------------------------#
+
+            #------------------------------------------#
+            #-- split the NA in training and testing --#
+            if(any(misdata))
+            {
+                is.na.A.train = is.na.A[-omit,, drop=FALSE]
+                is.na.A.test = is.na.A[omit,, drop=FALSE]
+                
+                ind.NA.train = which(apply(is.na.A.train, 1, sum) > 0) # calculated only once
+                ind.NA.test = which(apply(is.na.A.test, 1, sum) > 0) # calculated only once
+
+            } else {
+                is.na.A.train = is.na.A.test =NULL
+                ind.NA.train = ind.NA.test = NULL
+            }
+            #-- split the NA in training and testing --#
+            #------------------------------------------#
+
             #---------------------------------------#
             #-- near.zero.var ----------------------#
             
@@ -209,38 +253,14 @@ cl
                 X.train = X.train[, -c(ind.var),drop = FALSE]
                 X.test = X.test[, -c(ind.var),drop = FALSE]
                 
-                # match choice.keepX, choice.keepX.constraint and test.keepX if needed
-                if(is.null(choice.keepX.constraint) & !is.list(test.keepX))
-                {
-                    # keepX = c(choice.keepX, test.keepX[i])
-                    # keepX.constraint = NULL
+                # reduce choice.keepX and test.keepX if needed
+                if (any(choice.keepX > ncol(X.train)))
+                choice.keepX[which(choice.keepX>ncol(X.train))] = ncol(X.train)
+
+                # reduce test.keepX if needed
+                if (any(test.keepX > ncol(X.train)))
+                test.keepX[which(test.keepX>ncol(X.train))] = ncol(X.train)
                     
-                    # reduce choice.keepX and test.keepX if needed
-                    if (any(choice.keepX > ncol(X.train)))
-                    choice.keepX[which(choice.keepX>ncol(X.train))] = ncol(X.train)
-                    
-                    if (any(test.keepX > ncol(X.train)))
-                    test.keepX[which(test.keepX>ncol(X.train))] = ncol(X.train)
-                    
-                } else if(!is.list(test.keepX)){
-                    # keepX = test.keepX[i]
-                    # keepX.constraint = choice.keepX.constraint
-                    
-                    # reduce test.keepX if needed
-                    if (any(test.keepX > ncol(X.train)))
-                    test.keepX[which(test.keepX>ncol(X.train))] = ncol(X.train)
-                    
-                    choice.keepX.constraint = match.keepX.constraint(names.remove = names(ind.var), keepX.constraint = choice.keepX.constraint)
-                    
-                } else {
-                    # keepX = NULL
-                    # keepX.constraint = c(choice.keepX.constraint, test.keepX)
-                    
-                    # reduce choice.keepX.constraint if needed
-                    choice.keepX.constraint = match.keepX.constraint(names.remove = names(ind.var), keepX.constraint = c(choice.keepX.constraint, test.keepX))
-                    
-                }
-                
             }
             
             if(near.zero.var == TRUE)
@@ -254,37 +274,14 @@ cl
                     X.train = X.train[, -c(remove.zero),drop = FALSE]
                     X.test = X.test[, -c(remove.zero),drop = FALSE]
                     
-                    # match choice.keepX, choice.keepX.constraint and test.keepX if needed
-                    if(is.null(choice.keepX.constraint) & !is.list(test.keepX))
-                    {
-                        # keepX = c(choice.keepX, test.keepX[i])
-                        # keepX.constraint = NULL
-                        
-                        # reduce choice.keepX and test.keepX if needed
-                        if (any(choice.keepX > ncol(X.train)))
-                        choice.keepX[which(choice.keepX>ncol(X.train))] = ncol(X.train)
-                        
-                        if (any(test.keepX > ncol(X.train)))
-                        test.keepX[which(test.keepX>ncol(X.train))] = ncol(X.train)
-                        
-                    } else if(!is.list(test.keepX)){
-                        # keepX = test.keepX[i]
-                        # keepX.constraint = choice.keepX.constraint
-                        
-                        # reduce test.keepX if needed
-                        if (any(test.keepX > ncol(X.train)))
-                        test.keepX[which(test.keepX>ncol(X.train))] = ncol(X.train)
-                        
-                        choice.keepX.constraint = match.keepX.constraint(names.remove = names.var, keepX.constraint = choice.keepX.constraint)
-                        
-                    } else {
-                        # keepX = NULL
-                        # keepX.constraint = c(choice.keepX.constraint, test.keepX)
-                        
-                        # reduce choice.keepX.constraint if needed
-                        choice.keepX.constraint = match.keepX.constraint(names.remove = names.var, keepX.constraint = c(choice.keepX.constraint, test.keepX))
-                        
-                    }
+                    # reduce choice.keepX and test.keepX if needed
+                    if (any(choice.keepX > ncol(X.train)))
+                    choice.keepX[which(choice.keepX>ncol(X.train))] = ncol(X.train)
+                    
+                    # reduce test.keepX if needed
+                    if (any(test.keepX > ncol(X.train)))
+                    test.keepX[which(test.keepX>ncol(X.train))] = ncol(X.train)
+                    
                     
                 }
                 #print(remove.zero)
@@ -292,6 +289,8 @@ cl
             
             #-- near.zero.var ----------------------#
             #---------------------------------------#
+            
+            
             prediction.comp.j = array(0, c(length(omit), nlevels(Y), length(test.keepX)), dimnames = list(rownames(X.test), levels(Y), names(test.keepX)))
             
             
@@ -299,70 +298,130 @@ cl
             for(ijk in dist)
             class.comp.j[[ijk]] = matrix(0, nrow = length(omit), ncol = length(test.keepX))# prediction of all samples for each test.keepX and  nrep at comp fixed
             
+            # shape input for `internal_mint.block' (keepA, test.keepA, etc)
+            result = internal_wrapper.mint(X=X.train, Y=Y.train.mat, study=factor(rep(1,length(Y.train))), ncomp=ncomp,
+            keepX=choice.keepX, keepY=rep(ncol(Y.train.mat), ncomp-1), test.keepX=test.keepX, test.keepY=ncol(Y.train.mat),
+            mode="regression", scale=scale, near.zero.var=near.zero.var,
+            max.iter=max.iter, logratio="none", DA=TRUE, multilevel=NULL,
+            misdata = misdata, is.na.A = list(X=is.na.A.train, Y=NULL), ind.NA = list(X=ind.NA.train, Y=NULL), all.outputs=FALSE)
             
-            for (i in 1:length(test.keepX))
+            # `result' returns loadings and variates for all test.keepX on the ncomp component
+            
+            # need to find the best keepX/keepY among all the tested models
+            
+            #---------------------------------------#
+            #-- scaling X.test ---------------------#
+            
+            # we prep the test set for the successive prediction: scale and is.na.newdata
+            if (!is.null(attr(result$A[[1]], "scaled:center")))
+            X.test = sweep(X.test, 2, STATS = attr(result$A[[1]], "scaled:center"))
+            if (scale)
+            X.test = sweep(X.test, 2, FUN = "/", STATS = attr(result$A[[1]], "scaled:scale"))
+            
+            means.Y = matrix(attr(result$A[[2]], "scaled:center"),nrow=nrow(X.test),ncol=q,byrow=TRUE);
+            if (scale)
+            {sigma.Y = matrix(attr(result$A[[2]], "scaled:scale"),nrow=nrow(X.test),ncol=q,byrow=TRUE)}else{sigma.Y=matrix(1,nrow=nrow(X.test),ncol=q)}
+            
+            #-- scaling X.test ---------------------#
+            #---------------------------------------#
+
+
+            #-----------------------------------------#
+            #-- prediction on X.test for all models --#
+
+            # record prediction results for each test.keepX
+            keepA = result$keepA
+            test.keepA = keepA[[ncomp]]
+            
+            for(i in 1:nrow(test.keepA))
             {
-                if (progressBar ==  TRUE)
-                setTxtProgressBar(pb, (M*(nrep-1)+j-1)/(M*nrepeat) + (i-1)/length(test.keepX)/(M*nrepeat))
+                #print(i)
+                # creates temporary splsda object to use the predict function
+                object.splsda.temp = result
+                # add the "splsda" class
+                class(object.splsda.temp) = c("splsda","spls","DA")
                 
-                # depending on whether it is a constraint and whether it is from tune or perf, keepX and keepX.constraint differ:
-                # if it's from perf, then it's only either keepX or keepX.constraint
-                # if it's from tune, then it's either keepX, or a combination of keepX.constraint and keepX
-                # we know if it's perf+constraint or tune+constraint depending on the test.keepX that is either a vector or a list
-                object.res = mixOmics::splsda(X.train, Y.train, ncomp = ncomp,
-                keepX = if(is.null(choice.keepX.constraint) & !is.list(test.keepX)){c(choice.keepX, test.keepX[i])}else if(!is.list(test.keepX)){test.keepX[i]} else {NULL} ,
-                keepX.constraint = if(is.null(choice.keepX.constraint)& !is.list(test.keepX)){NULL}else if(!is.list(test.keepX)){choice.keepX.constraint} else {c(choice.keepX.constraint, test.keepX)},
-                logratio = "none", near.zero.var = FALSE, mode = "regression", max.iter = max.iter)
+                object.splsda.temp$X = result$A$X
+                object.splsda.temp$ind.mat = result$A$Y
+                object.splsda.temp$Y = factor(Y.train)
+                
+                # only pick the loadings and variates relevant to that test.keepX
+                
+                names.to.pick = NULL
+                if(ncomp>1)
+                names.to.pick = unlist(lapply(1:(ncomp-1), function(x){
+                    paste(paste0("comp",x),apply(keepA[[x]],1,function(x) paste(x,collapse="_")), sep=":")
+                    
+                }))
+                
+                names.to.pick.ncomp = paste(paste0("comp",ncomp),paste(keepA[[ncomp]][i,],collapse="_"), sep=":")
+                names.to.pick = c(names.to.pick, names.to.pick.ncomp)
+
+
+                
+                object.splsda.temp$variates = lapply(result$variates, function(x){if(ncol(x)!=ncomp) {x[,colnames(x)%in%names.to.pick, drop=FALSE]}else{x}})
+                object.splsda.temp$loadings = lapply(result$loadings, function(x){if(ncol(x)!=ncomp) {x[,colnames(x)%in%names.to.pick, drop=FALSE]}else{x}})
                 
                 # added: record selected features
-                if (any(class.object %in% c("splsda")) & length(test.keepX) ==  1) # only done if splsda and if only one test.keepX as not used if more so far
+                if (any(class.object == "splsda") & length(test.keepX) ==  1) # only done if splsda and if only one test.keepX as not used if more so far
                 # note: if plsda, 'features' includes everything: to optimise computational time, we don't evaluate for plsda object
-                features.j = selectVar(object.res, comp = ncomp)$name
+                features.j = selectVar(object.splsda.temp, comp = ncomp)$name
                 
-                test.predict.sw <- predict(object.res, newdata = X.test, dist = dist)
+                # do the prediction, we are passing to the function some invisible parameters:
+                # the scaled newdata and the missing values
+                test.predict.sw <- predict(object.splsda.temp, newdata.scale = X.test, dist = dist, misdata.all=any(misdata), is.na.X = list(X=is.na.A.train), is.na.newdata = list(X=is.na.A.test))
                 prediction.comp.j[, , i] =  test.predict.sw$predict[, , ncomp]
                 
                 for(ijk in dist)
                 class.comp.j[[ijk]][, i] =  test.predict.sw$class[[ijk]][, ncomp] #levels(Y)[test.predict.sw$class[[ijk]][, ncomp]]
             } # end i
             
-            
+            #-- prediction on X.test for all models --#
+            #-----------------------------------------#
+
+
             return(list(class.comp.j = class.comp.j, prediction.comp.j = prediction.comp.j, features = features.j, omit = omit))
-            
+            #result.all[[j]] = list(class.comp.j = class.comp.j,  prediction.comp.j = prediction.comp.j, features = features.j, omit = omit)
+
         } # end fonction.j.folds
-
-
-
-        if (!is.null(cl) == TRUE)
+        
+            
+        if (parallel == TRUE)
         {
-            result = parLapply(cl, 1: M, fonction.j.folds)
+            clusterEvalQ(cl, library(mixOmics))
+            clusterExport(cl, ls(), envir=environment())
+            result.all = parLapply(cl, 1: M, fonction.j.folds)
         } else {
-            result = lapply(1: M, fonction.j.folds)
+            result.all = lapply(1: M, fonction.j.folds)
             
         }
+        #---------------------------#
+        #--- combine the results ---#
 
-        # combine the results
         for(j in 1:M)
         {
-            omit = result[[j]]$omit
-            prediction.comp.j = result[[j]]$prediction.comp.j
-            class.comp.j = result[[j]]$class.comp.j
+            omit = result.all[[j]]$omit
+            prediction.comp.j = result.all[[j]]$prediction.comp.j
+            class.comp.j = result.all[[j]]$class.comp.j
 
             prediction.comp[[nrep]][omit, , ] = prediction.comp.j
             
             for(ijk in dist)
             class.comp[[ijk]][omit,nrep, ] = class.comp.j[[ijk]]
             
-            if (any(class.object %in% c("splsda")) & length(test.keepX) ==  1) # only done if splsda and if only one test.keepX as not used if more so far
-            features = c(features, result[[j]]$features)
+            if (length(test.keepX) ==  1) # only done if splsda and if only one test.keepX as not used if more so far
+            features = c(features, result.all[[j]]$features)
 
         }
+        #--- combine the results ---#
+        #---------------------------#
         
-
 
         if (progressBar ==  TRUE)
         setTxtProgressBar(pb, (M*nrep)/(M*nrepeat))
         
+        #---------------------------#
+        #----- AUC on the test -----#
         if(auc)
         {
             data=list()
@@ -373,13 +432,16 @@ cl
                 auc.all[[nrep]][, , i] = as.matrix(statauc(data))
             }
         }
-        
+        #----- AUC on the test -----#
+        #---------------------------#
+
     } #end nrep 1:nrepeat
 
     names(prediction.comp) = names (auc.all) = paste0("nrep.", 1:nrepeat)
     # class.comp[[ijk]] is a matrix containing all prediction for test.keepX, all nrepeat and all distance, at comp fixed
     
-    # average auc over the nrepeat, for each test.keepX
+    #-------------------------------------------------------------#
+    #----- average AUC over the nrepeat, for each test.keepX -----#
     if(auc)
     {
         
@@ -404,10 +466,12 @@ cl
         auc.mean.sd = auc.all = NULL
         
     }
-    
+    #----- average AUC over the nrepeat, for each test.keepX -----#
+    #-------------------------------------------------------------#
+
     result = list()
     error.mean = error.sd = error.per.class.keepX.opt.comp = keepX.opt = test.keepX.out = mat.error.final = choice.keepX.out = list()
-    
+
     if (any(measure == "overall"))
     {
         for(ijk in dist)
@@ -446,12 +510,8 @@ cl
             
             
             test.keepX.out[[ijk]] = test.keepX[keepX.opt[[ijk]]]
-            if(is.null(choice.keepX))
-            {
-                choice.keepX.out[[ijk]] = c(lapply(choice.keepX.constraint,length), test.keepX.out)
-            }else{
-                choice.keepX.out[[ijk]] = c(choice.keepX, test.keepX.out)
-            }
+            choice.keepX.out[[ijk]] = c(choice.keepX, test.keepX.out)
+            
             result$"overall"$error.rate.mean = error.mean
             if (!nrepeat ==  1)
             result$"overall"$error.rate.sd = error.sd
@@ -498,12 +558,8 @@ cl
             colnames(error.per.class.keepX.opt.comp[[ijk]]) = paste0("nrep.", 1:nrepeat)
             
             test.keepX.out[[ijk]] = test.keepX[keepX.opt[[ijk]]]
-            if(is.null(choice.keepX))
-            {
-                choice.keepX.out[[ijk]] = c(lapply(choice.keepX.constraint,length), test.keepX.out)
-            }else{
-                choice.keepX.out[[ijk]] = c(choice.keepX, test.keepX.out)
-            }
+            choice.keepX.out[[ijk]] = c(choice.keepX, test.keepX.out)
+
             result$"BER"$error.rate.mean = error.mean
             if (!nrepeat ==  1)
             result$"BER"$error.rate.sd = error.sd
@@ -516,7 +572,6 @@ cl
         
         
     }
-    
     
     result$prediction.comp = prediction.comp
     result$auc = auc.mean.sd

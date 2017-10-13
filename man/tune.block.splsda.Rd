@@ -22,17 +22,14 @@ dist = "max.dist",
 measure = "BER",
 weighted = TRUE,
 progressBar = TRUE,
+tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
 nrepeat = 1,
 design,
-scheme,
-mode,
+scheme= "horst",
 scale = TRUE,
-bias,
-init ,
-tol = 1e-06,
-verbose,
+init = "svd",
 light.output = TRUE,
 cpus,
 name.save=NULL
@@ -56,23 +53,16 @@ name.save=NULL
 should be a subset of \code{"centroids.dist"}, \code{"mahalanobis.dist"} or \code{"max.dist"} (see Details).}
 \item{measure}{Two misclassification measure are available: overall misclassification error \code{overall} or the Balanced Error Rate \code{BER}}
 \item{weighted}{tune using either the performance of the Majority vote or the Weighted vote.}
-
 \item{progressBar}{by default set to \code{TRUE} to output the progress bar of the computation.}
+\item{tol}{Convergence stopping value.}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Default value is FALSE}
 \item{nrepeat}{Number of times the Cross-Validation process is repeated.}
 \item{design}{numeric matrix of size (number of blocks in X) x (number of blocks in X) with 0 or 1 values. A value of 1 (0) indicates a relationship (no relationship) between the blocks to be modelled. If \code{Y} is provided instead of \code{indY}, the \code{design} matrix is changed to include relationships to \code{Y}. }
 \item{scheme}{Either "horst", "factorial" or "centroid". Default = \code{centroid}, see reference.}
-\item{mode}{character string. What type of algorithm to use, (partially) matching
-one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"classic"}.
-See Details. Default = \code{regression}.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances. Default = \code{TRUE}.}
-\item{bias}{boleean. A logical value for biaised or unbiaised estimator of the var/cov. Default = \code{FALSE}.}
 \item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single"). Default = \code{svd}.}
-\item{tol}{Convergence stopping value.}
-\item{verbose}{if set to \code{TRUE}, reports progress on computing.}
-
 \item{light.output}{if set to FALSE, the prediction/classification of each sample for each of \code{test.keepX} and each comp is returned.}
 \item{cpus}{Number of cpus to use when running the code in parallel.}
 \item{name.save}{character string for the name of the file to be saved.}

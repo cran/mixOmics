@@ -5,7 +5,7 @@
 
 #
 # created: 22-04-2015
-# last modified: 24-05-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2015
 #
@@ -37,6 +37,9 @@
 # tol: Convergence stopping value.
 # max.iter: integer, the maximum number of iterations.
 # near.zero.var: boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations
+# logratio: one of "none", "CLR"
+# multilevel: repeated measurement. `multilevel' is passed to multilevel(design = ) in withinVariation. Y is ommited and shouldbe included in `multilevel'
+# all.outputs: calculation of non-essential outputs (e.g. explained variance, loadings.Astar, etc)
 
 
 plsda = function(X,
@@ -48,7 +51,8 @@ tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
 logratio = "none",   # one of "none", "CLR"
-multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVariation. Y is ommited and shouldbe included in multilevel design
+multilevel = NULL,
+all.outputs = TRUE)
 {
     
     #-- validation des arguments --#
@@ -92,23 +96,24 @@ multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVar
     
     # call to 'internal_wrapper.mint'
     result = internal_wrapper.mint(X = X, Y = Y.mat, ncomp = ncomp, scale = scale, near.zero.var = near.zero.var, mode = mode,
-    max.iter = max.iter, tol = tol, logratio = logratio, multilevel = multilevel, DA = TRUE)
+    max.iter = max.iter, tol = tol, logratio = logratio, multilevel = multilevel, DA = TRUE, all.outputs=all.outputs)
 
     # choose the desired output from 'result'
     out = list(
         call = match.call(),
-        X = result$X[-result$indY][[1]],
+        X = result$A[-result$indY][[1]],
         Y = if (is.null(multilevel))
             {
                 Y
             } else {
                 result$Y.factor
             },
-        ind.mat = result$X[result$indY][[1]],
+        ind.mat = result$A[result$indY][[1]],
         ncomp = result$ncomp,
         mode = result$mode,
         variates = result$variates,
         loadings = result$loadings,
+        loadings.star = result$loadings.star,
         names = result$names,
         tol = result$tol,
         iter = result$iter,
@@ -118,8 +123,7 @@ multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVar
         logratio = logratio,
         explained_variance = result$explained_variance,#[-result$indY],
         input.X = result$input.X,
-        mat.c = result$mat.c,
-        defl.matrix = result$defl.matrix
+        mat.c = result$mat.c#,
         )
     
     class(out) = c("plsda","pls","DA")

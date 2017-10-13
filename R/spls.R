@@ -5,7 +5,7 @@
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 2009
-# last modified: 24-05-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2009
 #
@@ -41,14 +41,15 @@
 # tol: Convergence stopping value.
 # max.iter: integer, the maximum number of iterations.
 # near.zero.var: boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations
+# logratio: one of "none", "CLR"
+# multilevel: repeated measurement. `multilevel' is passed to multilevel(design = ) in withinVariation. Y is ommited and shouldbe included in `multilevel'
+# all.outputs: calculation of non-essential outputs (e.g. explained variance, loadings.Astar, etc)
 
 
 spls = function(X,
 Y,
 ncomp = 2,
 mode = c("regression", "canonical", "invariant", "classic"),
-keepX.constraint=NULL,
-keepY.constraint=NULL,
 keepX,
 keepY,
 scale = TRUE,
@@ -56,28 +57,28 @@ tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
 logratio = "none",   # one of "none", "CLR"
-multilevel = NULL)    # multilevel is passed to multilevel(design = ) in withinVariation. Y is ommited and shouldbe included in multilevel design
+multilevel = NULL,
+all.outputs = TRUE)
 {
 
     # call to 'internal_wrapper.mint'
     result = internal_wrapper.mint(X = X, Y = Y, ncomp = ncomp, scale = scale, near.zero.var = near.zero.var, mode = mode,
-    keepX = keepX, keepY = keepY, keepX.constraint = keepX.constraint, keepY.constraint = keepY.constraint, max.iter = max.iter,
+    keepX = keepX, keepY = keepY, max.iter = max.iter,
     tol = tol, logratio = logratio,
-    multilevel = multilevel, DA = FALSE)
+    multilevel = multilevel, DA = FALSE, all.outputs= all.outputs)
     
     # choose the desired output from 'result'
     out = list(
         call = match.call(),
-        X = result$X[-result$indY][[1]],
-        Y = result$X[result$indY][[1]],
+        X = result$A[-result$indY][[1]],
+        Y = result$A[result$indY][[1]],
         ncomp = result$ncomp,
         mode = result$mode,
-        keepX = result$keepA[[1]],
-        keepY = result$keepA[[2]],
-        keepX.constraint = result$keepA.constraint[[1]],
-        keepY.constraint = result$keepA.constraint[[2]],
+        keepX = result$keepX,
+        keepY = result$keepY,
         variates = result$variates,
         loadings = result$loadings,
+        loadings.star = result$loadings.star,
         names = result$names,
         tol = result$tol,iter = result$iter,
         max.iter = result$max.iter,
@@ -86,8 +87,7 @@ multilevel = NULL)    # multilevel is passed to multilevel(design = ) in withinV
         logratio = logratio,
         explained_variance = result$explained_variance,
         input.X = result$input.X,
-        mat.c = result$mat.c,
-        defl.matrix = result$defl.matrix
+        mat.c = result$mat.c#,
         )
     
    

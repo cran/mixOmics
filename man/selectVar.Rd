@@ -95,7 +95,7 @@ design = matrix(c(0,1,1,
 #note: the penalty parameters need to be tuned
 wrap.result.sgcca = wrapper.sgcca(X = data, design = design, penalty = c(.3,.3, 1),
                                   ncomp = 2,
-                                  scheme = "horst", verbose = FALSE)
+                                  scheme = "horst")
 
 #variables selected and loadings values on component 1 for the two blocs
 selectVar(wrap.result.sgcca, comp = 1, block = c(1,2))

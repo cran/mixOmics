@@ -3,7 +3,7 @@
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 22-04-2015
-# last modified: 08-07-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2015
 #
@@ -51,10 +51,10 @@ internal_wrapper.mint = function(X,
 Y,
 study,
 ncomp = 2,
-keepX.constraint,
-keepY.constraint,
 keepX,
 keepY,
+test.keepX=NULL,
+test.keepY=NULL,
 mode,
 scale = FALSE,
 near.zero.var = FALSE,
@@ -62,7 +62,10 @@ max.iter = 100,
 tol = 1e-06,
 logratio = "none",   # one of "none", "CLR"
 DA = FALSE,           # indicate whether it's a DA analysis, only used for the multilvel approach with withinVariation
-multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVariation. Y is ommited and should be included in multilevel design
+multilevel = NULL,   # multilevel is passed to multilevel(design=) in withinVariation. Y is ommited and should be included in multilevel design
+misdata = NULL, is.na.A = NULL, ind.NA = NULL,
+all.outputs=FALSE
+)
 {
     
     if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0 || length(ncomp)>1)
@@ -70,19 +73,19 @@ multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVar
     
     #-- validation des arguments --#
    
-    check = Check.entry.pls(X, Y, ncomp, keepX, keepY, keepX.constraint, keepY.constraint, mode=mode, scale=scale,
+    check = Check.entry.pls(X, Y, ncomp, keepX, keepY, mode=mode, scale=scale,
     near.zero.var=near.zero.var, max.iter=max.iter ,tol=tol ,logratio=logratio ,DA=DA, multilevel=multilevel)
     X = check$X
     input.X = X # save the checked X, before logratio/multileve/scale
     Y = check$Y
     ncomp = check$ncomp
     mode = check$mode
-    keepX.constraint = check$keepX.constraint
-    keepY.constraint = check$keepY.constraint
     keepX = check$keepX
     keepY = check$keepY
     nzv.A = check$nzv.A
-
+    
+    #test.keepX and test.keepY must be checked before (in tune)
+    
     #set the default study factor
     if (missing(study))
     {
@@ -145,48 +148,48 @@ multilevel = NULL)    # multilevel is passed to multilevel(design=) in withinVar
     }
     #-- multilevel approach ----------------------------------------------------#
     #---------------------------------------------------------------------------#
-
-
+    
+    
     #---------------------------------------------------------------------------#
-    #-- pls approach ----------------------------------------------------#
+    #-- keepA ----------------------------------------------------#
     
-    result = internal_mint.block(A = list(X = X, Y = Y), indY = 2, mode = mode, ncomp = c(ncomp, ncomp), tol = tol, max.iter = max.iter,
-    design = design, keepA = list(keepX, keepY), keepA.constraint = list(keepX.constraint, keepY.constraint),
-    scale = scale, scheme = "horst",init="svd", study = study)
+    # shaping keepA, contains all the keepX/keepY models to be constructed
     
-    #-- pls approach ----------------------------------------------------#
-    #---------------------------------------------------------------------------#
-
-    # calculating mat.c
-    R = lapply(result$defl.matrix, function(x){x$X}) # list of length ncomp, containing the deflated blocks
-    variates = result$variates$X
-    
-    is.na.X = is.na(X)
-    if(sum(is.na.X)>0)
+    if(!is.null(test.keepX) & !is.null(test.keepY))
     {
-        p.ones = rep(1, ncol(X))
+        test.keepA = lapply(list(X=test.keepX, Y=test.keepY),sort) #sort test.keepX so as to be sure to chose the smallest in case of several minimum
+    } else {test.keepA=NULL}
+    
+    keepA = vector("list", length = ncomp) # one keepA per comp
+    names(keepA) = paste0("comp",1:ncomp)
+    for(comp in 1:length(keepX)) # keepA[[block]] [1:ncomp]
+    keepA[[comp]] = lapply(list(X=keepX, Y=keepY), function(x) x[comp])
 
-        mat.c = matrix(0, nrow = ncol(X), ncol = ncomp)
-        for(comp in 1:ncomp)
-        {
-            R.temp = R[[comp]]
-            R.temp[is.na.X] = 0
-            c = crossprod(R.temp, variates[,comp])
-            T = drop(variates[,comp]) %o% p.ones
-            T[is.na.X] = 0
-            t.norm = crossprod(T)
-            c = c / diag(t.norm)
-            mat.c[,comp] = c
-        }
-    } else {
-        mat.c = sapply(1:ncol(variates), function(x){crossprod(R[[x]], variates[,x]) / drop(crossprod (variates[,x]))})
+    if(!is.null(test.keepA))
+    keepA[[ncomp]] = test.keepA
+    
+    keepA = lapply(keepA, expand.grid)
+    
+    # keepA[[comp]] is a matrix where each row is all the keepX the test over the block (each block is a column)
 
-    }
+    #-- keepA ----------------------------------------------------#
+    #---------------------------------------------------------------------------#
 
-    rownames(mat.c) = colnames(X)
-    colnames(mat.c) = paste0("comp ", 1:max(ncomp))
-    result$mat.c = mat.c
 
+    #---------------------------------------------------------------------------#
+    #-- pls approach ----------------------------------------------------#
+    result = internal_mint.block(A = list(X = X, Y = Y), indY = 2, mode = mode, ncomp = c(ncomp, ncomp), tol = tol, max.iter = max.iter,
+    design = design, keepA = keepA,
+    scale = scale, scheme = "horst",init="svd", study = study, misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA, all.outputs= all.outputs)
+    
+    #-- pls approach ----------------------------------------------------#
+    #---------------------------------------------------------------------------#
+    
+    # result contains all loadings and variates of the test.keepX and test.keepY (if not null)
+    # if no test.keepX and test.keepY, then it's classical outputs
+    
+    result$keepX = keepX
+    result$keepY = keepY
     result$ncomp = ncomp
     if(near.zero.var)
     result$nzv = nzv.A

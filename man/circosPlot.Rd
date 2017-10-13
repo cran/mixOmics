@@ -86,9 +86,7 @@ Y = Y,
 design = design,
 keepX = list(gene=c(10,10), lipid=c(15,15)),
 ncomp = 2,
-scheme = "horst",
-verbose = FALSE,
-bias = FALSE)
+scheme = "horst")
 
 circosPlot(nutrimouse.sgccda, cutoff = 0.7, ncol.legend = 2, size.legend = 1.1)
 

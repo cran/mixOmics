@@ -1,12 +1,12 @@
 #############################################################################################################
 # Authors:
+#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #   Benoit Gautier, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #   Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 2013
-# last modified: 24-08-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2013
 #
@@ -39,12 +39,17 @@
 # folds: if validation=Mfold, how many folds?
 # dist: distance to classify samples. see predict
 # measure: one of c("overall","BER"). Accuracy measure used in the cross validation processs
+# scale: boleean. If scale = TRUE, each block is standardized to zero means and unit variances (default: TRUE).
+# auc: calculate AUC
 # progressBar: show progress,
+# tol: Convergence stopping value.
+# max.iter: integer, the maximum number of iterations.
 # near.zero.var: boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations
 # nrepeat: number of replication of the Mfold process
-# logratio = c('none','CLR'). see splsda
-# verbose: if TRUE, shows component and nrepeat being tested.
-
+# logratio: one of "none", "CLR"
+# multilevel: repeated measurement. `multilevel' is passed to multilevel(design = ) in withinVariation. Y is ommited and shouldbe included in `multilevel'
+# light.output: if FALSE, output the prediction and classification of each sample during each folds, on each comp, for each repeat
+# cpus: number of cpus to use. default to no parallel
 
 tune.splsda = function (X, Y,
 ncomp = 1,
@@ -54,14 +59,16 @@ validation = "Mfold",
 folds = 10,
 dist = "max.dist",
 measure = "BER", # one of c("overall","BER")
+scale = TRUE,
 auc = FALSE,
 progressBar = TRUE,
+tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
 nrepeat = 1,
 logratio = c('none','CLR'),
 multilevel = NULL,
-light.output = TRUE, # if FALSE, output the prediction and classification of each sample during each folds, on each comp, for each repeat
+light.output = TRUE,
 cpus
 )
 {    #-- checking general input parameters --------------------------------------#
@@ -145,29 +152,17 @@ cpus
     constraint = FALSE # kept in the code so far, will probably get remove later on
     if (missing(already.tested.X))
     {
-        if(constraint == TRUE)
-        {
-            already.tested.X = list()
-        } else {
-            already.tested.X = NULL
-        }
+        already.tested.X = NULL
     } else {
         if(is.null(already.tested.X) | length(already.tested.X)==0)
-        stop("''already.tested.X' must be a vector of keepX values (if 'constraint'= FALSE) or a list (if'constraint'= TRUE) ")
+        stop("''already.tested.X' must be a vector of keepX values")
 
-        if(constraint == TRUE)
-        {
-            if(!is.list(already.tested.X))
-            stop("''already.tested.X' must be a list since 'constraint' is set to TRUE")
-            
-            message(paste("A total of",paste(lapply(already.tested.X,length),collapse=" and "),"specific variables ('already.tested.X') were selected on the first ", length(already.tested.X), "component(s)"))
-        } else {
-            if(is.list(already.tested.X))
-            stop("''already.tested.X' must be a vector of keepX values since 'constraint' is set to FALSE")
+        if(is.list(already.tested.X))
+        stop("''already.tested.X' must be a vector of keepX values since 'constraint' is set to FALSE")
 
-            message(paste("Number of variables selected on the first", length(already.tested.X), "component(s):", paste(already.tested.X,collapse = " ")))
-        }
+        message(paste("Number of variables selected on the first", length(already.tested.X), "component(s):", paste(already.tested.X,collapse = " ")))
     }
+    
     if(length(already.tested.X) >= ncomp)
     stop("'ncomp' needs to be higher than the number of components already tuned, which is length(already.tested.X)=",length(already.tested.X) , call. = FALSE)
     
@@ -188,12 +183,34 @@ cpus
         clusterExport(cl, c("splsda","selectVar"))
         
         if(progressBar == TRUE)
-        message(paste("As code is running in parallel, the progressBar will only show 100% upon completion of each component.",sep=""))
+        message(paste("As code is running in parallel, the progressBar will only show 100% upon completion of each nrepeat/ component.",sep=""))
 
     } else {
         parallel = FALSE
         cl = NULL
     }
+    
+    # add colnames and rownames if missing
+    X.names = dimnames(X)[[2]]
+    if (is.null(X.names))
+    {
+        X.names = paste("X", 1:ncol(X), sep = "")
+        dimnames(X)[[2]] = X.names
+    }
+    
+    ind.names = dimnames(X)[[1]]
+    if (is.null(ind.names))
+    {
+        ind.names = 1:nrow(X)
+        rownames(X)  = ind.names
+    }
+    
+    if (length(unique(rownames(X))) != nrow(X))
+    stop("samples should have a unique identifier/rowname")
+    if (length(unique(X.names)) != ncol(X))
+    stop("Unique indentifier is needed for the columns of X")
+
+
     #-- end checking --#
     #------------------#
     
@@ -203,7 +220,7 @@ cpus
     # we can do logratio and multilevel on the whole data as these transformation are done per sample
     X = logratio.transfo(X = X, logratio = logratio)
     
-    if (!is.null(multilevel) & logratio == "none") # if no logratio, we can do multilevel on the whole data; otherwise it needs to be done after each logratio inside the CV
+    if (!is.null(multilevel)) # logratio is applied per sample, multilevel as well, so both can be done on the whole data
     {
 
         Xw = withinVariation(X, design = multilevel)
@@ -216,27 +233,35 @@ cpus
         
         Y = as.factor(Y)
     }
-    #-- multilevel approach ----------------------------------------------------#
-    #---------------------------------------------------------------------------#
-
-
-    #-- cross-validation approach  ---------------------------------------------#
+    #-- logration + multilevel approach ----------------------------------------#
     #---------------------------------------------------------------------------#
     
+    
+    #---------------------------------------------------------------------------#
+    #-- NA calculation      ----------------------------------------------------#
+    
+    misdata = c(X=anyNA(X), Y=FALSE) # Detection of missing data. we assume no missing values in the factor Y
+    
+    if (any(misdata))
+    {
+        is.na.A = is.na(X)
+        
+        ind.NA = which(apply(is.na.A, 1, sum) > 0) # calculated only once
+    } else {
+        is.na.A = NULL
+        ind.NA = NULL
+    }
+    #-- NA calculation      ----------------------------------------------------#
+    #---------------------------------------------------------------------------#
+
+
+
     test.keepX = sort(test.keepX) #sort test.keepX so as to be sure to chose the smallest in case of several minimum
     names(test.keepX) = test.keepX
     # if some components have already been tuned (eg comp1 and comp2), we're only tuning the following ones (comp3 comp4 .. ncomp)
     if ((!is.null(already.tested.X)))
     {
         comp.real = (length(already.tested.X) + 1):ncomp
-        #check and match already.tested.X to X
-        if(constraint == TRUE)
-        {
-            already.tested.X = get.keepA.and.keepA.constraint (X = list(X=X), keepX.constraint = list(X=already.tested.X), ncomp = length(already.tested.X))$keepA.constraint$X
-            #transform already.tested.X to characters
-            already.tested.X = relist(colnames(X), skeleton = already.tested.X)
-        }
-
     } else {
         comp.real = 1:ncomp
     }
@@ -245,9 +270,6 @@ cpus
     choices = c("all", "max.dist", "centroids.dist", "mahalanobis.dist")
     dist = match.arg(dist, choices, several.ok = TRUE)
     
-    mat.error = matrix(nrow = length(test.keepX), ncol = nrepeat,
-    dimnames = list(test.keepX,c(paste('repeat', 1:nrepeat))))
-    rownames(mat.error) = test.keepX
     
     mat.error.rate = list()
     error.per.class = list()
@@ -255,13 +277,7 @@ cpus
     mat.sd.error = matrix(0,nrow = length(test.keepX), ncol = ncomp-length(already.tested.X),
     dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))
     mat.mean.error = matrix(nrow = length(test.keepX), ncol = ncomp-length(already.tested.X),
-    dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))
-
-    error.per.class.mean = matrix(nrow = nlevels(Y), ncol = ncomp-length(already.tested.X),
-        dimnames = list(c(levels(Y)), c(paste('comp', comp.real, sep=''))))
-    error.per.class.sd = matrix(0,nrow = nlevels(Y), ncol = ncomp-length(already.tested.X),
-        dimnames = list(c(levels(Y)), c(paste('comp', comp.real, sep=''))))
-        
+    dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))        
    
     # first: near zero var on the whole data set
     if(near.zero.var == TRUE)
@@ -301,10 +317,11 @@ cpus
             cat("\ncomp",comp.real[comp], "\n")
             
             result = MCVfold.splsda (X, Y, multilevel = multilevel, validation = validation, folds = folds, nrepeat = nrepeat, ncomp = 1 + length(already.tested.X),
-            choice.keepX = if(constraint){NULL}else{already.tested.X},
-            choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
-            test.keepX = test.keepX, measure = measure, dist = dist,
-            near.zero.var = near.zero.var, progressBar = progressBar, class.object = "splsda", max.iter = max.iter, auc = auc, cl = cl)
+            choice.keepX = already.tested.X,
+            test.keepX = test.keepX, measure = measure, dist = dist, scale=scale,
+            near.zero.var = near.zero.var, progressBar = progressBar, tol = tol, max.iter = max.iter, auc = auc,
+            cl = cl, parallel = parallel,
+            misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA, class.object="splsda")
             
             # in the following, there is [[1]] because 'tune' is working with only 1 distance and 'MCVfold.splsda' can work with multiple distances
             mat.error.rate[[comp]] = result[[measure]]$mat.error.rate[[1]]
@@ -318,16 +335,8 @@ cpus
 
 
             # best keepX
-            if(!constraint)
-            {
-                already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
-            } else {
-                fit = mixOmics::splsda(X, Y, ncomp = 1 + length(already.tested.X),
-                keepX.constraint = already.tested.X, keepX = result[[measure]]$keepX.opt[[1]], near.zero.var = near.zero.var, mode = "regression")
-                
-                already.tested.X[[paste("comp",comp.real[comp],sep="")]] = selectVar(fit, comp = 1 + length(already.tested.X))$name
-            }
-            
+            already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
+             
             if(light.output == FALSE)
             {
                 #prediction of each samples for each fold and each repeat, on each comp
@@ -356,7 +365,7 @@ cpus
         # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
         if(nrepeat > 2 & length(comp.real) >1)
         {
-            keepX = if(constraint){lapply(already.tested.X, length)}else{already.tested.X}
+            keepX = already.tested.X
             error.keepX = NULL
             for(comp in 1:length(comp.real))
             {
@@ -376,8 +385,7 @@ cpus
         error.rate = mat.mean.error,
         error.rate.sd = mat.sd.error,
         error.rate.all = mat.error.rate,
-        choice.keepX = if(constraint){sapply(already.tested.X, length)}else{already.tested.X},
-        #choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
+        choice.keepX = already.tested.X,
         choice.ncomp = list(ncomp = ncomp_opt, values = error.keepX),
         error.rate.class = error.per.class.keepX.opt.mean,
         error.rate.class.all = error.per.class.keepX.opt)

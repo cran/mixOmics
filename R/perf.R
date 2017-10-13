@@ -7,7 +7,7 @@
 #   Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
 #
 # created: 2015
-# last modified: 24-08-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2015
 #
@@ -82,7 +82,7 @@ progressBar = TRUE,
     }
     Y = object$Y
     
-    
+    scale = object$scale
     tol = object$tol
     max.iter = object$max.iter
     mode = object$mode
@@ -208,7 +208,7 @@ progressBar = TRUE,
                 if(any(keepX.temp > sum(nzv)))
                 keepX.temp[which(keepX.temp>sum(nzv))] = sum(nzv)
                 
-                spls.res = mixOmics::spls(X.train[,nzv], Y.train, ncomp = ncomp, mode = mode, max.iter = max.iter, tol = tol, keepX = keepX.temp, keepY = keepY, near.zero.var = FALSE)
+                spls.res = mixOmics::spls(X.train[,nzv], Y.train, ncomp = ncomp, mode = mode, max.iter = max.iter, tol = tol, keepX = keepX.temp, keepY = keepY, near.zero.var = FALSE, scale = scale)
                 Y.hat = predict(spls.res, X.test[,nzv, drop = FALSE])$predict
                 if(sum(is.na(Y.hat))>0) break
                 for (k in 1:ncomp)
@@ -378,36 +378,20 @@ cpus,
     multilevel = object$multilevel # repeated measurement and Y
     near.zero.var = !is.null(object$nzv) # if near.zero.var was used, we set it to TRUE. if not used, object$nzv is NULL
     
-    constraint = FALSE # kept in the code so far, will probably get remove later on
-    if(any(class(object) == "plsda") & constraint == TRUE)
-    {
-        constraint = FALSE #no need as all variable will be included
-        warning("'constraint' is set to FALSE as all variables are selected on all components (plsda object).")
-    }
     #-- tells which variables are selected in X and in Y --#
-    if(constraint)
+
+    #keepX.constraint = NULL
+    if (any(class(object) == "splsda"))
     {
-        keepX.constraint = apply(object$loadings$X, 2, function(x){names(which(x!=0))})
-        # gives a matrix of ncomp columns if same number of selected variables on each comp, I want a list of length ncomp
-        if(is.matrix(keepX.constraint))
-        {
-            keepX.constraint = split(keepX.constraint, rep(1:ncol(keepX.constraint), each = nrow(keepX.constraint)))
-            names(keepX.constraint) = paste("comp",1:length(keepX.constraint),sep="")
-        }
-        #keepX = NULL
+        keepX = object$keepX
     } else {
-        #keepX.constraint = NULL
-        if (any(class(object) == "splsda"))
-        {
-            keepX = object$keepX
-        } else {
-            keepX = rep(ncol(X), ncomp)
-        }
+        keepX = rep(ncol(X), ncomp)
     }
 
     tol = object$tol
     max.iter = object$max.iter
-    
+    scale = object$scale
+
     # initialize new objects:
     features = list()
     for(k in 1:ncomp)
@@ -497,8 +481,24 @@ cpus,
     }
     # and then we start from the X data set with the nzv removed
     
-
+    #---------------------------------------------------------------------------#
+    #-- NA calculation      ----------------------------------------------------#
     
+    misdata = c(X=anyNA(X), Y=FALSE) # Detection of missing data. we assume no missing values in the factor Y
+    
+    if (any(misdata))
+    {
+        is.na.A = is.na(X)
+        
+        ind.NA = which(apply(is.na.A, 1, sum) > 0) # calculated only once
+    } else {
+        is.na.A = NULL
+        ind.NA = NULL
+    }
+    #-- NA calculation      ----------------------------------------------------#
+    #---------------------------------------------------------------------------#
+
+
     list.features = list()
 
     mat.error.rate = mat.sd.error = mat.mean.error = error.per.class.keepX.opt = error.per.class.keepX.opt.mean = list()
@@ -545,36 +545,25 @@ cpus,
         if (progressBar == TRUE)
         cat("\ncomp",comp, "\n")
         
-        if(constraint)
+
+        if(comp > 1)
         {
-            
-            if(comp > 1)
-            {
-                choice.keepX.constraint = keepX.constraint[1 : (comp - 1)]
-            } else {
-                choice.keepX.constraint = NULL
-            }
-            test.keepX = keepX.constraint[comp]
-            #names(test.keepX) = test.keepX
-            #test.keepX is a vector a variables to keep on comp 'comp'
+            choice.keepX = keepX[1 : (comp - 1)]
         } else {
-            if(comp > 1)
-            {
-                choice.keepX = keepX[1 : (comp - 1)]
-            } else {
-                choice.keepX = NULL
-            }
-            test.keepX = keepX[comp]
-            names(test.keepX) = test.keepX
-            #test.keepX is a value
+           choice.keepX = NULL
         }
+        test.keepX = keepX[comp]
+        names(test.keepX) = test.keepX
+        #test.keepX is a value
+
 
         # estimate performance of the model for each component
         result = MCVfold.splsda (X, Y, multilevel = multilevel, validation = validation, folds = folds, nrepeat = nrepeat, ncomp = comp,
-        choice.keepX = if(constraint){NULL}else{choice.keepX},
-        #choice.keepX.constraint = if(constraint){choice.keepX.constraint}else{NULL},
-        test.keepX = test.keepX, measure = measure, dist = dist, near.zero.var = near.zero.var,
-        auc = auc, progressBar = progressBar, class.object = class(object), cl = cl)
+        choice.keepX = choice.keepX, test.keepX = test.keepX,
+        measure = measure, dist = dist, scale=scale,
+        near.zero.var = near.zero.var,
+        auc = auc, progressBar = progressBar, class.object = class(object), cl = cl, parallel = parallel,
+        misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA)
 
         # ---- extract stability of features ----- # NEW
         if (any(class(object) == "splsda"))

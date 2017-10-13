@@ -12,16 +12,14 @@ wrapper.rgcca(X,
     design = 1 - diag(length(X)),
     tau = rep(1, length(X)),
     ncomp = 1,
-    keepX.constraint,
     keepX,
     scheme = "horst",
     scale = TRUE,
-    bias = FALSE,
     init = "svd.single",
     tol = .Machine$double.eps,
-    verbose = FALSE,
     max.iter=1000,
-    near.zero.var = FALSE)
+    near.zero.var = FALSE,
+    all.outputs = TRUE)
 }
 
 \arguments{
@@ -31,18 +29,16 @@ wrapper.rgcca(X,
   each dimension using the Schafer and Strimmer (2005)
   analytical formula.}
 \item{ncomp}{the number of components to include in the model. Default to 1.}
-\item{keepX.constraint}{A list of same length as X. Each entry keepX.constraint[[i]] is a list containing which variables of X[[i]] are to be kept on each of the first PLS-components}
 \item{keepX}{ A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model on the last components (once all keepX.constraint[[i]] are used).}
   \item{scheme}{Either "horst", "factorial" or "centroid"
   (Default: "horst").}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances (default: TRUE)}
-\item{bias}{boleean. A logical value for biaised or unbiaised estimator of the var/cov (defaults to FALSE).}
 \item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single") . Default to "svd.single".}
 \item{tol}{Convergence stopping value.}
-\item{verbose}{if set to \code{TRUE}, reports progress on computing.}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations. Default value is FALSE}
+\item{all.outputs}{boolean. Computation can be faster when some specific (and non-essential) outputs are not calculated. Default = \code{TRUE}.}
 }
 
 
@@ -106,7 +102,7 @@ design = matrix(c(0,1,1,
 #note: the tau parameter is the regularization parameter
 wrap.result.rgcca = wrapper.rgcca(X = data, design = design, tau = c(1, 1, 0),
                                   ncomp = 2,
-                                  scheme = "centroid", verbose = FALSE)
+                                  scheme = "centroid")
 #wrap.result.rgcca
 }
 

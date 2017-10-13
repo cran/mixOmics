@@ -4,7 +4,7 @@
 #   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 15-04-2015
-# last modified: 12-04-2016
+# last modified: 04-10-2017
 #
 # Copyright (C) 2015
 #
@@ -41,12 +41,16 @@ explained_variance = function(data, variates, ncomp)
         warning("NA values put to zero, results will differ from PCA methods used with NIPALS")
         data[isna] = 0
     }
-    nor2x = sum((data)^2) # total variance in the data
+    nor2x <- sum((data)^2) # total variance in the data
+    
 	exp.varX = NULL
 	for (h in 1:ncomp)
 	{
-		temp = variates[, h] / drop(t(variates[, h]) %*% (variates[, h]))
-	    exp_var_new = as.numeric(t(variates[, h]) %*% data %*% t(data) %*% temp )/nor2x
+        a <- t(variates[, h, drop=FALSE]) %*% data
+        ta = t(a)
+        exp_var_new <- a%*%ta /crossprod(variates[, h],variates[, h])/nor2x
+
+
 	    exp.varX = append(exp.varX, exp_var_new)
 	
 	}

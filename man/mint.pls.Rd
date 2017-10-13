@@ -17,7 +17,8 @@ study,
 scale = TRUE,
 tol = 1e-06,
 max.iter = 100,
-near.zero.var = FALSE)
+near.zero.var = FALSE,
+all.outputs = TRUE)
 
 }
 
@@ -33,6 +34,7 @@ to zero means and unit variances. Default = \code{TRUE}.}
 \item{tol}{Convergence stopping value.}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Default = \code{FALSE}.}
+\item{all.outputs}{boolean. Computation can be faster when some specific (and non-essential) outputs are not calculated. Default = \code{TRUE}.}
 
 }
 

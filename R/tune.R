@@ -33,7 +33,7 @@
 tune = function (method, # choice of "spls", "splsda", "mint.splsda", "rcc", "pca"
 X,
 Y,
-multilevel,
+multilevel = NULL,
 ncomp,
 study, # mint.splsda
 test.keepX = c(5, 10, 15), # all but pca, rcc
@@ -109,55 +109,41 @@ light.output = TRUE # mint, splsda
         
         
     } else if (method == "splsda") {
-        if(missing(multilevel))
-        {
-            message("Calling 'tune.splsda'")
 
-            if (missing(ncomp))
-            ncomp = 1
-            
-            result = tune.splsda (X = X, Y = Y,
-            ncomp = ncomp,
-            test.keepX = test.keepX,
-            already.tested.X = already.tested.X,
-            validation = validation,
-            folds = folds,
-            dist = dist ,
-            measure = measure,
-            auc = auc,
-            progressBar = progressBar,
-            max.iter = max.iter,
-            near.zero.var = near.zero.var,
-            nrepeat = nrepeat,
-            logratio = logratio,
-            light.output = light.output)
-        } else {
-            message("Calling 'tune.multilevel' with method = 'splsda'")
-            if (missing(ncomp))
-            ncomp = 1
-            
-            result = tune.multilevel(X = X,
-            multilevel = multilevel,
-            ncomp = ncomp, test.keepX = test.keepX, dist = dist,
-            already.tested.X = already.tested.X,
-            validation = validation, folds = folds,
-            measure = measure, auc = auc,
-            progressBar = progressBar, near.zero.var = near.zero.var,
-            logratio = logratio, nrepeat = nrepeat)
-        }
+        message("Calling 'tune.splsda'")
+
+        if (missing(ncomp))
+        ncomp = 1
         
+        result = tune.splsda (X = X, Y = Y,
+        ncomp = ncomp,
+        test.keepX = test.keepX,
+        already.tested.X = already.tested.X,
+        validation = validation,
+        folds = folds,
+        dist = dist ,
+        measure = measure,
+        auc = auc,
+        progressBar = progressBar,
+        max.iter = max.iter,
+        near.zero.var = near.zero.var,
+        nrepeat = nrepeat,
+        logratio = logratio,
+        multilevel = multilevel,
+        light.output = light.output)
     } else if (method == "spls") {
         if(missing(multilevel))
         {
             stop("Only a multilevel spls can be tuned")
         } else {
-            message("Calling 'tune.multilevel' with method = 'spls'")
+            message("Calling 'tune.splslevel' with method = 'spls'")
 
             if (missing(ncomp))
             ncomp = 1
             if (missing(already.tested.Y))
             already.tested.Y = NULL
-            result = tune.multilevel(X = X, Y = Y,
+            
+            result = tune.splslevel(X = X, Y = Y,
             multilevel = multilevel,
             mode = mode,
             ncomp = ncomp, test.keepX = test.keepX, test.keepY = test.keepY,

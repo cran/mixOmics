@@ -1,12 +1,12 @@
 #############################################################################################################
 # Authors:
+#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #   Kim-Anh Le Cao, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #   Benoit Gautier, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #   Francois Bartolo, Institut National des Sciences Appliquees et Institut de Mathematiques, Universite de Toulouse et CNRS (UMR 5219), France
-#   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 2013
-# last modified: 24-08-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2013
 #
@@ -30,20 +30,29 @@
 # tune.splsda: chose the optimal number of parameters per component on a splsda method
 # ========================================================================================================
 
-# X: numeric matrix of predictors
-# Y: a factor or a class vector for the discrete outcome
-# ncomp: the number of components to include in the model. Default to 1.
-# test.keepX: grid of keepX among which to chose the optimal one
-# already.tested.X: a vector giving keepX on the components that were already tuned
+# X: a list of data sets (called 'blocks') matching on the same samples. Data in the list should be arranged in samples x variables, with samples order matching in all data sets. \code{NA}s are not allowed.
+# Y: a factor or a class vector for the discrete outcome.
+# indY: to supply if Y is missing, indicate the position of the outcome in the list X.
+# ncomp: numeric vector of length the number of blocks in \code{X}. The number of components to include in the model for each block (does not necessarily need to take the same value for each block). By default set to 2 per block.
+# test.keepX: list of length, length(X). each test.keepX[[i]] is a grid of keepX among which to chose the optimal one
+# already.tested.X: list of length, length(X). Each already.tested.X[[i]] is a vector giving the keepX on the components that were already tuned
 # validation: Mfold or loo cross validation
 # folds: if validation=Mfold, how many folds?
 # dist: distance to classify samples. see predict
 # measure: one of c("overall","BER"). Accuracy measure used in the cross validation processs
+# weighted: optimise the weighted or not-weighted prediction
 # progressBar: show progress,
+# tol: Convergence stopping value.
+# max.iter: integer, the maximum number of iterations.
 # near.zero.var: boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations
 # nrepeat: number of replication of the Mfold process
-# logratio = c('none','CLR'). see splsda
-# verbose: if TRUE, shows component and nrepeat being tested.
+# design: the input design.
+# scheme: the input scheme, one of "horst", "factorial" or ""centroid". Default to "centroid"
+# scale: boleean. If scale = TRUE, each block is standardized to zero means and unit variances (default: TRUE).
+# init: intialisation of the algorithm, one of "svd" or "svd.single". Default to "svd"
+# light.output: if FALSE, output the classification of each sample during each folds, on each comp, for each repeat
+# cpus: number of cpus to use. default to no parallel
+# name.save: if saving a file after each component
 
 
 tune.block.splsda = function (
@@ -59,17 +68,14 @@ dist = "max.dist",
 measure = "BER", # one of c("overall","BER")
 weighted = TRUE, # optimise the weighted or not-weighted prediction
 progressBar = TRUE,
+tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
 nrepeat = 1,
 design,
-scheme,
-mode,
+scheme= "horst",
 scale = TRUE,
-bias,
-init ,
-tol = 1e-06,
-verbose,
+init = "svd",
 light.output = TRUE, # if FALSE, output the prediction and classification of each sample during each folds, on each comp, for each repeat
 cpus,
 name.save = NULL)
@@ -141,52 +147,27 @@ name.save = NULL)
     
     #-- measure
     measure.input = measure
-    if(measure == "BER")
-    {
-        measure = "Overall.BER"
-    } else if (measure == "overall"){
-        measure = "Overall.ER"
-    } else {
-        stop("'measure' must be 'overall' or 'BER'")
-    }
+    if(! measure %in% c("overall", "BER"))
+    stop("'measure' must be 'overall' or 'BER'")
     
     
     #-- already.tested.X
-    constraint = FALSE # kept in the code so far, will probably get remove later on
-    #if TRUE, expect a list in already.tested.X, otherwise a number(keepX)
 
     if (missing(already.tested.X))
     {
-        if(constraint == TRUE)
-        {
-            already.tested.X = list()
-        } else {
-            already.tested.X = NULL
-        }
+        already.tested.X = NULL
     } else {
-        if(!is.list(already.tested.X))
-        stop("'already.tested.X' must be a list, each entry corresponding to a block of X (Y excluded)")
-        
-        if(is.null(already.tested.X) | length(already.tested.X)==0)
-        stop("'already.tested.X' must be a vector of keepX values (if 'constraint'= FALSE) or a list (if'constraint'= TRUE) ")
+
+        if(is.null(already.tested.X))
+        stop("'already.tested.X' must be a vector of keepX values ")
         
         # we require the same number of already tuned components on each block
         if(length(unique(sapply(already.tested.X, length))) > 1)
         stop("The same number of components must be already tuned for each block, in 'already.tested.X'")
         
-        
-        if(constraint == TRUE)
-        {
-            if(any(sapply(already.tested.X, function(x) is.list(x))) != TRUE)
-            stop(" Each entry of 'already.tested.X' must be a list since 'constraint' is set to TRUE")
-            
-            #print(paste("A total of",lapply(already.tested.X, function(x){sapply(x,length)}),collapse=" "),"specific variables ('already.tested.X') were selected on the first ", length(already.tested.X[[1]]), "component(s)"))
-        } else {
-            if(any(sapply(already.tested.X, function(x) is.list(x))) == TRUE)
-            stop(" Each entry of 'already.tested.X' must be a vector of keepX values")# since 'constraint' is set to FALSE")
-            
-            #print(paste("Number of variables selected on the first", length(already.tested.X), "component(s):", paste(already.tested.X,collapse = " ")))
-        }
+        if(any(sapply(already.tested.X, function(x) is.list(x))) == TRUE)
+        stop(" Each entry of 'already.tested.X' must be a vector of keepX values")
+
         if(length(already.tested.X[[1]]) >= ncomp)
         stop("'ncomp' needs to be higher than the number of components already tuned, which is length(already.tested.X)=",length(already.tested.X) , call. = FALSE)
     }
@@ -225,37 +206,42 @@ name.save = NULL)
     } else {
         parallel = TRUE
         if(progressBar == TRUE)
-        message(paste("As code is running in parallel, the progressBar will only show 100% upon completion of each component.",sep=""))
+        message(paste("As code is running in parallel, the progressBar will only show 100% upon completion of each nrepeat/ component.",sep=""))
 
     }
     
-    if(weighted == TRUE)
-    {
-        perfo = paste0("WeightedVote.error.rate.",dist)
-    } else {
-        perfo = paste0("MajorityVote.error.rate.",dist)
-    }
     #-- end checking --#
     #------------------#
     
-    test.keepX = lapply(test.keepX,sort) #sort test.keepX so as to be sure to chose the smallest in case of several minimum
     
-    grid = expand.grid (test.keepX[length(test.keepX):1])[length(test.keepX):1] # each row is to be tested, the reordering is just a personal preference, works without it
+    #---------------------------------------------------------------------------#
+    #-- NA calculation      ----------------------------------------------------#
+    
+    misdata = c(sapply(X,anyNA), Y=FALSE) # Detection of missing data. we assume no missing values in the factor Y
+    
+    is.na.A = ind.NA = vector("list", length = length(X))
+    for(q in 1:length(X))
+    {
+        if(misdata[q])
+        {
+            is.na.A[[q]] = is.na(X[[q]])
+            ind.NA[[q]] = which(apply(is.na.A, 1, sum) > 0) # calculated only once
+        } else {
+            is.na.A[[q]] = NULL
+            ind.NA[[q]] = NULL
+        }
+    }
+
+    #-- NA calculation      ----------------------------------------------------#
+    #---------------------------------------------------------------------------#
+    
     
     # if some components have already been tuned (eg comp1 and comp2), we're only tuning the following ones (comp3 comp4 .. ncomp)
     if ((!is.null(already.tested.X)) & length(already.tested.X) > 0)
     {
         comp.real = (length(already.tested.X[[1]]) + 1):ncomp
         #check and match already.tested.X to X
-        if(constraint == TRUE & length(already.tested.X[[1]]) >0)
-        {
-            already.tested.X = get.keepA.and.keepA.constraint (X = X, keepX.constraint = already.tested.X, ncomp = rep(length(already.tested.X[[1]]), length(X)))$keepA.constraint
-            
-            # to get characters in already.tested.X
-            already.tested.X = lapply(1:length(already.tested.X), function(y){temp = lapply(1:length(already.tested.X[[y]]), function(x){colnames(X[[y]])[already.tested.X[[y]][[x]]]}); names(temp) = paste("comp", 1:length(already.tested.X[[1]]), sep=""); temp})
-            names(already.tested.X) = names(X)
-            
-        } else if(length(already.tested.X[[1]]) >0)
+        if(length(already.tested.X[[1]]) >0)
         {
             if(length(unique(names(already.tested.X)))!=length(already.tested.X) | sum(is.na(match(names(already.tested.X),names(X)))) > 0)
             stop("Each entry of 'already.tested.X' must have a unique name corresponding to a block of 'X'")
@@ -266,213 +252,141 @@ name.save = NULL)
         comp.real = 1:ncomp
     }
     
+    # near zero var on the whole data sets. It will be performed inside each fold as well
+    if(near.zero.var == TRUE)
+    {
+        nzv.A = lapply(X, nearZeroVar)
+        for(q in 1:length(X))
+        {
+            if (length(nzv.A[[q]]$Position) > 0)
+            {
+                names.remove.X = colnames(X[[q]])[nzv.A[[q]]$Position]
+                X[[q]] = X[[q]][, -nzv.A[[q]]$Position, drop=FALSE]
+                warning("Zero- or near-zero variance predictors.\n Reset predictors matrix to not near-zero variance predictors.\n See $nzv for problematic predictors.")
+                if (ncol(X[[q]]) == 0)
+                stop(paste0("No more variables in",X[[q]]))
+                
+                #need to check that the keepA[[q]] is now not higher than ncol(A[[q]])
+                if (any(test.keepX[[q]] > ncol(X[[q]])))
+                test.keepX[[q]][which(test.keepX[[q]] > ncol(X[[q]]))] = ncol(X[[q]])
+            }
+            
+        }
+    }
+    
     
     if (parallel == TRUE)
     {
         cl <- makeCluster(cpus, type = "SOCK")
         clusterEvalQ(cl, library(mixOmics))
-    }
-    
-    fonction.indice.grid = function(indice.grid, mode, design, scheme, bias, init, verbose){
-        test.keepX.comp = grid[indice.grid,]
-        
-        if(constraint == FALSE)
-        {
-            keepX.temp = lapply(1:length(X), function(x){c(already.tested.X[[x]],test.keepX.comp[[x]])})
-            names(keepX.temp) = names(X)
-        }
-        
-        # run block.splsda
-        model = suppressMessages(block.splsda(X = X, Y = Y, ncomp=comp.real[comp],
-        keepX.constraint = if(constraint){already.tested.X}else{NULL},
-        keepX = if(constraint){test.keepX.comp}else{keepX.temp},
-        design=design, scheme=scheme, mode=mode, scale=scale,
-        bias=bias, init=init, tol=tol, verbose=verbose, max.iter=max.iter, near.zero.var=near.zero.var))
-        
-        
-        # run perf on the model
-        cvPerf = lapply(1 : nrepeat, function(u){out = suppressMessages(perf(model, validation = validation, folds = folds, dist = dist));
-            if (progressBar ==  TRUE)
-            setTxtProgressBar(pb, ((indice.grid-1)*nrepeat+u)/(nrow(grid)*nrepeat))
-            out
-        })
-        names(cvPerf) = paste("nrepeat",1:nrepeat,sep="")
-        
-        # record results
-        ## Majority Vote
-        if(weighted == TRUE)
-        {
-            cvPerf2 = lapply(1 : nrepeat, function(x){unlist(cvPerf[[x]][names(cvPerf[[x]]) == "WeightedVote.error.rate"], recursive = FALSE)})
-            names(cvPerf2) = paste("nrepeat",1:nrepeat,sep="")
-        } else {
-            cvPerf2 = lapply(1 : nrepeat, function(x){unlist(cvPerf[[x]][names(cvPerf[[x]]) == "MajorityVote.error.rate"], recursive = FALSE)})
-            names(cvPerf2) = paste("nrepeat",1:nrepeat,sep="")
-        }
-
-
-    
-        setTxtProgressBar(pb, indice.grid/nrow(grid))
-        
-        return(cvPerf2)
-    }
+    } else{cl=NULL}
     
     
-    keepX = error.rate = mat.sd.error = NULL
+    N.test.keepX = nrow(expand.grid(test.keepX))
+    
+    mat.error.rate = list()
+    error.per.class = list()
+    
+    mat.sd.error = matrix(0,nrow = N.test.keepX, ncol = ncomp-length(already.tested.X[[1]]))#,
+    #    dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))
+    mat.mean.error = matrix(nrow = N.test.keepX, ncol = ncomp-length(already.tested.X[[1]]))#,
+    #dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))
+    
+    
     mat.error.rate = list()
     error.per.class.keepX.opt=list()
+    error.per.class.keepX.opt.mean = matrix(0, nrow = nlevels(Y), ncol = length(comp.real),
+    dimnames = list(c(levels(Y)), c(paste('comp', comp.real, sep=''))))
+
     error.opt.per.comp = matrix(nrow = nrepeat, ncol = length(comp.real), dimnames=list(paste("nrep",1:nrepeat,sep="."), paste("comp", comp.real, sep='')))
+    
+    if(light.output == FALSE)
+    prediction.all = class.all = list()
+
+
     # successively tune the components until ncomp: comp1, then comp2, ...
     for(comp in 1:length(comp.real))
     {
         if (progressBar == TRUE)
         cat("\ncomp",comp.real[comp], "\n")
         
-        #-- set up a progress bar --#
-        if (progressBar ==  TRUE)# & comp == 1)
-        {
-            pb = txtProgressBar(style = 3)
-            nBar = 1
-        }
+        result = MCVfold.block.splsda (X, Y, validation = validation, folds = folds, nrepeat = nrepeat, ncomp = 1 + length(already.tested.X[[1]]),
+        choice.keepX = already.tested.X, scheme = scheme, design=design, init=init, tol=tol,
+        test.keepX = test.keepX, measure = measure, dist = dist, scale=scale, weighted=weighted,
+        near.zero.var = near.zero.var, progressBar = progressBar, max.iter = max.iter, cl = cl,
+        misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA, parallel = parallel)
         
-        result.comp = matrix(nrow=nrow(grid),ncol=1)
-        error.mean = error.sd = mat.error.rate.keepX = NULL
-        error.per.class = array(0,c(nlevels(Y),nrepeat,nrow(grid)),dimnames = list(levels(Y), paste("nrep",1:nrepeat,sep=".")))
+        #returns error.rate for all test.keepX
+    
         
-
-        if (parallel == TRUE)
-        {
-            clusterExport(cl, c("block.splsda","perf"))
-            cvPerf3 = parLapply(cl, 1: nrow(grid), fonction.indice.grid)
-        } else {
-            cvPerf3 = lapply(1: nrow(grid), fonction.indice.grid)
-            
-        }
-        names(cvPerf3) = paste("indice.grid",1:nrow(grid),sep="")
+        # in the following, there is [[1]] because 'tune' is working with only 1 distance and 'MCVfold.block.splsda' can work with multiple distances
+        mat.error.rate[[comp]] = result[[measure]]$mat.error.rate[[1]]
+        mat.mean.error[, comp]=result[[measure]]$error.rate.mean[[1]]
+        if (!is.null(result[[measure]]$error.rate.sd[[1]]))
+        mat.sd.error[, comp]=result[[measure]]$error.rate.sd[[1]]
         
-
+        # confusion matrix for keepX.opt
+        error.per.class.keepX.opt[[comp]]=result[[measure]]$confusion[[1]]
+        error.per.class.keepX.opt.mean[, comp]=apply(result[[measure]]$confusion[[1]], 1, mean)
         
-        
-        for(indice.grid in 1 : nrow(grid))
-        {
-            # test.keepX.comp: keepX for each block on component "comp.real[comp]"
-            # already.tested.X: either keepX (constraint=FALSE) or keepX.constraint.temp (constraint=TRUE) for all block on components 1:(comp.real[comp]-1)
-            # keepX.temp: keepX for all block on all component 1:comp.real[comp], only used if constraint=FALSE
-            mat.error.rate.temp = simplify2array( lapply(cvPerf3[[indice.grid]], function(x) x[[perfo]][measure,comp])) # error over the nrepeat
-            mat.error.rate.keepX = rbind(mat.error.rate.keepX, mat.error.rate.temp)
-            
-            error.mean = c(error.mean, mean(mat.error.rate.temp))
-            error.per.class[, , indice.grid] = simplify2array(lapply(cvPerf3[[indice.grid]], function(x){ x[[perfo]][1:nlevels(Y),comp]}))
-            
-            if(nrepeat > 1)
-            error.sd = c(error.sd, apply(simplify2array(lapply(cvPerf3[[indice.grid]], function(x) x[[perfo]])), c(1,2), sd)[measure,comp])
-            
-            #if (progressBar ==  TRUE)
-            #setTxtProgressBar(pb, (indice.grid)/nrow(grid))
-            
-        }
-        
-        names(error.mean) = apply(grid,1,function(x){paste(x, collapse = "_")})
-        if(nrepeat > 1)
-        names(error.sd) = names(error.mean)
-        
-        min.error = min(error.mean)
-        min.keepX = names(which(error.mean == min.error)) # vector of all keepX combination that gives the minimum error
-        
-        a = strsplit(min.keepX,"_") # list of all keepX combination
-        a = lapply(a, as.numeric) # transform characters of keepX into numbers
-        
-        #transform keepX in percentage of variable per dataset, so we choose the minimal overall
-        p = sapply(X,ncol)
-        percent = sapply(a, function(x) sum(x/p))
-        ind.opt = which.min(percent) # we take only one
-        a = a[[ind.opt]]# vector of each optimal keepX for all block on component comp.real[comp]
+        # error rate for best keepX
+        error.opt.per.comp[,comp] = mat.error.rate[[comp]][result[[measure]]$ind.keepX.opt[[1]],]
         
         # best keepX
-        opt.keepX.comp = as.list(a)
-        names(opt.keepX.comp) = names(X)
+        already.tested.X = result[[measure]]$choice.keepX
         
-        error.per.class.keepX.opt[[comp]] = error.per.class[, , which.min(error.mean)] # error for the optimal keepXs
-        error.rate = cbind(error.rate, error.mean)
-        mat.sd.error = cbind(mat.sd.error, error.sd)
-        rownames(mat.error.rate.keepX) = rownames(error.rate)
-        mat.error.rate [[comp]] = mat.error.rate.keepX
-        
-        if(!constraint)
+        if(light.output == FALSE)
         {
-            # add the optimal keepX to already.tested.X
-            already.tested.X = lapply(1:length(X), function(x){c(already.tested.X[[x]],opt.keepX.comp[[x]])})
-            
-        } else {
-            # get the variables selected by the optimal keepX, and add them in already.tested.X
-            fit = suppressMessages(block.splsda(X = X, Y = Y, ncomp=comp.real[comp],
-            keepX.constraint = already.tested.X,
-            keepX = opt.keepX.comp,
-            design=design, scheme=scheme, mode=mode, scale=scale,
-            bias=bias, init=init, tol=tol, verbose=verbose, max.iter=max.iter, near.zero.var=near.zero.var))
-            
-            varselect = selectVar(fit, comp = comp.real[comp])
-            varselect = varselect[which(names(varselect) %in% names(X))]
-            
-            if(length(already.tested.X) == 0)
-            {
-                already.tested.X = lapply(1:length(X), function(x){already.tested.X[[x]] = list()})
-                already.tested.X = lapply(1:length(X),function(x){already.tested.X[[x]][[comp.real[comp]]] = list("comp1" = selectVar(fit, comp = 1)[[x]]$"name")})
-                
-            } else {
-                already.tested.X = lapply(1:length(X),function(x){already.tested.X[[x]] = c(already.tested.X[[x]], list(selectVar(fit, comp = comp.real[comp])[[x]]$"name")); names(already.tested.X[[x]]) = paste("comp",1:comp.real[comp],sep=""); return(already.tested.X[[x]])})
-            }
+            #prediction of each samples for each fold and each repeat, on each comp
+            class.all[[comp]] = result$class.comp[[1]]
+            #prediction.all[[comp]] = result$prediction.comp
         }
-        names(already.tested.X) = names(X)
-        
         
         # prepping the results and save a file, if necessary
         if(!is.null(name.save))
         {
-            colnames(error.rate) = paste("comp", comp.real[1:comp], sep='')
-            names(mat.error.rate) = c(paste('comp', comp.real[1:comp], sep=''))
-            mat.error.rate = lapply(mat.error.rate, function(x) {colnames(x) = paste("nrep",1:nrepeat,sep="."); rownames(x) = rownames(error.rate);x})
-            names(error.per.class.keepX.opt) = c(paste('comp', comp.real[1:comp], sep=''))
-            
+            rownames(mat.mean.error) = rownames(result[[measure]]$mat.error.rate[[1]])
+            colnames(mat.mean.error) = paste("comp", comp.real, sep='')
+            names(mat.error.rate) = c(paste("comp", comp.real[1:comp], sep=''))
+            names(error.per.class.keepX.opt) = c(paste("comp", comp.real[1:comp], sep=''))
             if(nrepeat > 1)
-            colnames(mat.sd.error) = paste("comp", comp.real[1:comp], sep='')
+            {
+                rownames(mat.sd.error) = rownames(result[[measure]]$mat.error.rate[[1]])
+                colnames(mat.sd.error) = paste("comp", comp.real, sep='')
+            }
             
             
             result = list(
-            error.rate = error.rate,
+            error.rate = mat.mean.error,
             error.rate.sd = mat.sd.error,
             error.rate.all = mat.error.rate,
-            choice.keepX = if(constraint){lapply(already.tested.X, function(x){sapply(x,length)})}else{already.tested.X},
-            #choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
+            choice.keepX = already.tested.X,
             error.rate.class = error.per.class.keepX.opt)
             
             result$measure = measure.input
             result$call = match.call()
             
             class(result) = "tune.block.splsda"
-        
+            
             save(result, file = paste0(name.save,".comp",comp.real[1],"to",comp.real[comp],".Rdata"))
         }
-        
-        if (progressBar ==  TRUE)
-        setTxtProgressBar(pb, 1)
-        #save(list=ls(),file="temp.Rdata")
-
-        error.opt.per.comp[,comp] = mat.error.rate[[comp]][min.keepX[ind.opt],]
 
     }
+    rownames(mat.mean.error) = rownames(result[[measure]]$mat.error.rate[[1]])
+    colnames(mat.mean.error) = paste("comp", comp.real, sep='')
+    names(mat.error.rate) = c(paste("comp", comp.real, sep=''))
+    names(error.per.class.keepX.opt) = c(paste("comp", comp.real, sep=''))
+    if(nrepeat > 1)
+    {
+        rownames(mat.sd.error) = rownames(result[[measure]]$mat.error.rate[[1]])
+        colnames(mat.sd.error) = paste("comp", comp.real, sep='')
+    }
+    
     #close the cluster after ncomp
     if (parallel == TRUE)
     stopCluster(cl)
     
     cat("\n")
-    
-    colnames(error.rate) = paste("comp", comp.real, sep='')
-    names(mat.error.rate) = c(paste('comp', comp.real, sep=''))
-    mat.error.rate = lapply(mat.error.rate, function(x) {colnames(x) = paste("nrep",1:nrepeat,sep="."); rownames(x) = rownames(error.rate);x})
-    names(error.per.class.keepX.opt) = c(paste('comp', comp.real, sep=''))
-    
-    if(nrepeat > 1)
-    colnames(mat.sd.error) = paste("comp", comp.real, sep='')
     
     
     # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
@@ -487,12 +401,11 @@ name.save = NULL)
 
 
     result = list(
-    error.rate = error.rate,
+    error.rate = mat.mean.error,
     error.rate.sd = mat.sd.error,
     error.rate.all = mat.error.rate,
-    choice.keepX = if(constraint){lapply(already.tested.X, function(x){sapply(x,length)})}else{already.tested.X},
+    choice.keepX = already.tested.X,
     choice.ncomp = list(ncomp = ncomp_opt, values = error.keepX),
-    #choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
     error.rate.class = error.per.class.keepX.opt)
     
     result$measure = measure.input

@@ -1,4 +1,24 @@
 
+Changes in 6.3.0 (faster! and bug fixes)
+================
+
+
+Enhancements:
+-------------
+- huge gain in computation time for the tune functions tune.splsda and tune.block.splsda. The larger the data, the bigger the gain. Requires new dependencies: ‘matrixStats’, ‘rARPACK’, ‘gridExtra’ 
+- a plot for an object `tune.block.splsda'
+- tune.multilevel function was deprecated a while ago and now removed.
+
+Bug fixes:
+----------
+- fixed reproducibility problem when using parallel coding in tune.block.splsda (via the `cpus' argument)
+- network: correlation with missing values fixed, label names fixed
+- fixed perf for block.splsda objects with prediction distances
+- some NA issues reported in 6.2.0 fixed (hopefully)
+
+
+
+
 Changes in 6.2.0 (improvements and bug fixes)
 ================
 

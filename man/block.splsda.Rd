@@ -14,18 +14,16 @@ block.splsda(X,
 Y,
 indY,
 ncomp = 2,
-keepX.constraint,
 keepX,
 design,
 scheme,
 mode,
 scale = TRUE,
-bias,
-init ,
+init = "svd",
 tol = 1e-06,
-verbose,
 max.iter = 100,
-near.zero.var = FALSE)
+near.zero.var = FALSE,
+all.outputs = TRUE)
 }
 
 \arguments{
@@ -33,7 +31,6 @@ near.zero.var = FALSE)
 \item{Y}{A factor or a class vector indicating the discrete outcome of each sample.}
 \item{indY}{To be supplied if Y is missing, indicates the position of the factor / class vector outcome in the list \code{X}}
 \item{ncomp}{the number of components to include in the model. Default to 2. Applies to all blocks.}
-\item{keepX.constraint}{A list of same length as X. Each entry indicates specific variables to be selected in each of the blocks of X for the first PLS-components. See details and example.}
 \item{keepX}{A list of same length as X.  Each entry is the number of variables to select in each of the blocks of X for each component. In the case where keepX.constraint is specified it should indicate the number of variables to select on the remaining components. By default all variables are kept in the model.}
 \item{design}{numeric matrix of size (number of blocks in X) x (number of blocks in X) with values between 0 and 1. Each value indicates the strenght of the relationship to be modelled between two blocks; a value of 0 indicates no relationship, 1 is the maximum value. If \code{Y} is provided instead of \code{indY}, the \code{design} matrix is changed to include relationships to \code{Y}. }
 \item{scheme}{Either "horst", "factorial" or "centroid". Default = \code{horst}, see reference.}
@@ -42,12 +39,11 @@ one of \code{"regression"}, \code{"canonical"}, \code{"invariant"} or \code{"cla
 See Details. Default = \code{regression}.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances. Default = \code{TRUE}.}
-\item{bias}{boleean. A logical value for biaised or unbiaised estimator of the var/cov. Default = \code{FALSE}.}
-\item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single"). Default = \code{svd.single}.}
+\item{init}{Mode of initialization use in the algorithm, either by Singular Value Decompostion of the product of each block of X with Y ("svd") or each block independently ("svd.single"). Default = \code{svd}.}
 \item{tol}{Convergence stopping value.}
-\item{verbose}{if set to \code{TRUE}, reports progress on computing.}
 \item{max.iter}{integer, the maximum number of iterations.}
 \item{near.zero.var}{boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Default = \code{FALSE}.}
+\item{all.outputs}{boolean. Computation can be faster when some specific (and non-essential) outputs are not calculated. Default = \code{TRUE}.}
 }
 
 
@@ -146,28 +142,6 @@ plotIndiv(TCGA.block.splsda, ind.names = FALSE)
 plotLoadings(TCGA.block.splsda, ncomp = 1, contrib = 'max')
 plotVar(TCGA.block.splsda, style = 'graphics', legend = TRUE)
 
-
-# block.splsda constraint
-# -------------
-# using the data and design from example above
-## we force the first PLS-component of X to be built with only a few variables
-# selected in the earlier example
-
-constraint.mrna.comp1 = c("EPHB3", "CBR1", "BSPRY")
-constraint.mirna.comp1  = c("hsa-mir-128-2", "hsa-mir-196b")
-constraint.prot.comp1  = c("Paxillin")
-
-TCGA.block.splsda.constraint = block.splsda(X = data, Y = breast.TCGA$data.train$subtype, ncomp = 2,
-keepX = list(mrna = 20, mirna = 20, protein = 10),
-keepX.constraint = list(mrna = list(constraint.mrna.comp1), mirna = list(constraint.mirna.comp1),
-protein =  list(constraint.prot.comp1)))
-
-# see if that subset contraint on comp 1 affected the variables selected in comp 2:
-intersect(selectVar(TCGA.block.splsda.constraint, comp = 2)$mrna$name,
-selectVar(TCGA.block.splsda, comp = 2)$mrna$name)
-
-# indices of the constraint variables on the first component
-TCGA.block.splsda.constraint$keepX.constraint
 }
 
 \keyword{regression}

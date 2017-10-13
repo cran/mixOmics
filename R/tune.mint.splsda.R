@@ -3,7 +3,7 @@
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 22-04-2016
-# last modified: 24-08-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2016
 #
@@ -109,28 +109,14 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     
     #if ((!is.null(already.tested.X)) && (length(already.tested.X) != (ncomp - 1)) )
     #stop("The number of already tested parameters should be NULL or ", ncomp - 1, " since you set ncomp = ", ncomp)
-    constraint = FALSE # kept in the code so far, will probably get removed later on
     if (missing(already.tested.X))
     {
-        if(constraint == TRUE)
-        {
-            already.tested.X = list()
-        } else {
-            already.tested.X = NULL
-        }
+        already.tested.X = NULL
     } else {
-        if(constraint == TRUE)
-        {
-            if(!is.list(already.tested.X))
-            stop("''already.tested.X' must be a list since 'constraint' is set to TRUE")
-            
-            message(paste("A total of",paste(lapply(already.tested.X,length),collapse=" and "),"specific variables ('already.tested.X') were selected on the first ", length(already.tested.X), "component(s)"))
-        } else {
             if(is.list(already.tested.X))
-            stop("''already.tested.X' must be a vector of keepX values since 'constraint' is set to FALSE")
+            stop("''already.tested.X' must be a vector of keepX values")
             
             message(paste("Number of variables selected on the first", length(already.tested.X), "component(s):", paste(already.tested.X,collapse = " ")))
-        }
     }
     if(length(already.tested.X) >= ncomp)
     stop("'ncomp' needs to be higher than the number of components already tuned, which is length(already.tested.X)=",length(already.tested.X) , call. = FALSE)
@@ -185,14 +171,6 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     if ((!is.null(already.tested.X)))
     {
         comp.real = (length(already.tested.X) + 1):ncomp
-        #check and match already.tested.X to X
-        if(constraint == TRUE)
-        {
-            already.tested.X = get.keepA.and.keepA.constraint (X = list(X=X), keepX.constraint = list(X=already.tested.X), ncomp = length(already.tested.X))$keepA.constraint$X
-            #transform already.tested.X to characters
-            already.tested.X = relist(colnames(X), skeleton = already.tested.X)
-        }
-        
     } else {
         comp.real = 1:ncomp
     }
@@ -232,10 +210,11 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
         cat("\ncomp",comp.real[comp], "\n")
         
         result = LOGOCV (X, Y, ncomp = 1 + length(already.tested.X), study = study,
-        choice.keepX = if(constraint){NULL}else{already.tested.X}, choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
+        choice.keepX = already.tested.X,
         test.keepX = test.keepX, measure = measure,
         dist = dist, near.zero.var = near.zero.var, progressBar = progressBar, scale = scale, max.iter = max.iter, auc = auc)
         
+
         # in the following, there is [[1]] because 'tune' is working with only 1 distance and 'MCVfold.splsda' can work with multiple distances
         mat.mean.error[, comp]=result[[measure]]$error.rate.mean[[1]]
         if (!is.null(result[[measure]]$error.rate.sd[[1]]))
@@ -245,16 +224,7 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
         error.per.class.keepX.opt[[comp]]=result[[measure]]$confusion[[1]]
         
         # best keepX
-        if(!constraint)
-        {
-            already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
-        } else {
-            fit = suppressWarnings(mint.splsda(X, Y, ncomp = 1 + length(already.tested.X), study = study,
-            keepX.constraint = already.tested.X, keepX = result[[measure]]$keepX.opt[[1]],
-            near.zero.var = near.zero.var, scale = scale))# suppress NA warnings from explained_variance
-            
-            already.tested.X[[comp.real[comp]]] = selectVar(fit, comp = 1 + length(already.tested.X))$name
-        }
+        already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
 
         # error per study for keepX.opt
         error.per.study.keepX.opt[,comp] = result[[measure]]$error.per.study.keepX.opt[[1]]
@@ -276,7 +246,7 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     cat('\n')
     
     # calculating the number of optimal component based on t.tests and the error.rate.all, if more than 3 error.rates(repeat>3)
-    if(nlevels(study) > 2 & length(comp.real) >1 & constraint == FALSE)
+    if(nlevels(study) > 2 & length(comp.real) >1)
     {
         opt = t.test.process(error.per.study.keepX.opt)
         ncomp_opt = comp.real[opt]
@@ -286,7 +256,7 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     
     result = list(
     error.rate = mat.mean.error,
-    choice.keepX = if(constraint){lapply(already.tested.X, length)}else{already.tested.X},
+    choice.keepX = already.tested.X,
     #choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
     choice.ncomp = list(ncomp = ncomp_opt, values = error.per.study.keepX.opt),
     error.rate.class = error.per.class.keepX.opt)

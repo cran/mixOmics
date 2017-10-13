@@ -12,7 +12,7 @@
 #   Florian Rohart, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 2009
-# last modified: 25-08-2016
+# last modified: 05-10-2017
 #
 # Copyright (C) 2009
 #
@@ -767,9 +767,8 @@ print.tune.splsda = function(x, ...)
     cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
     cat(" Main numerical outputs: \n",
     "-------------------- \n")
-    cat(" Optimal keepX for each component, if 'constraint=FALSE': see object$choice.keepX \n")
-    cat(" Optimal keepX.constraint for each component, if 'constraint=TRUE': see object$choice.keepX.constraint \n")
-    cat(" Optimal number of components: see object$choice.ncomp \n")    
+    cat(" Optimal keepX for each component, see object$choice.keepX \n")
+    cat(" Optimal number of components: see object$choice.ncomp \n")
     cat(" Error rate for each tested keepX and for each component (averaged over the nrepeat, mean and standard deviation): see object$error.rate and object$error.rate.sd  \n")
     cat(" Error rate for each tested keepX, for each component and for each repeat: see object$error.rate.all \n")
     cat(" Error rate per class obtained with the optimal keepX, for each component and for each nrepeat: see object$error.rate.class \n")
@@ -786,10 +785,9 @@ print.tune.mint.splsda = function(x, ...)
     cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
     cat(" Main numerical outputs: \n",
     "-------------------- \n")
-    cat(" Optimal keepX for each component, if 'constraint=FALSE': see object$choice.keepX \n")
-    cat(" Optimal keepX.constraint for each component, if 'constraint=TRUE': see object$choice.keepX.constraint \n")
+    cat(" Optimal keepX for each component, see object$choice.keepX \n")
     cat(" Error rate for each tested keepX and for each component: see object$error.rate \n")
-    cat(" Error rate per class obtained with the optimal keepX.constraint, for each component: see object$error.rate.class \n\n")
+    cat(" Error rate per class obtained with the optimal keepX, for each component: see object$error.rate.class \n\n")
     
     cat(" Other outputs available, see ?tune.mint.splsda \n\n")
 
@@ -802,8 +800,7 @@ print.tune.block.splsda = function(x, ...)
     cat("\nCall:\n", deparse(x$call, width.cutoff = 500), "\n\n")
     cat(" Main numerical outputs: \n",
     "-------------------- \n")
-    cat(" Optimal keepX for each component, if 'constraint=FALSE': see object$choice.keepX \n")
-    cat(" Optimal keepX.constraint for each component, if 'constraint=TRUE': see object$choice.keepX.constraint \n")
+    cat(" Optimal keepX for each component, see object$choice.keepX \n")
     cat(" Error rate for each tested keepX and for each component (averaged over the nrepeat): see object$error.rate \n")
     cat(" Error rate for each tested keepX, for each component and for each repeat: see object$error.rate.all \n")
     cat(" Error rate per class obtained with the optimal keepX, for each component and for each nrepeat: see object$error.rate.class \n\n")

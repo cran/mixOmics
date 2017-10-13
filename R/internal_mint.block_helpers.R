@@ -5,7 +5,7 @@
 #   Benoit Gautier, The University of Queensland, The University of Queensland Diamantina Institute, Translational Research Institute, Brisbane, QLD
 #
 # created: 22-04-2015
-# last modified: 12-04-2016
+# last modified: 04-10-2017
 #
 # Copyright (C) 2015
 #
@@ -75,20 +75,24 @@ study_split = function(data, study)
     P = ncol(data)
     
     #---------------------- split data
-    data.list.study = split(data,study)
-    if (!is.null(rownames(data)))
-    study.name = split(rownames(data),study)
-    
-    for(m in 1:M)
+    if(M>1)
     {
-        data.list.study[[m]] = matrix(data.list.study[[m]], ncol=P)
-        
-        if (!is.null(colnames(data)))
-        colnames(data.list.study[[m]]) = colnames(data)
-        
+        data.list.study = split(data,study)
         if (!is.null(rownames(data)))
-        rownames(data.list.study[[m]]) = study.name[[m]]
+        {
+            study.name = split(rownames(data),study)
+        } else {
+            study.name=NULL
+        }
+        
+        for(m in 1:M)
+        data.list.study[[m]] = matrix(data.list.study[[m]], ncol=P, dimnames = list(study.name[[m]], colnames(data)))
+        
+    } else {
+        data.list.study = list(matrix(data, ncol=P,dimnames = list(rownames(data), colnames(data))))
+        names(data.list.study) = levels(study)
     }
+    
     result = data.list.study
     return(invisible(result))
 }
@@ -163,13 +167,10 @@ norm2 = function(vec)
 # --------------------------------------
 # sparsity function: used in 'internal_mint.block.R'
 # --------------------------------------
-sparsity=function(loadings.A, keepA, keepA.constraint=NULL, penalty=NULL)
+sparsity=function(loadings.A, keepA, penalty=NULL)
 {
     
-    if (!is.null(keepA.constraint))
-    {
-        loadings.A[-keepA.constraint] = 0
-    } else if (!is.null(keepA)) {
+    if (!is.null(keepA)) {
         nx = length(loadings.A) - keepA
         loadings.A = soft_thresholding_L1(loadings.A, nx = nx)
     } else if (!is.null(penalty)) {
@@ -184,24 +185,48 @@ sparsity=function(loadings.A, keepA, keepA.constraint=NULL, penalty=NULL)
 # --------------------------------------
 # scaling with or without bias: used in mean_centering_per_study (below)
 # --------------------------------------
-scale.function=function(temp, scale = TRUE, bias = FALSE)
+scale.function_old=function(temp, scale = TRUE) # problem: divide by n instead of n-#NA
 {
     meanX = colMeans(temp, na.rm = TRUE)
     data.list.study.scale_i = t(t(temp) - meanX)
     if (scale)
     {
-        if (bias)
-        {
-            sqrt.sdX = sqrt(colSums(data.list.study.scale_i^2, na.rm = TRUE) / (nrow(temp)))
-        } else {
-            sqrt.sdX = sqrt(colSums(data.list.study.scale_i^2, na.rm = TRUE) / (nrow(temp) - 1))
-        }
+        sqrt.sdX = sqrt(colSums(data.list.study.scale_i^2, na.rm = TRUE) / (nrow(temp) - 1))
         data.list.study.scale_i = t(t(data.list.study.scale_i) / sqrt.sdX)
     } else {
         sqrt.sdX = NULL
     }
     
-    is.na.data = is.na(data.list.study.scale_i)
+    #is.na.data = is.na(data.list.study.scale_i)
+    #if (sum(is.na.data) > 0)
+    #data.list.study.scale_i[is.na.data] = 0
+    
+    out = list(data_scale=data.list.study.scale_i, meanX=meanX, sqrt.sdX=sqrt.sdX)
+    return(out)
+}
+
+# --------------------------------------
+# scaling, using colSds from library(matrixStats), used in mean_centering_per_study (below)
+# --------------------------------------
+scale.function=function(temp, scale = TRUE)
+{
+    meanX = colMeans(temp, na.rm = TRUE)
+    
+    if (scale)
+    {
+        sqrt.sdX = colSds(temp, center = meanX, na.rm=TRUE)
+        data.list.study.scale_i = t( (t(temp)-meanX) / sqrt.sdX)
+        
+        ind = which(sqrt.sdX == 0) # scaling can creates NA
+        if(length(ind) >0)
+        data.list.study.scale_i[,ind] = 0
+        
+    } else {
+        sqrt.sdX = NULL
+        data.list.study.scale_i = t( (t(temp)-meanX))
+    }
+    
+    #is.na.data = is.na(data.list.study.scale_i)
     #if (sum(is.na.data) > 0)
     #data.list.study.scale_i[is.na.data] = 0
     
@@ -212,7 +237,7 @@ scale.function=function(temp, scale = TRUE, bias = FALSE)
 # --------------------------------------
 # Mean centering/scaling per study: used in 'internal_mint.block.R'
 # --------------------------------------
-mean_centering_per_study=function(data, study, scale, bias=FALSE)
+mean_centering_per_study=function(data, study, scale)
 {
     
     M = length(levels(study))   # number of groups
@@ -220,19 +245,24 @@ mean_centering_per_study=function(data, study, scale, bias=FALSE)
     data.list.study = study_split(data, study)
 
     # center and scale data per group, and concatene the data
-    res = lapply(data.list.study, scale.function, scale = scale, bias = bias)
-    concat.data = do.call("rbind", lapply(res,function(x){x[[1]]}))
+    res = lapply(data.list.study, scale.function, scale = scale)
+    
     meanX = lapply(res, function(x){x[[2]]})
     sqrt.sdX = lapply(res, function(x){x[[3]]})
     rownames.study = lapply(res, function(x){rownames(x[[1]])})
 
     #rename rows and cols of concatenated centered (and/or scaled) data
-    colnames(concat.data) = colnames(data)
+    #colnames(concat.data) = colnames(data) #already done
     
     #sort the samples as in the original X
-    indice.match = match(rownames(data),rownames(concat.data))
-    concat.data = concat.data[indice.match, ,drop=FALSE]
-    
+    if(M>1) # otherwise already same order
+    {
+        concat.data = do.call("rbind", lapply(res,function(x){x[[1]]}))
+        indice.match = match(rownames(data),rownames(concat.data))
+        concat.data = concat.data[indice.match, ,drop=FALSE]
+    } else{
+        concat.data = res[[1]][[1]]
+    }
     if (M > 1)
     {
         for (m in 1:M)
@@ -303,7 +333,7 @@ tau.estimate = function (x)
 # cov2() - Compute biased and unbiased covariance and variance estimates
 # ----------------------------------------------------------------------------------------------------------
 # used in 'internal_mint.block.R'
-cov2 = function (x, y = NULL, bias = TRUE) {
+cov2 = function (x, y = NULL, bias = FALSE) {
     n = NROW(x)
     if (is.null(y)) {
         x = as.matrix(x)
@@ -322,15 +352,6 @@ cov2 = function (x, y = NULL, bias = TRUE) {
     return(C)
 }
 
-# ----------------------------------------------------------------------------------------------------------
-# initsvd() - performs SVD on matrix X
-# ----------------------------------------------------------------------------------------------------------
-# used in 'internal_mint.block.R'
-initsvd = function (X) {
-    n = NROW(X)
-    p = NCOL(X)
-    ifelse(n >= p, return(svd(X, nu = 0, nv = 1)$v), return(svd(X, nu = 1, nv = 0)$u))
-}
 
 # ----------------------------------------------------------------------------------------------------------
 # miscrossprod() - Compute cross-product between vectors x and y
@@ -347,46 +368,74 @@ miscrossprod = function (x, y) {
 # deflation()
 # ----------------------------------------------------------------------------------------------------------
 # used in defl.select (below)
-deflation = function(X, y){
+deflation = function(X, y, misdata.q, is.na.A.q, ind.NA){
     # Computation of the residual matrix R
     # Computation of the vector p.
-    is.na.tX = is.na(t(X))
-    if (any(is.na.tX))
+    
+    #is.na.tX <- is.na(t(X))
+    #save(list=ls(),file="temp3.Rdata")
+    if (misdata.q)
     {
+        #is.na.tX = t(is.na.A.q)
         #p = apply(t(X),1,miscrossprod,y)/as.vector(crossprod(y))
         
         #variates.A[, q] =  apply(A[[q]], 1, miscrossprod, loadings.A[[q]])
-        A.temp = replace(t(X), is.na.tX, 0) # replace NA in A[[q]] by 0
-        variates.A.temp = A.temp %*% y
-        temp = drop(y) %o% rep(1, nrow(A.temp))
-        temp[(t(is.na.tX))] = 0
-        loadings.A.norm = crossprod(temp)
-        p = variates.A.temp / diag(loadings.A.norm)
+        #A.temp = replace(t(X), is.na.tX, 0) # replace NA in A[[q]] by 0
+        loadings.A.temp = crossprod(X, y)
+        #temp = drop(y) %o% rep(1, ncol(A.temp.q))
+        #temp[is.na.A.q] = 0
+        # we only want the diagonal, which is the norm of each column of temp
+        #loadings.A.norm = crossprod(temp)
+        #p = variates.A.temp / diag(loadings.A.norm)
+        
+        #d.loadings.A.norm = apply(temp,2, crossprod)
+        #only calculating the ones where there's a NA
+        d.loadings.A.norm = rep(crossprod(y), ncol(X))
+        #ind.NA = which(apply(is.na.A.q, 2, sum) == 1)
+        
+        
+        if(length(ind.NA)>0)
+        {
+            temp = drop(y) %o% rep(1, length(ind.NA))
+            temp[is.na.A.q[,ind.NA,drop=FALSE]] = 0
+            d.loadings.A.norm[ind.NA] = apply(temp,2, crossprod)
+        }
+        
+        p = loadings.A.temp / d.loadings.A.norm
         # we can have 0/0, so we put 0
         a = is.na(p)
         if (any(a))
         p[a] = 0
         
     } else {
-        p = t(X)%*%y/as.vector(crossprod(y))
+        p <- crossprod(X,y) / as.vector(crossprod(y))
     }
     
-    R = X - y%*%t(p)
+    R <- X - tcrossprod(y,p)
     return(list(p=p,R=R))
 }
+
 
 # ----------------------------------------------------------------------------------------------------------
 # defl.select() - computes residual matrices
 # ----------------------------------------------------------------------------------------------------------
 # used in 'internal_mint.block.R'
-defl.select = function(yy, rr, nncomp, nn, nbloc, indY = NULL, mode = "canonical", aa = NULL) { ### Start: Add new parameter for estimation classic mode
+defl.select = function(yy, rr, nncomp, nn, nbloc, indY = NULL, mode = "canonical", aa = NULL, misdata, is.na.A, ind.NA) { ### Start: Add new parameter for estimation classic mode
+    #save(list=ls(),file="temp2.Rdata")
     resdefl = NULL
     pdefl = NULL
     for (q in 1 : nbloc) {
+        # for each block we create missing data parameters to be passed to the deflation()
+        if(misdata[q])
+        {
+            is.na.A.q = is.na.A[[q]]
+        } else {
+            is.na.A.q = NULL
+        }
         ### Start: insertion of new deflations (See La regression PLS Theorie et pratique p204 (Chap 11))
         if ( nn <= nncomp[q] ) {
             if ((mode == "canonical") || (q != indY)) { #deflation of each block independently from the others, except indY
-                defltmp = deflation(rr[[q]], yy[ , q])
+                defltmp = deflation(rr[[q]], yy[ , q], misdata[q], is.na.A.q, ind.NA[[q]])
                 resdefl[[q]] = defltmp$R
                 pdefl[[q]]   = defltmp$p
             } else if (mode == "classic") {
@@ -396,7 +445,7 @@ defl.select = function(yy, rr, nncomp, nn, nbloc, indY = NULL, mode = "canonical
                 resdefl[[q]] = rr[[q]]
                 pdefl[[q]]   =  rep(0,NCOL(rr[[q]]))
             } else if (mode == "regression") {
-                resdefl[[q]] = Reduce("+", lapply(c(1:nbloc)[-q], function(x) {deflation(rr[[q]],yy[, x])$R}))/(nbloc-1)
+                resdefl[[q]] = Reduce("+", lapply(c(1:nbloc)[-q], function(x) {deflation(rr[[q]],yy[, x], misdata[q], is.na.A.q, ind.NA[[q]])$R}))/(nbloc-1)
                 pdefl[[q]]   =  rep(0,NCOL(rr[[q]]))
             }
             ### End: insertion of new deflations
@@ -410,4 +459,64 @@ defl.select = function(yy, rr, nncomp, nn, nbloc, indY = NULL, mode = "canonical
     return(list(resdefl=resdefl,pdefl=pdefl))
 }
 
+# ----------------------------------------------------------------------------------------------------------
+# initsvd() - performs SVD on matrix X
+# ----------------------------------------------------------------------------------------------------------
+# used in 'internal_mint.block.R'
+initsvd = function (X) {
+    n = NROW(X)
+    p = NCOL(X)
+    
+    if(p>3) #use svds
+    {
+        ifelse(n >= p, return(svds(X, k=1, nu = 1, nv = 1)$v), return(svds(X, k=1, nu = 1, nv = 1)$u))
+        
+    } else {
+        ifelse(n >= p, return(svd(X, nu = 0, nv = 1)$v), return(svd(X, nu = 1, nv = 0)$u))
+        
+    }
+}
+
+# ----------------------------------------------------------------------------------------------------------
+# init svd
+# ----------------------------------------------------------------------------------------------------------
+initialisation_by_svd = function(A, indY = NULL, misdata, is.na.A = NULL, init = "svd")
+{
+    
+    J = length(A)
+    loadings.A = vector("list",length=J)
+    
+    if (init == "svd")
+    {
+        
+        # same step with or without NA, as they are already replaced by 0
+        M = lapply(c(1:J)[-indY], function(x){crossprod(A[[x]], A[[indY]])})
+        #ssvd faster with svds, only if more than 3 column, otherwise break down
+        svd.M = lapply(M, function(x){if(ncol(x)>3) {svds(x, k=1, nu = 1, nv = 1)} else {svd(x, nu = 1, nv = 1)}})
+        
+        loadings.A[c(1:J)[-indY]] = lapply(c(1:J)[-indY], function(x){svd.M[[x]]$u})
+        loadings.A[[indY]] = svd.M[[1]]$v
+        
+    } else if (init=="svd.single") {
+        
+        alpha =  lapply(1 : J, function(y){initsvd(A[[y]])})
+
+        for (j in 1:J)
+        {
+            if (nrow(A[[j]]) >= ncol(A[[j]]))
+            {
+                loadings.A[[j]] = alpha[[j]]
+            } else {
+                alpha[[j]] = drop(1/sqrt( t(alpha[[j]]) %*% A[[j]] %*% (t(A[[j]]) %*% alpha[[j]]))) * alpha[[j]]
+                
+                loadings.A[[j]] = crossprod(A[[j]],alpha[[j]])
+            }
+        }
+    } else {
+        stop("init should be either 'svd' or 'svd.single'.")
+    }
+
+    return(loadings.A)
+
+}
 

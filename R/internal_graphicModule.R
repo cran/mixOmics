@@ -398,7 +398,7 @@ background = NULL)
     if (style=="lattice")
     {
         #-- Start: Lattice
-        p = xyplot(y ~ x | Block, data = df, xlab = list(label=X.label,cex=size.xlabel), ylab = list(label=X.label,cex=size.ylabel),
+        p = xyplot(y ~ x | Block, data = df, xlab = list(label=X.label,cex=size.xlabel), ylab = list(label=Y.label,cex=size.ylabel),
         main = list(label = title, cex = size.title), as.table = TRUE, #as.table plot in order
         groups = if (display.names) {names} else {group},
         scales= list(x = list(relation = "free", limits = xlim,cex=size.axis),

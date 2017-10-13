@@ -276,9 +276,7 @@ Y = Y,
 design = design,
 keepX = list(gene = c(10,10), lipid = c(15,15)),
 ncomp = 2,
-scheme = "centroid",
-verbose = FALSE,
-bias = FALSE)
+scheme = "centroid")
 
 plotLoadings(nutrimouse.sgccda,block=2)
 plotLoadings(nutrimouse.sgccda,block="gene")
