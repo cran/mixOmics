@@ -396,7 +396,7 @@ deflation = function(X, y, misdata.q, is.na.A.q, ind.NA){
         
         if(length(ind.NA)>0)
         {
-            temp = drop(y) %o% rep(1, length(ind.NA))
+            temp = drop(y) %o% rep(1, length(ind.NA)) # should be n*p, but we limit it to n* where there's NA
             temp[is.na.A.q[,ind.NA,drop=FALSE]] = 0
             d.loadings.A.norm[ind.NA] = apply(temp,2, crossprod)
         }

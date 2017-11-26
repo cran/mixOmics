@@ -98,17 +98,20 @@ sd = TRUE,
 model, laid out in a multi panel display.  It uses \code{\link{xyplot}} for
 performing the actual plotting.
 
-More details about the prediction distances in \code{?predict} and the referred publication.
+More details about the prediction distances in \code{?predict} and the supplemental material of the mixOmics article (Rohart et al. 2017).
+
 }
 
 
 \references{
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 }
 
 
 
-\author{Ignacio Gonzalez, Florian Rohart, Francois Bartolo, Kim-Anh Le Cao.}
+\author{Ignacio González, Florian Rohart, Francois Bartolo, Kim-Anh Lê Cao.}
 
 \seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}}, 
 \code{\link{perf}}.}

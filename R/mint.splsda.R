@@ -35,7 +35,7 @@
 # ncomp: the number of components to include in the model. Default to 2.
 # mode: input mode, one of "canonical", "classic", "invariant" or "regression". Default to "regression"
 # study: grouping factor indicating which samples are from the same study
-# keepX: number of \eqn{X} variables kept in the model on the last components (once all keepX.constraint[[i]] are used).
+# keepX: number of \eqn{X} variables kept in the model on the last components.
 # scale: boleean. If scale = TRUE, each block is standardized to zero means and unit variances (default: TRUE).
 # tol: Convergence stopping value.
 # max.iter: integer, the maximum number of iterations.

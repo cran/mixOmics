@@ -33,7 +33,7 @@ LOGOCV = function(X,
 Y,
 ncomp,
 study,
-choice.keepX = NULL, #either choice.keepX or choice.keepX.constraint, not both
+choice.keepX = NULL,
 test.keepX = c(5, 10, 15),
 dist = "max.dist",
 measure = c("BER"), # one of c("overall","BER")

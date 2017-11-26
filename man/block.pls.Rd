@@ -85,7 +85,7 @@ Generalized Canonical Correlation Analysis,
 Psychometrika, Vol. 76, Nr 2, pp 257-284.
 }
 
-\author{Florian Rohart, Benoit Gautier, Kim-Anh Le Cao}
+\author{Florian Rohart, Benoit Gautier, Kim-Anh Lê Cao}
 
 \seealso{\code{\link{plotIndiv}}, \code{\link{plotArrow}}, \code{\link{plotLoadings}}, \code{\link{plotVar}}, \code{\link{predict}}, \code{\link{perf}}, \code{\link{selectVar}}, \code{\link{block.spls}}, \code{\link{block.plsda}} and http://www.mixOmics.org for more details.}
 

@@ -10,7 +10,7 @@
 
 \description{
 Display relevance associations network for (regularized) canonical correlation analysis
-and (sparse) PLS regression. The function avoids the intensive computation of Pearson correlation matrices on large data set by calculating instead a pair-wise similarity matrix directly obtained from the latent components of our integrative approaches (CCA, PLS, block.pls methods). The similarity value between a pair of variables is obtained by calculating the sum of the correlations between the original variables and each of the latent components of the model. The values in the similarity matrix can be seen as a robust approximation of the Pearson correlation (see Gonzalez et al. 2012 for a mathematical demonstration and exact formula). The advantage of relevance networks is their ability to simultaneously represent positive and negative correlations, which are missed by methods based on Euclidian distances or mutual information. Those networks are bipartite and thus only a link between two variables of different types can be represented. The network can be saved in a .glm format using the \code{igraph} package, the function \code{write.graph} and extracting the output \code{object$gR}, see details.
+and (sparse) PLS regression. The function avoids the intensive computation of Pearson correlation matrices on large data set by calculating instead a pair-wise similarity matrix directly obtained from the latent components of our integrative approaches (CCA, PLS, block.pls methods). The similarity value between a pair of variables is obtained by calculating the sum of the correlations between the original variables and each of the latent components of the model. The values in the similarity matrix can be seen as a robust approximation of the Pearson correlation (see González et al. 2012 for a mathematical demonstration and exact formula). The advantage of relevance networks is their ability to simultaneously represent positive and negative correlations, which are missed by methods based on Euclidean distances or mutual information. Those networks are bipartite and thus only a link between two variables of different types can be represented. The network can be saved in a .glm format using the \code{igraph} package, the function \code{write.graph} and extracting the output \code{object$gR}, see details.
 }
 
 \usage{
@@ -149,10 +149,12 @@ If the number of variables is high, the generation of the network generation can
 
 \references{
 Mathematical definition:
-Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}
+González I., Lê Cao K-A., Davis, M.J. and Déjean, S. (2012). Visualising associations between paired omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}
 
 Examples and illustrations:
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 
 Relevance networks:
 
@@ -167,7 +169,7 @@ and Transcriptome in Human Hepatoma Cells. \emph{Molecular Cancer Therapeutics} 
 199-205.
 }
 
-\author{Ignacio Gonzalez and Kim-Anh Le Cao.}
+\author{Ignacio González and Kim-Anh Lê Cao.}
 
 \seealso{\code{\link{plotVar}}, \code{\link{cim}}, \code{\link{color.GreenRed}}, \code{\link{color.jet}}, \code{\link{color.spectral}}
 and http: //www.mixOmics.org for more details.}

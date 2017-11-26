@@ -75,9 +75,9 @@ contains the following components:
 }
 
 \references{
-Gonzalez, I., Dejean, S., Martin, P. G., and Baccini, A. (2008). CCA: An R package to extend canonical correlation analysis. Journal of Statistical Software, 23(12), 1-14.
+González, I., Déjean, S., Martin, P. G., and Baccini, A. (2008). CCA: An R package to extend canonical correlation analysis. Journal of Statistical Software, 23(12), 1-14.
 
-Gonzalez, I., Dejean, S., Martin, P., Goncalves, O., Besse, P., and Baccini, A. (2009). Highlighting relationships between heterogeneous biological data through graphical displays based on regularized canonical correlation analysis. Journal of Biological Systems, 17(02), 173-199.
+González, I., Déjean, S., Martin, P., Goncalves, O., Besse, P., and Baccini, A. (2009). Highlighting relationships between heterogeneous biological data through graphical displays based on regularized canonical correlation analysis. Journal of Biological Systems, 17(02), 173-199.
 
 Leurgans, S. E., Moyeed, R. A. and Silverman, B. W. (1993). 
 Canonical correlation analysis when the data are curves. 
@@ -92,7 +92,7 @@ Sch"afer, J., and K. Strimmer. 2005. A shrinkage approach to large-scale covaria
 
 }
 
-\author{Sebastien Dejean, Ignacio Gonzalez, Francois Bartolo.}
+\author{Sébastien Déjean, Ignacio González, Francois Bartolo.}
 
 \seealso{\code{\link{summary}}, \code{\link{tune.rcc}}, 
 \code{\link{plot.rcc}}, \code{\link{plotIndiv}},

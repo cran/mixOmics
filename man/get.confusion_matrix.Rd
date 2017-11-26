@@ -38,9 +38,10 @@ BER is appropriate in case of an unbalanced number of samples per class as it ca
 
 \references{
 
-mixOmics manuscript:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 }
 
 

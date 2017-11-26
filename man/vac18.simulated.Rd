@@ -38,7 +38,7 @@ Only a subset of those genes are presented here (to save memory space).
 
 
 \references{
-Liquet, B., Le Cao, K.-A., Hocini, H. and Thiebaut, R. (2012). A novel approach for biomarker selection and the
+Liquet, B., Lê Cao, K.-A., Hocini, H. and Thiebaut, R. (2012). A novel approach for biomarker selection and the
 integration of repeated measures experiments from two platforms. \emph{BMC Bioinformatics} \bold{13}:325.
 }
 

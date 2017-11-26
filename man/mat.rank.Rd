@@ -34,7 +34,7 @@ The returned value is a list with components:
   \item{tol}{the tolerance used for singular values.}
 }
 
-\author{Sebastien Dejean and Ignacio Gonzalez.}
+\author{Sébastien Déjean and Ignacio González.}
 
 \seealso{\code{\link{nipals}}}
 

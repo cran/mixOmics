@@ -31,7 +31,7 @@ all.outputs = TRUE)
 \item{mode}{character string. What type of algorithm to use, (partially) matching
 one of \code{"regression"} or \code{"canonical"}. See Details.}
 \item{study}{factor indicating the membership of each sample to each of the studies being combined}
-\item{keepX}{numeric vector indicating the number of variables to select in \code{X} on each component, or remaining components should \code{keepX.constraint} be provided. By default all variables are kept in the model.}
+\item{keepX}{numeric vector indicating the number of variables to select in \code{X} on each component. By default all variables are kept in the model.}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
 to zero means and unit variances. Default = \code{TRUE}.}
 \item{tol}{Convergence stopping value.}
@@ -53,9 +53,8 @@ algorithms are available: PLS regression \code{("regression")}, PLS canonical an
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
 algorithm \code{("classic")} (see References and more details in \code{?pls}).
 
-Constraint model. To improve performance, a new argument was recently added to fit a constraint model (\code{constraint=TRUE)}. The model is run on the optimal list of selected features \code{keepX.constraint} from the previous components, as opposed to considering only a specified number of features \code{keepX}. Such strategy was implemented in the sister package bootPLS and successfully applied in our recent integrative study (Rohart et al., 2016). Our experience has shown that the constraint model can substantially improve the performance of the method (see \code{\link{tune.mint.splsda}}).
 
-Variable selection is performed on each component for \code{X} via input parameter \code{keepX} and \code{keepX.constraint} afor a constraint model. \code{keepX.constraint} specifies variable names to be selected in the previous components of the model, see example.
+Variable selection is performed on each component for \code{X} via input parameter \code{keepX}.
 
 Useful graphical outputs are available, e.g. \code{\link{plotIndiv}}, \code{\link{plotLoadings}}, \code{\link{plotVar}}.
 }
@@ -84,17 +83,18 @@ that contains the following components:
 }
 
 \references{
-Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Lê Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
 
-mixOmics manuscript:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 
 }
 
-\author{Florian Rohart, Kim-Anh Le Cao}
+\author{Florian Rohart, Kim-Anh Lê Cao}
 
 \seealso{\code{\link{spls}}, \code{\link{summary}},
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, \code{\link{predict}}, \code{\link{perf}}, \code{\link{mint.pls}}, \code{\link{mint.plsda}}, \code{\link{mint.plsda}} and http://www.mixOmics.org/mixMINT for more details.}

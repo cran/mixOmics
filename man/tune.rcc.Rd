@@ -61,7 +61,7 @@ The returned value is a list with components:
   \item{mat}{matrix containing the cross-validation score computed on the grid.}
 }
 
-\author{Sebastien Dejean and Ignacio Gonzalez.}
+\author{Sébastien Déjean and Ignacio González.}
 
 \seealso{\code{\link{image.tune.rcc}} and http://www.mixOmics.org for more details.}
 

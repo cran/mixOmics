@@ -86,12 +86,14 @@ columns of \code{X} can be supplied. The value is passed to \code{\link{scale}}.
 }
 
 \details{
-For more details, please see the help file corresponding to your \code{method}, e.g. \code{tune.splsda}.
+The \code{tune} function called the function \code{predict}. more details about most arguments are detailed in \code{?predict}.
+
+Also see the help file corresponding to your \code{method}, e.g. \code{tune.splsda}.
 Note that only the arguments used in the tune function corresponding to \code{method} are passed on.
 
 Some details on the use of the nrepeat argument are provided in \code{?perf}.
 
-More details about the prediction distances in \code{?predict}. More details about the PLS modes in \code{?pls}.
+More details about the prediction distances in \code{?predict} and the supplemental material of the mixOmics article (Rohart et al. 2017). More details about the PLS modes are in \code{?pls}.
 }
 
 \value{
@@ -99,7 +101,7 @@ Depending on the type of analysis performed and the input arguments, a list that
 
 \item{error.rate}{returns the prediction error for each \code{test.keepX} on each component, averaged across all repeats and subsampling folds. Standard deviation is also output. All error rates are also available as a list.}
 \item{choice.keepX}{returns the number of variables selected (optimal keepX) on each component.}
-\item{choice.ncomp}{For supervised models; returns the optimal number of components for the model for each prediction distance using one-sided t-tests that test for a significant difference in the mean error rate (gain in prediction) when components are added to the model. See more details in Rohart et al 2016 Suppl. For more than one block, an optimal ncomp is returned for each prediction framework.}
+\item{choice.ncomp}{For supervised models; returns the optimal number of components for the model for each prediction distance using one-sided t-tests that test for a significant difference in the mean error rate (gain in prediction) when components are added to the model. See more details in Rohart et al 2017 Suppl. For more than one block, an optimal ncomp is returned for each prediction framework.}
 \item{error.rate.class}{returns the error rate for each level of \code{Y} and for each component computed with the optimal keepX}
 
 \item{predict}{Prediction values for each sample, each \code{test.keepX}, each comp and each repeat. Only if light.output=FALSE}
@@ -116,16 +118,17 @@ Depending on the type of analysis performed and the input arguments, a list that
 \references{
 DIABLO:
 
-Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Lê Cao K.A. (2016).
 DIABLO - multi omics integration for biomarker discovery.
 
-mixOmics main publication:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 
 MINT:
 
-Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Lê Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 PLS and PLS citeria for PLS regression:
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
@@ -137,13 +140,13 @@ Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of C
 
 sparse PLS regression mode:
 
-Le Cao, K. A., Rossouw D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable
+Lê Cao, K. A., Rossouw D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable
 selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular
 Biology} \bold{7}, article 35.
 
 One-sided t-tests (suppl material):
 
-Rohart F, Mason EA, Matigian N, Mosbergen R, Korn O, Chen T, Butcher S, Patel J, Atkinson K, Khosrotehrani K, Fisk NM, Le Cao K-A&, Wells CA& (2016). A Molecular Classification of Human Mesenchymal Stromal Cells. PeerJ 4:e1845.
+Rohart F, Mason EA, Matigian N, Mosbergen R, Korn O, Chen T, Butcher S, Patel J, Atkinson K, Khosrotehrani K, Fisk NM, Lê Cao K-A&, Wells CA& (2016). A Molecular Classification of Human Mesenchymal Stromal Cells. PeerJ 4:e1845.
 
 }
 

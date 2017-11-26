@@ -83,7 +83,9 @@ If \code{validation = "loo"}, leave-one-out cross-validation is performed. By de
 
 All combination of test.keepX values are tested. A message informs how many will be fitted on each component for a given test.keepX.
 
-More details about the prediction distances in \code{?predict}. More details about the PLS modes in \code{?pls}.
+More details about the prediction distances in \code{?predict} and the supplemental material of the mixOmics article (Rohart et al. 2017). Details about the PLS modes are in \code{?pls}.
+
+BER is appropriate in case of an unbalanced number of samples per class as it calculates the average proportion of wrongly classified samples in each class, weighted by the number of samples in each class. BER is less biased towards majority classes during the performance assessment.
 }
 
 \value{
@@ -104,16 +106,17 @@ A list that contains:
 \references{
 Method:
 
-Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016). DIABLO:  multi omics integration for biomarker discovery.
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Lê Cao K.A. (2016). DIABLO:  multi omics integration for biomarker discovery.
 
 
-mixOmics manuscript:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 }
 
 
-\author{Florian Rohart, Amrit Singh, Kim-Anh Le Cao.}
+\author{Florian Rohart, Amrit Singh, Kim-Anh Lê Cao.}
 
 \seealso{\code{\link{block.splsda}} and http://www.mixOmics.org for more details.}
 

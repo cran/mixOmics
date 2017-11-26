@@ -38,7 +38,7 @@ delete the rows with missing data or to estimate the missing data.
 The returned value is a list with components:
   \item{eig}{vector containing the pseudosingular values of \code{X}, of length \code{ncomp}.}
   \item{t}{matrix whose columns contain the left singular vectors of \code{X}.}
-  \item{p}{matrix whose columns contain the right singular vectors of \code{X}.}
+\item{p}{matrix whose columns contain the right singular vectors of \code{X}. Note that for a complete data matrix X, the return values \code{eig}, \code{t} and \code{p} such that  \code{X = t * diag(eig) * t(p)}.}
   \item{rec}{matrix obtained by the reconstitution of the data using the \code{ncomp} components.}
 }
 
@@ -53,7 +53,7 @@ In: Blalock H. M. et al. (editors). \emph{Quantitative Sociology: International 
 on mathematical and statistical model building}. Academic Press, N.Y., 307-357.
 }
 
-\author{Sebastien Dejean and Ignacio Gonzalez.}
+\author{Sébastien Déjean and Ignacio González.}
 
 \seealso{\code{\link{svd}}, \code{\link{princomp}}, \code{\link{prcomp}}, \code{\link{eigen}} and http://www.mixOmics.org for more details.}
 

@@ -37,7 +37,7 @@ A circle highlights the optimal number of variables oneach component.
 
 }
 
-\author{Kim-Anh Le Cao, Florian Rohart, Francois Bartolo.}
+\author{Kim-Anh Lê Cao, Florian Rohart, Francois Bartolo.}
 
 \seealso{ \code{\link{tune.mint.splsda}}, \code{\link{tune.splsda}} \code{\link{tune.block.splsda}} and http://www.mixOmics.org for more details.}
 
@@ -65,7 +65,7 @@ type.id = stemcells$celltype
 exp = stemcells$study
 
 out = tune(method="mint.splsda", X=data,Y=type.id, ncomp=2, study=exp, test.keepX=seq(1,10,1))
-out$choice.keepX.constraint
+out$choice.keepX
 
 plot(out)
 

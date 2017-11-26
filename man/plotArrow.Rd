@@ -29,7 +29,7 @@ plotArrow(  object,
 }
 
 \arguments{
-\item{object}{object of class inheriting from \pkg{mixOmics}:  \code{PLS, sPLS, rCC, rGCCA, sGCCA, sGCCDA}},
+\item{object}{object of class inheriting from \pkg{mixOmics}:  \code{PLS, sPLS, rCC, rGCCA, sGCCA, sGCCDA}}
 \item{comp}{integer vector of length two indicating the components represented on the horizontal
 and the vertical axis to project the individuals.}
 \item{abline}{should the vertical and horizontal line through the center be plotted? Default set to \code{FALSE}}
@@ -59,12 +59,12 @@ For objects of class \code{"GCCA"} and if there are more than 3 blocks, the star
 Short arrows indicate a strong agreement between the matching data sets, long arrows a disagreement between the matching data sets.
 }
 
-\author{Francois Bartolo, Kim-Anh Le Cao.}
+\author{Francois Bartolo, Kim-Anh Lê Cao.}
 
 \seealso{\code{\link{arrows}}, \code{\link{text}}, \code{\link{points}} and http://mixOmics.org/graphics for more details.}
 
 \references{
-Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods
+Lê Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods
 for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 }
 

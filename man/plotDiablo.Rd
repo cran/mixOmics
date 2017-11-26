@@ -27,7 +27,7 @@ The function uses a plot.data.frame to plot the component \code{ncomp} calculate
 
 
 \references{
-Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Lê Cao K.A. (2016).
 DIABLO - multi omics integration for biomarker discovery. Submitted.
 }
 

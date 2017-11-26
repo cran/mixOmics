@@ -99,9 +99,9 @@ that contains the following components:
 \references{
 Sparse PLS: canonical and regression modes:
 
-Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
+Lê Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 
-Le Cao, K.-A., Rossouw, D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable 
+Lê Cao, K.-A., Rossouw, D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable 
 selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular 
 Biology} \bold{7}, article 35.
 
@@ -118,7 +118,7 @@ Wold H. (1966). Estimation of principal components and related models by iterati
 
 On multilevel analysis:
 
-Liquet, B., Le Cao, K.-A., Hocini, H. and Thiebaut, R. (2012) A novel approach for
+Liquet, B., Lê Cao, K.-A., Hocini, H. and Thiebaut, R. (2012) A novel approach for
 biomarker selection and the integration of repeated measures experiments from two
 platforms. \emph{BMC Bioinformatics} \bold{13}:325.
 
@@ -126,7 +126,7 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
 \bold{6}(1), 119-128.
 }
 
-\author{Sebastien Dejean, Ignacio Gonzalez and Kim-Anh Le Cao.}
+\author{Sébastien Déjean, Ignacio González and Kim-Anh Lê Cao.}
 
 \seealso{\code{\link{pls}}, \code{\link{summary}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}, 

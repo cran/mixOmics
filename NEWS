@@ -1,4 +1,19 @@
 
+Changes in 6.3.1 (bug fixes)
+================
+
+Enhancements:
+-------------
+- plotContrib deprecated (use plotLoadings instead)
+
+Bug fixes:
+----------
+- major bug when NA values is now fixed
+- one-sided t-test in the tune functions fixed
+- nipals function capped to a maximum number of components and nipals function now faster
+
+
+
 Changes in 6.3.0 (faster! and bug fixes)
 ================
 

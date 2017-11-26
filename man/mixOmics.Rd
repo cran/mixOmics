@@ -54,9 +54,9 @@ to zero means and unit variances (default: TRUE)}
 \details{
 This function performs one of the PLS derived methods included in the mixOmics package that is the most appropriate for your input data, one of (mint).(block).(s)pls(da).
 
-If your input data \code{X} is a matrix, then the algorithm is directed towards one of (mint).(s)pls(da) depending on your input data \code{Y} (factor for the discrete outcome directs the algorithm to DA analysis) and whether you input a \code{study} parameter (MINT analysis) or a \code{keepX}/\code{keepX.constraint} parameter (sparse analysis).
+If your input data \code{X} is a matrix, then the algorithm is directed towards one of (mint).(s)pls(da) depending on your input data \code{Y} (factor for the discrete outcome directs the algorithm to DA analysis) and whether you input a \code{study} parameter (MINT analysis) or a \code{keepX} parameter (sparse analysis).
 
-If your input data \code{X} is a list of matrices, then the algorithm is directed towards one of (mint).block.(s)pls(da) depending on your input data \code{Y} (factor for the discrete outcome directs the algorithm to DA analysis) and whether you input a \code{study} parameter (MINT analysis) or a \code{keepX}/\code{keepX.constraint} parameter (sparse analysis).
+If your input data \code{X} is a list of matrices, then the algorithm is directed towards one of (mint).block.(s)pls(da) depending on your input data \code{Y} (factor for the discrete outcome directs the algorithm to DA analysis) and whether you input a \code{study} parameter (MINT analysis) or a \code{keepX} parameter (sparse analysis).
 
 More details about the PLS modes in \code{?pls}.
 
@@ -71,30 +71,31 @@ More details about the PLS modes in \code{?pls}.
 
 \references{
 
-mixOmics manuscript:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. 
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 
 
 MINT models:
 
-Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Lê Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2013). Multi-group PLS Regression: Application to Epidemiology. In New Perspectives in Partial Least Squares and Related Methods, pages 243-255. Springer.
 
 
 Integration of omics data sets:
 
-Singh A, Gautier B, Shannon C, Vacher M, Rohart F, Tebbutt S, Le Cao K-A. DIABLO: an integrative, multi-omics, multivariate method for multi-group classification. \url{http://biorxiv.org/content/early/2016/08/03/067611}
+Singh A, Gautier B, Shannon C, Vacher M, Rohart F, Tebbutt S, Lê Cao K-A. DIABLO: an integrative, multi-omics, multivariate method for multi-group classification. \url{http://biorxiv.org/content/early/2016/08/03/067611}
 
-Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods
+Lê Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods
 for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 
-Le Cao, K.-A., Rossouw, D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable
+Lê Cao, K.-A., Rossouw, D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable
 selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular
 Biology} \bold{7}, article 35.
 
-Tenenhaus A., Phillipe C., Guillemot V., Le Cao K-A. , Grill J. , Frouin V.  (2014), Variable selection for generalized canonical correlation analysis, \emph{Biostatistics}, doi: 10.1093/biostatistics. PMID: 24550197.
+Tenenhaus A., Phillipe C., Guillemot V., Lê Cao K-A. , Grill J. , Frouin V.  (2014), Variable selection for generalized canonical correlation analysis, \emph{Biostatistics}, doi: 10.1093/biostatistics. PMID: 24550197.
 
 Sparse SVD:
 
@@ -104,7 +105,7 @@ low rank matrix approximation. \emph{Journal of Multivariate Analysis} \bold{99}
 
 PLS-DA:
 
-Le Cao K-A, Boitard S and Besse P (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. BMC Bioinformatics 12:253.
+Lê Cao K-A, Boitard S and Besse P (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. BMC Bioinformatics 12:253.
 
 
 PLS:
@@ -117,7 +118,7 @@ Abdi H (2010). Partial least squares regression and projection on latent structu
 
 On multilevel analysis:
 
-Liquet, B., Le Cao, K.-A., Hocini, H. and Thiebaut, R. (2012) A novel approach for
+Liquet, B., Lê Cao, K.-A., Hocini, H. and Thiebaut, R. (2012) A novel approach for
 biomarker selection and the integration of repeated measures experiments from two
 platforms. \emph{BMC Bioinformatics} \bold{13}:325.
 
@@ -126,7 +127,7 @@ Westerhuis, J. A., van Velzen, E. J., Hoefsloot, H. C., and Smilde, A. K. (2010)
 
 Visualisations:
 
-Gonzalez I., Le Cao K.-A., Davis, M.D. and Dejean S. (2013) Insightful graphical outputs to explore relationships between two omics data sets. BioData Mining 5:19.
+González I., Lê Cao K.-A., Davis, M.D. and Déjean S. (2013) Insightful graphical outputs to explore relationships between two omics data sets. BioData Mining 5:19.
 }
 
 \examples{

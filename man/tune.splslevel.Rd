@@ -45,15 +45,16 @@ For a multilevel spls analysis, the tuning criterion is based on the maximisatio
 }
 
 \references{
-mixOmics manuscript:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 
 }
 
 
 
-\author{Kim-Anh Le Cao, Benoit Gautier, Francois Bartolo, Florian Rohart.}
+\author{Kim-Anh Lê Cao, Benoit Gautier, Francois Bartolo, Florian Rohart.}
 
 \seealso{\code{\link{splsda}}, \code{\link{predict.splsda}} and http://www.mixOmics.org for more details.}
 

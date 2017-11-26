@@ -91,21 +91,21 @@ least squares using microarray gene expression data. \emph{Bioinformatics}
 \bold{18}, 39-50.
 
 On multiple integration with PLS-DA:
-Gunther O., Shin H., Ng R. T. , McMaster W. R., McManus B. M. , Keown P. A. , Tebbutt S.J. , Le Cao K-A. ,  (2014) Novel multivariate methods for integration of genomics and proteomics data: Applications in a kidney transplant rejection study, OMICS: A journal of integrative biology, 18(11), 682-95.
+Gunther O., Shin H., Ng R. T. , McMaster W. R., McManus B. M. , Keown P. A. , Tebbutt S.J. , Lê Cao K-A. ,  (2014) Novel multivariate methods for integration of genomics and proteomics data: Applications in a kidney transplant rejection study, OMICS: A journal of integrative biology, 18(11), 682-95.
 
 On multiple integration with sPLS-DA and 4 data blocks:
 
-Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Lê Cao K.A. (2016).
 DIABLO:  multi omics integration for biomarker discovery. BioRxiv available here: \url{http://biorxiv.org/content/early/2016/08/03/067611}
 
-mixOmics manuscript:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
 
 
 }
 
-\author{Florian Rohart, Benoit Gautier, Kim-Anh Le Cao}
+\author{Florian Rohart, Benoit Gautier, Kim-Anh Lê Cao}
 
 \seealso{\code{\link{plotIndiv}}, \code{\link{plotArrow}}, \code{\link{plotLoadings}}, \code{\link{plotVar}}, \code{\link{predict}}, \code{\link{perf}}, \code{\link{selectVar}}, \code{\link{block.pls}}, \code{\link{block.splsda}} and http://www.mixOmics.org for more details.}
 

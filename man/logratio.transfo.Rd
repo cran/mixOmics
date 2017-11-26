@@ -25,7 +25,7 @@ logratio.transfo(X, logratio = "none", offset = 0)
 }
 
 \references{
-Kim-Anh Le Cao, Mary-Ellen Costello, Vanessa Anne Lakis, Francois Bartolo, Xin-Yi Chua, Remi Brazeilles, Pascale Rondeau
+Kim-Anh Lê Cao, Mary-Ellen Costello, Vanessa Anne Lakis, Francois Bartolo, Xin-Yi Chua, Remi Brazeilles, Pascale Rondeau
 mixMC: a multivariate statistical framework to gain insight into Microbial Communities
 bioRxiv 044206; doi: http://dx.doi.org/10.1101/044206
 

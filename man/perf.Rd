@@ -85,9 +85,11 @@ The mint.sPLS-DA function estimates errors based on Leave-one-group-out cross va
 
 AUROC. For PLS-DA, sPLS-DA, mint.PLS-DA and mint.sPLS-DA methods: if \code{auc=TRUE}, Area Under the Curve (AUC) values are calculated from the predicted scores obtained from the \code{predict} function applied to the internal test sets in the cross-validation process, either for all samples or for study-specific samples (for mint models). Therefore we minimise the risk of overfitting. See \code{\link{auroc}} for more details. Our multivariate supervised methods already use a prediction threshold based on distances (see \code{predict}) that optimally determine class membership of the samples tested. As such AUC and ROC are not needed to estimate the performance of the model. We provide those outputs as complementary performance measures. See more details in our mixOmics article.
 
-Prediction distances. See details from \code{?predict}.
+Prediction distances. See details from \code{?predict}, and also our supplemental material in the mixOmics article.
 
 Repeats of the CV-folds. Repeated cross-validation implies that the whole CV process is repeated a number of times (\code{nrepeat}) to reduce variability across the different subset partitions. In the case of Leave-One-Out CV (\code{validation = 'loo'}), each sample is left out once (\code{folds = N} is set internally) and therefore nrepeat is by default 1.
+
+BER is appropriate in case of an unbalanced number of samples per class as it calculates the average proportion of wrongly classified samples in each class, weighted by the number of samples in each class. BER is less biased towards majority classes during the performance assessment.
 
 More details about the PLS modes in \code{?pls}.
 
@@ -132,22 +134,23 @@ For sgccda models, \code{perf} produces the following outputs:
 \item{WeightedVote}{if more than one block, returns the weighted majority class over the blocks. NA for a sample means that there is no consensus on the predicted class for this particular sample over the blocks.}
 \item{WeightedVote.error.rate}{if more than one block, returns the error rate of the \code{WeightedVote} output}
 \item{weights}{Returns the weights of each block used for the weighted predictions, for each nrepeat and each fold}
-\item{choice.ncomp}{For supervised models; returns the optimal number of components for the model for each prediction distance using one-sided t-tests that test for a significant difference in the mean error rate (gain in prediction) when components are added to the model. See more details in Rohart et al 2016 Suppl. For more than one block, an optimal ncomp is returned for each prediction framework.}
+\item{choice.ncomp}{For supervised models; returns the optimal number of components for the model for each prediction distance using one-sided t-tests that test for a significant difference in the mean error rate (gain in prediction) when components are added to the model. See more details in Rohart et al 2017 Suppl. For more than one block, an optimal ncomp is returned for each prediction framework.}
 }
 
 \references{
 DIABLO:
 
-Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Lê Cao K.A. (2016).
 DIABLO - multi omics integration for biomarker discovery.
 
-mixOmics main publication:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 
 MINT:
 
-Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Lê Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 PLS and PLS citeria for PLS regression:
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.
@@ -159,16 +162,16 @@ Regression (PCR) and Partial Least Squares Regression (PLSR). \emph{Journal of C
 
 sparse PLS regression mode:
 
-Le Cao, K. A., Rossouw D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable 
+Lê Cao, K. A., Rossouw D., Robert-Granie, C. and Besse, P. (2008). A sparse PLS for variable 
 selection when integrating Omics data. \emph{Statistical Applications in Genetics and Molecular 
 Biology} \bold{7}, article 35.
 
 One-sided t-tests (suppl material):
 
-Rohart F, Mason EA, Matigian N, Mosbergen R, Korn O, Chen T, Butcher S, Patel J, Atkinson K, Khosrotehrani K, Fisk NM, Le Cao K-A&, Wells CA& (2016). A Molecular Classification of Human Mesenchymal Stromal Cells. PeerJ 4:e1845.
+Rohart F, Mason EA, Matigian N, Mosbergen R, Korn O, Chen T, Butcher S, Patel J, Atkinson K, Khosrotehrani K, Fisk NM, Lê Cao K-A&, Wells CA& (2016). A Molecular Classification of Human Mesenchymal Stromal Cells. PeerJ 4:e1845.
 }
 
-\author{Ignacio Gonzalez, Amrit Singh, Kim-Anh Le Cao, Benoit Gautier, Florian Rohart.}
+\author{Ignacio González, Amrit Singh, Kim-Anh Lê Cao, Benoit Gautier, Florian Rohart.}
 
 \seealso{\code{\link{predict}}, \code{\link{nipals}}, \code{\link{plot.perf}}, \code{\link{auroc}} and \url{www.mixOmics.org} for more details.}
 

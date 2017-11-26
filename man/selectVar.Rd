@@ -41,7 +41,7 @@ These functions are only implemented for the sparse versions.
 
 
 
-\author{Kim-Anh Le Cao, Florian Rohart.}
+\author{Kim-Anh Lê Cao, Florian Rohart.}
 
 \examples{
 data(liver.toxicity)

@@ -50,7 +50,7 @@ nipals = function (X, ncomp = 1, reconst = FALSE, max.iter = 500, tol = 1e-09)
     ind.names = 1:nrow(X)
     
     #-- ncomp
-    if (is.null(ncomp) || !is.numeric(ncomp) || ncomp < 1 || !is.finite(ncomp))
+    if (is.null(ncomp) || !is.numeric(ncomp) || ncomp < 1 || !is.finite(ncomp) || ncomp>min(nr,nc))
     stop("invalid value for 'ncomp'.", call. = FALSE)
     
     ncomp = round(ncomp)
@@ -149,12 +149,7 @@ nipals = function (X, ncomp = 1, reconst = FALSE, max.iter = 500, tol = 1e-09)
     
     if (reconst)
     {
-        X.hat = matrix(0, nrow = nr, ncol = nc)
-        
-        for (h in 1:ncomp)
-        {
-            X.hat = X.hat + eig[h] * t.mat[, h] %*% t(p[, h])
-        }
+        X.hat = t.mat %*% diag(eig) %*% t(p)
         
         colnames(X.hat) = colnames(X)
         rownames(X.hat) = rownames(X)

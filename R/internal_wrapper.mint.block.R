@@ -51,7 +51,7 @@ init ,
 tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
-misdata = NULL, is.na.A = NULL, ind.NA = NULL,
+misdata = NULL, is.na.A = NULL, ind.NA = NULL, ind.NA.col = NULL,
 all.outputs=TRUE
 )
 {
@@ -134,7 +134,8 @@ all.outputs=TRUE
     max.iter = max.iter,
     study = study,
     keepA = keepA,
-    misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA, all.outputs= all.outputs)
+    misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA, ind.NA.col = ind.NA.col,
+    all.outputs= all.outputs)
        
     if(near.zero.var)
     result$nzv=nzv.A

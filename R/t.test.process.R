@@ -29,23 +29,40 @@ t.test.process = function(mat.error.rate, alpha = 0.01)
     
     max = ncol(mat.error.rate) #number max of components included
     pval = NULL
-    opt = 1 #initialise the first optimal number of genes
-    for(j in 2:max)
+    opt = 1 #initialise the first optimal number of components
+    for(opt in 1:max)
     {
-        pval[j] = NA
+        j=opt+1
         temp = try(t.test(mat.error.rate[,opt],mat.error.rate[,j],alternative="greater")$p.value, silent=T) #t.test of "is adding X comp improves the overall results"
         if(any(class(temp) == "try-error") || is.na(temp)) # temp can be NaN when error.keepX is constant
         {
-            ncomp_opt = NULL
-            break
+            pval = 1
         } else {
-            pval[j] = temp #had to be two steps (temp then pval =temp) otherwise the class is lost
+            pval = temp
         }
-        if( (pval[j]< (alpha)))
-        opt=j #if the p-value is lower than 0.05, the optimal number of comp is updated
+        #print(opt)
+        #print(j)
+        #print(pval)
+
+        while(pval> (alpha) & j<max)
+        {
+            j=j+1
+            temp = try(t.test(mat.error.rate[,opt],mat.error.rate[,j],alternative="greater")$p.value, silent=T) #t.test of "is adding X comp improves the overall results"
+            if(any(class(temp) == "try-error") || is.na(temp)) # temp can be NaN when error.keepX is constant
+            {
+                pval = 1
+            } else {
+                pval = temp
+            }
+            #print(opt)
+            #print(j)
+            #print(pval)
+        }
+        
+        if( (pval> (alpha))) #if all pvalues were greater than alpha, then we do not increase opt and get out of the loop
+        break
     }
-    if(all(class(temp) != "try-error") & !is.na(temp))
-    ncomp_opt= opt
+    ncomp_opt = opt
     
     return(ncomp_opt)
 }

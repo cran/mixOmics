@@ -39,7 +39,7 @@ The raw data were downloaded from \url{http://hmpdacc.org/HMQCP/all/}.
 Filtering and normalisation described in our website \url{ www.mixOmics.org/mixMC}}
 
 \references{
-L\^{e} Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
+Lê Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
 }
 
 \keyword{datasets}

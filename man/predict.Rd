@@ -46,6 +46,7 @@ Variates for \code{newdata} are also returned. Please note that this method perf
 
 Different prediction distances are proposed for discriminant analysis. The reason is that our supervised models work with a dummy indicator matrix of \code{Y} to indicate the class membership of each sample. The prediction of a new observation results in either a predicted dummy variable (output \code{object$predict}), or a predicted variate (output \code{object$variates}). Therefore, an appropriate distance needs to be applied to those predicted values to assign the predicted class. We propose distances such as `maximum distance' for the predicted dummy variables, `Mahalanobis distance' and `Centroids distance' for the predicted variates.
 
+
 \code{"max.dist"} is the simplest method to predict the class of a test sample. For each new individual, the class with the largest predicted dummy variable is the predicted class. This distance performs well in single data set analysis with multiclass problems (PLS-DA).
 
 \code{"centroids.dist"}  allocates to the new observation the class that mimimises the distance between the predicted score and the centroids of the classes calculated on the latent components or variates of the trained model.
@@ -54,7 +55,7 @@ Different prediction distances are proposed for discriminant analysis. The reaso
 
 In practice we found that the centroid-based distances (\code{"centroids.dist"} and \code{"mahalanobis.dist"}), and specifically the Mahalanobis distance led to more accurate predictions than the maximum distance for complex classification problems and N-integration problems (block.splsda). The centroid distances consider the prediction in dimensional space spanned by the predicted variates, while the maximum distance considers a single point estimate using the predicted scores on the last dimension of the model. The user can assess the different distances, and choose the prediction distance that leads to the best performance of the model, as highlighted from the tune and perf outputs
 
-More (mathematical) details about the prediction distances are available in the supplemental of the mixOmics manuscript.
+More (mathematical) details about the prediction distances are available in the supplemental of the mixOmics article (Rohart et al 2017).
 
 
 For a visualisation of those prediction distances, see \code{background.predict} that overlays the prediction area in \code{plotIndiv} for a sPLS-DA object.
@@ -95,12 +96,13 @@ For discriminant analysis, the predicted class is returned for each block (\code
 
 \references{
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. 
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
+
 
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.  
 }
 
-\author{Florian Rohart, Sebastien Dejean, Ignacio Gonzalez, Kim-Anh Le Cao}
+\author{Florian Rohart, Sébastien Déjean, Ignacio González, Kim-Anh Lê Cao}
 
 
 \seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}},

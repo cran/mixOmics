@@ -1,8 +1,8 @@
 Package: mixOmics
 Type: Package
 Title: Omics Data Integration Project
-Version: 6.3.0
-Date: 2017-10-13
+Version: 6.3.1
+Date: 2017-10-25
 Depends: R (>= 2.10), MASS, lattice, ggplot2
 Imports: igraph, rgl, ellipse, corpcor, RColorBrewer, plyr,parallel,
         dplyr, tidyr, reshape2, methods, matrixStats, rARPACK,
@@ -15,7 +15,7 @@ License: GPL (>= 2)
 URL: http://www.mixOmics.org
 BugReports: https://bitbucket.org/klecao/package-mixomics/issues
 Repository: CRAN
-Date/Publication: 2017-10-13 21:27:45 UTC
-Packaged: 2017-10-12 23:12:48 UTC; klecao
+Date/Publication: 2017-11-26 15:26:09 UTC
+Packaged: 2017-11-25 23:49:41 UTC; klecao
 NeedsCompilation: no
 LazyData: true

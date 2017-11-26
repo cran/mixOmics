@@ -34,7 +34,7 @@
 # Y: a factor or a class vector for the discrete outcome.
 # indY: to supply if Y is missing, indicate the position of the outcome in the list X.
 # ncomp: numeric vector of length the number of blocks in \code{X}. The number of components to include in the model for each block (does not necessarily need to take the same value for each block). By default set to 2 per block.
-# keepX: A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model on the last components (once all keepX.constraint[[i]] are used).
+# keepX: A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model.
 # keepY: Only used if Y is provided. Each entry keepY[i] is the number of Y-variables kept in the model on the last components.
 # design: the input design.
 # scheme: the input scheme, one of "horst", "factorial" or ""centroid". Default to "centroid"

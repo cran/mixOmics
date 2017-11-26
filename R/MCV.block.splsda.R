@@ -52,6 +52,7 @@
 # misdata: optional. any missing values in the data? list, misdata[[q]] for each data set
 # is.na.A: optional. where are the missing values? list, is.na.A[[q]] for each data set (if misdata[[q]] == TRUE)
 # ind.NA: optional. which rows have missing values? list, ind.NA[[q]] for each data set.
+# ind.NA.col: optional. which col have missing values? list, ind.NA.col[[q]] for each data set.
 # parallel: logical.
 
 
@@ -80,6 +81,7 @@ scale,
 misdata,
 is.na.A,
 ind.NA,
+ind.NA.col,
 parallel
 )
 {    #-- checking general input parameters --------------------------------------#
@@ -191,12 +193,16 @@ parallel
                         is.na.A.test = lapply(is.na.A, function(x){x[omit,,drop=FALSE]})
                         
                         ind.NA.train = lapply(is.na.A.train, function(x){which(apply(x, 1, sum) > 0)})#list(X=ind.NA[which(!ind.NA%in% omit)])
-                        ind.NA.test = lapply(is.na.A.test, function(x){which(apply(x, 1, sum) > 0)})#list(X=ind.NA[which(ind.NA%in%omit)])
+                        #ind.NA.test = lapply(is.na.A.test, function(x){which(apply(x, 1, sum) > 0)})#list(X=ind.NA[which(ind.NA%in%omit)])
+
+                        ind.NA.col.train = lapply(is.na.A.train, function(x){which(apply(x, 2, sum) > 0)})#list(X=ind.NA[which(!ind.NA%in% omit)])
+                        #ind.NA.col.test = lapply(is.na.A.test, function(x){which(apply(x, 2, sum) > 0)})#list(X=ind.NA[which(ind.NA%in%omit)])
                     }
                 }
             } else {
                 is.na.A.train = is.na.A.test = NULL
-                ind.NA.train = ind.NA.test =NULL
+                ind.NA.train =NULL
+                ind.NA.col.train =NULL
             }
             
             #---------------------------------------#
@@ -255,7 +261,8 @@ parallel
             keepX=choice.keepX, keepY=rep(ncol(Y.train.mat), ncomp-1), test.keepX=test.keepX, test.keepY=ncol(Y.train.mat),
             mode="regression", scale=scale, near.zero.var=near.zero.var, design=design,
             max.iter=max.iter, scheme =scheme, init=init, tol=tol,
-            misdata = misdata, is.na.A = c(is.na.A.train, Y=NULL), ind.NA = c(ind.NA.train, Y=NULL), all.outputs=FALSE))
+            misdata = misdata, is.na.A = c(is.na.A.train, Y=NULL), ind.NA = c(ind.NA.train, Y=NULL),
+            ind.NA.col = c(ind.NA.col.train, Y=NULL), all.outputs=FALSE))
             #))
             
             # `result' returns loadings and variates for all test.keepX on the ncomp component

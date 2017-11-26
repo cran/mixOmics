@@ -39,7 +39,7 @@ internal_mint.block = function (A, indY = NULL,  design = 1 - diag(length(A)), t
 ncomp = rep(1, length(A)), scheme = "horst", scale = TRUE,
 init = "svd.single", tol = 1e-06,
 mode = "canonical", max.iter = 100,study = NULL, keepA = NULL,
-penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NULL)
+penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NULL, ind.NA.col = NULL)
 {
     # A: list of matrices
     # indY: integer, pointer to one of the matrices of A
@@ -59,7 +59,8 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
     # misdata: optional. any missing values in the data? list, misdata[[q]] for each data set
     # is.na.A: optional. where are the missing values? list, is.na.A[[q]] for each data set (if misdata[[q]] == TRUE)
     # ind.NA: optional. which rows have missing values? list, ind.NA[[q]] for each data set.
-    
+    # ind.NA.col: optional. which col have missing values? list, ind.NA.col[[q]] for each data set.
+
     
     names(ncomp) = names(A)
     
@@ -136,8 +137,10 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
     if (is.vector(tau))
     tau = matrix(rep(tau, N), nrow = N, ncol = length(tau), byrow = TRUE)
     
+    #save(list=ls(),file="temp.Rdata")
+
     # if missing values are not given as input (only when direct call to a (mint).(block).(s)pls(da)), we search for them here (takes time)
-    if(is.null(misdata) &  is.null(is.na.A) & is.null(ind.NA))
+    if(is.null(misdata) &  is.null(is.na.A) & is.null(ind.NA) & is.null(ind.NA.col))
     {
         misdata = sapply(A, anyNA) # Detection of missing data per block
         misdata.all = any(misdata) # is there any missing data overall
@@ -148,12 +151,15 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
         {
             is.na.A = lapply(A, is.na) # size n*p, which entry is na. might be none, but at least one in all the block will be a TRUE
             
-            ind.NA = list()
+            ind.NA = ind.NA.col = list()
             for(q in 1:J)
-            ind.NA[[q]] = which(apply(is.na.A[[q]], 1, sum) == 1) # indice of the row that have missing values. used in the calculation of loadings
-        } else {
+            {
+                ind.NA[[q]] = which(apply(is.na.A[[q]], 1, sum) >0) # indice of the row that have missing values. used in the calculation of loadings
+                ind.NA.col[[q]] = which(apply(is.na.A[[q]], 2, sum) >0) # indice of the col that have missing values. used in the deflation
+            }
+        }else {
             is.na.A = NULL
-            ind.NA = NULL
+            ind.NA = ind.NA.col = NULL
         }
     } else{
         misdata.all = any(misdata)
@@ -281,7 +287,7 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
                 if(time) time4 = proc.time()
                 
                 defla.result = defl.select(yy=mint.block.result$variates.A, rr=R, nncomp=ndefl, nn=comp, nbloc = J, indY = indY, mode = mode, aa = mint.block.result$loadings.A,
-                misdata=misdata, is.na.A=is.na.A, ind.NA = ind.NA)
+                misdata=misdata, is.na.A=is.na.A, ind.NA = ind.NA.col)
                 
                 R = defla.result$resdefl
                 
@@ -509,7 +515,7 @@ penalty=NULL, all.outputs = FALSE)
             
             if(length(ind.NA[[q]])>0) # should always be true
             {
-                temp = drop(loadings.temp) %o% rep(1, length(ind.NA[[q]]))
+                temp = drop(loadings.temp) %o% rep(1, length(ind.NA[[q]])) #p*n -> p * where there are NA
                 temp[t(is.na.A[[q]][ind.NA[[q]],,drop=FALSE])] = 0
                 d.variates.A.norm[ind.NA[[q]]] = apply(temp,2, crossprod)
             }

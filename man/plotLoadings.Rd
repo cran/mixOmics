@@ -57,7 +57,7 @@ legend.title = 'Outcome', layout = NULL, border = NA, xlim = NULL, ... )
 
 
 \arguments{
-\item{object}{object},
+\item{object}{object}
 \item{contrib}{a character set to 'max' or 'min' indicating if the color of the bar should correspond to the group with the maximal or minimal expression levels / abundance.}
 \item{method}{a character set to 'mean' or 'median' indicating the criterion to assess the contribution. We recommend using median in the case of count or skewed data.}
 \item{study}{Indicates which study are to be plotted.  A character vector containing some levels of \code{object$study}, "all.partial" to plot all studies or "global" is expected.}
@@ -96,7 +96,7 @@ For MINT analysis, \code{study="global"} plots the global loadings while partial
 Importantly for multi plots, the legend accounts for one subplot in the layout design.
 }
 
-\author{Florian Rohart, Kim-Anh Le Cao, Benoit Gautier}
+\author{Florian Rohart, Kim-Anh Lê Cao, Benoit Gautier}
 
 \seealso{\code{\link{pls}}, \code{\link{spls}}, \code{\link{plsda}}, \code{\link{splsda}},
 \code{\link{mint.pls}}, \code{\link{mint.spls}}, \code{\link{mint.plsda}}, \code{\link{mint.splsda}},
@@ -109,10 +109,10 @@ Rohart F. et al (2016, submitted). MINT: A multivariate integrative approach to 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2013). Multi-group PLS Regression: Application to Epidemiology.
 In New Perspectives in Partial Least Squares and Related Methods, pages 243-255. Springer.
 
-Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Lê Cao K.A. (2016).
 DIABLO - multi omics integration for biomarker discovery.
 
-Le Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods
+Lê Cao, K.-A., Martin, P.G.P., Robert-Granie, C. and Besse, P. (2009). Sparse canonical methods
 for biological data integration: application to a cross-platform study. \emph{BMC Bioinformatics} \bold{10}:34.
 
 Tenenhaus, M. (1998). \emph{La regression PLS: theorie et pratique}. Paris: Editions Technic.

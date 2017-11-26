@@ -35,7 +35,7 @@
 # study: grouping factor indicating which samples are from the same study
 
 # ncomp: numeric vector of length the number of blocks in \code{X}. The number of components to include in the model for each block (does not necessarily need to take the same value for each block). By default set to 2 per block.
-# keepX: A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model on the last components (once all keepX.constraint[[i]] are used).
+# keepX: A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model.
 # keepY: Only used if Y is provided. Each entry keepY[i] is the number of Y-variables kept in the model on the last components.
 # design: the input design.
 # tau:
@@ -255,7 +255,7 @@ near.zero.var = FALSE)
         if (is.factor(Y))#either plsda, splsda
         {
             
-            #Check.entry.pls.single(X, ncomp, keepX,keepX.constraint) # to have the warnings relative to X and Y, instead of blocks
+            #Check.entry.pls.single(X, ncomp, keepX) # to have the warnings relative to X and Y, instead of blocks
             if (length(Y)!=nrow(X))
             stop("unequal number of rows in 'X' and 'Y'.")
             
@@ -303,7 +303,7 @@ near.zero.var = FALSE)
         } else { #pls or spls
             
             
-            #Check.entry.pls(X, Y, ncomp, keepX, keepY,keepX.constraint,keepY.constraint) # to have the warnings relative to X and Y, instead of blocks
+            #Check.entry.pls(X, Y, ncomp, keepX, keepY) # to have the warnings relative to X and Y, instead of blocks
             
             if (missing(keepX) & missing(keepY))  #pls, mint.pls
             {

@@ -86,14 +86,14 @@ Logratio can only be applied if the data do not contain any 0 value (for count d
 \references{
 On log ratio transformations:
 Filzmoser, P., Hron, K., Reimann, C.: Principal component analysis for compositional data with outliers. Environmetrics 20(6), 621-632 (2009)
-L\^{e} Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
+Lê Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
 On multilevel decomposition:
 Westerhuis, J.A., van Velzen, E.J., Hoefsloot, H.C., Smilde, A.K.: Multivariate paired data analysis: multilevel plsda versus oplsda. Metabolomics 6(1), 119-128 (2010)
-Liquet, B., Le Cao, K.-A., Hocini, H., Thiebaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
+Liquet, B., Lê Cao, K.-A., Hocini, H., Thiebaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
 }
 
 
-\author{Florian Rohart, Kim-Anh Le Cao, Ignacio Gonzalez}
+\author{Florian Rohart, Kim-Anh Lê Cao, Ignacio González}
 
 \seealso{\code{\link{nipals}}, \code{\link{prcomp}}, \code{\link{biplot}}, 
 \code{\link{plotIndiv}}, \code{\link{plotVar}}

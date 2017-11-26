@@ -107,9 +107,9 @@ A list containing the following components:
   \item{names}{the name of each variable, matching their coordinates values.}
 }
 
-\author{Ignacio Gonzalez, Kim-Anh Le Cao, Benoit Gautier, Florian Rohart, Francois Bartolo.}
+\author{Ignacio González, Kim-Anh Lê Cao, Benoit Gautier, Florian Rohart, Francois Bartolo.}
 
-\references{Gonzalez I., Le Cao K-A., Davis, M.J. and Dejean, S. (2012). Visualising associations between paired 'omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}}
+\references{González I., Lê Cao K-A., Davis, M.J. and Déjean, S. (2012). Visualising associations between paired 'omics data sets. J. Data Mining 5:19. \url{http://www.biodatamining.org/content/5/1/19/abstract}}
 
 
 \seealso{\code{\link{cim}}, \code{\link{network}}, \code{\link{par}} and http://www.mixOmics.org for more details.}

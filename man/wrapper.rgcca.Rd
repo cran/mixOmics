@@ -29,7 +29,7 @@ wrapper.rgcca(X,
   each dimension using the Schafer and Strimmer (2005)
   analytical formula.}
 \item{ncomp}{the number of components to include in the model. Default to 1.}
-\item{keepX}{ A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model on the last components (once all keepX.constraint[[i]] are used).}
+\item{keepX}{ A vector of same length as X.  Each entry keepX[i] is the number of X[[i]]-variables kept in the model.}
   \item{scheme}{Either "horst", "factorial" or "centroid"
   (Default: "horst").}
 \item{scale}{boleean. If scale = TRUE, each block is standardized
@@ -80,7 +80,7 @@ that contains the following components:
   Genet. Mol. Biol. 4:32.
 }
 
-\author{Arthur Tenenhaus, Vincent Guillemot and Kim-Anh Le Cao.}
+\author{Arthur Tenenhaus, Vincent Guillemot and Kim-Anh Lê Cao.}
 
 \seealso{\code{\link{wrapper.rgcca}}, \code{\link{plotIndiv}}, \code{\link{plotVar}}, \code{\link{wrapper.sgcca}} and \url{http://www.mixOmics.org} for more details.}
 

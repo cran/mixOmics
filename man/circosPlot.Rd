@@ -44,7 +44,7 @@ If \code{NULL}, the colnames of the data matrix are used.}
 
 
 \details{
-\code{circosPlot} function depicts correlations of variables selected with \code{block.splsda} among different blocks, using a generalisation of the method presented in Gonzalez et al 2012.
+\code{circosPlot} function depicts correlations of variables selected with \code{block.splsda} among different blocks, using a generalisation of the method presented in González et al 2012.
 If \code{ncomp} is specified, then only the variables selected on that component are displayed.
 }
 
@@ -57,20 +57,21 @@ If saved in an object, the circos plot will output the similarity matrix and the
 
 
 \references{
-Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Le Cao K.A. (2016).
+Singh A., Gautier B., Shannon C., Vacher M., Rohart F., Tebbutt S. and Lê Cao K.A. (2016).
 DIABLO:  multi omics integration for biomarker discovery. BioRxiv available here: \url{http://biorxiv.org/content/early/2016/08/03/067611}
 
-mixOmics manuscript:
+mixOmics article:
 
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. BioRxiv available here: \url{http://biorxiv.org/content/early/2017/02/14/108597}
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
 
 
-Gonzalez I., Le Cao K.A., Davis M.J., Dejean S. (2012). Visualising associations between
+
+González I., Lê Cao K.A., Davis M.J., Déjean S. (2012). Visualising associations between
 paired 'omics' data sets. \emph{BioData Mining}; \bold{5}(1).
 
 }
 
-\author{Michael Vacher, Amrit Singh, Florian Rohart, Kim-Anh Le Cao}
+\author{Michael Vacher, Amrit Singh, Florian Rohart, Kim-Anh Lê Cao}
 
 \seealso{\code{\link{block.splsda}}, references and http://www.mixOmics.org/mixDIABLO for more details.}
 

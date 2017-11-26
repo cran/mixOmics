@@ -149,7 +149,6 @@ cpus
     #if ((!is.null(already.tested.X)) && (length(already.tested.X) != (ncomp - 1)) )
     #stop("The number of already tested parameters should be NULL or ", ncomp - 1, " since you set ncomp = ", ncomp)
     
-    constraint = FALSE # kept in the code so far, will probably get remove later on
     if (missing(already.tested.X))
     {
         already.tested.X = NULL
@@ -158,7 +157,7 @@ cpus
         stop("''already.tested.X' must be a vector of keepX values")
 
         if(is.list(already.tested.X))
-        stop("''already.tested.X' must be a vector of keepX values since 'constraint' is set to FALSE")
+        stop("''already.tested.X' must be a vector of keepX values")
 
         message(paste("Number of variables selected on the first", length(already.tested.X), "component(s):", paste(already.tested.X,collapse = " ")))
     }
@@ -247,9 +246,10 @@ cpus
         is.na.A = is.na(X)
         
         ind.NA = which(apply(is.na.A, 1, sum) > 0) # calculated only once
+        ind.NA.col = which(apply(is.na.A, 2, sum) >0) # indice of the col that have missing values. used in the deflation
     } else {
         is.na.A = NULL
-        ind.NA = NULL
+        ind.NA = ind.NA.col = NULL
     }
     #-- NA calculation      ----------------------------------------------------#
     #---------------------------------------------------------------------------#
@@ -321,7 +321,7 @@ cpus
             test.keepX = test.keepX, measure = measure, dist = dist, scale=scale,
             near.zero.var = near.zero.var, progressBar = progressBar, tol = tol, max.iter = max.iter, auc = auc,
             cl = cl, parallel = parallel,
-            misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA, class.object="splsda")
+            misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA, ind.NA.col = ind.NA.col, class.object="splsda")
             
             # in the following, there is [[1]] because 'tune' is working with only 1 distance and 'MCVfold.splsda' can work with multiple distances
             mat.error.rate[[comp]] = result[[measure]]$mat.error.rate[[1]]

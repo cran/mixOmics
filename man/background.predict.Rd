@@ -30,7 +30,7 @@ Note that by default xlim and ylim will create a rectangle of simulated data tha
 
 Also note that the white frontier that defines the predicted areas when plotting with \code{plotIndiv} can be reduced by increasing \code{resolution}.
 
-More details about the prediction distances in \code{?predict} and the referred publication.
+More details about the prediction distances in \code{?predict} and the supplemental material of the mixOmics article (Rohart et al. 2017).
 
 }
 
@@ -41,7 +41,7 @@ More details about the prediction distances in \code{?predict} and the referred 
 
 
 \references{
-Rohart F, Gautier B, Singh A, Le Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration.
+Rohart F, Gautier B, Singh A, Lê Cao K-A. mixOmics: an R package for 'omics feature selection and multiple data integration. PLoS Comput Biol 13(11): e1005752
 }
 
 

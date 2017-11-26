@@ -257,7 +257,6 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     result = list(
     error.rate = mat.mean.error,
     choice.keepX = already.tested.X,
-    #choice.keepX.constraint = if(constraint){already.tested.X}else{NULL},
     choice.ncomp = list(ncomp = ncomp_opt, values = error.per.study.keepX.opt),
     error.rate.class = error.per.class.keepX.opt)
     

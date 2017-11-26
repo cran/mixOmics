@@ -33,8 +33,8 @@ all.outputs = TRUE)
 \item{indY}{To supply if Y is missing, indicates the position of the matrix / vector response in the list \code{X}}
 \item{study}{factor indicating the membership of each sample to each of the studies being combined}
 \item{ncomp}{the number of components to include in the model. Default to 2.}
-\item{keepX}{A list of same length as X.  Each entry is the number of variables to select in each of the blocks of X for each component. In the case where keepX.constraint is specified it should indicate the number of variables to select on the remaining components. By default all variables are kept in the model.}
-\item{keepY}{Only if Y is provided. Each entry is the number of variables to select in each of the blocks of Y for each component. In the case where keepX.constraint is specified it should indicate the number of variables to select on the remaining components. By default all variables are kept in the model.}
+\item{keepX}{A list of same length as X.  Each entry is the number of variables to select in each of the blocks of X for each component. By default all variables are kept in the model.}
+\item{keepY}{Only if Y is provided. Each entry is the number of variables to select in each of the blocks of Y for each component. By default all variables are kept in the model.}
 \item{design}{numeric matrix of size (number of blocks in X) x (number of blocks in X) with 0 or 1 values. A value of 1 (0) indicates a relationship (no relationship) between the blocks to be modelled. If \code{Y} is provided instead of \code{indY}, the \code{design} matrix is changed to include relationships to \code{Y}. }
 \item{scheme}{Either "horst", "factorial" or "centroid". Default = \code{horst}, see reference.}
 \item{mode}{character string. What type of algorithm to use, (partially) matching
@@ -61,7 +61,6 @@ algorithms are available: PLS regression \code{("regression")}, PLS canonical an
 \code{("canonical")}, redundancy analysis \code{("invariant")} and the classical PLS
 algorithm \code{("classic")} (see References and more details in \code{?pls}).
 
-Constraint model (\code{constraint=TRUE)}. The model is run on the optimal list of selected features \code{keepX.constraint} from the previous components, as opposed to considering only a specified number of features \code{keepX}.
 }
 
 \value{
@@ -85,13 +84,13 @@ that contains the following components:
 
 
 \references{
-Rohart F, Eslami A, Matigian, N, Bougeard S, Le Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
+Rohart F, Eslami A, Matigian, N, Bougeard S, Lê Cao K-A (2017). MINT: A multivariate integrative approach to identify a reproducible biomarker signature across multiple experiments and platforms. BMC Bioinformatics 18:128.
 
 
 Eslami, A., Qannari, E. M., Kohler, A., and Bougeard, S. (2014). Algorithms for multi-group PLS. J. Chemometrics, 28(3), 192-201.
 }
 
-\author{Florian Rohart, Benoit Gautier, Kim-Anh Le Cao}
+\author{Florian Rohart, Benoit Gautier, Kim-Anh Lê Cao}
 
 
 \seealso{\code{\link{spls}}, \code{\link{summary}},

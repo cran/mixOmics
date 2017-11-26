@@ -66,7 +66,7 @@ components.
 \author{Fangzhou Yao and Jeff Coquery.}
 
 \references{
-Yao, F., Coquery, J. and Le Cao, K.-A. (2011) Principal component analysis with independent loadings: a combination of PCA and ICA. (in preparation)
+Yao, F., Coquery, J. and Lê Cao, K.-A. (2011) Principal component analysis with independent loadings: a combination of PCA and ICA. (in preparation)
 
 A. Hyvarinen and E. Oja (2000) Independent Component Analysis: Algorithms and Applications, \emph{Neural Networks}, \bold{13(4-5)}:411-430
 

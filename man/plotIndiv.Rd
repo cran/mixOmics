@@ -132,7 +132,7 @@ For customized plots (i.e. adding points, text), use the style = 'graphics' (def
 Note: the ellipse options were borrowed from the \pkg{ellipse}.
 }
 
-\author{Ignacio Gonzalez, Benoit Gautier, Francois Bartolo, Florian Rohart}
+\author{Ignacio González, Benoit Gautier, Francois Bartolo, Florian Rohart}
 
 \seealso{\code{\link{text}}, \code{\link{background.predict}}, \code{\link{points}} and http://mixOmics.org/graphics for more details.}
 
