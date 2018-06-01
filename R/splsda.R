@@ -99,7 +99,7 @@ all.outputs = TRUE)
     # call to 'internal_wrapper.mint'
     result = internal_wrapper.mint(X = X, Y = Y.mat, ncomp = ncomp, scale = scale, near.zero.var = near.zero.var, mode = mode,
     keepX = keepX, max.iter = max.iter, tol = tol, logratio = logratio,
-    multilevel = multilevel, DA = TRUE, all.outputs = all.outputs)
+    multilevel = multilevel, DA = TRUE, all.outputs = all.outputs, remove.object=c("X"))
     
 
     # choose the desired output from 'result'

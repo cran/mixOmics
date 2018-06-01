@@ -208,10 +208,6 @@ function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist"
             dim(newdata) = c(1, p) #don't understand that, Benoit?
         }
         
-        if (any(sapply(newdata, function(x){any(is.na(x))})))
-        stop("Some missing data are present in the matrix")
-        
-        
         #check dimnames and ncomp per block of A
         for(q in 1:length(newdata))
         {
@@ -398,38 +394,45 @@ function(object, newdata,study.test,dist = c("all", "max.dist", "centroids.dist"
     # Y         # observation
     # newdata   #list of blocks for the prediction, same length as A, scaled
     
-    
     ###  replace NA by 0 in the training data
-    
-    if( (hasArg(misdata.all) & hasArg(is.na.X)) && list(...)$misdata.all) # ind.na.X: all blocks except Y
+    if( (hasArg(misdata.all) & hasArg(is.na.X)) && any(list(...)$misdata.all)) # ind.na.X: all blocks except Y
     {    # if misdata.all and ind.na.X are provided, we don't calculate the is.na(X) as it takes time. Used in tune functions.
-        X = lapply(1:J, function(q){replace(X[[q]], list(...)$is.na.X[[q]], 0)})
+        for(j in c(1:J)[list(...)$misdata.all])
+        X[[j]][list(...)$is.na.X[[j]]]=0 # faster than using replace
     } else {
         # replace NA by 0
         X = lapply(X,function(x)
         {
-            ind = which(is.na(x))
-            if (length(ind) > 0)
+            if (anyNA(x)){
+            ind = is.na(x)
             x[ind] = 0
+            }
             x
         })
     }
 
-    if( (hasArg(misdata.all) & hasArg(is.na.newdata)) && list(...)$misdata.all) # ind.na.newdata: all blocks of newdata
+    ###  replace NA by 0 in the test data
+
+    if( (hasArg(misdata.all) & hasArg(is.na.newdata)) && any(list(...)$misdata.all)) # ind.na.newdata: all blocks of newdata
     {
         # if misdata.all and ind.na.X are provided, we don't calculate the is.na(X) as it takes time. Used in tune functions.
         concat.newdata = lapply(1:J, function(q){replace(concat.newdata[[q]], list(...)$is.na.newdata[[q]], 0)})
+
     } else {
         # replace NA by 0
         concat.newdata = lapply(concat.newdata,function(x)
         {
-            ind = which(is.na(x))
-            if (length(ind) > 0)
-            x[ind] = 0
+            if (anyNA(x)){
+                ind = is.na(x)
+                x[ind] = 0
+            }
             x
         })
-
     }
+    
+    if (any(sapply(concat.newdata, anyNA)))
+    stop("Some missing values are present in the test data")
+
     
     # replace NA by 0 in Y
     Y[is.na(Y)] = 0

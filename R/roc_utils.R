@@ -86,9 +86,10 @@ statauc <- function(data = NULL, plot = FALSE, title = NULL){
     p = p + geom_abline(intercept = 1) + theme(legend.key.size = unit(1.5, "cm"), plot.title = element_text(lineheight=.8, face="bold"), legend.title = element_text(size=14, face="bold")) + ggtitle(title) + theme(plot.title = element_text(hjust = 0.5))
     
     plot(p)
+  } else {
+      p=NULL
   }
-  
-  return(ann_text)
+  return(list(ann_text,graph=p))
   
 }
 

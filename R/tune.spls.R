@@ -27,11 +27,11 @@
 
 
 # ========================================================================================================
-# tune.splsda: chose the optimal number of parameters per component on a splsda method
+# tune.spls: chose the optimal number of parameters per component on a spls method, based on MSE
 # ========================================================================================================
 
 # X: numeric matrix of predictors
-# Y: a factor or a class vector for the discrete outcome
+# Y: a numeric matrix
 # ncomp: the number of components to include in the model. Default to 1.
 # test.keepX: grid of keepX among which to chose the optimal one
 # already.tested.X: a vector giving keepX on the components that were already tuned
@@ -46,27 +46,29 @@
 # max.iter: integer, the maximum number of iterations.
 # near.zero.var: boolean, see the internal \code{\link{nearZeroVar}} function (should be set to TRUE in particular for data with many zero values). Setting this argument to FALSE (when appropriate) will speed up the computations
 # nrepeat: number of replication of the Mfold process
-# logratio: one of "none", "CLR"
 # multilevel: repeated measurement. `multilevel' is passed to multilevel(design = ) in withinVariation. Y is ommited and shouldbe included in `multilevel'
 # light.output: if FALSE, output the prediction and classification of each sample during each folds, on each comp, for each repeat
 # cpus: number of cpus to use. default to no parallel
 
-tune.splsda = function (X, Y,
+
+
+# I start with no selection on Y. Otherwise we need to be able to tell which submodel of Y is better. I'm afraid a sum(MSE_Yi) is gonna lead to very sparse model (only 1Y), to test.
+
+tune.spls = function (X, Y,
 ncomp = 1,
 test.keepX = c(5, 10, 15),
 already.tested.X,
 validation = "Mfold",
 folds = 10,
-dist = "max.dist",
-measure = "BER", # one of c("overall","BER")
+measure = "MSE", # MAE (Mean Absolute Error: MSE without the square), Bias (average of the differences), MAPE (average of the absolute errors, as a percentage of the actual values)
+# can do a R2 per Y (correlation, linear regression R2),
+# need to call MSEP (see perf.spls)
 scale = TRUE,
-auc = FALSE,
 progressBar = TRUE,
 tol = 1e-06,
 max.iter = 100,
 near.zero.var = FALSE,
 nrepeat = 1,
-logratio = c('none','CLR'),
 multilevel = NULL,
 light.output = TRUE,
 cpus
@@ -75,54 +77,29 @@ cpus
     #---------------------------------------------------------------------------#
     
     #------------------#
-    #-- check entries --#
-    if(!any(class(X) == "matrix"))
-    X = as.matrix(X)
+    if(!any(class(X)=="matrix"))
+    X= as.matrix(X)
     
+    if(!any(class(Y)=="matrix"))
+    Y= as.matrix(Y)
+    
+    #-- check entries --#
     if (length(dim(X)) != 2 || !is.numeric(X))
     stop("'X' must be a numeric matrix.")
     
-    
-    # Testing the input Y
-    if (is.null(multilevel))
-    {
-        if (is.null(Y))
-        stop("'Y' has to be something else than NULL.")
-        
-        if (is.null(dim(Y)))
-        {
-            Y = factor(Y)
-        }  else {
-            stop("'Y' should be a factor or a class vector.")
-        }
-        
-        if (nlevels(Y) == 1)
-        stop("'Y' should be a factor with more than one level")
-        
-    } else {
-        # we expect a vector or a 2-columns matrix in 'Y' and the repeated measurements in 'multilevel'
-        multilevel = data.frame(multilevel)
-        
-        if ((nrow(X) != nrow(multilevel)))
-        stop("unequal number of rows in 'X' and 'multilevel'.")
-        
-        if (ncol(multilevel) != 1)
-        stop("'multilevel' should have a single column for the repeated measurements, other factors should be included in 'Y'.")
-        
-        if (!is.null(ncol(Y)) && !ncol(Y) %in% c(0,1,2))# multilevel 1 or 2 factors
-        stop("'Y' should either be a factor, a single column data.frame containing a factor, or a 2-columns data.frame containing 2 factors.")
-        
-        multilevel = data.frame(multilevel, Y)
-        multilevel[, 1] = as.numeric(factor(multilevel[, 1])) # we want numbers for the repeated measurements
-        
-    }
-    
+    if (length(dim(Y)) != 2 || !is.numeric(Y))
+    stop("'Y' must be a numeric matrix.")
     
     #-- progressBar
     if (!is.logical(progressBar))
     stop("'progressBar' must be a logical constant (TRUE or FALSE).", call. = FALSE)
     
-    
+    #-- measure
+    choices = c("MSE", "MAE","Bias","R2")
+    measure = choices[pmatch(measure, choices)]
+    if (is.na(measure))
+    stop("'measure' must be one of 'MSE', 'MAE', 'bias' or 'R2' ")
+
     if (is.null(ncomp) || !is.numeric(ncomp) || ncomp <= 0)
     stop("invalid number of variates, 'ncomp'.")
     
@@ -140,16 +117,8 @@ cpus
         nrepeat = 1
     }
     
-    #-- logratio
-    if (length(logratio) > 1)
-    logratio = logratio[1]
     
-    if (!logratio %in% c("none","CLR"))
-    stop("'logratio must be one of 'none' or 'CLR'")
-    
-    #if ((!is.null(already.tested.X)) && (length(already.tested.X) != (ncomp - 1)) )
-    #stop("The number of already tested parameters should be NULL or ", ncomp - 1, " since you set ncomp = ", ncomp)
-    
+    #-- already.tested.X
     if (missing(already.tested.X))
     {
         already.tested.X = NULL
@@ -165,12 +134,6 @@ cpus
     
     if(length(already.tested.X) >= ncomp)
     stop("'ncomp' needs to be higher than the number of components already tuned, which is length(already.tested.X)=",length(already.tested.X) , call. = FALSE)
-    
-    #-- measure
-    choices = c("BER", "overall")
-    measure = choices[pmatch(measure, choices)]
-    if (is.na(measure))
-    stop("'measure' must be either 'BER' or 'overall' ")
 
     if (any(is.na(validation)) || length(validation) > 1)
     stop("'validation' should be one of 'Mfold' or 'loo'.", call. = FALSE)
@@ -186,7 +149,6 @@ cpus
         
         parallel = TRUE
         cl = makeCluster(cpus, type = "SOCK")
-        #clusterExport(cl, c("splsda","selectVar"))
         clusterEvalQ(cl, library(mixOmics))
 
         if(progressBar == TRUE)
@@ -216,49 +178,25 @@ cpus
     stop("samples should have a unique identifier/rowname")
     if (length(unique(X.names)) != ncol(X))
     stop("Unique indentifier is needed for the columns of X")
-    
-    rm(X.names);rm(ind.names)
+
 
     #-- end checking --#
     #------------------#
     
    
-    #---------------------------------------------------------------------------#
-    #-- logration + multilevel approach ----------------------------------------#
-    # we can do logratio and multilevel on the whole data as these transformation are done per sample
-    X = logratio.transfo(X = X, logratio = logratio)
-    
-    if (!is.null(multilevel)) # logratio is applied per sample, multilevel as well, so both can be done on the whole data
-    {
-
-        Xw = withinVariation(X, design = multilevel)
-        X = Xw
-
-        #-- Need to set Y variable for 1 or 2 factors
-        Y = multilevel[, -1, drop=FALSE]
-        if (ncol(Y) >= 1)
-        Y = apply(Y, 1, paste, collapse = ".")  #  paste is to combine in the case we have 2 levels
-        
-        Y = as.factor(Y)
-    }
-    #-- logration + multilevel approach ----------------------------------------#
-    #---------------------------------------------------------------------------#
-    
     
     #---------------------------------------------------------------------------#
     #-- NA calculation      ----------------------------------------------------#
     
-    misdata = c(X=anyNA(X), Y=FALSE) # Detection of missing data. we assume no missing values in the factor Y
+    misdata = c(X=anyNA(X), Y=anyNA(Y)) # Detection of missing data. we assume no missing values in the factor Y
     
     if (any(misdata))
     {
-        is.na.A = is.na(X)
-        
-        #ind.NA = which(apply(is.na.A, 1, sum) > 0) # calculated only once
-        #ind.NA.col = which(apply(is.na.A, 2, sum) >0) # indice of the col that have missing values. used in the deflation
+        is.na.A.X = is.na(X)
+        is.na.A.Y = is.na(Y)
+        is.na.A = list(X=is.na.A.X, Y=is.na.A.Y)
     } else {
         is.na.A = NULL
-        #ind.NA = ind.NA.col = NULL
     }
     #-- NA calculation      ----------------------------------------------------#
     #---------------------------------------------------------------------------#
@@ -267,6 +205,7 @@ cpus
 
     test.keepX = sort(unique(test.keepX)) #sort test.keepX so as to be sure to chose the smallest in case of several minimum
     names(test.keepX) = test.keepX
+    
     # if some components have already been tuned (eg comp1 and comp2), we're only tuning the following ones (comp3 comp4 .. ncomp)
     if ((!is.null(already.tested.X)))
     {
@@ -275,18 +214,14 @@ cpus
         comp.real = 1:ncomp
     }
     
-    
-    choices = c("all", "max.dist", "centroids.dist", "mahalanobis.dist")
-    dist = match.arg(dist, choices, several.ok = TRUE)
-    
-    
+
     mat.error.rate = list()
     error.per.class = list()
 
     mat.sd.error = matrix(0,nrow = length(test.keepX), ncol = ncomp-length(already.tested.X),
-    dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))
+    dimnames = list(test.keepX, c(paste('comp', comp.real, sep=''))))
     mat.mean.error = matrix(nrow = length(test.keepX), ncol = ncomp-length(already.tested.X),
-    dimnames = list(c(test.keepX), c(paste('comp', comp.real, sep=''))))        
+    dimnames = list(test.keepX, c(paste('comp', comp.real, sep=''))))
    
     # first: near zero var on the whole data set
     if(near.zero.var == TRUE)
@@ -306,22 +241,13 @@ cpus
     if (is.null(multilevel) | (!is.null(multilevel) && ncol(multilevel) == 2))
     {
         if(light.output == FALSE)
-        prediction.all = class.all = list()
+        prediction.all = list()
         
-        if(auc)
-        {
-            auc.mean.sd=list()
-            if(light.output == FALSE)
-            auc.all=list()
-        }
-        
-        class.object=c("splsda","DA")
-        if(!missing(cpus))
-            clusterExport(cl, c("X","Y","is.na.A","misdata","scale","near.zero.var","class.object","test.keepX"),envir=environment())
 
-        error.per.class.keepX.opt = list()
-        error.per.class.keepX.opt.mean = matrix(0, nrow = nlevels(Y), ncol = length(comp.real),
-        dimnames = list(c(levels(Y)), c(paste('comp', comp.real, sep=''))))
+        class.object="spls"
+        if(!missing(cpus))
+        clusterExport(cl, c("X","Y","is.na.A","misdata","scale","near.zero.var","class.object","test.keepX", "test.keepY"),envir=environment())
+
         # successively tune the components until ncomp: comp1, then comp2, ...
         for(comp in 1:length(comp.real))
         {
@@ -331,47 +257,37 @@ cpus
             
             result = MCVfold.spls (X, Y, multilevel = multilevel, validation = validation, folds = folds, nrepeat = nrepeat, ncomp = 1 + length(already.tested.X),
             choice.keepX = already.tested.X,
-            test.keepX = test.keepX, test.keepY = nlevels(Y), measure = measure, dist = dist, scale=scale,
-            near.zero.var = near.zero.var, progressBar = progressBar, tol = tol, max.iter = max.iter, auc = auc,
+            test.keepX = test.keepX, test.keepY = ncol(Y), measure = measure, dist = NULL, auc=FALSE, scale=scale,
+            near.zero.var = near.zero.var, progressBar = progressBar, tol = tol, max.iter = max.iter,
             cl = cl, parallel = parallel,
             misdata = misdata, is.na.A = is.na.A, class.object=class.object)
             
+            #save(list=ls(),file="temp.Rdata")
             # in the following, there is [[1]] because 'tune' is working with only 1 distance and 'MCVfold.splsda' can work with multiple distances
             mat.error.rate[[comp]] = result[[measure]]$mat.error.rate[[1]]
             mat.mean.error[, comp]=result[[measure]]$error.rate.mean[[1]]
             if (!is.null(result[[measure]]$error.rate.sd[[1]]))
             mat.sd.error[, comp]=result[[measure]]$error.rate.sd[[1]]
             
-            # confusion matrix for keepX.opt
-            error.per.class.keepX.opt[[comp]]=result[[measure]]$confusion[[1]]
-            error.per.class.keepX.opt.mean[, comp]=apply(result[[measure]]$confusion[[1]], 1, mean)
-
 
             # best keepX
             already.tested.X = c(already.tested.X, result[[measure]]$keepX.opt[[1]])
-             
+
             if(light.output == FALSE)
             {
                 #prediction of each samples for each fold and each repeat, on each comp
-                class.all[[comp]] = result$class.comp[[1]]
                 prediction.all[[comp]] = result$prediction.comp
             }
             
-            if(auc)
-            {
-                auc.mean.sd[[comp]] = result$auc
-                if(light.output == FALSE)
-                auc.all[[comp]] = result$auc.all
-            }
-            
+
+
         } # end comp
         if (parallel == TRUE)
         stopCluster(cl)
         
         names(mat.error.rate) = c(paste('comp', comp.real, sep=''))
-        names(error.per.class.keepX.opt) = c(paste('comp', comp.real, sep=''))
         names(already.tested.X) = c(paste('comp', 1:ncomp, sep=''))
-        
+
         if (progressBar == TRUE)
         cat('\n')
 
@@ -383,9 +299,10 @@ cpus
             for(comp in 1:length(comp.real))
             {
                 ind.row = match(keepX[[comp.real[comp]]],test.keepX)
-                error.keepX = cbind(error.keepX, mat.error.rate[[comp]][ind.row,])
+                error.keepX = cbind(error.keepX, apply(matrix(mat.error.rate[[comp]][[ind.row]],ncol=nrepeat),2,mean))
             }
             colnames(error.keepX) = c(paste('comp', comp.real, sep=''))
+            rownames(error.keepX) = c(paste('nrep.', 1:nrepeat, sep=''))
             
             opt = t.test.process(error.keepX)
             
@@ -393,55 +310,34 @@ cpus
         } else {
             ncomp_opt = error.keepX = NULL
         }
-        
+
+
         result = list(
         error.rate = mat.mean.error,
         error.rate.sd = mat.sd.error,
         error.rate.all = mat.error.rate,
         choice.keepX = already.tested.X,
-        choice.ncomp = list(ncomp = ncomp_opt, values = error.keepX),
-        error.rate.class = error.per.class.keepX.opt.mean,
-        error.rate.class.all = error.per.class.keepX.opt)
+        choice.ncomp = list(ncomp = ncomp_opt, values = error.keepX))
         
         if(light.output == FALSE)
         {
-            names(class.all) = names(prediction.all) = c(paste('comp', comp.real, sep=''))
+            names(prediction.all) = c(paste('comp', comp.real, sep=''))
             result$predict = prediction.all
-            result$class = class.all
         }
-        if(auc)
-        {
-            names(auc.mean.sd) = c(paste('comp', comp.real, sep=''))
-            result$auc = auc.mean.sd
-            if(light.output == FALSE)
-            {
-                names(auc.all) = c(paste('comp', comp.real, sep=''))
-                result$auc.all =auc.all
-            }
-        }
+
         result$measure = measure
         result$call = match.call()
 
-        class(result) = "tune.splsda"
+        class(result) = "tune.spls"
 
         return(result)
     } else {
         # if multilevel with 2 factors, we can not do as before because withinvariation depends on the factors, we maximase a correlation
-        message("For a two-factor analysis, the tuning criterion is based on the maximisation of the correlation between the components on the whole data set")
+        message("Not implemented at the moment")
 
-        cor.value = vector(length = length(test.keepX))
-        names(cor.value) = test.keepX
-
-        for (i in 1:length(test.keepX))
-        {
-            spls.train = mixOmics::splsda(X, Y, ncomp = ncomp, keepX = c(already.tested.X, test.keepX[i]), logratio = logratio, near.zero.var = FALSE, mode = "regression")
-            
-            # Note: this is performed on the full data set
-            # (could be done with resampling (bootstrap) (option 1) and/or prediction (option 2))
-            cor.value[i] = cor(spls.train$variates$X[, ncomp], spls.train$variates$Y[, ncomp])
-            #
         }
-        return(list(cor.value = cor.value))
-
-    }
 }
+
+
+
+

@@ -25,7 +25,7 @@
 #############################################################################################################
 
 
-plot.tune.splsda = #plot.spca <- plot.ipca <- plot.sipca <-
+plot.tune.splsda = plot.tune.spls = #plot.spca <- plot.ipca <- plot.sipca <-
 function(x, optimal = TRUE, sd = TRUE, legend.position = "topright", col, ...)
 {
     
@@ -68,6 +68,14 @@ function(x, optimal = TRUE, sd = TRUE, legend.position = "topright", col, ...)
     } else if (measure == "BER")
     {
         ylab = "Balanced error rate"
+    } else if (measure == "MSE"){
+        ylab = "MSE"
+    }else if (measure == "MAE"){
+        ylab = "MAE"
+    }else if (measure == "Bias"){
+        ylab = "Bias"
+    }else if (measure == "R2"){
+        ylab = "R2"
     }
 
     matplot(rownames(error),error, type = "l", axes = TRUE, lwd = 2, lty = 1, log = "x",
@@ -107,6 +115,7 @@ function(x, optimal = TRUE, sd = TRUE, legend.position = "topright", col, ...)
     legend = legend)
     
 }
+
 
 
 plot.tune.block.splsda =

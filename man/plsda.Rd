@@ -76,19 +76,26 @@ that contains the following components:
 
 \references{
 On PLSDA:
+
 Barker M and Rayens W (2003). Partial least squares for discrimination. \emph{Journal of Chemometrics} \bold{17}(3), 166-173.
-Perez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: 
-a partial least squares discriminant analysis (PLS-DA) approach. \emph{Human Genetics} 
+Perez-Enciso, M. and Tenenhaus, M. (2003). Prediction of clinical outcome with microarray data: a partial least squares discriminant analysis (PLS-DA) approach. \emph{Human Genetics} 
 \bold{112}, 581-592.
+
 Nguyen, D. V. and Rocke, D. M. (2002). Tumor classification by partial
 least squares using microarray gene expression data. \emph{Bioinformatics}
 \bold{18}, 39-50.
+
 On log ratio transformation:
+
 Filzmoser, P., Hron, K., Reimann, C.: Principal component analysis for compositional data with outliers. Environmetrics 20(6), 621-632 (2009)
+
 Lê Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
+
 On multilevel decomposition:
 Westerhuis, J.A., van Velzen, E.J., Hoefsloot, H.C., Smilde, A.K.: Multivariate paired data analysis: multilevel plsda versus oplsda. Metabolomics 6(1), 119-128 (2010)
+
 Liquet, B., Lê Cao K.-A., Hocini, H., Thiebaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
+
 }
 
 \author{Ignacio González, Kim-Anh Lê Cao.}

@@ -35,10 +35,10 @@ explained_variance = function(data, variates, ncomp)
     data = check$X
     ncomp = check$ncomp
     
-    isna = is.na(data)
-    if (sum(isna > 0))
+    if (anyNA(data))
     {
         warning("NA values put to zero, results will differ from PCA methods used with NIPALS")
+        isna = is.na(data)
         data[isna] = 0
     }
     nor2x <- sum((data)^2) # total variance in the data

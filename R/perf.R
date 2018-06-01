@@ -209,7 +209,7 @@ progressBar = TRUE,
                 keepX.temp[which(keepX.temp>sum(nzv))] = sum(nzv)
                 
                 spls.res = mixOmics::spls(X.train[,nzv], Y.train, ncomp = ncomp, mode = mode, max.iter = max.iter, tol = tol, keepX = keepX.temp, keepY = keepY, near.zero.var = FALSE, scale = scale)
-                Y.hat = predict(spls.res, X.test[,nzv, drop = FALSE])$predict
+                Y.hat = predict.spls(spls.res, X.test[,nzv, drop = FALSE])$predict
                 if(sum(is.na(Y.hat))>0) break
                 for (k in 1:ncomp)
                 {
@@ -440,7 +440,9 @@ cpus,
         
         parallel = TRUE
         cl = makeCluster(cpus, type = "SOCK")
-        clusterExport(cl, c("splsda","selectVar"))
+        #clusterExport(cl, c("splsda","selectVar"))
+        clusterEvalQ(cl, library(mixOmics))
+
     } else {
         parallel = FALSE
         cl = NULL
@@ -489,11 +491,11 @@ cpus,
     {
         is.na.A = is.na(X)
         
-        ind.NA = which(apply(is.na.A, 1, sum) > 0) # calculated only once
-        ind.NA.col = which(apply(is.na.A, 2, sum) > 0) # calculated only once
+        #ind.NA = which(apply(is.na.A, 1, sum) > 0) # calculated only once
+        #ind.NA.col = which(apply(is.na.A, 2, sum) > 0) # calculated only once
     } else {
         is.na.A = NULL
-        ind.NA = ind.NA.col = NULL
+        #ind.NA = ind.NA.col = NULL
     }
     #-- NA calculation      ----------------------------------------------------#
     #---------------------------------------------------------------------------#
@@ -539,6 +541,10 @@ cpus,
         class.all[[ijk]] = array(0, c(nrow(X),  nrepeat ,ncomp),
         dimnames = list(rownames(X),c(paste('nrep', 1 : nrepeat)),c(paste('comp', 1 : ncomp))))
     }
+    
+    class.object=class(object)
+    if(!missing(cpus))
+    clusterExport(cl, c("X","Y","is.na.A","misdata","scale","near.zero.var","class.object","test.keepX"),envir=environment())
 
     for (comp in 1 : ncomp)
     {
@@ -556,14 +562,13 @@ cpus,
         names(test.keepX) = test.keepX
         #test.keepX is a value
 
-
         # estimate performance of the model for each component
-        result = MCVfold.splsda (X, Y, multilevel = multilevel, validation = validation, folds = folds, nrepeat = nrepeat, ncomp = comp,
-        choice.keepX = choice.keepX, test.keepX = test.keepX,
+        result = MCVfold.spls (X, Y, multilevel = multilevel, validation = validation, folds = folds, nrepeat = nrepeat, ncomp = comp,
+        choice.keepX = choice.keepX, test.keepX = test.keepX, test.keepY = nlevels(Y),
         measure = measure, dist = dist, scale=scale,
         near.zero.var = near.zero.var,
-        auc = auc, progressBar = progressBar, class.object = class(object), cl = cl, parallel = parallel,
-        misdata = misdata, is.na.A = is.na.A, ind.NA = ind.NA, ind.NA.col = ind.NA.col)
+        auc = auc, progressBar = progressBar, class.object = class.object, cl = cl, parallel = parallel,
+        misdata = misdata, is.na.A = is.na.A)#, ind.NA = ind.NA, ind.NA.col = ind.NA.col)
 
         # ---- extract stability of features ----- # NEW
         if (any(class(object) == "splsda"))

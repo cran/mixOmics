@@ -70,7 +70,7 @@ data matrix is used as names (see Details).}
 \item{group}{factor indicating the group membership for each sample, useful for ellipse plots. Coded as default for the supervised methods \code{PLS-DA, SPLS-DA,sGCCDA}, but needs to be input for the unsupervised methods \code{PCA, sPCA, IPCA, sIPCA, PLS, sPLS, rCC, rGCCA, sGCCA}}
 \item{col.per.group}{character (or symbol) color to be used when 'group' is defined. Vector of the same length than the number of groups.}
 \item{style}{argument to be set to either \code{'graphics'}, \code{'lattice'}, \code{'ggplot2'} or \code{'3d'} for a style of plotting. Default set to 'ggplot2'. See details. \code{3d} is not available for MINT objects.}
-\item{ellipse}{boolean indicating if ellipse plots should be plotted. In the non supervised objects \code{PCA, sPCA, IPCA, sIPCA, PLS, sPLS, rCC, rGCCA, sGCCA} ellipse plot is only be plotted if the argument \code{group} is provided. In the \code{PLS-DA, SPLS-DA,sGCCDA} supervised object, by default the ellipse will be plotted accoding to the outcome \code{Y}.}
+\item{ellipse}{boolean indicating if ellipse confidence region plots should be plotted. In the non supervised objects \code{PCA, sPCA, IPCA, sIPCA, PLS, sPLS, rCC, rGCCA, sGCCA} ellipse plot is only be plotted if the argument \code{group} is provided. In the \code{PLS-DA, SPLS-DA,sGCCDA} supervised object, by default the ellipse will be plotted accoding to the outcome \code{Y}.}
 \item{ellipse.level}{Numerical value indicating the confidence level of ellipse being plotted when \code{ellipse =TRUE} (i.e. the size of the ellipse). The default is set to 0.95, for a 95\% region.}
 \item{centroid}{boolean indicating whether centroid points should be plotted. In the non supervised objects \code{PCA, sPCA, IPCA, sIPCA, PLS, sPLS, rCC, rGCCA, sGCCA} the centroid will  only be plotted if the argument \code{group} is provided. The centroid will be calculated based on the group categories. In the supervised objects \code{PLS-DA, SPLS-DA,sGCCDA} the centroid will be calculated according to the outcome \code{Y}.}
 \item{star}{boolean indicating whether a star plot should be plotted, with arrows starting from the centroid (see argument 
@@ -112,9 +112,7 @@ or integers. See \code{\link{points}} for all alternatives.}
 depending on the subspace of projection. Each point corresponds to an individual.
 
 If \code{ind.names=TRUE} and row names is \code{NULL}, then \code{ind.names=1:n}, where
-\code{n} is the number of individuals. Also, if \code{pch} is an input, then \code{ind.names} is set to FALSE
-as we do not show both names and shapes.
-
+\code{n} is the number of individuals. Also, if \code{pch} is an input, then \code{ind.names} is set to FALSE as we do not show both names and shapes.
 
 \code{plotIndiv} can have a two layers legend. This is especially convenient when you have two grouping factors, such as a gender effect and a study effect, and you want to highlight both simulatenously on the graphical output.
 A first layer is coded by the \code{group} factor, the second by the \code{pch} argument. When \code{pch} is missing, a single layer legend is shown.
@@ -129,7 +127,7 @@ Note that this functionality is only available for models with less than 2 compo
 
 For customized plots (i.e. adding points, text), use the style = 'graphics' (default is ggplot2).
 
-Note: the ellipse options were borrowed from the \pkg{ellipse}.
+Note: the ellipse options were borrowed from the \pkg{ellipse}, see \code{?ellipse} for more details about how the confidence region is calculated.
 }
 
 \author{Ignacio González, Benoit Gautier, Francois Bartolo, Florian Rohart}

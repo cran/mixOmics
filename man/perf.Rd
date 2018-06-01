@@ -73,7 +73,8 @@ Measures of performance. For fitted PLS and sPLS regression models, \code{perf} 
 mean squared error of prediction (MSEP), \eqn{R^2}, and \eqn{Q^2} to assess the predictive 
 perfity of the model using M-fold or leave-one-out cross-validation. Note that only the \code{classic}, \code{regression} and  \code{invariant} modes can be applied.
 For sPLS, the MSEP, \eqn{R^2}, and \eqn{Q^2} criteria are averaged across all folds.
-Note that for PLS and sPLS objects, perf is performed on the pre-processed data after log ratio transform and multilevel analysis, if any.
+The \code{Q2.total} combines the  \eqn{Q^2} values for each Y variable and provides an overall assessment of fit. According to Tenenhaus (1998) the rule of thumb to decide whether a component contributes significantly to the prediction is when its Q2.total is still greater than 0.0975. However whe dealing with a large number of variables, especially in X, we have often experienced Q2.total values that do not decrease. The sPLS method also may not reach this cutoff, depending on the type of data and problem.
+Note that for PLS and sPLS objects, perf is performed on the pre-processed data after log ratio transform and multilevel analysis, when applied.
 
 
 Sparse methods. The sPLS, sPLS-DA and sgccda functions are run on several and different subsets of data (the cross-folds) and will certainly lead to different subset of selected features. Those are summarised in the output \code{features$stable} (see output Value below) to assess how often the variables are selected across all folds.

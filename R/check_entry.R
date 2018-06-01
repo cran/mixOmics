@@ -103,6 +103,7 @@ Check.entry.single = function(X,  ncomp, q)
     if (length(dim(X)) != 2)
     stop(paste0("'X[[", q, "]]' must be a numeric matrix."))
     
+    if(! any(class(X) %in% "matrix"))
     X = as.matrix(X)
     
     if (!is.numeric(X))
@@ -162,7 +163,7 @@ Check.entry.single = function(X,  ncomp, q)
 Check.entry.pls = function(X, Y, ncomp, keepX, keepY, test.keepX, test.keepY, mode, scale,
      near.zero.var, max.iter, tol, logratio, DA, multilevel)
 {
-
+    
     if (missing(mode))
     mode = "regression"
     
@@ -177,8 +178,9 @@ Check.entry.pls = function(X, Y, ncomp, keepX, keepY, test.keepX, test.keepY, mo
     if (length(dim(X)) != 2)
     stop("'X' must be a numeric matrix.")
     
+    if(! any(class(X) %in% "matrix"))
     X = as.matrix(X)
-    
+
     if (!(logratio %in% c("none", "CLR")))
     stop("Choose one of the two following logratio transformation: none or CLR")
     
@@ -244,16 +246,21 @@ Check.entry.pls = function(X, Y, ncomp, keepX, keepY, test.keepX, test.keepY, mo
     if (is.null(ind.names))
     {
         ind.names = dimnames(Y)[[1]]
-        rownames(X) = ind.names
+        if (is.null(ind.names))
+        {
+            ind.names = 1:N
+            rownames(X) = rownames(Y) = ind.names
+
+        } else {
+            rownames(X) = ind.names
+        }
+        
+        #rownames(X) = ind.names
+    } else {
+        rownames(Y) = ind.names
     }
     
-    if (is.null(ind.names))
-    {
-        ind.names = 1:N
-        rownames(X) = rownames(Y) = ind.names
-    }
-    
-    rownames(X) = rownames(Y) = ind.names
+    #rownames(X) = rownames(Y) = ind.names
     
     
     #if (dim(Y)[2] == 1) Y.names = "Y"
@@ -523,8 +530,11 @@ max.iter)
     # --------------------------------------------------------------------------------
     
     # force all rownames to be the same
-    ind.names = rownames(A[[1]])
-    lapply(A, function(x){rownames(x) = ind.names})
+    ind.names=lapply(A,rownames)
+    check = sapply(1:length(A),function(j){identical(ind.names[[1]],ind.names[[j]])})
+    
+    if(sum(check) != length(check))
+    stop("Please check the rownames of the data, there seems to be some discrepancies")
     
     if (!(mode %in% c("canonical", "invariant", "classic", "regression")))
     stop("Choose one of the four following modes: canonical, invariant, classic or regression")

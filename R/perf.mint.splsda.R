@@ -192,7 +192,7 @@ progressBar = TRUE,
             keepX = already.tested.X,
             scale = scale, mode = "regression")
             
-            test.predict.sw <- predict(object.res, newdata = X.test, dist = dist, study.test = study.test.CV)
+            test.predict.sw <- predict.spls(object.res, newdata = X.test, dist = dist, study.test = study.test.CV)
             prediction.comp[omit, match(levels(Y.train),levels(Y))] =  test.predict.sw$predict[, , comp]
             
             for(ijk in dist)

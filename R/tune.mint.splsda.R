@@ -145,6 +145,13 @@ light.output = TRUE # if FALSE, output the prediction and classification of each
     if (any(table(study) < 5))
     warning("At least one study has less than 5 samples, mean centering might not do as expected")
     
+    if(sum(apply(table(Y,study)!=0,2,sum)==1) >0)
+    stop("At least one study only contains a single level of the multi-levels outcome Y. The MINT algorithm cannot be computed.")
+    
+    if(sum(apply(table(Y,study)==0,2,sum)>0) >0)
+    warning("At least one study does not contain all the levels of the outcome Y. The MINT algorithm might not perform as expected.")
+
+
     #-- dist
     
     choices = c("max.dist", "centroids.dist", "mahalanobis.dist")

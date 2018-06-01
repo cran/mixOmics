@@ -62,15 +62,6 @@ function(X,
     if (any(apply(X, 1, is.infinite)))
     stop("infinite values in 'X'.", call. = FALSE)
 
-    #-- put a names on the rows and columns of X --#
-    X.names = colnames(X)
-    if (is.null(X.names))
-    X.names = paste("V", 1:ncol(X), sep = "")
-
-    ind.names = rownames(X)
-    if (is.null(ind.names))
-    ind.names = 1:nrow(X)
-
     #-- ncomp
     if (is.null(ncomp))
     ncomp = min(nrow(X),ncol(X))
@@ -175,10 +166,12 @@ function(X,
     # put a names on the rows and columns
     X.names = dimnames(X)[[2]]
     if (is.null(X.names)) X.names = paste("X", 1:p, sep = "")
-
+    colnames(X) = X.names
+    
     ind.names = dimnames(X)[[1]]
-    if (is.null(ind.names)) X.names = 1:nrow(X)
-
+    if (is.null(ind.names)) ind.names = 1:nrow(X)
+    rownames(X) = ind.names
+    
     vect.varX=vector(length=ncomp)
     names(vect.varX) = paste("PC", 1:ncomp, sep = "")#c(1:ncomp)
 

@@ -39,7 +39,7 @@ internal_mint.block = function (A, indY = NULL,  design = 1 - diag(length(A)), t
 ncomp = rep(1, length(A)), scheme = "horst", scale = TRUE,
 init = "svd.single", tol = 1e-06,
 mode = "canonical", max.iter = 100,study = NULL, keepA = NULL,
-penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NULL, ind.NA.col = NULL)
+penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NULL, ind.NA.col = NULL, remove.object=NULL)
 {
     # A: list of matrices
     # indY: integer, pointer to one of the matrices of A
@@ -61,7 +61,7 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
     # ind.NA: optional. which rows have missing values? list, ind.NA[[q]] for each data set.
     # ind.NA.col: optional. which col have missing values? list, ind.NA.col[[q]] for each data set.
 
-    
+
     names(ncomp) = names(A)
     
     time = FALSE
@@ -75,6 +75,13 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
     if(time) print(time1bis-time1)
     
     A = lapply(mean_centered, function(x){as.matrix(x$concat.data)})
+    
+    #save rownames study
+    mean_centered.rownames.study = vector("list", nlevels(study))
+    for (m in 1:nlevels(study))
+    mean_centered.rownames.study[[m]] = mean_centered[[1]]$rownames.study[[m]]
+    
+    rm(mean_centered) #free memory
     
     ni = table(study) #number of samples per study
     
@@ -90,7 +97,7 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
     # keepA[[comp]] is a matrix where each row is all the keepX the test over the block (each block is a column)
     
     #number of models to be tested: either a keepA per component, or multiple (e.g. in tune functions)
-    number.models.per.comp = sapply(keepA,nrow)
+    number.models.per.comp = sapply(keepA, nrow)
     one.model = !any( number.models.per.comp !=1)
     
     if(time) print("one.model")
@@ -103,13 +110,13 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
     if(one.model) # more outputs that what is needed for tune functions
     {
         for (k in 1:J)
-        variates.A[[k]] = matrix(NA, nb_ind, N)
+        variates.A[[k]] = matrix(NA_real_, nb_ind, N)
         
         for (k in 1:J)
         {
-            loadings.A[[k]] = matrix(NA, pjs[[k]], N)
+            loadings.A[[k]] = matrix(NA_real_, pjs[[k]], N)
             if(all.outputs)
-            P[[k]] = loadings.Astar[[k]]= matrix(NA, pjs[[k]], N)
+            P[[k]] = loadings.Astar[[k]]= matrix(NA_real_, pjs[[k]], N)
         }
         
         for (k in 1:J)
@@ -117,15 +124,15 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
             loadings.partial.A[[k]] = variates.partial.A[[k]] = vector("list", length = nlevels(study))
             for(m in 1:nlevels(study))
             {
-                loadings.partial.A[[k]][[m]] = matrix(nrow = NCOL(A[[k]]), ncol = N)
-                variates.partial.A[[k]][[m]] = matrix(nrow = ni[m], ncol = N)
+                loadings.partial.A[[k]][[m]] = matrix(NA_real_,nrow = NCOL(A[[k]]), ncol = N)
+                variates.partial.A[[k]][[m]] = matrix(NA_real_,nrow = ni[m], ncol = N)
             }
         }
     } else {
         for (k in 1:J)
         {
-            variates.A[[k]] = matrix(NA, nb_ind, sum(number.models.per.comp))
-            loadings.A[[k]] = matrix(NA, pjs[[k]], sum(number.models.per.comp))
+            variates.A[[k]] = matrix(NA_real_, nb_ind, sum(number.models.per.comp))
+            loadings.A[[k]] = matrix(NA_real_, pjs[[k]], sum(number.models.per.comp))
         }
         loadings.partial.A = variates.partial.A = NULL # not needed for tune functions
     }
@@ -146,17 +153,22 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
         misdata.all = any(misdata) # is there any missing data overall
         
         if(time) print(misdata.all)
-        
+        #save(list=ls(),file="temp.Rdata")
         if (misdata.all)
         {
-            is.na.A = lapply(A, is.na) # size n*p, which entry is na. might be none, but at least one in all the block will be a TRUE
+            is.na.A = temp = vector("list",length=length(A))
+            is.na.A[misdata] = lapply(A[misdata], is.na) # size n*p, which entry is na. might be none, but at least one in all the block will be a TRUE
             
-            ind.NA = ind.NA.col = list()
-            for(q in 1:J)
-            {
-                ind.NA[[q]] = which(apply(is.na.A[[q]], 1, sum) >0) # indice of the row that have missing values. used in the calculation of loadings
-                ind.NA.col[[q]] = which(apply(is.na.A[[q]], 2, sum) >0) # indice of the col that have missing values. used in the deflation
-            }
+            temp[misdata] = lapply(is.na.A[misdata], function(x){which(x,arr.ind=TRUE)})
+            ind.NA = lapply(temp, function(x){unique(x[,1])})
+            ind.NA.col = lapply(temp, function(x){unique(x[,2])})
+            
+            #ind.NA = ind.NA.col = list()
+            #for(q in 1:J)
+            #{
+            #    ind.NA[[q]] = which(apply(is.na.A[[q]], 1, sum) >0) # indice of the row that have missing values. used in the calculation of loadings
+            #    ind.NA.col[[q]] = which(apply(is.na.A[[q]], 2, sum) >0) # indice of the col that have missing values. used in the deflation
+            #}
         }else {
             is.na.A = NULL
             ind.NA = ind.NA.col = NULL
@@ -178,7 +190,7 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
     } else {mat.c = NULL}
     
     ### End: Initialization parameters
-    
+
     iter=NULL
     compteur = 0
     for (comp in 1 : N)
@@ -186,10 +198,13 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
         if(time) cat("====================================================================================================\n")
         if(time) print(paste0("component ", comp))
         if(time) cat("====================================================================================================\n")
-        
+        #save(list=ls(),file="temp.Rdata")
+
         if(misdata.all)# replace NA in A[[q]] by 0
-        R = lapply(1:J, function(q){replace(R[[q]], is.na.A[[q]], 0)}) # if missing data, R is the one replace by 0 where NA are supposed to be
-        
+        for(j in c(1:J)[misdata])
+        R[[j]][is.na.A[[j]]]=0 # faster than using replace
+        #R = lapply(1:J, function(q){if(misdata[q]) {replace(R[[q]], is.na.A[[q]], 0)}else{R[[q]]}}) # if missing data, R is the one replace by 0 where NA are supposed to be
+
         # initialisation_by_svd, get the loadings.A
         loadings.A.init = initialisation_by_svd(R, indY, misdata, is.na.A, init = init)
         
@@ -264,15 +279,24 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
             
             if(all.outputs & J==2 & nlevels(study) == 1 & one.model)# mat.c, (s)pls(da)
             {
-                if(misdata.all)
+                if(misdata.all) #only one model, so misdata[1]=TRUE
                 {
                     R.temp = R[[1]]
                     R.temp[is.na.X] = 0
                     c = crossprod(R.temp, variates.A[[1]][,comp])
-                    T = drop(variates.A[[1]][,comp]) %o% p.ones
-                    T[is.na.X] = 0
-                    t.norm = crossprod(T)
-                    c = c / diag(t.norm)
+                    rm(R.temp) #free memory
+                    
+                    #save(list=ls(),file="temp.Rdata")
+                    
+                    t.norm = rep(crossprod(variates.A[[1]][,comp]), length(c))
+                    
+                    if(length(ind.NA.col[[1]])>0) # should always be true
+                    {
+                        temp = drop(variates.A[[1]][,comp]) %o% rep(1, length(ind.NA.col[[1]])) #p*n -> p * where there are NA
+                        temp[is.na.X[,ind.NA.col[[1]],drop=FALSE]] = 0
+                        t.norm[ind.NA.col[[1]]] = apply(temp,2, crossprod)
+                    }
+                    c = c / t.norm
                     mat.c[,comp] = c
                 } else {
                     mat.c[,comp] <- t(crossprod(variates.A[[1]][,comp], R[[1]])) / drop(crossprod (variates.A[[1]][,comp]))
@@ -290,6 +314,9 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
                 misdata=misdata, is.na.A=is.na.A, ind.NA = ind.NA.col)
                 
                 R = defla.result$resdefl
+                
+                if(!(all.outputs & one.model)) #rm only if not used in the loop below
+                defla.result$resdefl=NULL #free memory
                 
                 if(time) time5 = proc.time()
                 if(time) print("deflation")
@@ -358,7 +385,7 @@ penalty = NULL, all.outputs = FALSE, misdata = NULL, is.na.A = NULL, ind.NA = NU
                 {
                     rownames(loadings.partial.A[[k]][[m]]) = colnames(A[[k]])
                     colnames(loadings.partial.A[[k]][[m]]) = paste0("comp ", 1:max(ncomp))
-                    rownames(variates.partial.A[[k]][[m]]) = mean_centered[[1]]$rownames.study[[m]]
+                    rownames(variates.partial.A[[k]][[m]]) = mean_centered.rownames.study[[m]]
                     colnames(variates.partial.A[[k]][[m]]) = paste0("comp ", 1:max(ncomp))
                 }
             }

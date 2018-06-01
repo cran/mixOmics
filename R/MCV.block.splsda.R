@@ -80,8 +80,6 @@ cl,
 scale,
 misdata,
 is.na.A,
-ind.NA,
-ind.NA.col,
 parallel
 )
 {    #-- checking general input parameters --------------------------------------#
@@ -162,6 +160,7 @@ parallel
         # perform loocv
         stop.user = FALSE
         
+        #save(list=ls(),file="temp22.Rdata")
 
         #result.all=list()
         fonction.j.folds =function(j)#for(j in 1:M)
@@ -179,42 +178,24 @@ parallel
             Y.train.mat = unmap(Y.train)
             Q = ncol(Y.train.mat)
             colnames(Y.train.mat) = levels(Y.train)
+            rownames(Y.train.mat) = rownames(X.train[[1]])
             X.test = lapply(X, function(x){x[omit, , drop = FALSE]}) #matrix(X[omit, ], nrow = length(omit)) #removed to keep the colnames in X.test
             Y.test = Y[omit]
-            
-            # split the NA in training and testing
-            if(any(misdata))
-            {
-                for(q in 1:length(X))
-                {
-                    if(misdata[q])
-                    {
-                        is.na.A.train = lapply(is.na.A, function(x){x[-omit,, drop=FALSE]})
-                        is.na.A.test = lapply(is.na.A, function(x){x[omit,,drop=FALSE]})
-                        
-                        ind.NA.train = lapply(is.na.A.train, function(x){which(apply(x, 1, sum) > 0)})#list(X=ind.NA[which(!ind.NA%in% omit)])
-                        #ind.NA.test = lapply(is.na.A.test, function(x){which(apply(x, 1, sum) > 0)})#list(X=ind.NA[which(ind.NA%in%omit)])
 
-                        ind.NA.col.train = lapply(is.na.A.train, function(x){which(apply(x, 2, sum) > 0)})#list(X=ind.NA[which(!ind.NA%in% omit)])
-                        #ind.NA.col.test = lapply(is.na.A.test, function(x){which(apply(x, 2, sum) > 0)})#list(X=ind.NA[which(ind.NA%in%omit)])
-                    }
-                }
-            } else {
-                is.na.A.train = is.na.A.test = NULL
-                ind.NA.train =NULL
-                ind.NA.col.train =NULL
-            }
-            
+
             #---------------------------------------#
             #-- near.zero.var ----------------------#
-            
+            remove = vector("list",length=length(X))
             # first remove variables with no variance inside each X.train/X.test
-            var.train = lapply(X, function(x){apply(x, 2, var)})
+            #var.train = colVars(X.train, na.rm=TRUE)#apply(X.train, 2, var)
+            var.train = lapply(X.train, function(x){colVars(x, na.rm=TRUE)})
             for(q in 1:length(X))
             {
                 ind.var = which(var.train[[q]] == 0)
                 if (length(ind.var) > 0)
                 {
+                    remove[[q]] = c(remove[[q]], colnames(X.train[[q]])[ind.var])
+
                     X.train[[q]] = X.train[[q]][, -c(ind.var),drop = FALSE]
                     X.test[[q]] = X.test[[q]][, -c(ind.var),drop = FALSE]
                     
@@ -225,6 +206,7 @@ parallel
                     # reduce test.keepX if needed
                     if (any(test.keepX[[q]] > ncol(X.train[[q]])))
                     test.keepX[[q]][which(test.keepX[[q]]>ncol(X.train[[q]]))] = ncol(X.train[[q]])
+                    
                 }
             }
             
@@ -237,7 +219,11 @@ parallel
                     if (length(nzv.A[[q]]$Position) > 0)
                     {
                         names.remove.X = colnames(X.train[[q]])[nzv.A[[q]]$Position]
+                        remove[[q]] = c(remove[[q]], names.remove.X)
+
                         X.train[[q]] = X.train[[q]][, -nzv.A[[q]]$Position, drop=FALSE]
+                        X.test[[q]] = X.test[[q]][, -nzv.A[[q]]$Position,drop = FALSE]
+                        
                         #if (verbose)
                         #warning("Zero- or near-zero variance predictors.\n Reset predictors matrix to not near-zero variance predictors.\n See $nzv for problematic predictors.")
                         if (ncol(X.train[[q]]) == 0)
@@ -253,16 +239,80 @@ parallel
             #-- near.zero.var ----------------------#
             #---------------------------------------#
             
-            #prediction.comp.j = array(0, c(length(omit), nlevels(Y), length(test.keepX)), dimnames = list(rownames(X.test), levels(Y), names(test.keepX)))
             
+            #------------------------------------------#
+            # split the NA in training and testing
+            if(any(misdata))
+            {
+                
+                is.na.A.train = is.na.A.test = ind.NA.train = ind.NA.col.train = vector("list", length = length(X))
+
+                for(q in 1:length(X))
+                {
+                    if(misdata[q])
+                    {
+                        if(length(remove[[q]])>0){
+                            ind.remove = which(colnames(X[[q]]) %in% remove[[q]])
+                            is.na.A.train[[q]] = is.na.A[[q]][-omit, -ind.remove, drop=FALSE]
+                            is.na.A.test[[q]] = is.na.A[[q]][omit, -ind.remove, drop=FALSE]
+                        } else {
+                            is.na.A.train[[q]] = is.na.A[[q]][-omit, , drop=FALSE]
+                            is.na.A.test[[q]] = is.na.A[[q]][omit, , drop=FALSE]
+                        }
+                        temp = which(is.na.A.train[[q]], arr.ind=TRUE)
+                        ind.NA.train[[q]] = unique(temp[,1])
+                        ind.NA.col.train[[q]] = unique(temp[,2])
+                    }
+                }
+                names(is.na.A.train) = names(is.na.A.test) = names(ind.NA.train) = names(ind.NA.col.train) = names(is.na.A)
+                
+                
+                if(FALSE){
+                    is.na.A.train = ind.NA.train = ind.NA.col.train = vector("list", length = length(X))
+                    
+                    is.na.A.train= lapply(is.na.A, function(x){x[-omit,, drop=FALSE]})
+                    is.na.A.test = lapply(is.na.A, function(x){x[omit,,drop=FALSE]})
+                    for(q in 1:length(X))
+                    {
+                        if(misdata[q])
+                        {
+                            
+                            temp = which(is.na.A.train[[q]], arr.ind=TRUE)
+                            ind.NA.train[[q]] = unique(temp[,1])
+                            ind.NA.col.train[[q]] = unique(temp[,2])
+                            #ind.NA.train[[q]] = which(apply(is.na.A.train[[q]], 1, sum) > 0) # calculated only once
+                            #ind.NA.test = which(apply(is.na.A.test, 1, sum) > 0) # calculated only once
+                            #ind.NA.col.train[[q]] = which(apply(is.na.A.train[[q]], 2, sum) > 0) # calculated only once
+                        }
+                    }
+                }
+            } else {
+                is.na.A.train = is.na.A.test = NULL
+                ind.NA.train = NULL
+                ind.NA.col.train = NULL
+            }
+
+            # split the NA in training and testing
+            #------------------------------------------#
+
+
+            #save(list=ls(), file="temp2.Rdata")
+            #stop("blaa")
+            
+            #prediction.comp.j = array(0, c(length(omit), nlevels(Y), length(test.keepX)), dimnames = list(rownames(X.test), levels(Y), names(test.keepX)))
+            is.na.A.temp = ind.NA.temp = ind.NA.col.temp = vector("list", length = length(X)+1) # inside wrapper.mint.block, X and Y are combined, so the ind.NA need  length(X)+1
+            is.na.A.temp[1:length(X)] = is.na.A.train
+            ind.NA.temp[1:length(X)] = ind.NA.train
+            ind.NA.col.temp[1:length(X)] = ind.NA.col.train
+                        
             # shape input for `internal_mint.block' (keepA, test.keepA, etc)
             #print(system.time(
             result <- suppressMessages(internal_wrapper.mint.block(X=X.train, Y=Y.train.mat, study=factor(rep(1,length(Y.train))), ncomp=ncomp,
             keepX=choice.keepX, keepY=rep(ncol(Y.train.mat), ncomp-1), test.keepX=test.keepX, test.keepY=ncol(Y.train.mat),
             mode="regression", scale=scale, near.zero.var=near.zero.var, design=design,
             max.iter=max.iter, scheme =scheme, init=init, tol=tol,
-            misdata = misdata, is.na.A = c(is.na.A.train, Y=NULL), ind.NA = c(ind.NA.train, Y=NULL),
-            ind.NA.col = c(ind.NA.col.train, Y=NULL), all.outputs=FALSE))
+            misdata = misdata, is.na.A = is.na.A.temp, ind.NA = ind.NA.temp,
+            ind.NA.col = ind.NA.col.temp, all.outputs=FALSE))
             #))
             
             # `result' returns loadings and variates for all test.keepX on the ncomp component
@@ -293,18 +343,21 @@ parallel
             for(ijk in dist)
             class.comp.j[[ijk]] = matrix(0, nrow = length(omit), ncol = nrow(test.keepA))# prediction of all samples for each test.keepX and  nrep at comp fixed
             
+            
+            # creates temporary block.splsda object to use the predict function
+            class(result) = c("block.splsda", "block.spls", "sgccda", "sgcca", "DA")#c("splsda","spls","DA")
+            
+            result$X = result$A[-result$indY]
+            result$ind.mat = result$A[result$indY][[1]]
+            result$Y = factor(Y.train)
+
+            #save variates and loadings for all test.keepA
+            result.temp = list(variates = result$variates, loadings = result$loadings)
+
             #time2 = proc.time()
             for(i in 1:nrow(test.keepA))
             {
                 #print(i)
-                # creates temporary splsda object to use the predict function
-                object.block.splsda.temp = result
-                # add the "splsda" class
-                class(object.block.splsda.temp) = c("block.splsda", "block.spls", "sgccda", "sgcca", "DA")#c("splsda","spls","DA")
-                
-                object.block.splsda.temp$X = result$A[-result$indY]
-                object.block.splsda.temp$ind.mat = result$A[result$indY][[1]]
-                object.block.splsda.temp$Y = factor(Y.train)
                 
                 # only pick the loadings and variates relevant to that test.keepX
                 
@@ -315,20 +368,19 @@ parallel
                     
                 }))
                 
-                names.to.pick.ncomp = paste(paste0("comp",ncomp),paste(keepA[[ncomp]][i,],collapse="_"), sep=":")
+                names.to.pick.ncomp = paste(paste0("comp",ncomp),paste(as.numeric(keepA[[ncomp]][i,]),collapse="_"), sep=":")
                 names.to.pick = c(names.to.pick, names.to.pick.ncomp)
                 
                 
+                result$variates = lapply(result.temp$variates, function(x){if(ncol(x)!=ncomp) {x[,colnames(x)%in%names.to.pick, drop=FALSE]}else{x}})
+                result$loadings = lapply(result.temp$loadings, function(x){if(ncol(x)!=ncomp) {x[,colnames(x)%in%names.to.pick, drop=FALSE]}else{x}})
                 
-                object.block.splsda.temp$variates = lapply(result$variates, function(x){if(ncol(x)!=ncomp) {x[,colnames(x)%in%names.to.pick, drop=FALSE]}else{x}})
-                object.block.splsda.temp$loadings = lapply(result$loadings, function(x){if(ncol(x)!=ncomp) {x[,colnames(x)%in%names.to.pick, drop=FALSE]}else{x}})
-                
-                object.block.splsda.temp$weights = get.weights(object.block.splsda.temp$variates, indY = object.block.splsda.temp$indY)
+                result$weights = get.weights(result$variates, indY = result$indY)
 
                 # do the prediction, we are passing to the function some invisible parameters:
                 # the scaled newdata and the missing values
                 #print(system.time(
-                test.predict.sw <- predict(object.block.splsda.temp, newdata.scale = X.test, dist = dist, misdata.all=any(misdata), is.na.X = is.na.A.train, is.na.newdata = is.na.A.test, noAveragePredict=FALSE)
+                test.predict.sw <- predict.block.spls(result, newdata.scale = X.test, dist = dist, misdata.all=misdata, is.na.X = is.na.A.train, is.na.newdata = is.na.A.test, noAveragePredict=FALSE)
                 #))
                 #prediction.comp.j[, , i] =  test.predict.sw$predict[, , ncomp]
                 if(weighted ==TRUE) #WeightedVote

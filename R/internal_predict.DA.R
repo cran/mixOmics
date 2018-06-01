@@ -182,10 +182,41 @@ internal_predict.DA = function(object, out, q, dist, weights)
         names(out.DA$MajorityVote) = names(out.DA$class)
         
         #save(list=ls(),file="temp.Rdata")
-        
+        #stop("")
         # weighted vote for each distance, each comp
         if(!is.null(weights))
         {
+            out.WeightedVote = vector("list",length=length(out.DA$class))
+            Group.2 = n = x =NULL #CRAN check
+            for(i in 1:length(out.DA$class)){ #i distance
+                out = matrix(NA_real_,nrow=nrow(newdata[[1]]), ncol=min(ncomp))
+                rownames(out) = rownames(newdata[[1]])
+                colnames(out) = paste0("comp",1:min(ncomp))
+                
+                for(comp in 1:min(ncomp)){ #comp
+                    data.temp=NULL
+                    for(j in 1:J){ #block
+                        data.temp = rbind(data.temp,out.DA$class[[i]][[j]][,comp,drop=FALSE])
+                    }
+                    colnames(data.temp)="pred"
+                    temp=data.frame(data.temp,indiv=rownames(data.temp),weights=rep(weights,each=nrow(out.DA$class[[1]][[1]])))
+                    ag = aggregate(temp$weights, by=list(temp$pred, temp$indiv), FUN=sum)
+                    data_max = ag %>% group_by(Group.2) %>% filter(row_number(x)==n())
+                    out.comp = as.matrix(data_max[,1])
+                    rownames(out.comp) = as.matrix(data_max[,2])
+                    colnames(out.comp) = paste0("comp",comp)
+                    
+                    out[,comp] = out.comp[match(rownames(out),rownames(out.comp)),]
+                }
+
+                out.WeightedVote[[i]] = out
+            }
+            names(out.WeightedVote) = names(out.DA$class)
+            out.DA$WeightedVote = out.WeightedVote
+            
+            
+            
+            if(FALSE){
             out.DA$WeightedVote = lapply(out.DA$class, function(x){ # x is a distance
                 class.per.comp = lapply(1:min(ncomp), function(y) {matrix(sapply(x, function(z)  z[,y, drop = FALSE]),ncol=J)}) # combine the results per component
                 names(class.per.comp) = paste0("comp",1:min(ncomp))
@@ -211,6 +242,7 @@ internal_predict.DA = function(object, out, q, dist, weights)
                 #class.per.comp = lapply(class.per.comp, function(y){rownames(y) = rownames(out.DA$MajorityVote[[1]]); colnames(y) = names(x); y})
 
             })
+            }
             out.DA$weights = weights
             
         }

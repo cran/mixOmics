@@ -67,9 +67,19 @@ all.outputs = TRUE)
     }  else {
         stop("'Y' should be a factor or a class vector.")
     }
-    Y.mat=unmap(Y)
+    Y.mat = unmap(Y)
     colnames(Y.mat) = levels(Y)
 
+    X = as.matrix(X)
+
+    if (length(study) != nrow(X))
+    stop(paste0("'study' must be a factor of length ",nrow(X),"."))
+
+    if(sum(apply(table(Y,study)!=0,2,sum)==1) >0)
+    stop("At least one study only contains a single level of the multi-levels outcome Y. The MINT algorithm cannot be computed.")
+
+    if(sum(apply(table(Y,study)==0,2,sum)>0) >0)
+    warning("At least one study does not contain all the levels of the outcome Y. The MINT algorithm might not perform as expected.")
 
     # call to 'internal_wrapper.mint'
     result = internal_wrapper.mint(X = X, Y = Y.mat, study = study, ncomp = ncomp, scale = scale, near.zero.var = near.zero.var, mode = mode,

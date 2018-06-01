@@ -76,6 +76,7 @@ all.outputs = TRUE)
         Y.input = Y
         Y = unmap(Y)
         colnames(Y) = levels(Y.input)
+        rownames(Y) = rownames(X[[1]])
     } else if (!missing(indY)) {
         temp = X[[indY]] #not called Y to not be an input of the wrapper.sparse.mint.block
         if (is.null(dim(temp)))
@@ -91,6 +92,7 @@ all.outputs = TRUE)
         Y.input = temp
         X[[indY]] = unmap(temp)
         colnames(X[[indY]]) = levels(Y.input)
+        rownames(X[[indY]]) = rownames(X[[ifelse(indY==1,2,1)]])
 
     } else if (missing(indY)) {
         stop("Either 'Y' or 'indY' is needed")

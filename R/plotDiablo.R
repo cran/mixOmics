@@ -92,7 +92,7 @@ legend.ncol,
             {
                 intersect(paste(i,j,sep="_"), x)
             }))
-            splotMatPlot(x=VarX[, i], y=VarX[, j], datNames, Y, ptype)
+            splotMatPlot(x=VarX[, j], y=VarX[, i], datNames, Y, ptype)
             
             if(i == 1 & j %in% seq(2, numberOfRows, 1))
             Axis(side = 3, x=VarX[, i])

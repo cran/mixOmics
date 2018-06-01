@@ -131,18 +131,18 @@ cpus,
         ### Estimation models
         if(missing(cpus))
         {
-            model = lapply(1 : M, function(x) {block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]),
+            model = lapply(1 : M, function(x) {suppressWarnings(block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]),
                 keepX = keepX,
                 design = object$design, max.iter = object$max.iter, tol = object$tol, init = object$init, scheme = object$scheme,
-                mode = object$mode)})
+                mode = object$mode))})
         } else {
             cl <- makeCluster(cpus, type = "SOCK")
             clusterExport(cl, c("block.splsda"))
             
-            model = parLapply(cl, 1 : M, function(x) {block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]),
+            model = parLapply(cl, 1 : M, function(x) {suppressWarnings(block.splsda(X = X.training[[x]], Y = Y.training[[x]], ncomp = max(object$ncomp[-indY]),
                 keepX = keepX,
                 design = object$design, max.iter = object$max.iter, tol = object$tol, init = object$init, scheme = object$scheme,
-                mode = object$mode)})
+                mode = object$mode))})
             
             stopCluster(cl)
         }
@@ -208,7 +208,7 @@ cpus,
         
         ### Start: Prediction (score / class) sample test
         # Prediction model on test dataset
-        predict.all[[nrep]] = lapply(1 : M, function(x) {predict(model[[x]], X.test[[x]], dist = "all")})
+        predict.all[[nrep]] = lapply(1 : M, function(x) {predict.block.spls(model[[x]], X.test[[x]], dist = "all")})
         
         # Retrieve class prediction
         Y.predict[[nrep]] = lapply(1 : M, function(x) {predict.all[[nrep]][[x]]$class})

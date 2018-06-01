@@ -1,5 +1,5 @@
 
-import(MASS, lattice, igraph, ggplot2,corpcor,parallel, RColorBrewer, plyr)
+import(MASS, lattice, igraph, ggplot2,corpcor,parallel, RColorBrewer)
 
 importFrom(rgl, axes3d, bbox3d, box3d, cube3d, dodecahedron3d,
             ellipse3d, icosahedron3d, layout3d, legend3d, mtext3d,
@@ -32,11 +32,11 @@ importFrom("grDevices","rainbow")
 
 importFrom("methods", "hasArg", "is")
 
-importFrom("dplyr","group_by")
+importFrom("dplyr","group_by", "mutate", "summarise", "arrange","row_number","filter")
 
 importFrom("tidyr","gather")
 
-importFrom("matrixStats","colSds")
+importFrom("matrixStats","colSds","colVars")
 
 importFrom("reshape2","melt","dcast")
 
@@ -98,6 +98,7 @@ splsda,
 study_split,
 tune,
 tune.mint.splsda,
+tune.spls,
 tune.splsda,
 tune.block.splsda,
 tune.splslevel,
@@ -138,6 +139,7 @@ S3method(plot, perf.sgccda.mthd)
 S3method(plot, rcc)
 S3method(plot, pca)
 S3method(plot, sgccda)
+S3method(plot, tune.spls)
 S3method(plot, tune.splsda)
 S3method(plot, tune.block.splsda)
 
@@ -176,6 +178,7 @@ S3method(predict, block.spls)
 S3method(summary, pls)
 S3method(summary, spls)
 S3method(summary, rcc)
+S3method(summary, pca)
 
 S3method(print, pls)
 S3method(print, spls)

@@ -70,29 +70,21 @@ get.weights = function(variates, indY)
 # --------------------------------------
 study_split = function(data, study)
 {
+    #data should be a matrix
+    if(!any(class(data) == "matrix"))
     data = as.matrix(data)
+    
     M = length(levels(study))
-    P = ncol(data)
     
     #---------------------- split data
     if(M>1)
     {
-        data.list.study = split(data,study)
-        if (!is.null(rownames(data)))
-        {
-            study.name = split(rownames(data),study)
-        } else {
-            study.name=NULL
-        }
-        
-        for(m in 1:M)
-        data.list.study[[m]] = matrix(data.list.study[[m]], ncol=P, dimnames = list(study.name[[m]], colnames(data)))
-        
+        data.list.study = split.data.frame(data,study)
     } else {
-        data.list.study = list(matrix(data, ncol=P,dimnames = list(rownames(data), colnames(data))))
+        data.list.study = list(data)
         names(data.list.study) = levels(study)
     }
-    
+
     result = data.list.study
     return(invisible(result))
 }
@@ -214,7 +206,7 @@ scale.function=function(temp, scale = TRUE)
     
     if (scale)
     {
-        sqrt.sdX = colSds(temp, center = meanX, na.rm=TRUE)
+        sqrt.sdX = colSds(temp,  na.rm=TRUE)
         data.list.study.scale_i = t( (t(temp)-meanX) / sqrt.sdX)
         
         ind = which(sqrt.sdX == 0) # scaling can creates NA
@@ -233,6 +225,7 @@ scale.function=function(temp, scale = TRUE)
     out = list(data_scale=data.list.study.scale_i, meanX=meanX, sqrt.sdX=sqrt.sdX)
     return(out)
 }
+
 
 # --------------------------------------
 # Mean centering/scaling per study: used in 'internal_mint.block.R'
@@ -494,7 +487,7 @@ initialisation_by_svd = function(A, indY = NULL, misdata, is.na.A = NULL, init =
         #ssvd faster with svds, only if more than 3 column, otherwise break down
         svd.M = lapply(M, function(x){if(ncol(x)>3) {svds(x, k=1, nu = 1, nv = 1)} else {svd(x, nu = 1, nv = 1)}})
         
-        loadings.A[c(1:J)[-indY]] = lapply(c(1:J)[-indY], function(x){svd.M[[x]]$u})
+        loadings.A[c(1:J)[-indY]] = lapply(1:length(M), function(x){svd.M[[x]]$u})
         loadings.A[[indY]] = svd.M[[1]]$v
         
     } else if (init=="svd.single") {

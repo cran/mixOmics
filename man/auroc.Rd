@@ -66,6 +66,7 @@ Note that for mint.plsda and mint.splsda objects, if \code{roc.study} is differe
 \value{
 Depending on the type of object used, a list that contains:
 The AUC and Wilcoxon test pvalue for each 'one vs other' classes comparison performed, either per component (splsda, plsda, mint.plsda, mint.splsda), or per block and per component (wrapper.sgccda, block.plsda, blocksplsda).
+The ggplot output that can be changed by users by adding ggplot layers.
 }
 
 
@@ -82,6 +83,10 @@ Y <- breast.tumors$sample$treatment
 
 plsda.breast <- plsda(X, Y, ncomp = 2)
 auc.plsda.breast = auroc(plsda.breast, ncomp = 1)
+
+# changing plot title
+p = auc.plsda.breast$graph.Comp1 #saving the ggplot graph in p
+p+ggtitle("Something witty")
 
 ## example with sPLSDA
 # -----------------

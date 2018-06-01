@@ -80,12 +80,22 @@ that contains the following components:
 
 \references{
 On sPLS-DA:
+
 Lê Cao, K.-A., Boitard, S. and Besse, P. (2011). Sparse PLS Discriminant Analysis: biologically relevant feature selection and graphical displays for multiclass problems. \emph{BMC Bioinformatics} \bold{12}:253.
+
+An overview as part of mixOmics:
+Rohart F, Gautier B, Singh A, Lê Cao K-A (2017) mixOmics: An R package for ‘omics feature selection and multiple data integration. \emph{PLoS Comput Biol} \bold{13}(11): e1005752. \url{https://doi.org/10.1371/journal.pcbi.1005752}
+
 On log ratio transformations:
+
 Filzmoser, P., Hron, K., Reimann, C.: Principal component analysis for compositional data with outliers. Environmetrics 20(6), 621-632 (2009)
+
 Lê Cao K.-A., Costello ME,  Lakis VA, Bartolo, F,Chua XY, Brazeilles R, Rondeau P. MixMC: Multivariate insights into Microbial Communities. PLoS ONE, 11(8): e0160169 (2016).
+
 On multilevel decomposition:
+
 Westerhuis, J.A., van Velzen, E.J., Hoefsloot, H.C., Smilde, A.K.: Multivariate paired data analysis: multilevel plsda versus oplsda. Metabolomics 6(1), 119-128 (2010)
+
 Liquet, B., Lê Cao K.-A., Hocini, H., Thiebaut, R.: A novel approach for biomarker selection and the integration of repeated measures experiments from two assays. BMC bioinformatics 13(1), 325 (2012)
 }
 
